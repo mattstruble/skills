@@ -1,0 +1,224 @@
+---
+name: tdd
+description: "Test-driven development workflow for implementing features and protecting behavior during refactors. Use whenever building new modules, APIs, services, handlers, or processing logic (payment systems, auth servers, caching layers, data pipelines, retry mechanisms); refactoring, rewriting, or migrating existing code; restructuring monoliths or tightly-coupled modules; or any task with multiple behaviors and non-trivial logic. Trigger on 'implement', 'build', 'add feature', 'refactor', 'migrate', 'rewrite', 'restructure', or mentions of TDD, red-green-refactor, or test-first development -- even if the user doesn't mention TDD, the workflow applies whenever the task involves substantial new functionality or reorganizing how existing code is structured. Complements test-design (test quality) and software-design (design principles). NOT for small bug fixes, config changes, renaming, documentation, or writing tests in isolation without driving implementation."
+---
+
+# Test-Driven Development
+
+This skill governs *how you work* -- the rhythm of writing tests and code
+together. For guidance on *what makes a good test* (desiderata, anti-patterns,
+language-specific patterns), see the `test-design` skill. For design principles
+that inform refactoring decisions, see the `software-design` skill.
+
+## Philosophy
+
+Tests verify behavior through public interfaces, not implementation details.
+Code can change entirely; tests should not need to. A good test reads like a
+specification -- it describes *what* the system does, and a reader who has
+never seen the code can understand the capability it protects.
+
+The corollary: if a test breaks when you refactor internals but behavior hasn't
+changed, that test was testing structure, not behavior. It's working against you
+rather than for you.
+
+This skill has two modes depending on the task:
+
+- **Feature Mode** -- building something new using the red-green-refactor cycle
+- **Refactor Mode** -- protecting existing behavior with characterization tests
+  before restructuring code
+
+## Feature Mode
+
+Use when building new functionality. The goal is to let tests drive the design
+forward incrementally: write a failing test that describes what you want, then
+write the minimum code to make it pass. Repeat.
+
+### Planning
+
+Before writing any code, identify the behaviors the new feature needs to
+exhibit. Think in terms of what a caller or user would observe, not
+implementation steps.
+
+If the feature is straightforward (clear inputs, outputs, and behaviors), lay
+out the behavior list and proceed. If there's genuine ambiguity about what
+the feature should do, what its interface should look like, or which behaviors
+matter most, confirm with the user before starting. The judgment call is:
+would a wrong guess waste significant work?
+
+Prioritize behaviors. You can't test everything, and not every behavior is
+equally important. Focus testing effort on critical paths and complex logic
+over trivial happy paths.
+
+### Tracer Bullet
+
+Start with a single test that proves the path works end-to-end:
+
+```
+RED:   Write one test for the most important behavior -> test fails
+GREEN: Write minimal code to make it pass -> test passes
+```
+
+This is the tracer bullet -- it confirms the interface works, the test
+infrastructure is set up correctly, and you have a foundation to build on.
+
+### Incremental Loop
+
+For each remaining behavior:
+
+```
+RED:   Write the next test -> fails
+GREEN: Minimal code to pass -> passes
+```
+
+One test at a time. Only enough code to pass the current test. Each test
+responds to what you learned from the previous cycle -- because you just
+wrote the code, you know exactly what behavior matters and how to verify it.
+
+The reason this matters: tests written one-at-a-time in response to real code
+describe *actual* behavior. Tests written in bulk before implementation
+describe *imagined* behavior -- they tend to test the shape of data structures
+and function signatures rather than what the system actually does.
+
+### Anti-Pattern: Horizontal Slices
+
+Writing all tests first, then all implementation, is "horizontal slicing":
+
+```
+WRONG (horizontal):
+  RED:   test1, test2, test3, test4, test5
+  GREEN: impl1, impl2, impl3, impl4, impl5
+
+RIGHT (vertical):
+  RED->GREEN: test1 -> impl1
+  RED->GREEN: test2 -> impl2
+  RED->GREEN: test3 -> impl3
+  ...
+```
+
+Horizontal slicing produces brittle tests because they're written before
+understanding the implementation. You outrun your headlights, committing to
+test structure before learning what actually matters. Vertical slices keep
+tests grounded in reality.
+
+### Refactor Phase
+
+After the tests are green, look for opportunities to improve the code.
+Refactoring happens *only* when all tests pass -- never while red. The tests
+give you confidence that your improvements preserve behavior.
+
+Run tests after each refactor step, not just at the end. Small, verified
+steps are safer than a large restructuring followed by a prayer.
+
+See the `software-design` skill for guidance on what to look for: duplication,
+shallow modules that should be deepened, feature envy, primitive obsession.
+
+### Test Cleanup and Isolation
+
+Tests often need to reset state between runs. Resist the urge to add private
+`_reset()` or `_clear_state()` methods to production code for test convenience
+-- these are test hooks disguised as implementation, and they couple tests to
+internals.
+
+Prefer approaches that work through the public interface or the test framework:
+use fresh instances per test, use the test framework's setup/teardown to
+reconstruct objects, or use dependency injection to supply test-specific
+implementations. If the only way to reset state is through a private function,
+that's a signal the module's interface may need a rethink -- perhaps the state
+should be scoped to an object lifecycle rather than living in module globals.
+
+### Checklist Per Cycle
+
+After each red-green cycle, verify:
+
+- The test describes behavior a caller would care about, not implementation
+- The test uses only the public interface
+- The test would survive an internal refactor
+- The production code is minimal for this test -- no speculative features
+- Test cleanup uses public interfaces or framework mechanisms, not private hooks
+- All previous tests still pass
+
+## Refactor Mode
+
+Use when restructuring, migrating, or reorganizing existing code. The goal
+is the opposite of Feature Mode: you start GREEN and stay GREEN throughout.
+Tests come first not to drive new design, but to lock down existing behavior
+so you can change the code with confidence.
+
+### Assess Existing Coverage
+
+Before writing new tests, check what's already covered. Look at existing
+tests for the code you're about to change:
+
+- What behaviors do they exercise?
+- Do they test through public interfaces or are they coupled to internals?
+- Are there gaps in coverage for the code paths you'll be modifying?
+
+Tests that are already green and test through public interfaces are valuable
+-- keep them. Tests coupled to implementation details will likely break during
+the refactor regardless of whether behavior changes; note these but don't
+count them as coverage.
+
+### Identify Behaviors to Preserve
+
+Look at the public interface contracts of the code being refactored:
+
+- Function and method signatures -- what goes in, what comes out
+- Side effects visible to callers (records created, events emitted, errors raised)
+- Edge cases and error handling that callers depend on
+
+The focus is on what external consumers of this code observe, not on internal
+mechanics. If an internal helper reorganizes its work but the public interface
+still returns the same results for the same inputs, that's a successful
+refactor.
+
+### Write Characterization Tests
+
+For each uncovered behavior, write a test that passes against the current
+code. These are characterization tests -- they document what the system
+*actually does* right now, whether or not that's what was originally intended.
+
+Unlike Feature Mode, writing multiple characterization tests before changing
+any code is expected and correct here. You're capturing a snapshot of existing
+behavior, not driving new design.
+
+After writing the characterization tests, run the full test suite. Everything
+should be green. This is your baseline -- if anything is already failing,
+investigate before proceeding with the refactor.
+
+### Refactor
+
+Now change the code. The tests act as a safety net:
+
+- Make a change
+- Run tests
+- If green, continue
+- If red, the change broke existing behavior -- fix it before moving on
+
+Keep changes small and incremental. A refactor that touches 15 files at once
+and then has 8 failing tests is much harder to debug than a series of small
+changes, each verified individually.
+
+### When Tests Break
+
+A failing test after a refactor step means one of two things:
+
+1. **The refactor changed behavior** -- this is a regression. Undo or fix the
+   change so the test passes again.
+2. **The test was coupled to implementation** -- if the behavior is preserved
+   but the test was asserting on internal structure (method call order, private
+   state, specific SQL queries), update the test to assert on behavior instead.
+
+Distinguishing between these requires judgment: check whether the test's
+*intent* still holds. If the test was "users can log in with valid
+credentials" and it's failing because you renamed an internal method, that's
+case 2. If it's failing because the login flow now returns a different
+response, that's case 1.
+
+## Mode Transitions
+
+Feature Mode and Refactor Mode often interleave in practice. While building a
+new feature, you may discover that existing code needs restructuring to support
+it. When that happens, pause the feature work, apply Refactor Mode to the
+existing code (characterize, refactor, verify), then resume Feature Mode for
+the new functionality. The key is recognizing which mode you're in so you
+apply the right workflow: red-green for new behavior, stay-green for existing.

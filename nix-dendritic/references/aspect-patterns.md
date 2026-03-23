@@ -4,6 +4,19 @@ Each pattern below solves a specific structural problem. Most real features comb
 Read the SKILL.md decision tree first to identify which pattern(s) you need, then find the
 implementation details here.
 
+## Contents
+
+- [Simple Aspect](#simple-aspect) — one or more module classes, no dependencies
+- [Multi Context Aspect](#multi-context-aspect) — system module that pulls in Home Manager config
+- [Inheritance Aspect](#inheritance-aspect) — feature that composes other features
+- [Conditional Aspect](#conditional-aspect) — platform-specific behavior within a module class
+- [Collector Aspect](#collector-aspect) — multiple files contribute to the same service
+- [Constants Aspect](#constants-aspect) — shared values across module classes
+- [DRY Aspect](#dry-aspect) — reusable config fragments applied to multiple targets
+- [Factory Aspect](#factory-aspect) — parameterized feature generation
+- [Applying and Selecting Patterns](#applying-and-selecting-patterns) — worked example: combining multiple patterns
+- [Putting It All Together](#putting-it-all-together) — full config layout with all patterns in context
+
 ## Simple Aspect
 
 **Use case:** A feature that provides config in one or more module classes without depending on other features.

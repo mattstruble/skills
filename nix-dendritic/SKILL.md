@@ -239,43 +239,52 @@ details and code examples.
 
 ## Anti-patterns
 
-These will cause errors or break the dendritic pattern:
+### Hard errors — these will break your config
 
-**Do not use `specialArgs` or `extraSpecialArgs`.** The `inputs` argument is available in every
-flake-parts module automatically. For other shared values, use let-bindings (for values within
-a file) or the Constants Aspect (for values across files). `specialArgs` is a workaround for
-a problem that doesn't exist in dendritic configs.
+**Do not put `lib.mkIf` in `imports`.** Nix evaluates the `imports` list unconditionally —
+conditions are silently ignored, so the module is always imported regardless of the condition.
+Use the Conditional Aspect instead: put `lib.mkMerge` + `lib.mkIf` on config *values*, not on
+imports.
 
-**Do not put `lib.mkIf` in `imports`.** Nix evaluates the `imports` list unconditionally --
-conditions are ignored. Use the Conditional Aspect pattern (`lib.mkMerge` + `lib.mkIf` on
-config values) instead.
+**Do not import across module classes.** A `nixos` module cannot import a `darwin` module
+because they are different module systems with different option sets — Nix will error on unknown
+options. If you need a module accessible from multiple classes, define it under the `generic`
+class (a literal class name you define — see Constants Aspect) and import it from each class's
+base module.
 
-**Do not import across module classes.** A `nixos` module cannot import a `darwin` module --
-they are different module systems. Use the `generic` class for modules that need to be shared
-across classes.
+**Do not create import cycles.** If module A imports B which imports A, Nix will fail with an
+infinite recursion error. Diamond imports are fine (A and C both import B — Nix deduplicates).
+Only direct cycles cause problems.
 
-**Do not put logic in `flake.nix`.** Keep `flake.nix` to inputs and the `mkFlake` call.
-All configuration logic belongs in `modules/`.
+### Guidance — not errors, but against the pattern's spirit
 
-**Do not import the same module multiple times in one hierarchy path.** If module A imports B,
-and module C also imports B, that's fine (B is deduplicated). But if A imports B which imports
-A, you have a cycle.
+**Avoid `specialArgs` and `extraSpecialArgs`.** Every flake-parts module file receives `inputs`
+as a module argument at the outer level — no need to pass it through `specialArgs`. For values
+shared within a file, use a `let` binding at the top of the file (visible to all inner module
+blocks). For values shared across files, use the Constants Aspect. `specialArgs` is a workaround
+for a problem that doesn't exist in dendritic configs — using it means you're fighting the
+framework rather than working with it.
 
-Guidance (not hard errors, but against the pattern's spirit):
+**Keep `flake.nix` to inputs and the `mkFlake` call.** If configuration logic lives in
+`flake.nix`, it bypasses `import-tree` and breaks the "every file is a flake-parts module"
+invariant. It also makes the config harder to navigate — readers expect `flake.nix` to be
+minimal. Move all logic into `modules/`.
 
-**Do not organize directories by module class.** Directories named `nixos/`, `darwin/`,
-`home-manager/`, or `home/` conflate the directory structure with the module class system. A
-feature like SSH has aspects in multiple classes -- its file belongs in `services/ssh.nix`, not
-in `nixos/ssh.nix` and `home/ssh.nix`. Organize by what features do (`programs/`, `services/`,
-`system/`, `users/`) not which class they configure.
+**Organize directories by feature, not module class.** Directories named `nixos/`, `darwin/`,
+`home-manager/`, or `home/` force you to split a feature across multiple files. SSH config for
+NixOS ends up in `nixos/ssh.nix` and SSH config for Home Manager ends up in `home/ssh.nix` —
+now you have to look in two places to understand SSH. In dendritic, `services/ssh.nix` holds
+all SSH config for all platforms in one place. Organize by what features do (`programs/`,
+`services/`, `system/`, `users/`), not which class they configure.
 
-**Prefer feature-centric file names over host-centric.** Name files after what they configure
-(`ssh.nix`, `desktop-environment.nix`), not where they run (`my-laptop.nix`). Host files should
-be thin compositions of feature imports.
+**Name files after features, not hosts.** `ssh.nix` and `desktop-environment.nix` tell you what
+a file configures. `my-laptop.nix` tells you where it runs but not what it does. Host files
+should be thin compositions of feature imports — the features themselves should be reusable
+across hosts.
 
-**Prefer importing a module over `enable = true` flags.** In dendritic, you "enable" a feature
-by including its aspect in a host's `imports` list. You don't need custom `enable` options for
-feature toggling -- the presence or absence of the import is the toggle.
+**Use imports as the enable toggle, not `enable = true` flags.** In dendritic, you activate a
+feature by adding its aspect to a host's `imports` list. Custom `enable` options add indirection
+without benefit — the presence or absence of the import is already the toggle.
 
 ## References
 

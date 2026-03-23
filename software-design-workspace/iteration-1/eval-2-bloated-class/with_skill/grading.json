@@ -1,0 +1,47 @@
+{
+  "expectations": [
+    {
+      "text": "Identifies the distinct responsibilities (validation, serialization, DB access, notifications) as separate concerns",
+      "passed": true,
+      "evidence": "Response explicitly names all four: 'User input validation, JSON serialization, Database access, Email notification' and labels them 'four separate concerns'."
+    },
+    {
+      "text": "Recommends splitting into multiple focused classes or modules",
+      "passed": true,
+      "evidence": "Shows validation.py, serialization.py, repositories.py, notifications.py, user_service.py as separate modules."
+    },
+    {
+      "text": "Addresses the 8-parameter constructor problem (too many params = too many responsibilities)",
+      "passed": true,
+      "evidence": "Explicitly states 'The 8-parameter constructor is a direct symptom — each group of parameters belongs to a different responsibility.' Shows UserRegistrationService with 2 params vs original 8."
+    },
+    {
+      "text": "Provides a concrete before/after or step-by-step refactoring approach",
+      "passed": true,
+      "evidence": "6-step approach with Before code block showing the God Object (UserManager with 8 params, 12 methods) and After code blocks for each extracted unit."
+    },
+    {
+      "text": "Explains why the split improves testability and maintainability",
+      "passed": true,
+      "evidence": "Summary table shows 'Pure functions test with no mocks; each class tested in isolation' vs 'Requires mocking DB + SMTP for every test'. Key Principles section explains each benefit."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "New skill's examples (especially the Composition/Inheritance before/after) directly shaped the response",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Response uses Protocol-based abstractions (UserRepository, UserNotifier) matching the skill's Longevity example pattern. Before block shows the God Object explicitly, matching the skill's Before/After format."
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [],
+    "overall": "All 5 assertions pass with strong evidence. The new skill's before/after examples clearly influenced the response quality."
+  }
+}

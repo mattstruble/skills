@@ -1,6 +1,6 @@
 ---
 name: software-design
-description: Use this skill when writing code from scratch (scripts, functions, APIs, modules, classes) or restructuring existing code (refactoring bloated classes, splitting large functions, reorganizing parameters). Applies to concrete implementation tasks like "build a payment module", "write a script that processes files", "this class does too many things", "this function has 10+ parameters", or "should I use inheritance here?" (when applied to a specific class or module). Also trigger when the user wants to know whether to use inheritance vs composition for a concrete design, needs to split a large module, is designing a new service or library, or is unsure how to structure a codebase — even if they don't explicitly ask for "design help". The skill guides toward small, focused, composable design. Do NOT use for debugging existing errors, language syntax questions ("how do I use TypedDict?"), framework setup (CI/CD, database migrations), performance benchmarking, test quality criteria (see test-design), API surface conventions (see api-design), or abstract pattern theory discussions.
+description: Use this skill when writing code from scratch (scripts, functions, APIs, modules, classes) or restructuring existing code (refactoring bloated classes, splitting large functions, reorganizing parameters). Applies to concrete implementation tasks like "build a payment module", "write a script that processes files", "this class does too many things", "this function has 10+ parameters", or "should I use inheritance here?". The skill guides toward small, focused, composable design. Do NOT use for debugging existing errors, language syntax questions ("how do I use TypedDict?"), framework setup (CI/CD, database migrations), performance benchmarking, or abstract pattern theory discussions.
 ---
 
 # Software Design Principles
@@ -31,27 +31,6 @@ problem it solves.
   Start there, then build inward. Don't expose internal complexity through the
   interface.
 
-**Before:** (speculative abstraction nobody asked for)
-```
-class DataPipelineOrchestrator:
-    def __init__(self, source_adapter, sink_adapter, transformer_chain,
-                 retry_policy, metrics_collector, feature_flags):
-        ...
-
-    def execute_with_hooks(self, pre_hooks=None, post_hooks=None): ...
-    def execute_async(self): ...
-    def execute_dry_run(self): ...
-```
-
-**After:** (solve the actual problem first)
-```
-def process_records(records):
-    """Filter and transform records. Extend when the need is real."""
-    return [transform(r) for r in records if is_valid(r)]
-```
-
----
-
 ## Minimalism
 
 "Less, but better." Every line, parameter, abstraction, and dependency should
@@ -67,28 +46,6 @@ earn its keep.
   patterns only when repetition proves they're real, not when you imagine they
   might be.
 
-**Before:** (every option imaginable, most never used)
-```
-def send_email(to, subject, body,
-               cc=None, bcc=None, reply_to=None,
-               html_body=None, attachments=None,
-               priority="normal", read_receipt=False,
-               track_opens=False, retry_count=3,
-               timeout=30, encoding="utf-8"):
-    ...
-```
-
-**After:** (start with what callers actually need; add options when real callers ask for them)
-```
-def send_email(to, subject, body):
-    ...
-
-# When a caller genuinely needs cc/attachments, add them then:
-# def send_email(to, subject, body, cc=None, attachments=None): ...
-```
-
----
-
 ## Focused Interfaces
 
 Clients should never be forced to depend on things they don't use. This is the
@@ -103,23 +60,16 @@ it's a way of thinking about every boundary in your code.
 - Apply this to function signatures, module exports, API endpoints, config
   objects, and data structures -- not just class interfaces.
 
-**Before:** (one config object forces every consumer to know about everything)
+**Example -- config bloat:**
 ```
+# Before: one config object forces every consumer to know about everything
 def process(config):  # config has 12 fields, this function uses 3
-    input_path = config.input_path
-    output_format = config.output_format
-    verbose = config.verbose
-    ...  # ignores config.db_url, config.cache_ttl, config.retry_policy, ...
-# Every caller must construct a full config even to call this one function
-```
+    ...
 
-**After:** (accept only what you need — callers that only need processing don't see DB config)
-```
+# After: accept only what you need
 def process(input_path, output_format, verbose=False):
     ...
 ```
-
----
 
 ## Composition and Pure Functions
 
@@ -138,28 +88,6 @@ hidden state, no surprise side effects, no reading from global variables.
 - When a function needs to do IO or mutate state, isolate that at the
   boundary. Keep the core logic pure and push side effects to the edges.
 
-**Before:** (logic tangled with side effects -- hard to test, hard to reuse)
-```
-def calculate_discount(user_id):
-    user = db.get_user(user_id)          # side effect: DB read
-    discount = user.loyalty_years * 0.05
-    logger.info(f"Discount for {user_id}: {discount}")  # side effect: logging
-    analytics.track("discount_calculated", user_id)     # side effect: network
-    return discount
-```
-
-**After:** (pure core, side effects pushed to the caller)
-```
-def calculate_discount(loyalty_years):
-    return min(loyalty_years * 0.05, 0.30)
-
-# Caller handles IO:
-user = db.get_user(user_id)
-discount = calculate_discount(user.loyalty_years)
-logger.info(f"Discount for {user_id}: {discount}")
-analytics.track("discount_calculated", user_id)
-```
-
 ### Immutability by Default
 
 Mutable state is the primary source of bugs that are hard to reproduce and
@@ -172,19 +100,6 @@ rather than containers that get modified in place.
   lifecycle explicit.
 - Prefer returning new values over modifying existing ones. `sorted(items)`
   over `items.sort()` when the caller doesn't expect mutation.
-
-**Before:** (mutates in place — caller's list is silently changed)
-```
-def process_items(items):
-    items.sort()    # mutates the caller's list
-    return items
-```
-
-**After:** (return new values; caller's data is untouched)
-```
-def process_items(items):
-    return sorted(items)  # caller's list unchanged
-```
 
 ### Compose, Don't Inherit
 
@@ -200,35 +115,6 @@ inheritance hierarchies.
   `data |> validate |> transform |> persist` tells you exactly what happens
   and in what order.
 
-**Before:** (deep inheritance to share behavior)
-```
-class BaseService:
-    def log(self): ...
-    def validate(self): ...
-
-class UserService(BaseService):
-    def notify(self): ...
-
-class AdminService(UserService):  # inherits log, validate, notify — but only needs log + audit
-    def audit(self): ...
-```
-
-**After:** (compose only what each class actually needs)
-```
-class UserService:
-    def __init__(self, logger, validator, notifier):
-        self.logger = logger
-        self.validator = validator
-        self.notifier = notifier
-
-class AdminService:
-    def __init__(self, logger, auditor):
-        self.logger = logger
-        self.auditor = auditor
-
-# In tests, swap any collaborator: AdminService(logger=FakeLogger(), auditor=FakeAuditor())
-```
-
 ### Declarative Over Imperative
 
 Express *what* should happen rather than *how* it should happen, when the
@@ -238,23 +124,6 @@ language and context support it.
   the intent is a data transformation.
 - Declarative code communicates intent; imperative code communicates mechanism.
   Both have their place, but default to intent.
-
-**Before:** (imperative — describes the mechanism)
-```
-result = []
-for user in users:
-    if user.active:
-        result.append(user.email)
-```
-
-**After:** (declarative — describes the intent)
-```
-result = [user.email for user in users if user.active]
-```
-
-When comprehensions become hard to read (nested conditions, side effects), a named loop is clearer — don't force it.
-
----
 
 ## Self-Explanatory Design
 
@@ -272,27 +141,6 @@ Code should communicate its purpose without requiring external explanation.
   earn their keep. Don't comment the "what" (the code says that); comment the
   "why."
 
-**Before:** (names that hide intent)
-```
-def proc(d, f=True):
-    tmp = []
-    for x in d:
-        if x[2] > 0:
-            tmp.append(x)
-    if f:
-        tmp = sorted(tmp, key=lambda x: x[1])
-    return tmp
-```
-
-**After:** (names that reveal intent)
-```
-def active_users(users, sort_by_name=True):
-    active = [u for u in users if u.is_active]
-    return sorted(active, key=lambda u: u.name) if sort_by_name else active
-```
-
----
-
 ## Honesty
 
 Code should not promise more than it delivers.
@@ -303,35 +151,8 @@ Code should not promise more than it delivers.
 - Error handling should be explicit. Make failure modes visible in the type
   system or API contract. Don't swallow errors or return ambiguous sentinels.
 - Complexity should be visible, not hidden. If an operation is expensive, the
-  API should make that clear, not disguise an O(n²) operation behind a
+  API should make that clear, not disguise an O(n^2) operation behind a
   property accessor.
-
-**Before:** (function does more than its name says)
-```
-def get_user(user_id):
-    user = db.query(user_id)
-    cache.set(user_id, user)         # hidden side effect
-    analytics.track("user_fetched")  # hidden side effect
-    if not user:
-        return None                  # silent failure
-    return user
-```
-
-**After:** (name matches behavior; failure is explicit; caller owns the side effects)
-```
-def get_user(user_id) -> User:
-    user = db.query(user_id)
-    if not user:
-        raise UserNotFoundError(user_id)
-    return user
-
-# Caller decides what to do with the result:
-user = get_user(user_id)
-cache.set(user_id, user)
-analytics.track("user_fetched", user_id)
-```
-
----
 
 ## Thoroughness
 
@@ -347,28 +168,6 @@ maintainers.
   released. Use language-appropriate patterns (context managers, defer, RAII,
   try-with-resources).
 
-**Before:** (assumes the happy path; silent failures on bad input)
-```
-def parse_config(path):
-    data = open(path).read()       # file never closed
-    return json.loads(data)        # crashes on malformed JSON with no context
-                                   # returns None if path is wrong
-```
-
-**After:** (validates input, cleans up resources, fails clearly)
-```
-def parse_config(path) -> dict:
-    if not os.path.exists(path):
-        raise ConfigNotFoundError(f"Config file not found: {path}")
-    with open(path) as f:
-        try:
-            return json.load(f)
-        except json.JSONDecodeError as e:
-            raise ConfigParseError(f"Invalid JSON in {path}: {e}") from e
-```
-
----
-
 ## Longevity Over Trend
 
 Favor stable, well-understood approaches over fashionable ones.
@@ -381,46 +180,6 @@ Favor stable, well-understood approaches over fashionable ones.
 - Write code for the reader who comes after you. Optimize for understanding,
   not for impressing. The most maintainable code is the code that doesn't
   require the original author to explain it.
-
-**Before:** (tightly coupled to a specific library — callers can't swap the backend)
-```
-import redis
-
-class SessionStore:
-    def __init__(self):
-        self._client = redis.StrictRedis()   # hard-coded to Redis
-
-    def get(self, key):
-        return self._client.get(key)
-
-    def set(self, key, value):
-        self._client.set(key, value)
-```
-
-**After:** (depend on an abstraction; swap the backend without changing callers)
-```
-from typing import Protocol
-
-class SessionStore(Protocol):
-    def get(self, key: str) -> bytes | None: ...
-    def set(self, key: str, value: bytes) -> None: ...
-
-class RedisSessionStore:
-    def __init__(self, client):   # inject the client — callers can pass a fake in tests
-        self._client = client
-
-    def get(self, key):
-        return self._client.get(key)
-
-    def set(self, key, value):
-        self._client.set(key, value)
-
-# Caller depends on the Protocol, not the implementation:
-def save_session(store: SessionStore, session_id: str, data: bytes) -> None:
-    store.set(session_id, data)
-```
-
----
 
 ## Applying These Principles
 

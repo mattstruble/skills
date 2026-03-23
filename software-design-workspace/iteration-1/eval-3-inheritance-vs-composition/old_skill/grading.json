@@ -1,0 +1,51 @@
+{
+  "expectations": [
+    {
+      "text": "Recommends composition over inheritance with clear rationale",
+      "passed": true,
+      "evidence": "Response opens with 'Recommendation: Composition. Use composition. Avoid inheritance here.' and explains the 'is-a' relationship problem."
+    },
+    {
+      "text": "Explains why inheritance is problematic here (tight coupling, AdminService would inherit things it doesn't need)",
+      "passed": true,
+      "evidence": "States: 'AdminService isn't a specialized UserService, it's a different service that happens to share some cross-cutting concerns. Modelling that with inheritance misrepresents the domain.'"
+    },
+    {
+      "text": "Shows how to inject shared behaviors (logger, auditor, permission checker) as dependencies",
+      "passed": true,
+      "evidence": "Shows UserService and AdminService both taking Logger, AuditRecorder, PermissionChecker as constructor parameters."
+    },
+    {
+      "text": "Provides a concrete code example of the composition approach",
+      "passed": true,
+      "evidence": "Code blocks showing both services with injected collaborators. Also shows ServiceDeps dataclass as an alternative."
+    },
+    {
+      "text": "Addresses the bulk operations concern (AdminService-specific methods don't pollute UserService)",
+      "passed": true,
+      "evidence": "States: 'AdminService.bulk_delete and any other admin-only methods live naturally on AdminService without polluting a shared base class or forcing UserService to know about them.'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "Old skill produced equally complete output on this eval",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Both responses correctly recommend composition, explain the inheritance problems, show injection patterns, and address bulk operations. Old skill response includes the ServiceDeps dataclass bonus which is a nice touch."
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "Both versions pass all assertions. The key qualitative difference is that the new skill response includes an explicit Before/After code block showing the inheritance anti-pattern, while the old skill jumps straight to the solution. Consider adding assertion: 'includes an explicit code example showing the inheritance anti-pattern to avoid'."
+      }
+    ],
+    "overall": "Both versions pass all assertions. Qualitative difference: new skill response includes explicit before/after showing the inheritance anti-pattern, which is more instructive."
+  }
+}

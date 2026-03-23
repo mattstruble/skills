@@ -1,0 +1,51 @@
+{
+  "expectations": [
+    {
+      "text": "Identifies the distinct responsibilities (validation, serialization, DB access, notifications) as separate concerns",
+      "passed": true,
+      "evidence": "Response names all four: 'Validation, Serialization, Repository, Notifications' and says 'Each becomes its own focused unit'."
+    },
+    {
+      "text": "Recommends splitting into multiple focused classes or modules",
+      "passed": true,
+      "evidence": "Shows separate extraction of validation (pure function), serialization (pure functions), UserRepository protocol, UserNotifier protocol."
+    },
+    {
+      "text": "Addresses the 8-parameter constructor problem (too many params = too many responsibilities)",
+      "passed": true,
+      "evidence": "Shows Before with 8 params and After with UserRegistrationHandler taking 2 params. States 'The coordinator has 2 constructor parameters (down from 8)'."
+    },
+    {
+      "text": "Provides a concrete before/after or step-by-step refactoring approach",
+      "passed": true,
+      "evidence": "7-step approach with Before/After code blocks for each step."
+    },
+    {
+      "text": "Explains why the split improves testability and maintainability",
+      "passed": true,
+      "evidence": "Summary table shows 'Test validation with a plain dict' vs 'Need to mock DB + SMTP just to test validation'. Key Checks section references the 6 design questions."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "Old skill produced equally complete output on this eval",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Both responses correctly identify all 4 responsibilities, show before/after, and explain testability benefits. Old skill response is slightly less detailed in the Before block (no explicit God Object code) but covers all assertions."
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "Both versions pass all assertions. Consider adding an assertion about 'includes an explicit Before code block showing the problematic class structure' to differentiate quality."
+      }
+    ],
+    "overall": "Both versions pass. The new skill response includes a more explicit Before block showing the God Object, which is a quality differentiator not captured by current assertions."
+  }
+}

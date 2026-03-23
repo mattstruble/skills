@@ -1,0 +1,54 @@
+{
+  "expectations": [
+    {
+      "text": "Uses Enum or StrEnum for payment types (not magic strings)",
+      "passed": true,
+      "evidence": "response.md shows enums.py with PaymentType(StrEnum), Region(StrEnum), OrderStatus(StrEnum). Comment explicitly notes 'a typo like PaymentType.CREDCARD is a NameError at the call site'."
+    },
+    {
+      "text": "Uses frozen dataclass for Order or result domain objects",
+      "passed": true,
+      "evidence": "response.md shows models.py with @dataclass(frozen=True) for Order, LineItem, PaymentResult, ProcessedOrder domain objects."
+    },
+    {
+      "text": "Uses Protocol, singledispatch, or structural dispatch for different payment types",
+      "passed": true,
+      "evidence": "response.md shows payments.py using @singledispatch for payment type dispatch AND notifications.py using Protocol for Notifier interface. Both patterns applied."
+    },
+    {
+      "text": "Defines a domain-specific exception hierarchy",
+      "passed": true,
+      "evidence": "response.md shows errors.py with OrderError as base, PaymentError, InsufficientFunds, CardDeclined, PaymentTimeout, TaxCalculationError, NotificationError — shallow hierarchy."
+    },
+    {
+      "text": "Keeps operations as standalone functions rather than bloating a single class",
+      "passed": true,
+      "evidence": "response.md shows standalone functions in tax.py, payments.py, notifications.py. pipeline.py uses generator pipeline. No god-class."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "total_steps": 3,
+    "files_created": ["response.md", "metrics.json"],
+    "errors_encountered": 0,
+    "output_chars": 21000
+  },
+  "claims": [
+    {
+      "claim": "Applied all skill patterns including Protocol for Notifier",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Response shows Protocol for Notifier interface, singledispatch for payment dispatch, generator pipeline, StrEnum, frozen dataclasses, shallow error hierarchy"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [],
+    "overall": "Excellent output. New skill's singledispatch example with payment types directly influenced the dispatch pattern used. Protocol for Notifier shows the skill's Protocol guidance was applied beyond just the quick reference table."
+  }
+}

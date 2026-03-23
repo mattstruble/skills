@@ -1,0 +1,174 @@
+{
+  "metadata": {
+    "skill_name": "python-design",
+    "skill_path": "python-design/SKILL.md",
+    "timestamp": "2026-03-23T00:00:00Z",
+    "evals_run": ["eval-1-api-client", "eval-2-pydantic-vs-dataclass", "eval-3-order-processing"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "api-client",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": null,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses Pydantic BaseModel for validating external API responses at the boundary", "passed": true, "evidence": "Pydantic in requests.py at HTTP boundary"},
+        {"text": "Uses frozen dataclass or TypedDict for internal domain objects", "passed": true, "evidence": "frozen dataclasses for UserProfile/ActivityEvent, TypedDict for raw JSON"},
+        {"text": "Defines a Protocol or clear interface for the client", "passed": true, "evidence": "_protocols.py with Protocol definitions"},
+        {"text": "Defines a shallow exception hierarchy", "passed": true, "evidence": "errors.py with APIError base + 4 specific errors"},
+        {"text": "Defines __all__ or clearly separates public vs private interface", "passed": true, "evidence": "__all__ in errors.py, __init__.py re-exports only public surface"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "api-client",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": null,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses Pydantic BaseModel for validating external API responses at the boundary", "passed": true, "evidence": "schemas.py with Pydantic at HTTP boundary"},
+        {"text": "Uses frozen dataclass or TypedDict for internal domain objects", "passed": true, "evidence": "models.py with frozen dataclasses"},
+        {"text": "Defines a Protocol or clear interface for the client", "passed": false, "evidence": "_types.py used for TYPE_CHECKING imports, no Protocol-based client contract"},
+        {"text": "Defines a shallow exception hierarchy", "passed": true, "evidence": "errors.py with ApiClientError base + 5 specific errors"},
+        {"text": "Defines __all__ or clearly separates public vs private interface", "passed": true, "evidence": "__all__ in errors.py, __init__.py as public surface"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "pydantic-vs-dataclass",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": null,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Explains that Pydantic belongs at validation boundaries", "passed": true, "evidence": "Clear opening principle statement"},
+        {"text": "Recommends frozen dataclasses for domain objects after validation", "passed": true, "evidence": "Section 2 with frozen dataclass example"},
+        {"text": "Provides clear decision criteria", "passed": true, "evidence": "Concrete decision rule + edge cases covered"},
+        {"text": "Mentions immutability benefit of frozen dataclasses", "passed": true, "evidence": "Immutability signal to readers mentioned, replace() shown"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "pydantic-vs-dataclass",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": null,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Explains that Pydantic belongs at validation boundaries", "passed": true, "evidence": "Clear principle stated in opening"},
+        {"text": "Recommends frozen dataclasses for domain objects after validation", "passed": true, "evidence": "frozen dataclass shown in After example"},
+        {"text": "Provides clear decision criteria", "passed": true, "evidence": "Decision table provided"},
+        {"text": "Mentions immutability benefit of frozen dataclasses", "passed": true, "evidence": "Frozen dataclasses prevent mutation mentioned"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "order-processing",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": null,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses Enum or StrEnum for payment types", "passed": true, "evidence": "enums.py with PaymentType(StrEnum), Region(StrEnum), OrderStatus(StrEnum)"},
+        {"text": "Uses frozen dataclass for Order or result domain objects", "passed": true, "evidence": "models.py with frozen dataclasses for Order, LineItem, PaymentResult"},
+        {"text": "Uses Protocol, singledispatch, or structural dispatch for payment types", "passed": true, "evidence": "payments.py with singledispatch AND notifications.py with Protocol"},
+        {"text": "Defines a domain-specific exception hierarchy", "passed": true, "evidence": "errors.py with OrderError base + 6 specific errors"},
+        {"text": "Keeps operations as standalone functions", "passed": true, "evidence": "Standalone functions in tax.py, payments.py, notifications.py, pipeline.py"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "order-processing",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": null,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses Enum or StrEnum for payment types", "passed": true, "evidence": "models.py with PaymentType(StrEnum), Region(StrEnum), OrderStatus(StrEnum)"},
+        {"text": "Uses frozen dataclass for Order or result domain objects", "passed": true, "evidence": "models.py with frozen dataclasses for LineItem, Order, ProcessedOrder"},
+        {"text": "Uses Protocol, singledispatch, or structural dispatch for payment types", "passed": true, "evidence": "payment.py with singledispatch, match/case for status dispatch"},
+        {"text": "Defines a domain-specific exception hierarchy", "passed": true, "evidence": "errors.py with OrderError base + 4 specific errors"},
+        {"text": "Keeps operations as standalone functions", "passed": true, "evidence": "Standalone functions in tax.py, payment.py, notifications.py, processor.py"}
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": null, "stddev": null, "min": null, "max": null},
+      "tokens": {"mean": null, "stddev": null, "min": null, "max": null}
+    },
+    "old_skill": {
+      "pass_rate": {"mean": 0.93, "stddev": 0.09, "min": 0.8, "max": 1.0},
+      "time_seconds": {"mean": null, "stddev": null, "min": null, "max": null},
+      "tokens": {"mean": null, "stddev": null, "min": null, "max": null}
+    },
+    "delta": {
+      "pass_rate": "+0.07",
+      "time_seconds": "N/A",
+      "tokens": "N/A"
+    }
+  },
+  "notes": [
+    "New skill (with_skill) achieved 100% pass rate across all 3 evals (14/14 expectations passed)",
+    "Old skill (old_skill) achieved 93% pass rate (13/14 expectations passed)",
+    "The one failure in old_skill: eval-1 'Defines a Protocol for the client' — old skill's Protocol guidance was present but less prominent, leading to TYPE_CHECKING imports being used instead",
+    "Eval-2 (pydantic-vs-dataclass) was a tie — both versions handle the validation boundary pattern equally well since it's well-covered in both",
+    "Eval-3 (order-processing) was a tie on pass rate, but new skill response also applied Protocol for Notifier interface (not just singledispatch), showing broader pattern adoption",
+    "New skill's before/after examples for validation boundary and Protocol vs ABC appear to have improved pattern adoption",
+    "New skill is 400 lines vs 537 lines (25% reduction), making it more focused and within the 500-line guideline",
+    "Advanced patterns (typing, async, module organization) moved to references/advanced-patterns.md (284 lines)"
+  ]
+}

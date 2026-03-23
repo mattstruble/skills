@@ -21,7 +21,22 @@ structure Nix configs around features (cross-cutting concerns) rather than hosts
 
 4. **`flake.modules.<class>.<aspect>` is the core mechanism.** Classes include `nixos`, `darwin`, `homeManager`, and any custom name. Aspects are referenced via `inputs.self.modules.<class>.<aspect>`.
 
-5. **File organization is free.** The pattern imposes no directory structure. Paths serve as documentation -- organize files in whatever way reflects your mental model.
+5. **Organize by what features do, not which module class they use.** The conventional categories are `programs/` (user-facing apps), `services/` (system daemons), `system/` (system-level settings and type hierarchy), `users/` (per-user modules), `hosts/` (host definitions), `factory/` (parameterized generators), and `nix/` (framework boilerplate and tool integrations). Paths serve as documentation -- use these categories unless the user explicitly requests a different structure.
+
+   A mature config grows toward this shape:
+   ```
+   modules/
+   ├── factory/          -- parameterized feature generation
+   ├── hosts/            -- host definitions (thin compositions)
+   ├── nix/              -- framework boilerplate (flake-parts.nix)
+   │   └── tools/        -- tool integrations (home-manager, secrets)
+   ├── programs/         -- user-facing applications (browser, shell, office)
+   ├── services/         -- system services (ssh, printing, syncthing)
+   ├── system/
+   │   ├── settings/     -- system-level config (bluetooth, network, constants)
+   │   └── system-types/ -- inheritance hierarchy (default -> cli -> desktop)
+   └── users/            -- per-user modules
+   ```
 
 6. **No manual imports.** `import-tree` auto-loads every `.nix` file under `modules/`. A module becomes active only when another module imports its aspect via `imports`.
 
@@ -152,7 +167,7 @@ Uncomment `nix-darwin` if the user needs macOS support. Add other inputs as need
 Uncomment helpers as needed based on the user's target platforms. Trim `systems` to only
 include architectures the user actually targets.
 
-### modules/system/system-default.nix
+### modules/system/system-types/system-default.nix
 
 ```nix
 { inputs, ... }:
@@ -174,7 +189,20 @@ include architectures the user actually targets.
 ```
 
 After generating the scaffold, iterate: the user describes a feature they need, you select
-the appropriate aspect pattern(s) from the decision tree below, then generate the module.
+the appropriate aspect pattern(s) from the decision tree below, then create the module in the
+appropriate category directory:
+
+| Directory | What goes here | Create when |
+|-----------|---------------|-------------|
+| `programs/` | User-facing applications (browser, shell, office) | First user app feature |
+| `services/` | System services and daemons (ssh, printing, syncthing) | First service feature |
+| `system/settings/` | System-level config (bluetooth, network, constants) | First system setting |
+| `system/system-types/` | Inheritance hierarchy (default -> cli -> desktop) | Already scaffolded |
+| `users/` | Per-user modules | First user module |
+| `hosts/` | Host definitions (thin compositions of feature imports) | First host definition |
+| `factory/` | Factory functions for parameterized features | First factory pattern |
+| `nix/` | Framework boilerplate (flake-parts.nix) | Already scaffolded |
+| `nix/tools/` | Nix tool integrations (home-manager, secrets, impermanence) | First tool integration |
 
 ## Pattern Selection Decision Tree
 
@@ -234,6 +262,12 @@ and module C also imports B, that's fine (B is deduplicated). But if A imports B
 A, you have a cycle.
 
 Guidance (not hard errors, but against the pattern's spirit):
+
+**Do not organize directories by module class.** Directories named `nixos/`, `darwin/`,
+`home-manager/`, or `home/` conflate the directory structure with the module class system. A
+feature like SSH has aspects in multiple classes -- its file belongs in `services/ssh.nix`, not
+in `nixos/ssh.nix` and `home/ssh.nix`. Organize by what features do (`programs/`, `services/`,
+`system/`, `users/`) not which class they configure.
 
 **Prefer feature-centric file names over host-centric.** Name files after what they configure
 (`ssh.nix`, `desktop-environment.nix`), not where they run (`my-laptop.nix`). Host files should

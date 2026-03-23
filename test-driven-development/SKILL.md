@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "Test-driven development workflow for implementing features and protecting behavior during refactors. Use whenever building new modules, APIs, services, handlers, or processing logic (payment systems, auth servers, caching layers, data pipelines, retry mechanisms); refactoring, rewriting, or migrating existing code; restructuring monoliths or tightly-coupled modules; or any task with multiple behaviors and non-trivial logic. Trigger on 'implement', 'build', 'add feature', 'refactor', 'migrate', 'rewrite', 'restructure', or mentions of TDD, red-green-refactor, or test-first development -- even if the user doesn't mention TDD, the workflow applies whenever the task involves substantial new functionality or reorganizing how existing code is structured. Complements test-design (test quality) and software-design (design principles). NOT for small bug fixes, config changes, renaming, documentation, or writing tests in isolation without driving implementation."
+description: "Test-driven development workflow for implementing features and protecting behavior during refactors. Use whenever building new modules, APIs, services, handlers, or processing logic (payment systems, auth servers, caching layers, data pipelines, retry mechanisms); refactoring, rewriting, or migrating existing code; restructuring monoliths or tightly-coupled modules; or any task with multiple behaviors and non-trivial logic. Trigger on 'implement', 'build', 'add feature', 'refactor', 'migrate', 'rewrite', 'restructure', or mentions of TDD, red-green-refactor, or test-first development -- even if the user doesn't mention TDD, the workflow applies whenever the task involves substantial new functionality or reorganizing how existing code is structured. Complements test-design (test quality) and software-design (design principles). NOT for small bug fixes, config changes, renaming, documentation, or test quality in isolation (see test-design)."
 ---
 
 # Test-Driven Development
@@ -54,7 +54,7 @@ over trivial happy paths.
 Start with a single test that proves the path works end-to-end:
 
 ```
-RED:   Write one test for the most important behavior -> test fails
+RED:   Write one test for the simplest end-to-end behavior -> test fails
 GREEN: Write minimal code to make it pass -> test passes
 ```
 
@@ -99,6 +99,94 @@ Horizontal slicing produces brittle tests because they're written before
 understanding the implementation. You outrun your headlights, committing to
 test structure before learning what actually matters. Vertical slices keep
 tests grounded in reality.
+
+### Worked Example: Rate Limiter
+
+Here's what 2 TDD cycles look like in practice. The domain is a rate limiter
+that allows N requests per time window per client.
+
+The snippets below are pseudo-code — method signatures omit language-specific
+boilerplate (`self`/`this`, type annotations) for clarity. `self.` in method
+bodies is a stand-in for the instance reference; use `this.` or equivalent in
+your language.
+
+**Behavior list (planned upfront):**
+1. Requests within the limit are allowed
+2. Requests that exceed the limit are denied
+3. The window resets after the time period
+4. Different clients have independent limits
+
+**Cycle 1 — Tracer bullet (simplest end-to-end path):**
+
+The tracer bullet is the simplest behavior that proves the interface works and
+the test harness is set up correctly. For a rate limiter, that's the happy path.
+
+```
+// RED: write the test first, watch it fail
+test "first request is allowed":
+    limiter = RateLimiter(limit=3, window=60)
+    result = limiter.check("client-A")
+    assert result == ALLOWED
+
+// GREEN: write the minimum code to pass
+class RateLimiter:
+    check(client_id):
+        return ALLOWED   // hardcoded — just enough to pass
+```
+
+The test passes. The implementation is obviously incomplete, but that's fine.
+The tracer bullet proved the interface compiles and the test harness works.
+
+**Cycle 2 — Enforce the limit:**
+
+```
+// RED: write the next test, watch it fail
+test "request beyond limit is denied":
+    limiter = RateLimiter(limit=2, window=60)
+    limiter.check("client-A")   // request 1
+    limiter.check("client-A")   // request 2
+    result = limiter.check("client-A")   // request 3 — over limit
+    assert result == DENIED
+
+// GREEN: extend the implementation to make both tests pass
+class RateLimiter:
+    init(limit, window):
+        self.limit = limit
+        self.counts = {}   // maps client_id -> request count
+
+    check(client_id):
+        count = self.counts[client_id] ?? 0   // 0 if client not seen yet
+        if count >= self.limit:
+            return DENIED
+        self.counts[client_id] = count + 1
+        return ALLOWED
+```
+
+Both tests pass. The implementation is still incomplete (no window reset, no
+client isolation test), but it's grounded in real behavior.
+
+**After cycle 2 — Refactor opportunity:**
+
+Before adding window-reset logic (which will also need to read the count),
+extract the count lookup to avoid duplicating the access pattern:
+
+```
+// Extract a helper — all tests still pass after this change
+class RateLimiter:
+    count_for(client_id):
+        return self.counts[client_id] ?? 0
+
+    check(client_id):
+        count = self.count_for(client_id)
+        if count >= self.limit:
+            return DENIED
+        self.counts[client_id] = count + 1
+        return ALLOWED
+```
+
+The pattern continues: each remaining behavior (window reset, client isolation)
+gets its own RED→GREEN cycle. Each cycle adds one behavior, keeps all previous
+tests green.
 
 ### Refactor Phase
 
@@ -181,9 +269,31 @@ Unlike Feature Mode, writing multiple characterization tests before changing
 any code is expected and correct here. You're capturing a snapshot of existing
 behavior, not driving new design.
 
-After writing the characterization tests, run the full test suite. Everything
+**Example — before refactoring a payment module:**
+
+```
+// Capture what the current code does before touching it.
+// These tests don't judge whether the behavior is ideal — they just pin it.
+
+test "processing a valid card returns success":
+    result = process_payment(valid_card, amount=50.00)
+    assert result.status == SUCCESS
+    assert result.charge_id != null
+
+test "processing a declined card returns failure with reason":
+    result = process_payment(declined_card, amount=50.00)
+    assert result.status == DECLINED
+    assert result.reason != null
+
+test "processing with zero amount raises an error":
+    expect_error(InvalidAmountError):
+        process_payment(valid_card, amount=0)
+    // syntax for expect_error varies by language (pytest.raises, assertThrows, etc.)
+```
+
+After writing these characterization tests, run the full test suite. Everything
 should be green. This is your baseline -- if anything is already failing,
-investigate before proceeding with the refactor.
+investigate before proceeding.
 
 ### Refactor
 

@@ -1,38 +1,5 @@
 # Development Environments
 
-## Contents
-
-- [Overview](#overview)
-- [nix shell](#nix-shell)
-- [nix run](#nix-run)
-- [nix develop](#nix-develop)
-  - [Impure mode](#impure-mode)
-- [pkgs.mkShell](#pkgsmkshell)
-- [Multi-Platform Support](#multi-platform-support)
-- [Multiple Dev Shells](#multiple-dev-shells)
-- [direnv Integration](#direnv-integration)
-  - [Setup](#setup)
-  - [Usage](#usage)
-  - [Advanced .envrc](#advanced-envrc)
-- [devenv (High-Level Dev Environments)](#devenv-high-level-dev-environments)
-  - [Setup](#setup-1)
-  - [Configuration (devenv.nix)](#configuration-devenvnix)
-  - [Key Features](#key-features)
-  - [When to use devenv vs mkShell](#when-to-use-devenv-vs-mkshell)
-- [FHS Environment (Downloaded Binaries)](#fhs-environment-downloaded-binaries)
-  - [For Specific Binary](#for-specific-binary)
-- [nix-ld (Alternative for Binaries)](#nix-ld-alternative-for-binaries)
-- [Python Development](#python-development)
-  - [Virtual Environment](#virtual-environment)
-  - [poetry2nix](#poetry2nix)
-- [Language-Specific Shells](#language-specific-shells)
-  - [Node.js](#nodejs)
-  - [Rust](#rust)
-  - [Go](#go)
-  - [Java](#java)
-  - [C/C++](#cc)
-- [Community Templates](#community-templates)
-
 ## Overview
 
 Four approaches for dev environments:

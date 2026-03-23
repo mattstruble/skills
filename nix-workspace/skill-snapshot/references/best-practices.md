@@ -1,45 +1,5 @@
 # Best Practices
 
-## Contents
-
-- [Configuration Organization](#configuration-organization)
-  - [Modularization](#modularization)
-  - [Module Pattern](#module-pattern)
-- [Git Integration](#git-integration)
-  - [Version Control Your Config](#version-control-your-config)
-  - [Critical: Stage Files Before Build](#critical-stage-files-before-build)
-  - [Move Config from /etc/nixos](#move-config-from-etcnixos)
-- [Debugging](#debugging)
-  - [Verbose Output](#verbose-output)
-  - [nix repl](#nix-repl)
-  - [Common Errors](#common-errors)
-- [System Management](#system-management)
-  - [Generation Management](#generation-management)
-  - [Automatic GC](#automatic-gc)
-  - [Boot Entries](#boot-entries)
-- [Input Management](#input-management)
-  - [Pin Versions](#pin-versions)
-  - [Use follows](#use-follows)
-  - [Mixing Stable and Unstable](#mixing-stable-and-unstable)
-- [Remote Deployment](#remote-deployment)
-  - [nixos-rebuild](#nixos-rebuild)
-  - [Colmena](#colmena)
-  - [deploy-rs](#deploy-rs)
-  - [nixos-anywhere](#nixos-anywhere)
-- [Binary Cache](#binary-cache)
-  - [Using Cachix](#using-cachix)
-- [CI/CD](#cicd)
-  - [GitHub Actions](#github-actions)
-  - [NixOS Test Framework](#nixos-test-framework)
-- [Security](#security)
-  - [Secrets Management](#secrets-management)
-  - [Principle of Least Privilege](#principle-of-least-privilege)
-- [Common Patterns](#common-patterns)
-  - [Conditional Configuration](#conditional-configuration)
-  - [Platform-Specific](#platform-specific)
-  - [Darwin Rebuild](#darwin-rebuild)
-  - [DRY with Functions](#dry-with-functions)
-
 ## Configuration Organization
 
 ### Modularization

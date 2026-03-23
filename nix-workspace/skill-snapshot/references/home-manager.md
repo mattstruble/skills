@@ -1,31 +1,5 @@
 # Home Manager Reference
 
-## Contents
-
-- [Overview](#overview)
-- [Installation Methods](#installation-methods)
-  - [As NixOS Module](#as-nixos-module)
-  - [As Darwin Module](#as-darwin-module)
-  - [Standalone](#standalone)
-- [Basic home.nix](#basic-homenix)
-- [backupFileExtension](#backupfileextension)
-- [File Management](#file-management)
-  - [mkOutOfStoreSymlink](#mkoutofstoresymlink)
-- [Program Modules](#program-modules)
-  - [Git](#git)
-  - [Shell (Bash)](#shell-bash)
-  - [Shell (Zsh)](#shell-zsh)
-  - [Shell (Fish)](#shell-fish)
-  - [Neovim](#neovim)
-  - [Starship Prompt](#starship-prompt)
-  - [Direnv](#direnv)
-  - [Tmux](#tmux)
-- [Environment Variables](#environment-variables)
-- [User Services (systemd)](#user-services-systemd)
-- [macOS (launchd)](#macos-launchd)
-- [Activation Scripts](#activation-scripts)
-- [NixOS vs Home Manager](#nixos-vs-home-manager)
-
 ## Overview
 
 Home Manager manages user-specific:
@@ -73,7 +47,7 @@ Home Manager manages user-specific:
 # Same pattern as NixOS
 {
   inputs = {
-      nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
+    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.11";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";

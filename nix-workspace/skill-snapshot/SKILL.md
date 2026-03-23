@@ -91,42 +91,29 @@ inputs = {
 ```
 
 ### Priority Control
-
-The module system merges options from multiple modules. When two modules set the same option, priority determines which wins. Higher priority number = more easily overridden (counterintuitive but correct).
-
 ```nix
 {
-  # lib.mkDefault (priority 1000) - highest number, lowest priority, most easily overridden
-  # Use this in shared/common modules so host-specific configs can override
+  # lib.mkDefault (priority 1000) - for base module defaults, easily overridden
   services.nginx.enable = lib.mkDefault true;
 
   # Direct assignment (priority 100) - normal configuration
-  # This is what you use 95% of the time
   services.nginx.enable = true;
 
-  # lib.mkForce (priority 50) - lowest number, highest priority, wins over everything
-  # Use when another module sets a value you can't change any other way
+  # lib.mkForce (priority 50) - last resort override
   services.nginx.enable = lib.mkForce false;
 }
 ```
 
 ### Package Customization
-
-Three levels of customization, from least to most invasive:
-
 ```nix
 {
-  # override: change function arguments (what goes INTO a package build)
-  # Use when a package accepts configuration parameters (e.g., enabling optional features)
+  # Override function arguments (change what goes INTO a package build)
   pkgs.fcitx5-rime.override { rimeDataPkgs = [ ./custom-rime ]; }
 
-  # overrideAttrs: change derivation attributes (the build itself)
-  # Use when you need to patch source, change build flags, or pin a version
+  # Override derivation attributes (change the build itself)
   pkgs.hello.overrideAttrs (old: { doCheck = false; })
 
-  # Overlays: modify packages globally across your entire config
-  # Use when you want the change to apply everywhere (all dependents use the modified version)
-  # Warning: overlays invalidate binary cache for affected packages — they'll build from source
+  # Overlays (modify packages globally across your config)
   nixpkgs.overlays = [
     (final: prev: {
       myPackage = prev.myPackage.override { /* ... */ };
@@ -134,8 +121,6 @@ Three levels of customization, from least to most invasive:
   ];
 }
 ```
-
-**Rule of thumb:** `override` for feature flags → `overrideAttrs` for build changes → overlays for global changes. See `references/nixpkgs-advanced.md` for full details including `callPackage` and trivial builders.
 
 ## Platform-Specific
 
@@ -187,13 +172,13 @@ home-manager switch --flake .#username@hostname
 
 ## Common Gotchas
 
-1. **Untracked files invisible to flakes** - Run `git add` before any flake command. Nix copies only git-tracked files into the Nix store before evaluating — files that aren't staged or committed are excluded from the copy, so Nix can't see them (staged but not committed is fine).
-2. **allowUnfree breaks in devShells** - `nixpkgs.config.allowUnfree` from your system config doesn't flow into standalone `nix develop`. `nixpkgs.config` is a NixOS/nix-darwin module option — when you run `nix develop` outside a system rebuild, there's no module system evaluation; the devShell's `pkgs` is a direct nixpkgs import that doesn't read your system config. Use `--impure` flag, an overlay, or set it in `~/.config/nixpkgs/config.nix`.
-3. **Duplicate nixpkgs downloads** - Use `inputs.nixpkgs.follows = "nixpkgs"` on all inputs that depend on nixpkgs, or you'll download and evaluate it multiple times. Each input brings its own nixpkgs unless told to share yours.
-4. **Python pip/pip install fails** - Nix's sandboxed builds can't run pip. The sandbox has no network access and no writable filesystem, by design. Use `venv` inside a `mkShell`, `poetry2nix`, or containers.
-5. **Downloaded binaries crash** - Pre-built binaries expect FHS paths (`/lib`, `/usr`). NixOS stores everything in `/nix/store` with unique hashes, so the hardcoded paths in binaries don't exist. Use `pkgs.buildFHSEnv` for a compatibility wrapper or `nix-ld` system-wide.
-6. **String interpolation in multi-line strings** - Use `''$` to escape `${` inside `''...''` strings (e.g., `${var}` interpolates, but `''${` is the escape that produces a literal `${`). The `''` string syntax uses `${` for interpolation just like regular strings.
-7. **Build from source unexpectedly** - Overlays can invalidate the binary cache since they change the derivation hash. The Nix store path is a hash of the derivation (build recipe + all inputs) — modifying a package via overlay changes its derivation hash, so no cached binary matches. Consider a separate nixpkgs instance for overlayed packages.
+1. **Untracked files invisible to flakes** - Run `git add` before any flake command. Nix only sees files tracked by git (even if staged but not committed).
+2. **allowUnfree breaks in devShells** - `nixpkgs.config.allowUnfree` from your system config doesn't flow into standalone `nix develop`. Use `--impure` flag, an overlay, or set it in `~/.config/nixpkgs/config.nix`.
+3. **Duplicate nixpkgs downloads** - Use `inputs.nixpkgs.follows = "nixpkgs"` on all inputs that depend on nixpkgs, or you'll download and evaluate it multiple times.
+4. **Python pip/pip install fails** - Nix's sandboxed builds can't run pip. Use `venv` inside a `mkShell`, `poetry2nix`, or containers.
+5. **Downloaded binaries crash** - Pre-built binaries expect FHS paths (`/lib`, `/usr`). Use `pkgs.buildFHSEnv` for a compatibility wrapper or `nix-ld` system-wide.
+6. **String interpolation in multi-line strings** - Use `''$` to escape `${` inside `''...''` strings (e.g., `''${var}` evaluates the Nix variable, but `''\${var}` prevents interpolation).
+7. **Build from source unexpectedly** - Overlays can invalidate the binary cache since they change the input hash. Consider a separate nixpkgs instance for overlayed packages.
 
 ## Development Environments
 

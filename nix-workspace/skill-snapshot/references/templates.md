@@ -2,24 +2,6 @@
 
 Ready-to-use `flake.nix` templates for common scenarios.
 
-## Contents
-
-- [Minimal NixOS](#minimal-nixos)
-- [NixOS + Home Manager](#nixos--home-manager)
-- [nix-darwin (macOS)](#nix-darwin-macos)
-- [nix-darwin + Home Manager](#nix-darwin--home-manager)
-- [Standalone Home Manager](#standalone-home-manager)
-- [Development Shell](#development-shell)
-- [Multi-Language Dev Shell](#multi-language-dev-shell)
-- [Cross-Platform (NixOS + Darwin)](#cross-platform-nixos--darwin)
-- [Package + DevShell](#package--devshell)
-- [Docker / OCI Image Build](#docker--oci-image-build)
-- [flake-parts](#flake-parts)
-- [With Overlays](#with-overlays)
-- [Starter configuration.nix](#starter-configurationnix)
-- [Starter home.nix](#starter-homenix)
-- [Starter darwin.nix](#starter-darwinnix)
-
 ## Minimal NixOS
 
 ```nix

@@ -1,24 +1,5 @@
 # Flakes Reference
 
-## Contents
-
-- [Overview](#overview)
-- [Enabling Flakes](#enabling-flakes)
-- [Input Types](#input-types)
-  - [GitHub](#github)
-  - [Git](#git)
-  - [Path (Local)](#path-local)
-  - [Tarball](#tarball)
-  - [Non-Flake Inputs](#non-flake-inputs)
-- [Input Follows](#input-follows)
-- [Flake Outputs Schema](#flake-outputs-schema)
-- [Lock File (flake.lock)](#lock-file-flakelock)
-- [Flake Commands](#flake-commands)
-- [Self Reference](#self-reference)
-- [Flake Registry](#flake-registry)
-- [flake-parts (Modular Flakes)](#flake-parts-modular-flakes)
-- [flake-compat (Using Flakes with Non-Flake Nix)](#flake-compat-using-flakes-with-non-flake-nix)
-
 ## Overview
 
 Flakes provide:

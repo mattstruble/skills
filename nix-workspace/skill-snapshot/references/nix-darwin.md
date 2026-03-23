@@ -1,26 +1,5 @@
 # nix-darwin Reference
 
-## Contents
-
-- [Overview](#overview)
-- [Installation](#installation)
-- [Basic flake.nix](#basic-flakenix)
-- [Basic darwin.nix](#basic-darwinnix)
-- [System Preferences](#system-preferences)
-  - [Dock](#dock)
-  - [Finder](#finder)
-  - [Keyboard](#keyboard)
-  - [Trackpad](#trackpad)
-  - [Screenshots](#screenshots)
-- [TouchID for sudo](#touchid-for-sudo)
-- [Homebrew Integration](#homebrew-integration)
-- [Services (launchd)](#services-launchd)
-- [Fonts](#fonts)
-- [Environment](#environment)
-- [Home Manager Integration](#home-manager-integration)
-- [Commands](#commands)
-- [Useful Defaults Commands](#useful-defaults-commands)
-
 ## Overview
 
 nix-darwin brings NixOS-style declarative configuration to macOS:

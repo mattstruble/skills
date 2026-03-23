@@ -1,30 +1,5 @@
 # Nixpkgs Advanced Usage
 
-## Contents
-
-- [callPackage](#callpackage)
-  - [How callPackage Works](#how-callpackage-works)
-  - [Best Practice](#best-practice)
-- [override](#override)
-  - [Finding Override Arguments](#finding-override-arguments)
-- [overrideAttrs](#overrideattrs)
-  - [Common Attributes to Override](#common-attributes-to-override)
-  - [overrideDerivation (Deprecated)](#overridederivation-deprecated)
-- [Trivial Builders](#trivial-builders)
-- [Overlays](#overlays)
-  - [Basic Structure](#basic-structure)
-  - [Using final vs prev](#using-final-vs-prev)
-  - [Applying Overlays in Flakes](#applying-overlays-in-flakes)
-  - [Practical Overlay Examples](#practical-overlay-examples)
-  - [Exporting Overlays from Flakes](#exporting-overlays-from-flakes)
-- [Multiple Nixpkgs Instances](#multiple-nixpkgs-instances)
-- [Unfree Packages](#unfree-packages)
-  - [Method 1: nixpkgs-unfree (Recommended)](#method-1-nixpkgs-unfree-recommended)
-  - [Method 2: Configuration](#method-2-configuration)
-  - [Method 3: User Config](#method-3-user-config)
-- [Fetchers](#fetchers)
-  - [Getting Hashes](#getting-hashes)
-
 ## callPackage
 
 `callPackage` auto-injects dependencies from nixpkgs:

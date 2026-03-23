@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "messy-working-tree-multi-area",
+  "prompt": "I've been working on a bunch of stuff today. Can you look at my changes and help me commit them? I've got changes in the auth module (new token refresh logic + tests), some test fixes for the payment module, and I updated the README with new setup instructions. Everything is unstaged.",
+  "assertions": [
+    {
+      "text": "Agent runs git status and git diff before proposing any commits",
+      "type": "behavioral"
+    },
+    {
+      "text": "Agent groups auth feature code and its tests together in one feat: commit (not splitting tests into a separate test: commit)",
+      "type": "grouping-correctness"
+    },
+    {
+      "text": "Agent separates the README change into a docs: commit",
+      "type": "grouping-correctness"
+    },
+    {
+      "text": "Agent presents the grouping plan and asks for user confirmation before executing any git commands",
+      "type": "behavioral"
+    },
+    {
+      "text": "All commit messages follow conventional commit format: type(scope): description",
+      "type": "format"
+    }
+  ]
+}

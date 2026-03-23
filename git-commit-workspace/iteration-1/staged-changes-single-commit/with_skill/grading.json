@@ -1,0 +1,36 @@
+{
+  "eval_id": 2,
+  "eval_name": "staged-changes-single-commit",
+  "run": "with_skill",
+  "assertions": [
+    {
+      "text": "Agent uses git diff --cached (not git diff) to inspect staged changes",
+      "passed": true,
+      "evidence": "Step 3 explicitly runs git diff --cached and shows the cached diff output"
+    },
+    {
+      "text": "Agent produces exactly one commit message (not multiple, since files are already staged)",
+      "passed": true,
+      "evidence": "Single commit message produced: feat(payments): handle Stripe payment_intent.succeeded webhook"
+    },
+    {
+      "text": "Commit message subject line is under 72 characters",
+      "passed": true,
+      "evidence": "'feat(payments): handle Stripe payment_intent.succeeded webhook' is 60 characters"
+    },
+    {
+      "text": "Commit message uses imperative mood (e.g., 'add' not 'added' or 'adds')",
+      "passed": true,
+      "evidence": "Subject uses 'handle' (imperative)"
+    },
+    {
+      "text": "Agent does not propose to unstage or restage files",
+      "passed": true,
+      "evidence": "No mention of unstaging or restaging; works directly with the staged diff"
+    }
+  ],
+  "pass_count": 5,
+  "total": 5,
+  "pass_rate": 1.0,
+  "notes": "With-skill run added a body explaining the idempotency design — a good application of the 'add body only when subject cannot convey critical context' rule"
+}

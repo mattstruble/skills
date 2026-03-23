@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: "Git conventional commits -- analyzes working tree changes, groups them logically by change type (feat/fix/docs/refactor/test/chore/etc.), detects and respects repo-level commit conventions (commitlint, commitizen, CONTRIBUTING.md), infers scopes, and creates subject-first conventional commit messages with minimal bodies. Use this skill whenever committing code, writing or planning commit messages, or any task that involves creating git commits -- 'commit my stuff', 'commit this', 'commit my changes', 'make a commit', 'git commit', 'help me commit', 'draft commit messages', or just 'commit' as an action. Also trigger when grouping changes into logical commits, cleaning up a messy working tree into organized commits, reviewing staged changes before committing, or when any agent needs to create or plan commit messages as part of a workflow. NOT for non-commit git operations (branching, merging, rebasing, resolving conflicts, creating PRs, writing PR descriptions, git configuration, or exploring git history)."
+description: "Git conventional commits -- analyzes working tree changes, groups them logically by change type (feat/fix/docs/refactor/test/chore/etc.), detects and respects repo-level commit conventions (commitlint, commitizen, CONTRIBUTING.md), infers scopes, and creates subject-first conventional commit messages with minimal bodies. Use this skill whenever committing code, writing or planning commit messages, or any task that involves creating git commits -- 'commit my stuff', 'commit this', 'commit my changes', 'make a commit', 'git commit', 'help me commit', 'draft commit messages', or just 'commit' as an action. Also trigger when grouping changes into logical commits, cleaning up a messy working tree into organized commits, or when any agent needs to create or plan commit messages as part of a workflow. NOT for non-commit git operations (branching, merging, rebasing, history exploration)."
 ---
 
 # Git Conventional Commits
@@ -111,50 +111,6 @@ For each group (or for the single staged commit):
 
 This isn't rigid -- use judgment. If a doc change is part of a feature, it goes with the feature commit, not at the end.
 
-## Worked example: from diff to commits
-
-Here's what the full analysis-to-grouping process looks like in practice, including some of the trickier decisions.
-
-**Given these unstaged changes:**
-- `backend/auth/utils.py` — new file, extracts `validate_token` helper from `auth.py`
-- `backend/auth/auth.py` — modified, now calls `validate_token` from utils (behavior unchanged)
-- `tests/test_auth_utils.py` — new file, tests for the extracted helper
-- `backend/api/profile.py` — new file, user profile API endpoint
-- `backend/models/profile.py` — new file, Profile data model
-- `db/migrations/0042_add_profile_table.sql` — new file, schema migration for profiles
-- `tests/test_profile_api.py` — new file, tests for the profile API
-- `frontend/package.json` — modified, adds `react-avatar` dependency for profile UI
-- `frontend/package-lock.json` — modified, lockfile updated by the above
-- `backend/services/email.py` — modified, fixes null pointer when recipient is missing
-
-**Reasoning through the grouping:**
-
-- `auth.py`, `utils.py`, and `test_auth_utils.py` are a pure refactor — no new behavior, just restructuring. Keeping it separate from the profile feature means a reviewer can confirm "nothing changed" without wading through new code. The test belongs here because it validates the extracted helper, not a new feature.
-- `profile.py` (API), `profile.py` (model), the migration, and `test_profile_api.py` all implement the same capability. The migration *enables* the model — it's part of the feature, not a standalone `chore:`. The tests validate the feature code, so they go here too.
-- `package.json` and `package-lock.json` exist solely because the profile UI needs `react-avatar`. They're configuration that enables the feature, so they belong with the profile commit — not in a separate `build:` commit.
-- `email.py` is an unrelated bug fix. Someone reverting the profile feature shouldn't also lose this fix.
-
-**Result:**
-```
-1. refactor(auth): extract validate_token into utils module
-   - backend/auth/utils.py (new)
-   - backend/auth/auth.py (modified)
-   - tests/test_auth_utils.py (new)
-
-2. feat(profile): add user profile API, data model, and database migration
-   - backend/api/profile.py (new)
-   - backend/models/profile.py (new)
-   - db/migrations/0042_add_profile_table.sql (new)
-   - tests/test_profile_api.py (new)
-   - frontend/package.json (modified)
-   - frontend/package-lock.json (modified)
-
-3. fix(email): handle null pointer when recipient is missing
-   - backend/services/email.py (modified)
-```
-
-The key decisions here: the refactor lands before the feature (so reviewers see the structure first), the migration and lockfile go *with* the feature that caused them (not as separate commits), and the unrelated bug fix stays isolated so it can be reverted independently.
-
 ## Conventional commit format
 
 ```
@@ -192,7 +148,7 @@ Choose the type based on the *intent* of the change, not just what files were to
 |------|------------|---------|
 | `feat` | A new capability that didn't exist before | `feat(search): add fuzzy matching` |
 | `fix` | Corrects incorrect behavior | `fix(parser): handle empty input without crashing` |
-| `docs` | Documentation only -- READMEs, standalone guides, docs/ files (inline docstrings and comments travel with the code they document) | `docs: add deployment troubleshooting section` |
+| `docs` | Documentation only -- READMEs, docstrings, comments, guides | `docs: add deployment troubleshooting section` |
 | `style` | Formatting, whitespace, semicolons -- no logic change | `style: fix indentation in auth module` |
 | `refactor` | Restructuring code without changing behavior | `refactor(db): extract query builder into separate module` |
 | `perf` | A change whose primary purpose is improving performance | `perf(api): cache user lookup results` |
@@ -226,6 +182,6 @@ Scopes help readers quickly identify what part of the codebase a commit affects.
 
 **Binary files** -- Mention them in the commit message ("add logo assets") but don't try to describe their diff content.
 
-**Generated files** -- Lock files (`package-lock.json`, `poetry.lock`), build outputs, and similar generated files should go with the commit that caused them to change. When the purpose of the change is a dependency update, that's a `build:` commit (e.g., upgrading webpack in `package.json` + the resulting lockfile = one `build:` commit). When a dependency is added specifically to enable a feature in the same changeset, the lockfile goes with that feature commit instead — see the worked example above.
+**Generated files** -- Lock files (`package-lock.json`, `poetry.lock`), build outputs, and similar generated files should generally go with the commit that caused them to change (e.g., a dependency update in `package.json` + the resulting `package-lock.json` change = one `build:` commit).
 
 **Merge conflicts** -- If the working tree has unresolved merge conflicts, don't try to commit. Let the user know they need to resolve conflicts first.

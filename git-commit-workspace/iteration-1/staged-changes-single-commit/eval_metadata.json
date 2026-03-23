@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "staged-changes-single-commit",
+  "prompt": "I just finished a feature. All my changes are staged. Write me a good commit message.",
+  "assertions": [
+    {
+      "text": "Agent uses git diff --cached (not git diff) to inspect staged changes",
+      "type": "behavioral"
+    },
+    {
+      "text": "Agent produces exactly one commit message (not multiple, since files are already staged)",
+      "type": "behavioral"
+    },
+    {
+      "text": "Commit message subject line is under 72 characters",
+      "type": "format"
+    },
+    {
+      "text": "Commit message uses imperative mood (e.g., 'add' not 'added' or 'adds')",
+      "type": "format"
+    },
+    {
+      "text": "Agent does not propose to unstage or restage files",
+      "type": "behavioral"
+    }
+  ]
+}

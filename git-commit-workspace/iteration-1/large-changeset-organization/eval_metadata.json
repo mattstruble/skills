@@ -1,0 +1,31 @@
+{
+  "eval_id": 3,
+  "eval_name": "large-changeset-organization",
+  "prompt": "I have a messy working tree with 15 changed files across 6 directories. Help me organize these into logical commits. The changes include: new user profile page (frontend + backend + tests), a database migration for the profile table, a bug fix in the email service, updated CI config to add Python 3.12 to the test matrix, and some refactoring of the auth module to extract a helper function.",
+  "assertions": [
+    {
+      "text": "Agent identifies at least 4 distinct commit groups from the described changes",
+      "type": "grouping-correctness"
+    },
+    {
+      "text": "CI config change gets a ci: type commit",
+      "type": "type-correctness"
+    },
+    {
+      "text": "Auth refactor gets a refactor: type commit (not feat: or fix:)",
+      "type": "type-correctness"
+    },
+    {
+      "text": "Email bug fix gets a fix: type commit",
+      "type": "type-correctness"
+    },
+    {
+      "text": "Agent presents the plan and asks for confirmation before committing",
+      "type": "behavioral"
+    },
+    {
+      "text": "Agent acknowledges the large changeset and suggests smaller working sessions going forward",
+      "type": "behavioral"
+    }
+  ]
+}

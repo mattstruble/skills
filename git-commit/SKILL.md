@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: "Git conventional commits -- analyzes working tree changes, groups them logically by change type (feat/fix/docs/refactor/test/chore/etc.), detects and respects repo-level commit conventions (commitlint, commitizen, CONTRIBUTING.md), infers scopes, and creates well-formed conventional commit messages. Use this skill whenever the user asks to commit changes, write commit messages, 'commit my stuff', 'commit this', 'help me commit', group or organize changes into commits, or anything involving crafting git commits. Also trigger when the user has a messy working tree and wants to create clean, organized commits from it."
+description: "Git conventional commits -- analyzes working tree changes, groups them logically by change type (feat/fix/docs/refactor/test/chore/etc.), detects and respects repo-level commit conventions (commitlint, commitizen, CONTRIBUTING.md), infers scopes, and creates subject-first conventional commit messages with minimal bodies. Use this skill whenever committing code, writing or planning commit messages, or any task that involves creating git commits -- 'commit my stuff', 'commit this', 'commit my changes', 'make a commit', 'git commit', 'help me commit', 'draft commit messages', or just 'commit' as an action. Also trigger when grouping changes into logical commits, cleaning up a messy working tree into organized commits, or when any agent needs to create or plan commit messages as part of a workflow. NOT for non-commit git operations (branching, merging, rebasing, history exploration)."
 ---
 
 # Git Conventional Commits
@@ -127,10 +127,12 @@ This isn't rigid -- use judgment. If a doc change is part of a feature, it goes 
 - `description` starts lowercase, uses imperative mood ("add" not "added" or "adds"), and does not end with a period
 - The whole subject line should be under 72 characters
 - Breaking changes append `!` before the colon: `feat(api)!: change auth token format`
+- The subject line must be self-sufficient -- a reader should understand the full intent of the commit from the subject alone, without needing a body
 
-**Body** (when the subject line isn't enough):
+**Body** -- the default is no body. Add one **only** when the subject cannot convey critical context on its own -- a non-obvious trade-off, a breaking change, or a design decision future readers will question.
 - Separated from the subject by a blank line
 - Explains *what* and *why*, not *how* (the diff shows the how)
+- Keep to 1-3 lines; if you need more, the commit is probably doing too much
 - Wrap at 72 characters
 
 **Footers:**
@@ -183,5 +185,3 @@ Scopes help readers quickly identify what part of the codebase a commit affects.
 **Generated files** -- Lock files (`package-lock.json`, `poetry.lock`), build outputs, and similar generated files should generally go with the commit that caused them to change (e.g., a dependency update in `package.json` + the resulting `package-lock.json` change = one `build:` commit).
 
 **Merge conflicts** -- If the working tree has unresolved merge conflicts, don't try to commit. Let the user know they need to resolve conflicts first.
-
-**Empty commit message body** -- Most commits don't need a body. Add one only when the subject line alone can't convey the reasoning -- especially for non-obvious fixes, breaking changes, or design decisions that future readers will question.

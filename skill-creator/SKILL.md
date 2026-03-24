@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.
+description: Use when creating a new skill from scratch, editing or optimizing an existing skill, running evals to test a skill, benchmarking skill performance with variance analysis, or optimizing a skill's description for better triggering accuracy.
 ---
 
 # Skill Creator
@@ -75,7 +75,9 @@ Check available tools — if useful for research (searching docs, finding simila
 Based on the user interview, fill in these components:
 
 - **name**: Skill identifier
-- **description**: When to trigger, what it does. This is the primary triggering mechanism - include both what the skill does AND specific contexts for when to use it. All "when to use" info goes here, not in the body. Note: models tend to "undertrigger" skills — to not use them when they'd be useful. To combat this, make the skill descriptions a little bit "pushy". So for instance, instead of "How to build a simple fast dashboard to display internal data.", you might write "How to build a simple fast dashboard to display internal data. Make sure to use this skill whenever the user mentions dashboards, data visualization, internal metrics, or wants to display any kind of data, even if they don't explicitly ask for a 'dashboard.'"
+- **description**: When to trigger. This is the primary triggering mechanism — include specific contexts, symptoms, and situations that should invoke the skill. All "when to use" info goes here, not in the body. Note: models tend to "undertrigger" skills — to not use them when they'd be useful. To combat this, make the skill descriptions a little bit "pushy". So for instance, instead of "Use when the user wants to display internal data.", you might write "Use when the user wants to display internal data. Make sure to use this skill whenever the user mentions dashboards, data visualization, internal metrics, or wants to display any kind of data, even if they don't explicitly ask for a 'dashboard.'"
+
+  **Important — don't summarize the workflow in the description.** Descriptions that explain *how* the skill works (e.g., "dispatches subagents per task with code review between tasks") create a shortcut: the agent reads the description and follows that summary instead of loading and reading the full skill. The description should only describe *when* to trigger. The "Description Anti-Pattern: Workflow Summaries" section under Description Optimization has concrete before/after examples.
 - **compatibility**: Required tools, dependencies (optional, rarely needed)
 - **the rest of the skill :)**
 
@@ -149,6 +151,48 @@ Output: feat(auth): implement JWT-based authentication
 ### Writing Style
 
 Try to explain to the model why things are important in lieu of heavy-handed musty MUSTs. Use theory of mind and try to make the skill general and not super-narrow to specific examples. Start by writing a draft and then look at it with fresh eyes and improve it.
+
+For skills that need to enforce discipline or stay lean under pressure, see the hardening patterns below.
+
+### Skill Hardening Patterns
+
+A few patterns that come up when writing skills that need to be effective and robust in practice.
+
+#### Anti-Rationalization (for discipline-enforcing skills)
+
+Skills that enforce discipline — TDD, verification steps, mandatory reviews — need to resist agent rationalization. Agents are smart and find loopholes under pressure. If your skill is the kind that says "you must do X before Y", consider these techniques:
+
+- **Rationalization tables**: During testing, capture the excuses agents use to skip steps, then add explicit counters. A `| Excuse | Reality |` table works well.
+- **Red-flag lists**: Make self-checking easy. "If you catch yourself thinking X, stop." is more effective than a general rule.
+- **Close loopholes explicitly**: Don't just state the rule — forbid the specific workarounds. "Delete means delete. Not 'keep as reference', not 'adapt while writing tests'."
+- **Spirit vs letter**: Add "violating the letter of these rules is violating the spirit" early in discipline skills to cut off "I'm following the intent" rationalizations.
+
+These patterns apply to discipline-enforcing skills. Technique skills and reference skills generally don't need them.
+
+#### Token Efficiency
+
+The SkillsBench data already tells us compact skills outperform comprehensive ones. Some concrete targets:
+
+- **Frequently-loaded skills** (triggers on many conversations): aim for <200 words in the SKILL.md body
+- **Standard skills**: <500 words is ideal (note: the Progressive Disclosure section sets a 500-*line* limit for the whole file — these are complementary, not the same target)
+- **Heavy reference material**: move to `references/` subdirectories with clear pointers about when to read each file
+
+Techniques for staying lean: reference `--help` instead of documenting all flags inline; cross-reference other skills instead of repeating their content; one excellent example beats three mediocre ones; don't repeat what's in cross-referenced skills.
+
+#### Flowchart Usage
+
+Flowcharts (graphviz dot, Mermaid, etc.) help in specific situations and hurt in others.
+
+**Use flowcharts for:**
+- Non-obvious decision points where the agent might go wrong
+- Process loops where the agent might stop too early
+- "When to use A vs B" decisions
+
+**Don't use flowcharts for:**
+- Reference material (use tables or lists)
+- Code examples (use markdown code blocks)
+- Linear instructions (use numbered lists)
+- Labels without semantic meaning ("step1", "helper2")
 
 ### Test Cases
 
@@ -290,6 +334,32 @@ This is optional, requires subagents, and most users won't need it. The human re
 ## Description Optimization
 
 The description field in SKILL.md frontmatter is the primary mechanism that determines whether a model invokes a skill. After creating or improving a skill, offer to optimize the description for better triggering accuracy.
+
+### Description Anti-Pattern: Workflow Summaries
+
+The description field has a subtle failure mode: **if the description summarizes the skill's workflow, the agent will follow that summary instead of reading the full skill.**
+
+Testing showed this concretely: a description saying "dispatches subagents per task with code review between tasks" caused agents to do *one* review, even though the skill's flowchart showed *two* (spec compliance, then code quality). When the description was changed to triggering conditions only, agents correctly loaded and followed the full skill.
+
+So: descriptions should only describe *when* to trigger — the skill body handles the rest.
+
+```yaml
+# (description field only — not full frontmatter)
+
+# BAD: summarizes workflow — agent follows this instead of reading the skill
+description: Use when executing plans - dispatches subagent per task with code review between tasks
+
+# BAD: too much process detail
+description: Use for TDD - write test first, watch it fail, write minimal code, refactor
+
+# GOOD: just triggering conditions
+description: Use when executing implementation plans with independent tasks in the current session
+
+# GOOD: triggering conditions only
+description: Use when implementing any feature or bugfix, before writing implementation code
+```
+
+Start descriptions with "Use when..." and focus on: what the user is trying to do, what situation they're in, what symptoms or contexts should trigger the skill. The skill body handles the rest.
 
 ### Step 1: Generate trigger eval queries
 

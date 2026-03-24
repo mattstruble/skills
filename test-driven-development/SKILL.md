@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "Test-driven development workflow for implementing features and protecting behavior during refactors. Use whenever building new modules, APIs, services, handlers, or processing logic (payment systems, auth servers, caching layers, data pipelines, retry mechanisms); refactoring, rewriting, or migrating existing code; restructuring monoliths or tightly-coupled modules; or any task with multiple behaviors and non-trivial logic. Trigger on 'implement', 'build', 'add feature', 'refactor', 'migrate', 'rewrite', 'restructure', or mentions of TDD, red-green-refactor, or test-first development -- even if the user doesn't mention TDD, the workflow applies whenever the task involves substantial new functionality or reorganizing how existing code is structured. Complements test-design (test quality) and software-design (design principles). NOT for small bug fixes, config changes, renaming, documentation, or test quality in isolation (see test-design)."
+description: "Test-driven development workflow for implementing features, fixing bugs, and protecting behavior during refactors. Use whenever building new modules, APIs, services, handlers, or processing logic (payment systems, auth servers, caching layers, data pipelines, retry mechanisms); refactoring, rewriting, or migrating existing code; restructuring monoliths or tightly-coupled modules; fixing bugs (reproduce with a failing test first); or any task with multiple behaviors and non-trivial logic. Trigger on 'implement', 'build', 'add feature', 'refactor', 'migrate', 'rewrite', 'restructure', 'fix bug', 'reproduce', or mentions of TDD, red-green-refactor, or test-first development -- even if the user doesn't mention TDD, the workflow applies whenever the task involves substantial new functionality or reorganizing how existing code is structured. Complements test-design (test quality) and software-design (design principles). NOT for trivial one-liner fixes, config changes, renaming, documentation, or test quality in isolation (see test-design)."
 ---
 
 # Test-Driven Development
@@ -21,11 +21,20 @@ The corollary: if a test breaks when you refactor internals but behavior hasn't
 changed, that test was testing structure, not behavior. It's working against you
 rather than for you.
 
+Writing tests *before* implementation matters for a specific reason: tests
+written after you've built something are biased by what you built. You
+unconsciously test the code paths you remember and skip the ones you forgot.
+Tests written first force you to specify behavior before you know the
+implementation, which catches a different class of bugs. A test that passes
+immediately when you first run it has never proven it catches anything. You
+don't know whether it would fail if the feature were broken.
+
 This skill has two modes depending on the task:
 
 - **Feature Mode** -- building something new using the red-green-refactor cycle
 - **Refactor Mode** -- protecting existing behavior with characterization tests
   before restructuring code
+- **Bug Fix Mode** -- reproducing a defect with a test before fixing it
 
 ## Feature Mode
 
@@ -55,6 +64,10 @@ Start with a single test that proves the path works end-to-end:
 
 ```
 RED:   Write one test for the simplest end-to-end behavior -> test fails
+       Verify it fails for the right reason: the feature is missing,
+       not a typo or import error. An error during setup means the test
+       infrastructure isn't working yet — fix that first.
+       A test that passes immediately is testing existing behavior — rewrite it.
 GREEN: Write minimal code to make it pass -> test passes
 ```
 
@@ -67,6 +80,8 @@ For each remaining behavior:
 
 ```
 RED:   Write the next test -> fails
+       Verify it fails for the right reason: the behavior is absent,
+       not a typo or import error.
 GREEN: Minimal code to pass -> passes
 ```
 
@@ -276,18 +291,18 @@ behavior, not driving new design.
 // These tests don't judge whether the behavior is ideal — they just pin it.
 
 test "processing a valid card returns success":
-    result = process_payment(valid_card, amount=50.00)
+    result = process_payment(valid_card, amount: 50.00)
     assert result.status == SUCCESS
     assert result.charge_id != null
 
 test "processing a declined card returns failure with reason":
-    result = process_payment(declined_card, amount=50.00)
+    result = process_payment(declined_card, amount: 50.00)
     assert result.status == DECLINED
     assert result.reason != null
 
 test "processing with zero amount raises an error":
     expect_error(InvalidAmountError):
-        process_payment(valid_card, amount=0)
+        process_payment(valid_card, amount: 0)
     // syntax for expect_error varies by language (pytest.raises, assertThrows, etc.)
 ```
 
@@ -324,11 +339,55 @@ credentials" and it's failing because you renamed an internal method, that's
 case 2. If it's failing because the login flow now returns a different
 response, that's case 1.
 
+## Bug Fix Mode
+
+Use when a defect has been reported. Before touching the code, write a test
+that reproduces the bug. Watch it fail — this proves the bug exists and that
+your test actually catches it. Then fix the code and verify the test passes.
+The test now prevents the regression permanently.
+
+```
+test "empty email is rejected":           // reproduces the reported bug
+    result = submit_form(email: "")
+    assert result.error == "Email required"  // FAILS — bug confirmed
+
+// fix: add validation to submit_form
+// test passes — regression prevented permanently
+```
+
+The key step is watching the test fail before you fix anything. A test you
+write after the fix might pass for the wrong reason — maybe it's testing the
+wrong thing, or the bug was never there to begin with. The failure is the
+proof.
+
+Bug Fix Mode is the simplest form of TDD and a natural entry point for teams
+adopting it. It requires no upfront planning — just reproduce, verify, fix.
+
 ## Mode Transitions
 
 Feature Mode and Refactor Mode often interleave in practice. While building a
 new feature, you may discover that existing code needs restructuring to support
 it. When that happens, pause the feature work, apply Refactor Mode to the
 existing code (characterize, refactor, verify), then resume Feature Mode for
-the new functionality. The key is recognizing which mode you're in so you
-apply the right workflow: red-green for new behavior, stay-green for existing.
+the new functionality. Bug Fix Mode can interrupt either: when a defect
+surfaces during feature work or a refactor, pause, reproduce the bug with a
+failing test, fix it, then resume the original mode. The key is recognizing
+which mode you're in so you apply the right workflow: red-green for new
+behavior, stay-green for existing, reproduce-then-fix for defects.
+
+## When TDD Feels Hard
+
+If writing a test feels painful, that's usually a signal about the design, not
+the testing. Tests are the first client of your code — if they're hard to
+write, the interface is probably hard to use.
+
+| Problem | Signal | Response |
+|---------|--------|----------|
+| Don't know what to test | Staring at a blank test file | Write the assertion first (what should be true?), then work backward to the setup |
+| Test is hard to write | Excessive setup or mocking needed | Simplify the interface — decompose the function or reduce its dependencies |
+| Must mock everything | Every collaborator needs a fake | Use dependency injection — code is too coupled |
+| Test setup is enormous | Can't write the test without building a world first | Extract factory helpers, or simplify the design |
+
+The pattern: test hard to write = design unclear. When TDD feels painful,
+treat it as a diagnostic. The test is telling you something about the code.
+Listen to it before reaching for workarounds.

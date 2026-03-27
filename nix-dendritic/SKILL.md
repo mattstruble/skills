@@ -1,6 +1,6 @@
 ---
 name: nix-dendritic
-description: "Dendritic Nix configuration pattern -- aspect-oriented flake-parts modules for multi-host, multi-platform NixOS/nix-darwin/Home Manager setups. Covers scaffolding new dendritic configs, writing feature modules across configuration classes, selecting aspect patterns (Simple, Multi Context, Inheritance, Conditional, Collector, Constants, DRY, Factory), and migrating existing Nix configs to the dendritic structure. Use when the user mentions dendritic, flake-parts modules, aspect-oriented Nix config, feature-centric configuration, `flake.modules.<class>.<aspect>`, import-tree, flake-file, or wants to restructure their Nix config to share features across NixOS/darwin/Home Manager. Also trigger when the user has a multi-host or cross-platform Nix setup and wants to reduce duplication or improve modularity. NOT for general Nix questions, basic flake setup, or single-machine configs -- see the `nix` skill for those."
+description: "Dendritic Nix configuration pattern -- aspect-oriented flake-parts modules for multi-host, multi-platform NixOS/nix-darwin/Home Manager setups. Use when the user mentions dendritic, flake-parts modules, aspect-oriented Nix config, feature-centric configuration, `flake.modules.<class>.<aspect>`, import-tree, flake-file, or wants to restructure their Nix config to share features across NixOS/darwin/Home Manager. Also trigger when the user has a multi-host or cross-platform Nix setup and wants to reduce duplication or improve modularity. NOT for general Nix questions, basic flake setup, or single-machine configs -- see the `nix` skill for those."
 ---
 
 # Dendritic Nix Configuration
@@ -87,117 +87,20 @@ Key things to notice:
 
 ## Scaffolding a New Dendritic Config
 
-When setting up a new dendritic config, ask the user which platforms they need (NixOS, Darwin,
-Home Manager standalone), then generate this minimal scaffold:
+Read `references/scaffolding.md` for the full scaffold templates (`flake.nix`,
+`modules/nix/flake-parts.nix`, `modules/system/system-types/system-default.nix`). Ask the
+user which platforms they need (NixOS, Darwin, Home Manager standalone), then generate from
+those templates.
 
-### flake.nix
-
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    import-tree.url = "github:vic/import-tree";
-
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # Include for Darwin support:
-    # nix-darwin = {
-    #   url = "github:nix-darwin/nix-darwin";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-  };
-
-  outputs = inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
-}
-```
-
-Uncomment `nix-darwin` if the user needs macOS support. Add other inputs as needed.
-
-### modules/nix/flake-parts.nix
-
-```nix
-{ inputs, lib, ... }:
-{
-  imports = [
-    inputs.flake-parts.flakeModules.modules
-  ];
-
-  systems = [
-    "aarch64-darwin"
-    "aarch64-linux"
-    "x86_64-darwin"
-    "x86_64-linux"
-  ];
-
-  # Helper: create a NixOS configuration from a module name
-  config.flake.lib.mkNixos = system: name: {
-    ${name} = inputs.nixpkgs.lib.nixosSystem {
-      modules = [
-        inputs.self.modules.nixos.${name}
-        { nixpkgs.hostPlatform = lib.mkDefault system; }
-      ];
-    };
-  };
-
-  # Helper: create a Darwin configuration from a module name
-  # config.flake.lib.mkDarwin = system: name: {
-  #   ${name} = inputs.nix-darwin.lib.darwinSystem {
-  #     modules = [
-  #       inputs.self.modules.darwin.${name}
-  #       { nixpkgs.hostPlatform = lib.mkDefault system; }
-  #     ];
-  #   };
-  # };
-
-  # Helper: create a standalone Home Manager configuration
-  # config.flake.lib.mkHome = system: name: {
-  #   ${name} = inputs.home-manager.lib.homeManagerConfiguration {
-  #     pkgs = inputs.nixpkgs.legacyPackages.${system};
-  #     modules = [ inputs.self.modules.homeManager.${name} ];
-  #   };
-  # };
-}
-```
-
-Uncomment helpers as needed based on the user's target platforms. Trim `systems` to only
-include architectures the user actually targets.
-
-### modules/system/system-types/system-default.nix
-
-```nix
-{ inputs, ... }:
-{
-  flake.modules.nixos.system-default = {
-    # Base NixOS config shared across all hosts
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  };
-
-  # flake.modules.darwin.system-default = {
-  #   # Base Darwin config shared across all hosts
-  #   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  # };
-
-  # flake.modules.homeManager.system-default = {
-  #   # Base Home Manager config
-  # };
-}
-```
-
-After generating the scaffold, iterate: the user describes a feature they need, you select
-the appropriate aspect pattern(s) from the decision tree below, then create the module in the
-appropriate category directory:
+After scaffolding, create feature modules in the appropriate directory as the user describes
+what they need:
 
 | Directory | What goes here | Create when |
 |-----------|---------------|-------------|
 | `programs/` | User-facing applications (browser, shell, office) | First user app feature |
 | `services/` | System services and daemons (ssh, printing, syncthing) | First service feature |
 | `system/settings/` | System-level config (bluetooth, network, constants) | First system setting |
-| `system/system-types/` | Inheritance hierarchy (default -> cli -> desktop) | Already scaffolded |
+| `system/system-types/` | Inheritance hierarchy (default -> cli -> desktop) | Already scaffolded (uncomment Darwin/HM blocks if needed) |
 | `users/` | Per-user modules | First user module |
 | `hosts/` | Host definitions (thin compositions of feature imports) | First host definition |
 | `factory/` | Factory functions for parameterized features | First factory pattern |
@@ -207,8 +110,8 @@ appropriate category directory:
 ## Pattern Selection Decision Tree
 
 When the user wants to add a feature, walk through these questions to select aspect pattern(s).
-Most features combine 2-3 patterns. Load `references/aspect-patterns.md` for implementation
-details and code examples.
+Most features combine 2-3 patterns. Read `references/aspect-patterns.md` for implementation
+details and code examples once you've identified the pattern(s).
 
 1. **Single module class only?** (e.g., just NixOS or just Home Manager)
    -> Simple Aspect
@@ -291,5 +194,6 @@ without benefit — the presence or absence of the import is already the toggle.
 | Reference | When to read it |
 |-----------|----------------|
 | `references/aspect-patterns.md` | Writing feature modules or selecting aspect patterns |
+| `references/scaffolding.md` | Setting up a new dendritic config from scratch |
 | `references/migration.md` | Converting an existing Nix config to dendritic |
-| `references/ecosystem.md` | Setting up flake-parts/import-tree, exploring alternatives |
+| `references/ecosystem.md` | Setting up flake-parts/import-tree, using flake-file for co-located inputs, exploring alternatives |

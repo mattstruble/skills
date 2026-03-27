@@ -156,3 +156,6 @@ Each host file becomes a thin composition of features rather than a monolith.
   validate that your feature modules work across different compositions.
 - **Hardware configs stay per-host.** `hardware-configuration.nix` is inherently host-specific.
   Keep it in the host's directory.
+
+Once migrated, add new features using the aspect patterns in `references/aspect-patterns.md`
+and the decision tree in SKILL.md.

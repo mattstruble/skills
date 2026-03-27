@@ -1,8 +1,8 @@
 # Dendritic Aspect Patterns
 
 Each pattern below solves a specific structural problem. Most real features combine 2-3 patterns.
-Read the SKILL.md decision tree first to identify which pattern(s) you need, then find the
-implementation details here.
+The SKILL.md decision tree identifies which pattern(s) to use. This file provides the
+implementation details for each.
 
 ## Contents
 
@@ -284,10 +284,10 @@ Define the reusable fragment:
 
 Apply it to specific interfaces:
 ```nix
-{ lib, ... }:
+{ inputs, lib, ... }:
 {
   networking.interfaces."enp86s0" =
-    with self.modules.networkInterface;
+    with inputs.self.modules.networkInterface;
     lib.mkMerge [
       subnet-A
       subnet-B
@@ -344,10 +344,10 @@ Create a factory function:
 
 Use the factory:
 ```nix
-{ lib, ... }:
+{ inputs, lib, ... }:
 {
   flake.modules = lib.mkMerge [
-    (self.factory.user "bob" true)
+    (inputs.self.factory.user "bob" true)
     {
       nixos.bob = {
         # Additional bob-specific NixOS config

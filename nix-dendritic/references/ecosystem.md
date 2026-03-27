@@ -21,21 +21,16 @@ Setup in your `flake.nix`:
 }
 ```
 
-Enable the modules option (required for `flake.modules` to work):
+Enable the modules option (required for `flake.modules` to work). See `references/scaffolding.md`
+for the full `flake-parts.nix` template including `mkNixos`/`mkDarwin`/`mkHome` helper functions.
+The minimal setup is:
+
 ```nix
 # modules/nix/flake-parts.nix
 { inputs, ... }:
 {
-  imports = [
-    inputs.flake-parts.flakeModules.modules
-  ];
-
-  systems = [
-    "aarch64-darwin"
-    "aarch64-linux"
-    "x86_64-darwin"
-    "x86_64-linux"
-  ];
+  imports = [ inputs.flake-parts.flakeModules.modules ];
+  systems = [ "x86_64-linux" ]; # adjust to your target architectures
 }
 ```
 

@@ -4,6 +4,10 @@ Each pattern below solves a specific structural problem. Most real features comb
 The SKILL.md decision tree identifies which pattern(s) to use. This file provides the
 implementation details for each.
 
+**Terminology reminder:** A *feature* is the flake-parts module file (e.g., `ssh.nix`). An
+*aspect* is a `flake.modules.<class>.<name>` definition within that file. A single feature can
+define aspects for multiple classes plus flake-parts boilerplate.
+
 ## Contents
 
 - [Simple Aspect](#simple-aspect) — one or more module classes, no dependencies

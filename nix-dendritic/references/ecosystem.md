@@ -92,6 +92,17 @@ inputs.flake-file.url = "github:vic/flake-file";
 imports = [ inputs.flake-file.flakeModules.default ];
 ```
 
+### Quick setup with `flakeModules.dendritic`
+
+`flake-file` also provides a `flakeModules.dendritic` convenience module that sets up
+flake-file, import-tree, flake-parts, and configures `outputs` to import all `./modules`
+in one step. This replaces manual wiring of these three tools:
+
+```nix
+# In your flake-parts setup module:
+imports = [ inputs.flake-file.flakeModules.dendritic ];
+```
+
 This is a convenience, not a requirement. It makes inputs co-located with the features that
 use them, but adds another dependency to understand. Consider adopting it after you're
 comfortable with the base dendritic pattern.

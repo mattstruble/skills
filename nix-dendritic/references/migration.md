@@ -155,7 +155,22 @@ Each host file becomes a thin composition of features rather than a monolith.
 - **Start with features used on multiple hosts.** These benefit most from the pattern and
   validate that your feature modules work across different compositions.
 - **Hardware configs stay per-host.** `hardware-configuration.nix` is inherently host-specific.
-  Keep it in the host's directory.
+  Keep it in the host's directory and import it inside the host's aspect:
+  ```nix
+  # modules/hosts/my-host.nix
+  { inputs, ... }:
+  {
+    flake.modules.nixos.my-host = {
+      imports = [
+        ./hardware-configuration.nix  # host-specific hardware
+      ] ++ (with inputs.self.modules.nixos; [
+        system-cli
+        ssh
+        bob
+      ]);
+    };
+  }
+  ```
 
 Once migrated, add new features using the aspect patterns in `references/aspect-patterns.md`
 and the decision tree in SKILL.md.

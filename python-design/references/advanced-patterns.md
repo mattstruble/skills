@@ -1,7 +1,15 @@
 # Advanced Python Patterns
 
-Supplementary reference for less-frequently-needed Python patterns. Read
-when the core SKILL.md guidance isn't enough for your specific situation.
+Read this when the SKILL.md summary isn't enough detail for advanced typing,
+pattern matching, async, or module organization patterns.
+
+## Contents
+
+- [Typing Patterns](#typing-patterns)
+- [Structural Pattern Matching](#structural-pattern-matching)
+- [Immutability Toolkit](#immutability-toolkit)
+- [Async Patterns](#async-patterns)
+- [Module Organization](#module-organization)
 
 ---
 
@@ -88,11 +96,13 @@ def process_payment(order: Order) -> None: ...
 runtime, so the unresolved `Order` reference doesn't cause a `NameError`
 at import time.
 
-**This is the only scenario where `from __future__ import annotations` is
-warranted.** Modern Python (3.10+) supports `X | Y` union syntax natively,
-and PEP 649 (Python 3.14) makes lazy annotation evaluation the default,
-deprecating PEP 563. Avoid it in new code except for this `TYPE_CHECKING`
-pattern.
+**This is the primary scenario where `from __future__ import annotations` is
+useful.** Modern Python (3.10+) supports `X | Y` union syntax natively,
+and PEP 649 (Python 3.14) makes lazy annotation evaluation the default
+via a descriptor mechanism — annotations remain real objects rather than
+strings. `from __future__ import annotations` (PEP 563) is not deprecated
+and still works, but is no longer needed for the `TYPE_CHECKING` pattern
+on 3.14+.
 
 ---
 
@@ -195,7 +205,7 @@ class DataFetcher:
         return self
 
     async def __aexit__(self, *exc_info: object) -> None:
-        await self._session.aclose()
+        await self._session.close()
 
     async def fetch(self, url: str) -> bytes:
         # If url is user-supplied, validate scheme and host against an
@@ -257,6 +267,8 @@ def calculate_total(price: Decimal, quantity: int) -> Decimal:
 
 **After (public API first, helpers below):**
 ```python
+from decimal import Decimal
+
 __all__ = ["calculate_total"]
 
 def calculate_total(price: Decimal, quantity: int) -> Decimal:

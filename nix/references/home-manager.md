@@ -258,7 +258,7 @@ Home Manager has built-in modules for many programs:
       export PATH="$HOME/.local/bin:$PATH"
     '';
     bashrcExtra = ''
-      # Additional bashrc content (sourced before initExtra)
+      # Additional bashrc content (appended to .bashrc)
     '';
     profileExtra = ''
       # Additional profile content

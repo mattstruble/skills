@@ -59,11 +59,8 @@ description: "Comprehensive NixOS, Nix Flakes, Home Manager, and nix-darwin skil
 ### Input Management
 ```nix
 inputs = {
-  nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+  # Add an unstable channel alongside stable (shown in Flake Structure above)
   unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-
-  # Pin dependencies to your nixpkgs to avoid downloading multiple copies
-  home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
   # Non-flake input (config files, plain repos, etc.)
   private-config = {
@@ -92,19 +89,18 @@ inputs = {
 
 ### Priority Control
 
-The module system merges options from multiple modules. When two modules set the same option, priority determines which wins. Higher priority number = more easily overridden (counterintuitive but correct).
+The module system merges options from multiple modules. When two modules set the same option, the **lower priority number wins** (overrides the others).
 
 ```nix
 {
-  # lib.mkDefault (priority 1000) - highest number, lowest priority, most easily overridden
-  # Use this in shared/common modules so host-specific configs can override
+  # lib.mkDefault (priority 1000) - loses to almost everything
+  # Use in shared/common modules so host-specific configs can override
   services.nginx.enable = lib.mkDefault true;
 
-  # Direct assignment (priority 100) - normal configuration
-  # This is what you use 95% of the time
+  # Direct assignment (priority 100) - normal, overrides mkDefault
   services.nginx.enable = true;
 
-  # lib.mkForce (priority 50) - lowest number, highest priority, wins over everything
+  # lib.mkForce (priority 50) - wins over everything
   # Use when another module sets a value you can't change any other way
   services.nginx.enable = lib.mkForce false;
 }
@@ -187,54 +183,13 @@ home-manager switch --flake .#username@hostname
 
 ## Common Gotchas
 
-1. **Untracked files invisible to flakes** - Run `git add` before any flake command. Nix copies only git-tracked files into the Nix store before evaluating — files that aren't staged or committed are excluded from the copy, so Nix can't see them (staged but not committed is fine).
-2. **allowUnfree breaks in devShells** - `nixpkgs.config.allowUnfree` from your system config doesn't flow into standalone `nix develop`. `nixpkgs.config` is a NixOS/nix-darwin module option — when you run `nix develop` outside a system rebuild, there's no module system evaluation; the devShell's `pkgs` is a direct nixpkgs import that doesn't read your system config. Use `--impure` flag, an overlay, or set it in `~/.config/nixpkgs/config.nix`.
-3. **Duplicate nixpkgs downloads** - Use `inputs.nixpkgs.follows = "nixpkgs"` on all inputs that depend on nixpkgs, or you'll download and evaluate it multiple times. Each input brings its own nixpkgs unless told to share yours.
-4. **Python pip/pip install fails** - Nix's sandboxed builds can't run pip. The sandbox has no network access and no writable filesystem, by design. Use `venv` inside a `mkShell`, `poetry2nix`, or containers.
-5. **Downloaded binaries crash** - Pre-built binaries expect FHS paths (`/lib`, `/usr`). NixOS stores everything in `/nix/store` with unique hashes, so the hardcoded paths in binaries don't exist. Use `pkgs.buildFHSEnv` for a compatibility wrapper or `nix-ld` system-wide.
-6. **String interpolation in multi-line strings** - Use `''$` to escape `${` inside `''...''` strings (e.g., `${var}` interpolates, but `''${` is the escape that produces a literal `${`). The `''` string syntax uses `${` for interpolation just like regular strings.
-7. **Build from source unexpectedly** - Overlays can invalidate the binary cache since they change the derivation hash. The Nix store path is a hash of the derivation (build recipe + all inputs) — modifying a package via overlay changes its derivation hash, so no cached binary matches. Consider a separate nixpkgs instance for overlayed packages.
-
-## Development Environments
-
-```nix
-# In flake.nix outputs:
-devShells.x86_64-linux.default = pkgs.mkShell {
-  packages = with pkgs; [ nodejs python3 rustc ];
-
-  shellHook = ''
-    echo "Dev environment ready"
-    export MY_VAR="value"
-  '';
-
-  # For C libraries that need LD_LIBRARY_PATH
-  LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.openssl ];
-};
-```
-
-### direnv Integration
-```bash
-# .envrc
-use flake
-# or for unfree packages: use flake --impure
-```
-
-For higher-level dev environments with managed language versions, services (Postgres, Redis, etc.), and pre-commit hooks, see **devenv** in `references/dev-environments.md`.
-
-## Debugging
-
-```bash
-# Verbose rebuild with full trace
-sudo nixos-rebuild switch --show-trace --print-build-logs --verbose
-
-# Interactive REPL — the fastest way to explore and debug
-nix repl
-:lf .                    # load current flake
-:e pkgs.hello           # open package definition in $EDITOR
-:b pkgs.hello           # build a derivation
-inputs.<TAB>            # explore flake inputs
-builtins.toString pkgs.hello  # show store path
-```
+1. **Untracked files invisible to flakes** - Run `git add` before any flake command. Nix only copies git-tracked files into the store for evaluation (staged but uncommitted is fine).
+2. **allowUnfree breaks in devShells** - `nixpkgs.config.allowUnfree` doesn't flow into standalone `nix develop` because devShells bypass the module system. Use `nixpkgs-unfree` (recommended), `--impure`, or `~/.config/nixpkgs/config.nix`. See `references/nixpkgs-advanced.md` for details.
+3. **Duplicate nixpkgs downloads** - Use `inputs.nixpkgs.follows = "nixpkgs"` on all inputs that depend on nixpkgs, or each input downloads its own copy.
+4. **Python pip install fails** - Nix's sandbox blocks network and filesystem writes. Use `venv` inside `mkShell`, `poetry2nix`, or containers. See `references/dev-environments.md`.
+5. **Downloaded binaries crash** - Pre-built binaries expect FHS paths (`/lib`, `/usr`) that don't exist on NixOS. Use `pkgs.buildFHSEnv` or `nix-ld`. See `references/dev-environments.md`.
+6. **String interpolation in multi-line strings** - Use `''$` to escape `${` inside `''...''` strings. See `references/nix-language.md` for the full escaping table.
+7. **Build from source unexpectedly** - Overlays change derivation hashes, invalidating binary cache. Consider a separate nixpkgs instance for overlayed packages. See `references/nixpkgs-advanced.md`.
 
 ## References
 
@@ -242,11 +197,11 @@ Consult these based on what you're working on:
 
 | Reference | When to read it |
 |-----------|----------------|
-| `references/nix-language.md` | Writing or debugging Nix expressions, understanding syntax |
-| `references/flakes.md` | Configuring flake inputs/outputs, understanding lock files |
-| `references/home-manager.md` | Managing user dotfiles, programs, and services |
-| `references/nix-darwin.md` | macOS system config, Homebrew integration, system defaults |
-| `references/nixpkgs-advanced.md` | Custom packages, overlays, overrides, `callPackage` |
-| `references/dev-environments.md` | Dev shells, direnv, FHS compat, devenv, language-specific setups |
-| `references/best-practices.md` | Project structure, debugging, deployment, secrets, CI/CD |
-| `references/templates.md` | Copy-paste flake.nix starting points for common setups |
+| `references/nix-language.md` | Writing or debugging Nix expressions, syntax, builtins, `lib` functions, string escaping |
+| `references/flakes.md` | Flake input types, outputs schema, lock files, flake-parts, flake-compat |
+| `references/home-manager.md` | User dotfiles, program modules, file management, `mkOutOfStoreSymlink`, activation scripts |
+| `references/nix-darwin.md` | macOS system config, Homebrew integration, system defaults (Dock/Finder/Keyboard), launchd, TouchID |
+| `references/nixpkgs-advanced.md` | Custom packages, `callPackage`, overlays, overrides, unfree packages, trivial builders, fetchers |
+| `references/dev-environments.md` | Dev shells, `mkShell`, direnv, devenv, FHS compat, nix-ld, language-specific setups (Python, Rust, Node, etc.) |
+| `references/best-practices.md` | Project structure, debugging (`nix repl`, `--show-trace`), deployment (Colmena, deploy-rs), secrets, CI/CD |
+| `references/templates.md` | Copy-paste `flake.nix` starting points for NixOS, Darwin, Home Manager, dev shells, Docker images |

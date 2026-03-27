@@ -536,7 +536,7 @@ Ready-to-use `flake.nix` templates for common scenarios.
     casks = [ "firefox" "visual-studio-code" ];
   };
 
-  system.stateVersion = 5;
+  system.stateVersion = 6;
 }
 
 # Apply with: sudo darwin-rebuild switch --flake .#hostname

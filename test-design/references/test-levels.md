@@ -4,7 +4,7 @@ The Test Desiderata properties don't carry equal weight at every test level. Thi
 
 ## Unit Tests
 
-Unit tests are the foundation. They should be the majority of your test suite and they should be cheap to write, fast to run, and easy to understand.
+Unit tests are valuable for isolated logic. They should be fast to run and easy to understand. See the SKILL.md "Where to Invest" section for guidance on where to focus testing effort across levels.
 
 **Prioritize these properties:**
 - **Isolated**: Absolutely. Each unit test runs independently -- no shared state, no ordering dependence, no implicit setup from other tests.
@@ -94,6 +94,6 @@ The traditional testing pyramid -- many unit tests, fewer integration tests, ver
     /____________________\
 ```
 
-This isn't dogma -- some systems benefit from a different shape (more integration tests for a CRUD app, more e2e tests for a critical workflow). But the reasoning behind the pyramid is sound: invest most in the tests that give you the fastest feedback loop (unit), and use higher-level tests strategically for confidence that can't come from unit tests alone.
+This isn't dogma -- some systems benefit from a different shape. The SKILL.md "Where to Invest" section recommends defaulting to integration tests for most codebases, using unit tests for pure logic and isolated algorithms, and keeping e2e suites small and focused.
 
-Follow this distribution naturally: generate thorough unit tests for logic, targeted integration tests for component boundaries, and suggest (but not necessarily generate) e2e tests for critical paths.
+Follow this principle naturally: write unit tests for pure logic, integration tests for component boundaries (and as the default when in doubt), and a small curated suite of e2e tests for critical paths.

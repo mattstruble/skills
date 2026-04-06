@@ -41,9 +41,28 @@ Read `references/test-levels.md` for deeper guidance. Summary:
 
 **Unit tests** -- Optimize for: isolated, fast, specific, structure-insensitive, composable. Each tests one behavioral concern, runs in milliseconds, survives refactors.
 
-**Integration tests** -- Accept: slower, less isolated. Gain: more predictive. Mock less (that's the point), but stay focused on specific integration points.
+**Integration tests** -- Accept: slower, less isolated. Gain: more predictive. Use real or local equivalents -- that's the point. Stay focused on specific integration points.
 
 **E2e tests** -- Accept: slowest, least specific. Gain: most predictive. Keep the count low, focused on critical user journeys.
+
+## Where to Invest
+
+For most codebases, **integration tests return the most value per test written**. Here's why:
+
+- **Unit tests are coupled to internals.** A unit test that passes a mock repository to a service is really testing the service's call sequence, not its behavior. When you refactor -- extract a method, add a caching layer, change a collaborator -- unit tests break even when behavior is unchanged. This is the fragility trap.
+- **E2e tests are hard to debug.** When an e2e test fails, the failure could be anywhere in the stack. The signal is real but the diagnosis is expensive.
+- **Integration tests hit the middle ground.** High enough to test real correctness (real or local equivalents of databases, HTTP, message queues), low enough that a failure points to a specific component boundary. They survive refactors because they test outcomes, not call sequences.
+
+**Where unit tests are the right choice:**
+- Isolated algorithmic logic: parsers, calculators, validators, data transformations
+- Pure functions with many input combinations (use parameterized tests)
+- Parser combinators and state machines where each rule needs direct verification
+- Anything where the "integration" would just be noise -- no real collaborator interaction
+
+**The role of e2e tests:**
+Keep a small, curated suite covering the most common user flows and a handful of critical edge cases. Run them religiously -- a failing e2e test is a production risk. Don't let the suite grow large; each addition should be justified by a flow that can't be adequately covered at the integration level.
+
+**The practical bias:** When deciding where to add a new test, default to integration unless there's a clear reason to go lower (pure logic, speed requirements) or higher (critical user journey). This isn't a pyramid -- it's a judgment call, and integration is usually the right default.
 
 ## Checklist
 
@@ -62,7 +81,7 @@ When writing or reviewing a test:
 Read `references/anti-patterns.md` for detailed examples. The key anti-patterns to watch for:
 
 - **Echo-back assertions**: Asserting the function returns the same values you passed in. Test derived/consequential state instead.
-- **Over-mocking**: Mocking every collaborator and verifying calls makes tests mirror the implementation. Use fakes for stateful collaborators; verify outcomes, not interactions.
+- **Over-mocking**: Mocking every collaborator and verifying calls makes tests mirror the implementation. Mocks should be rare -- approaching never for stateful collaborators. When you do mock, do it only at coarse-grain system boundaries: external HTTP services, payment processors, third-party APIs. Use fakes with in-memory state for everything else; verify outcomes, not interactions.
 - **Testing private methods**: Test through the public API. If a private method needs direct testing, it should be its own unit.
 - **Excessive setup**: 30 lines of construction for 2 lines of testing. Use factory functions with sensible defaults.
 - **Snapshot overuse**: Snapshots break on any change, including cosmetic ones. Assert on specific properties you care about.
@@ -75,7 +94,7 @@ The key patterns to follow:
 - **One behavioral concern per test**: Not one assertion, but one *concern*. "inventory decreases and email is sent" is two concerns -- split them.
 - **Arrange-Act-Assert**: Three clear phases with blank lines between them.
 - **Boundary behavior**: Happy paths are the least likely to catch bugs. Focus on edge cases, error conditions, and boundary values.
-- **Fakes over mock-call verification**: At the unit level, verify outcomes (data persisted, state changed) rather than interactions (method called with args). At the integration level, prefer real or local equivalents over mocks.
+- **Fakes over mock-call verification**: Verify outcomes (data persisted, state changed) rather than interactions (method called with args). At the integration level, use real or local equivalents. At the unit level, use fakes with in-memory state for stateful collaborators. Reserve mocks for true external boundaries (third-party APIs, payment processors) where a real or fake equivalent isn't practical.
 
 ## References
 

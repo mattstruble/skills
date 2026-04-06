@@ -87,6 +87,32 @@ Use this template when spawning each reviewer. Populate all fields before spawni
 
 ---
 
+## Review Principles
+
+These principles apply to all four sub-reviewers. Internalize them before evaluating any finding.
+
+### Chesterton's Fence
+
+Before recommending removal or rewrite of any code, be able to articulate why the code was there in the first place. "I don't understand this" is not a valid reason to recommend removal — it's a reason to investigate.
+
+This applies especially to:
+- Error handling that looks redundant
+- Defensive checks that seem unnecessary
+- Legacy compatibility code
+- Commented-out code that might be intentional documentation
+
+If you cannot explain the purpose of code you're recommending to remove, downgrade your finding to a suggestion and note that the purpose is unclear. The author may have context you don't.
+
+### FOLD (Fear of Looking Dumb)
+
+"I don't understand this and that concerns me" is a legitimate, high-signal review comment. If you cannot understand a piece of code after a genuine attempt, that's information about the code's complexity — not your competence.
+
+Raise a readability finding when code is genuinely hard to follow, even if you can't articulate exactly what's wrong. "I had to read this three times and I'm still not confident I understand it" is a valid finding.
+
+These two principles are complementary: Chesterton's Fence says *don't tear down what you don't understand*; FOLD says *it's okay to admit you don't understand*.
+
+---
+
 ## Review Loop
 
 This is the core orchestration logic. Follow it precisely.

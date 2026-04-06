@@ -41,6 +41,8 @@ library interop — use TypedDict. The access pattern tells you:
 | Shared implementation for authors | `ABC` | Callers type against Protocol, not the ABC |
 | Shared behavior across unrelated classes | Mixin | Implementation without contract |
 
+**Generics restraint:** `TypeVar` and generics shine in container and collection abstractions — type-safe wrappers, reusable data structures, utility functions like `first(items: Sequence[T]) -> T`. The trap is over-genericizing business logic that only ever has one concrete type: if `UserRepository` will never be anything other than a `UserRepository`, making it `Repository[T]` adds abstraction without value. Even when multiple concrete types exist, if every subclass adds domain-specific methods anyway, the generic base captures only the trivial skeleton — evaluate whether that skeleton justifies the abstraction overhead. A caller-facing `Protocol` often provides more value than a generic concrete base. Reach for generics when the type relationship is genuinely reusable across multiple concrete types; otherwise, name the type directly. See `references/advanced-patterns.md` for `TypeVar` syntax and examples.
+
 ---
 
 ## Key Patterns

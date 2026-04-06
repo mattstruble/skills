@@ -5,183 +5,157 @@ description: Use when writing a new service, adding error handling, implementing
 
 # Logging
 
-Logging is one of the highest-leverage investments in a codebase, and one of the most neglected. Schools don't teach it. Most tutorials skip it. Then a service breaks at 2am and you're staring at a stack trace with no context.
+Logging is how you see what your system did after the fact, without a debugger attached. It's the difference between resolving an incident in minutes and staring at a stack trace wishing you'd logged more.
 
-The goal of logging is **operability**: the ability to understand what your system is doing, after the fact, without a debugger attached.
+The natural instinct is to treat logging as an afterthought — bolt it onto error handlers, rank it last in code review fix lists, add it "later." That instinct is wrong. Logging is a first-class design concern. Build it into the normal flow of the code, not just the failure path.
 
-Use language-agnostic pseudocode in all examples unless the user specifies a language.
+Match the user's language. If no language is specified or implied, use Python.
 
 ---
 
-## What to Log
+## Log the happy path, not just errors
 
-### Log all branches, not just the entry point
+The biggest gap in most logging: every error branch has a log line, but successful operations are silent. When investigating an incident, you need to see what the system *did*, not just what broke. If only failures are visible in logs, you can't distinguish "no traffic" from "everything worked fine."
 
-The most common logging mistake is logging only at the start of a function. When something goes wrong, you need to know *which path* was taken.
+Log the *outcome* of each significant operation — request handled, job completed, payment processed. One INFO line per significant operation on the happy path.
 
+```python
+# Gap: success is invisible
+@app.route("/orders/<int:order_id>")
+def get_order(order_id):
+    order = db.get(order_id)
+    if order is None:
+        log.warning("order_not_found", order_id=order_id)
+        return {"error": "not found"}, 404
+    return serialize(order), 200  # silent — was this endpoint even called?
+
+# Fixed: normal flow is observable
+@app.route("/orders/<int:order_id>")
+def get_order(order_id):
+    order = db.get(order_id)
+    if order is None:
+        log.warning("order_not_found", order_id=order_id)
+        return {"error": "not found"}, 404
+    log.info("order_retrieved", order_id=order_id, status=order.status)
+    return serialize(order), 200
 ```
-# Poor: you know the request arrived, nothing else
-function handle_payment(order):
-    log.info("handling payment", order_id=order.id)
-    if order.total == 0:
-        return skip_payment(order)       # silent
-    if order.payment_method == "credit":
-        return charge_card(order)        # silent
-    return charge_wallet(order)          # silent
 
-# Better: each branch is observable
-function handle_payment(order):
-    log.info("handling payment", order_id=order.id, total=order.total,
+This extends to branches too — log which path was taken through conditional logic, not just the entry point:
+
+```python
+def handle_payment(order):
+    log.info("payment_started", order_id=order.id, total=order.total,
              method=order.payment_method)
     if order.total == 0:
-        log.info("skipping payment: zero total", order_id=order.id)
+        log.info("payment_skipped_zero_total", order_id=order.id)
         return skip_payment(order)
     if order.payment_method == "credit":
-        log.info("charging card", order_id=order.id)
+        log.info("charging_card", order_id=order.id)
         return charge_card(order)
-    log.info("charging wallet", order_id=order.id)
+    log.info("charging_wallet", order_id=order.id)
     return charge_wallet(order)
 ```
 
-### Log enough context to reproduce — but not sensitive data
+## Use structured logging consistently
 
-Errors without context are nearly useless. Log the state that led to the error — not just the message. But never log credentials, tokens, passwords, payment card numbers, or raw PII. Log identifiers (user_id, order_id) that let you look up sensitive data through secure channels — not the sensitive data itself.
+Pick one format for the entire codebase and stick with it. Mixing %-interpolation, f-strings, and `extra={}` dicts across files makes logs harder to query, not easier.
 
+Use keyword arguments that produce key-value pairs a log aggregator can filter on. The specific library (structlog, stdlib with a JSON formatter, etc.) matters less than consistency.
+
+```python
+# Inconsistent — three formats in one codebase, none queryable the same way
+logger.info("User %s placed order %s", user_id, order_id)
+logger.info(f"User {user_id} placed order {order_id}")
+logger.info("order placed", extra={"user_id": user_id})
+
+# Consistent — every log line is structured and queryable the same way
+log.info("order_placed", user_id=user_id, order_id=order_id, total=total)
 ```
-# Safe: log identifiers
-log.error("payment failed", user_id=user.id, order_id=order.id)
 
-# Dangerous: log raw object state (may contain secrets, PII, tokens)
-log.error("payment failed", user=user, order=order)
+## Always include a correlation ID
+
+Not just when the architecture is "obviously" distributed. Any request that touches a database, an API, or a queue benefits from a correlation ID. It costs one line at the entry point and pays back every time you trace a request through logs.
+
+Generate it at the entry point. Bind it to the logger context so it appears in every subsequent log line automatically. Pass it in headers to downstream services.
+
+```python
+def handle_request(request):
+    correlation_id = request.headers.get("X-Correlation-ID") or str(uuid4())
+    log = logger.bind(correlation_id=correlation_id)
+    log.info("request_received", method=request.method, path=request.path)
+    # all subsequent calls using `log` include correlation_id automatically
 ```
 
-```
-# Poor: you know it failed, you don't know why
+## Log entry AND exit of external calls, with duration
+
+When an external call fails, you need to know what was attempted, not just that something failed. When it succeeds, you still need the duration — that's how you spot degradation before it becomes an outage.
+
+```python
+# Gap: only failures are visible, no timing data
 try:
-    result = process(item)
-catch Exception as e:
-    log.error("processing failed", error=e)
+    response = client.get(url, timeout=10)
+except RequestException as e:
+    log.error("shipping_api_failed", error=str(e))
+    return {}
 
-# Better: log identifiers and safe fields alongside the error
+# Fixed: entry, exit, and duration are all observable
+log.info("shipping_api_calling", url=url, tracking_number=tracking)
+start = time.monotonic()
 try:
-    result = process(item)
-catch Exception as e:
-    log.error("processing failed",
-              error=e,
-              item_id=item.id,
-              item_type=item.type,
-              retry_count=item.retry_count)
+    response = client.get(url, timeout=10)
+    response.raise_for_status()
+    duration_ms = (time.monotonic() - start) * 1000
+    log.info("shipping_api_responded", status=response.status_code,
+             duration_ms=round(duration_ms, 1))
+    return response.json()
+except RequestException as e:
+    duration_ms = (time.monotonic() - start) * 1000
+    log.warning("shipping_api_failed", error=str(e),
+                duration_ms=round(duration_ms, 1))
+    return {}
 ```
 
-### Log entry/exit of significant operations
+## In code reviews, treat missing logging as a production-readiness issue
 
-For operations that take meaningful time or have side effects (DB writes, external API calls, queue publishes), log both entry and exit with duration.
+Missing logging is an operability gap, not a nice-to-have. When reviewing code for production, rank logging alongside error handling — both affect your ability to operate and debug the system.
 
-```
-log.debug("calling payment gateway", gateway=gateway.name, amount=order.total)
-start = now()
-response = gateway.charge(order)
-log.info("payment gateway responded",
-         gateway=gateway.name,
-         status=response.status,
-         duration_ms=elapsed(start))
-```
+Flag these specifically:
+- Endpoints or jobs with no logging on the success path
+- External calls with no entry/exit logging or timing
+- Error handlers that log the exception but not the state that led to it
+- Request-handling code with no correlation ID
 
----
+## Make log levels adjustable at runtime
 
-## Log Levels
+Hardcoded log levels mean you either drown in noise or fly blind. At minimum, read the level from a config that can change without redeployment. Better: expose a mechanism to adjust per-service or per-user.
 
-Use levels consistently so you can filter noise in production:
+Per-user debug logging is especially powerful for production debugging — turn on verbose output for one user reporting a bug without flooding everyone else's logs. Use request-scoped loggers; never mutate shared logger state in a concurrent server.
 
-| Level | When to use |
-|-------|-------------|
-| **DEBUG** | Detailed internal state, decision points, loop iterations. Off in production by default. |
-| **INFO** | Normal operations worth recording: requests received, jobs completed, config loaded. |
-| **WARN** | Something unexpected happened but the system recovered. Worth investigating later. |
-| **ERROR** | Something failed and requires attention. Include full context. |
-
-A useful heuristic: if you'd want to see it during a production incident, it's INFO or higher. If you'd only want it when actively debugging a specific issue, it's DEBUG.
-
----
-
-## Correlation IDs
-
-In any system with multiple services or concurrent requests, logs from a single operation get scattered. Correlation IDs tie them together.
-
-**Assign a correlation ID at the entry point** (HTTP request, queue message, job start) and propagate it through every downstream call and log line.
-
-```
-# Entry point: assign or accept a correlation ID
-function handle_request(request):
-    correlation_id = request.header("X-Correlation-ID") or generate_uuid()
-    context.set("correlation_id", correlation_id)
-    log.info("request received", correlation_id=correlation_id,
-             path=request.path, method=request.method)
-    start = now()
-    response = route(request)
-    log.info("request complete", correlation_id=correlation_id,
-             status=response.status, duration_ms=elapsed(start))
-    return response
-
-# Downstream: pull from context, pass to log and outbound calls
-function fetch_user(user_id):
-    correlation_id = context.get("correlation_id")
-    log.debug("fetching user", correlation_id=correlation_id, user_id=user_id)
-    response = user_service.get(user_id,
-                                headers={"X-Correlation-ID": correlation_id})
-    ...
-```
-
-Now you can grep all logs for a single correlation ID and reconstruct exactly what happened for one request.
-
----
-
-## Dynamic Log Level Control
-
-Hardcoded log levels mean you either drown in DEBUG noise or fly blind in production. The fix: make log levels adjustable at runtime without redeployment.
-
-**Minimum viable approach:** read the log level from an environment variable or config file that can be updated without restart.
-
-**Better:** expose an admin endpoint or feature flag that changes the level per-service or per-user. The debug flag must be controlled by operators or admins -- not user-settable. A user-controllable debug flag is an information disclosure risk.
-
-```
-# Per-user debug logging: use a request-scoped logger, not a global set_level
-# WRONG: logger.set_level(DEBUG)  -- mutates shared state, races with other requests
-# RIGHT: create a request-scoped logger with the appropriate level
-function handle_request(request):
+```python
+def handle_request(request):
     user_id = authenticate(request)
-    if debug_flag_enabled_for(user_id):
-        request_logger = logger.with_level(DEBUG)
+    if debug_enabled_for(user_id):
+        req_log = logger.bind(correlation_id=corr_id).with_level(DEBUG)
     else:
-        request_logger = logger.with_level(INFO)
-    request_logger.info("handling request", user_id=user_id)
-    ...
+        req_log = logger.bind(correlation_id=corr_id)
+    req_log.info("request_received", user_id=user_id)
 ```
 
-Per-user debug logging lets you turn on verbose output for a specific user reporting a bug, without flooding logs for everyone else. Use request-scoped or context-local loggers -- never mutate a shared logger's level in a concurrent server.
-
-When reviewing a production incident, always ask: "Would dynamic log levels have helped here?" If the answer is yes, add runtime level control as part of the fix — not just the immediate bug.
+When reviewing a production incident, ask: "Would adjustable log levels have helped here?" If yes, add runtime level control as part of the fix.
 
 ---
 
-## Structured Logging
+## What not to log
 
-Prefer key=value pairs or JSON over interpolated strings. Structured logs are searchable and parseable by log aggregation tools.
+- **Secrets and PII.** Never log credentials, tokens, passwords, or payment card numbers. Log identifiers (user_id, order_id) that let you look up sensitive data through secure channels.
+- **Every loop iteration.** Log the loop's start, end, and count — not every step.
+- **Redundant context.** If a correlation ID is bound to the logger, don't repeat it in the message string.
 
+```python
+# Dangerous: may contain secrets, PII, tokens
+log.error("payment_failed", user=user, order=order)
+
+# Safe: log identifiers only
+log.error("payment_failed", user_id=user.id, order_id=order.id,
+          payment_method=order.payment_method)
 ```
-# Hard to query
-log.info(f"User {user_id} placed order {order_id} for ${total}")
-
-# Easy to query: filter by user_id, order_id, or total range
-log.info("order placed", user_id=user_id, order_id=order_id, total=total)
-```
-
----
-
-## The Cultural Point
-
-Logging is treated as an afterthought in most codebases because it's invisible when it works and painful only when it's missing — and by then, you're in an incident. The engineers who invest in logging early are the ones who sleep through incidents that would wake others up.
-
-Good logging is a form of respect: for your future self, for your teammates, and for the users depending on your system.
-
-Treat it like a first-class concern from the start.

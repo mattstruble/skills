@@ -42,11 +42,12 @@ def process_records(records):
     return [transform(r) for r in records if is_valid(r)]
 ```
 
-**Chesterton's Fence**: New code earns its place by proving it's needed.
-Existing code already earned its place once -- before removing it, understand
-*why* it exists. What invariant does it protect? What edge case does it handle?
-What broke before it was added? Deleting code you don't understand is how you
-reintroduce bugs that were already fixed.
+**Chesterton's Fence**: Existing code already earned its place once -- before
+removing it, understand *why* it exists. What invariant does it protect? What
+edge case does it handle? What broke before it was added? Deleting code you
+don't understand is how you reintroduce bugs that were already fixed. Code that
+is demonstrably unreachable or has no callers can be removed without this
+investigation -- the evidence of disuse is itself the answer.
 
 **Let cut points emerge**: Don't factor too early. Wait for natural factoring
 boundaries to reveal themselves through experience. The right abstraction
@@ -61,17 +62,20 @@ the full API available when needed. Don't force every caller to supply
 parameters they don't care about just because one caller does.
 
 ```
-# Before: every caller must supply all options
+# Before: every caller must handle the full complexity
 def send_report(data, format, recipients, cc=None, subject=None,
                 template=None, retry_count=3, timeout=30): ...
 
-# After: simple for the common case, full control when needed
-def send_report(data, recipients, format="pdf"):
-    """Covers 80% of callers. Use send_report_advanced() for custom templates."""
-    ...
+# After: compose small pieces — simple callers use the composed version,
+# power users use the building blocks directly
+def build_report(data, format="pdf", template=None): ...
+def deliver(report, recipients, cc=None, subject=None,
+            retry_count=3, timeout=30): ...
 
-def send_report_advanced(data, recipients, format, subject, template,
-                          cc=None, retry_count=3, timeout=30): ...
+def send_report(data, recipients, format="pdf"):
+    """Simple API: covers 80% of callers."""
+    report = build_report(data, format)
+    deliver(report, recipients)
 ```
 
 ---

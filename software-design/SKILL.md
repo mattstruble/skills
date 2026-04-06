@@ -1,6 +1,6 @@
 ---
 name: software-design
-description: Use this skill when writing code from scratch (scripts, functions, APIs, modules, classes) or restructuring existing code (refactoring bloated classes, splitting large functions, reorganizing parameters). Applies to concrete implementation tasks like "build a payment module", "write a script that processes files", "this class does too many things", "this function has 10+ parameters", or "should I use inheritance here?" (when applied to a specific class or module). Also trigger when the user wants to know whether to use inheritance vs composition for a concrete design, needs to split a large module, is designing a new service or library, or is unsure how to structure a codebase — even if they don't explicitly ask for "design help". The skill guides toward small, focused, composable design. Do NOT use for debugging existing errors, language syntax questions ("how do I use TypedDict?"), framework setup (CI/CD, database migrations), performance benchmarking, test quality criteria (see test-design), API surface conventions (see api-design), or abstract pattern theory discussions.
+description: Use this skill when writing code from scratch (scripts, functions, APIs, modules, classes) or restructuring existing code (refactoring bloated classes, splitting large functions, reorganizing parameters). Applies to concrete implementation tasks like "build a payment module", "write a script that processes files", "this class does too many things", "this function has 10+ parameters", or "should I use inheritance here?" (when applied to a specific class or module). Also trigger when the user wants to know whether to use inheritance vs composition for a concrete design, needs to split a large module, is designing a new service or library, is unsure how to structure a codebase, wants to know when to extract a helper vs keep it inline, or is deciding whether to remove existing code (dead code, legacy logic, retry blocks) — even if they don't explicitly ask for "design help". The skill guides toward small, focused, composable design. Do NOT use for debugging existing errors, language syntax questions ("how do I use TypedDict?"), framework setup (CI/CD, database migrations), performance benchmarking, test quality criteria (see test-design), API surface conventions (see api-design), or abstract pattern theory discussions.
 ---
 
 # Software Design Principles
@@ -40,6 +40,38 @@ class DataPipelineOrchestrator:
 def process_records(records):
     """Filter and transform records. Extend when the need is real."""
     return [transform(r) for r in records if is_valid(r)]
+```
+
+**Chesterton's Fence**: New code earns its place by proving it's needed.
+Existing code already earned its place once -- before removing it, understand
+*why* it exists. What invariant does it protect? What edge case does it handle?
+What broke before it was added? Deleting code you don't understand is how you
+reintroduce bugs that were already fixed.
+
+**Let cut points emerge**: Don't factor too early. Wait for natural factoring
+boundaries to reveal themselves through experience. The right abstraction
+announces itself: a narrow interface that hides genuine complexity, a pattern
+that repeats in three genuinely similar places, a boundary where two things
+change at different rates. Premature extraction creates abstractions that fit
+the first two cases but fight the third.
+
+**Layered interfaces**: Design for the 80% use case first; make the 20%
+possible without making the 80% harder. A simple API for simple cases, with
+the full API available when needed. Don't force every caller to supply
+parameters they don't care about just because one caller does.
+
+```
+# Before: every caller must supply all options
+def send_report(data, format, recipients, cc=None, subject=None,
+                template=None, retry_count=3, timeout=30): ...
+
+# After: simple for the common case, full control when needed
+def send_report(data, recipients, format="pdf"):
+    """Covers 80% of callers. Use send_report_advanced() for custom templates."""
+    ...
+
+def send_report_advanced(data, recipients, format, subject, template,
+                          cc=None, retry_count=3, timeout=30): ...
 ```
 
 ---
@@ -102,6 +134,31 @@ Code should communicate its purpose and not promise more than it delivers.
   implementations. Wrap external dependencies so you can swap them. Write for
   the reader who comes after you.
 
+**Locality of Behavior**: The behavior of a code unit should be obvious by
+looking only at that unit. When you have to chase through five files to
+understand what a single function does, the behavior has been spread too thin.
+This complements honesty (don't hide what you do) but addresses *structural
+proximity*: don't spread a single behavior across distant files when it can
+live together. Co-locate the things that change together.
+
+**Expression complexity**: Break complex conditionals into named intermediate
+variables. This makes the logic readable and makes the intermediate values
+inspectable in a debugger.
+
+```
+# Before: dense conditional — hard to read, hard to debug
+if user.subscription_tier in ("pro", "enterprise") and not user.payment_overdue \
+        and (user.trial_days_remaining > 0 or user.has_paid_invoice):
+    grant_access()
+
+# After: named intermediates — each step is readable and debuggable
+is_paid_tier = user.subscription_tier in ("pro", "enterprise")
+is_account_current = not user.payment_overdue
+has_valid_access = user.trial_days_remaining > 0 or user.has_paid_invoice
+if is_paid_tier and is_account_current and has_valid_access:
+    grant_access()
+```
+
 ```
 # Before: name hides side effects; failure is silent
 def get_user(user_id):
@@ -133,9 +190,12 @@ When reviewing code or making design decisions:
 1. **Does this earn its place?** (Purpose and Usefulness, Minimalism)
 2. **Is each piece focused on one thing?** (Focused Interfaces)
 3. **Can I understand this without running it in my head?** (Pure Functions, Self-Explanatory Design)
-4. **Does it do what it says?** (Honesty)
+4. **Does it do what it says?** (Honesty, Locality of Behavior)
 5. **What happens when things go wrong?** (Thoroughness)
 6. **Will this still make sense in a year?** (Longevity Over Trend)
+7. **Before I delete this -- do I know why it exists?** (Chesterton's Fence)
+8. **Am I factoring too early, or has the pattern proven itself?** (Let cut points emerge)
+9. **Is the common case simple, and the complex case possible?** (Layered interfaces)
 
 These are lenses, not laws. They sometimes conflict -- minimalism might suggest
 fewer types while thoroughness demands explicit error handling. Use judgment.

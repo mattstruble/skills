@@ -46,6 +46,12 @@ for truly simple topics, but you still question before acting.
   Compare trade-offs and recommend one.
 - **YAGNI ruthlessly.** Challenge features that aren't clearly needed. Remove
   unnecessary complexity from all designs.
+- **80/20 when YAGNI fails.** Sometimes you can't say no — a stakeholder has
+  already committed, a business requirement is non-negotiable, or the team has
+  decided. That's okay. When a feature survives the YAGNI challenge, the next
+  question becomes: what's the version that delivers 80% of the value with 20%
+  of the complexity? Strip it to the core need. The goal shifts from elimination
+  to simplification.
 - **Flag scope early.** If the request covers multiple independent subsystems, flag
   it immediately rather than refining details of something that needs decomposition
   first. Help break it into pieces, then brainstorm the first piece.

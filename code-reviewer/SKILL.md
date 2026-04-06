@@ -89,7 +89,7 @@ Use this template when spawning each reviewer. Populate all fields before spawni
 
 ## Review Principles
 
-These principles apply to all four sub-reviewers. Internalize them before evaluating any finding.
+These principles apply when orchestrating reviews and evaluating findings. When spawning sub-reviewers, include these principles in the review request prompt so they are visible to each reviewer.
 
 ### Chesterton's Fence
 
@@ -99,9 +99,10 @@ This applies especially to:
 - Error handling that looks redundant
 - Defensive checks that seem unnecessary
 - Legacy compatibility code
-- Commented-out code that might be intentional documentation
 
 If you cannot explain the purpose of code you're recommending to remove, downgrade your finding to a suggestion and note that the purpose is unclear. The author may have context you don't.
+
+**Security exception:** This downgrade rule does not apply to security-relevant code. If you cannot explain why a security check, input validation, authentication guard, or rate limit exists, escalate rather than downgrade. The cost of wrongly removing a security defense is asymmetrically higher than preserving unnecessary code.
 
 ### FOLD (Fear of Looking Dumb)
 

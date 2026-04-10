@@ -1,6 +1,6 @@
 ---
 name: software-design
-description: Use this skill when writing code from scratch (scripts, functions, APIs, modules, classes) or restructuring existing code (refactoring bloated classes, splitting large functions, reorganizing parameters). Applies to concrete implementation tasks like "build a payment module", "write a script that processes files", "this class does too many things", "this function has 10+ parameters", or "should I use inheritance here?" (when applied to a specific class or module). Also trigger when the user wants to know whether to use inheritance vs composition for a concrete design, needs to split a large module, is designing a new service or library, is unsure how to structure a codebase, wants to know when to extract a helper vs keep it inline, or is deciding whether to remove existing code (dead code, legacy logic, retry blocks) — even if they don't explicitly ask for "design help". The skill guides toward small, focused, composable design. Do NOT use for debugging existing errors, language syntax questions ("how do I use TypedDict?"), framework setup (CI/CD, database migrations), performance benchmarking, test quality criteria (see test-design), API surface conventions (see api-design), or abstract pattern theory discussions.
+description: Use this skill whenever writing, reviewing, or designing code in any language — scripts, functions, APIs, modules, classes, or systems. Applies to concrete implementation tasks like "build a payment module", "write a script that processes files", "this class does too many things", "this function has 10+ parameters", or "should I use inheritance here?" (when applied to a specific class or module). Also trigger when the user wants to know whether to use inheritance vs composition for a concrete design, needs to split a large module, is designing a new service or library, is unsure how to structure a codebase, wants to know when to extract a helper vs keep it inline, is deciding whether to remove existing code (dead code, legacy logic, retry blocks), encounters code that seems verbose or over-documented (unnecessary wrappers, comments restating the code, docstrings duplicating signatures), faces genuinely ambiguous design behavior (what should happen on empty input, which error should propagate, what the right default is), or is reviewing code where conventions are silently violated without explanation. The skill guides toward small, focused, composable, honest design — even if the user doesn't explicitly ask for "design help". Do NOT use for debugging existing errors (see systematic-debugging), language syntax questions ("how do I use TypedDict?"), framework setup (CI/CD, database migrations), performance benchmarking, test quality criteria (see test-design), API surface conventions (see api-design), abstract pattern theory discussions, style or convention violations in isolation (see code-reviewer, python-code-style), or debugging sessions where ambiguous behavior is a symptom of a bug rather than a design question.
 ---
 
 # Software Design Principles
@@ -163,6 +163,48 @@ if is_paid_tier and is_account_current and has_valid_access:
     grant_access()
 ```
 
+**Ask at decision points**: Ask when the answer cannot be inferred from the
+codebase's conventions, the language's standard behavior, or the caller's
+stated intent. When a standard defensive default applies, apply it and note the
+assumption in a comment. Reserve asking for cases where reasonable engineers
+would disagree — the cost of asking is one question; the cost of guessing wrong
+is rework after the caller discovers the assumption. This applies to code review
+too: if a design choice isn't obvious from context, the author should document
+the reasoning, not leave reviewers to guess.
+
+**Conciseness**: Every line of code and documentation should carry information.
+No docstrings that restate what the signature already says. No comments that
+narrate the code. No single-use abstractions (type aliases, helper functions,
+wrapper classes) that exist only to "be clean" but add indirection without
+simplifying. Remove documentation that adds no information beyond what the
+signature and code already express; keep documentation that explains the "why,"
+not the "what."
+
+```
+# Before: comment restates the code
+x = x + 1  # increment x by 1
+
+# Before: wrapper that adds nothing
+def get_items():
+    return fetch_items()
+
+# After: the code speaks for itself — comment only when the "why" isn't obvious
+x = x + 1  # offset for 1-based indexing in the legacy API
+```
+
+**Comment when breaking a convention**: Silence means the project's conventions
+apply. An inline comment means you thought about it and chose differently for a
+specific reason. This makes rule violations visible and reviewable — the
+alternative is silent deviation that erodes conventions over time.
+
+```
+try:
+    plugin.load(name)
+# Catching broad Exception because the plugin loader must never crash the host process.
+except Exception:
+    logger.exception("plugin failed to load")
+```
+
 ```
 # Before: name hides side effects; failure is silent
 def get_user(user_id):
@@ -200,6 +242,9 @@ When reviewing code or making design decisions:
 7. **Before I delete this -- do I know why it exists?** (Chesterton's Fence)
 8. **Am I factoring too early, or has the pattern proven itself?** (Let cut points emerge)
 9. **Is the common case simple, and the complex case possible?** (Layered interfaces)
+10. **Am I guessing at behavior, or did I confirm it?** (Ask at decision points)
+11. **Does every line carry information?** (Conciseness)
+12. **If I'm breaking a convention, did I say why?** (Comment when breaking a convention)
 
 These are lenses, not laws. They sometimes conflict -- minimalism might suggest
 fewer types while thoroughness demands explicit error handling. Use judgment.

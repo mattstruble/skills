@@ -75,9 +75,12 @@ Check available tools — if useful for research (searching docs, finding simila
 Based on the user interview, fill in these components:
 
 - **name**: Skill identifier
-- **description**: When to trigger. This is the primary triggering mechanism — include specific contexts, symptoms, and situations that should invoke the skill. All "when to use" info goes here, not in the body. Note: models tend to "undertrigger" skills — to not use them when they'd be useful. To combat this, make the skill descriptions a little bit "pushy". So for instance, instead of "Use when the user wants to display internal data.", you might write "Use when the user wants to display internal data. Make sure to use this skill whenever the user mentions dashboards, data visualization, internal metrics, or wants to display any kind of data, even if they don't explicitly ask for a 'dashboard.'"
+- **description**: When to trigger. This is the primary triggering mechanism. Models tend to **undertrigger** skills — they won't consult a skill if they feel confident handling the task alone. Combat this with forceful language and a clear template. See the "Description Template" section under Description Optimization for the full pattern, but the key rules are:
 
-  **Important — don't summarize the workflow in the description.** Descriptions that explain *how* the skill works (e.g., "dispatches subagents per task with code review between tasks") create a shortcut: the agent reads the description and follows that summary instead of loading and reading the full skill. The description should only describe *when* to trigger. The "Description Anti-Pattern: Workflow Summaries" section under Description Optimization has concrete before/after examples.
+  - **Use MUST language** for skills that need aggressive triggering: "You MUST consult this skill when..." or "You MUST use this skill before..."
+  - **Target ~80 words**: forceful opener (~15 words) + 2-3 non-obvious triggers (~30 words) + concise exclusions (~25 words)
+  - **Don't list keyword variants** — "commit my stuff", "commit this", "make a commit" wastes words. A broad opener catches these; save words for non-obvious triggers the opener wouldn't catch.
+  - **Don't summarize the workflow** — descriptions that explain *how* the skill works create a shortcut: the agent follows the summary instead of loading the full skill. See "Description Anti-Pattern: Workflow Summaries" under Description Optimization.
 - **compatibility**: Required tools, dependencies (optional, rarely needed)
 - **the rest of the skill :)**
 
@@ -359,7 +362,54 @@ description: Use when executing implementation plans with independent tasks in t
 description: Use when implementing any feature or bugfix, before writing implementation code
 ```
 
-Start descriptions with "Use when..." and focus on: what the user is trying to do, what situation they're in, what symptoms or contexts should trigger the skill. The skill body handles the rest.
+Descriptions should only describe *when* to trigger — the skill body handles the rest.
+
+### Description Template
+
+Every description follows this structure:
+
+1. **Forceful opener** (~15 words): "You MUST consult/apply/use this skill when/before..."
+2. **Non-obvious triggers** (~30 words): 2-3 scenarios that wouldn't be intuited from the opener alone
+3. **Concise exclusions** (~25 words): "NOT for X, Y, or Z (see other-skill)"
+
+Target: **~80 words total**. No keyword variant lists, no philosophy taglines, no workflow summaries.
+
+**Two framing variants:**
+
+- **"when" (concurrent)** — for skills that shape how work is done: "You MUST consult this skill when writing Python code." Use for design skills, code style, logging.
+- **"before" (temporal gate)** — for skills that must fire before work starts: "You MUST use this skill before implementing any feature." Use for TDD, brainstorming, planning.
+
+**"Use when" (soft)** is fine for niche/keyword-driven skills where the topic is distinctive enough that soft language works (e.g., Nix, git-commit). Use MUST for skills that agents tend to skip because they feel confident handling the task alone — design, testing, logging.
+
+**Proactive skills** — skills that should fire when the user doesn't mention the topic (like logging) can't rely on topic vocabulary. Match the ACTIVITY vocabulary instead: "when writing FastAPI services, background workers, queue consumers" rather than "when the user mentions logging."
+
+```yaml
+# BAD: soft language, keyword list, philosophy tagline
+description: Use this skill whenever writing Python code. Covers Protocol vs ABC,
+  TypedDict vs dataclass, functools, generator pipelines... The skill guides toward
+  clean, well-structured Python.
+
+# BAD: lists every phrase variant
+description: Use when committing — 'commit my stuff', 'commit this', 'make a commit',
+  'git commit', 'help me commit', or just 'commit'.
+
+# GOOD: MUST opener, non-obvious triggers, concise exclusions
+description: You MUST consult this skill when writing, reviewing, or generating Python
+  code. Also trigger on Python-specific design choices (Protocol vs ABC, Pydantic
+  boundaries), code style anti-patterns (broad exceptions, sentinel defaults). NOT for
+  debugging, framework setup, package management, or writing tests (see test-design).
+
+# GOOD: temporal gate for prerequisite skill
+description: You MUST use this skill before implementing any feature, fixing any bug,
+  or refactoring existing code. Also trigger on mentions of TDD or red-green-refactor.
+  NOT for trivial fixes, config changes, or test quality in isolation (see test-design).
+```
+
+### Co-triggering
+
+Multiple skills firing for the same query is correct behavior when they provide complementary guidance. A "write a Python feature with tests" prompt should trigger software-design, python-design, test-design, and TDD simultaneously — each contributes different value.
+
+When designing trigger eval queries (below), mark `should_trigger=true` for EVERY skill that should fire for a query, not just the "most specific" one. Treat unexpected co-triggers as false positives only when the skills genuinely conflict or the additional skill adds no value.
 
 ### Step 1: Generate trigger eval queries
 
@@ -380,7 +430,7 @@ Good: `"ok so my boss just sent me this xlsx file (its in my downloads, called s
 
 For the **should-trigger** queries (8-10), think about coverage. You want different phrasings of the same intent — some formal, some casual. Include cases where the user doesn't explicitly name the skill or file type but clearly needs it. Throw in some uncommon use cases and cases where this skill competes with another but should win.
 
-For the **should-not-trigger** queries (8-10), the most valuable ones are the near-misses — queries that share keywords or concepts with the skill but actually need something different. Think adjacent domains, ambiguous phrasing where a naive keyword match would trigger but shouldn't, and cases where the query touches on something the skill does but in a context where another tool is more appropriate.
+For the **should-not-trigger** queries (8-10), the most valuable ones are the near-misses — queries that share keywords or concepts with the skill but actually need something different. Think adjacent domains, ambiguous phrasing where a naive keyword match would trigger but shouldn't, and cases where the query touches on something the skill does but in a context where another tool is more appropriate. Remember that co-triggering is fine (see above) — only mark a query as should-not-trigger when the skill genuinely adds no value for that task.
 
 The key thing to avoid: don't make should-not-trigger queries obviously irrelevant. "Write a fibonacci function" as a negative test for a PDF skill is too easy — it doesn't test anything. The negative cases should be genuinely tricky.
 

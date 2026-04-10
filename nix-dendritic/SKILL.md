@@ -1,6 +1,6 @@
 ---
 name: nix-dendritic
-description: Dendritic Nix configuration pattern — aspect-oriented flake-parts modules for multi-host, multi-platform setups. Use when the user mentions dendritic, flake-parts modules, aspect-oriented Nix config, `flake.modules.<class>.<aspect>`, import-tree, or flake-file, or wants to share features across NixOS/darwin/Home Manager hosts. NOT for general Nix questions, basic flake setup, or single-machine configs (see nix).
+description: Dendritic Nix configuration pattern — aspect-oriented flake-parts modules for multi-host, multi-platform setups. Use when the user mentions dendritic, flake-parts modules, aspect-oriented Nix config, generic module class, `flake.modules.<class>.<aspect>`, import-tree, or flake-file, or wants to share features across NixOS/darwin/Home Manager hosts. NOT for general Nix questions, basic flake setup, or single-machine configs (see nix).
 ---
 
 # Dendritic Nix Configuration

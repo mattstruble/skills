@@ -1,6 +1,6 @@
 ---
 name: nix
-description: Use this skill for any Nix, NixOS, Flakes, Home Manager, or nix-darwin task. Also trigger when the user mentions flake.nix, devShells, mkShell, nixos-rebuild, darwin-rebuild, home-manager switch, nix develop, overlays, derivations, or anything involving declarative system/package configuration on Linux or macOS — even if they don't explicitly say 'Nix'. NOT for the dendritic flake-parts pattern (see nix-dendritic).
+description: Use this skill for any Nix, NixOS, Flakes, Home Manager, or nix-darwin task. Also trigger when the user mentions flake.nix, devShells, mkShell, nixos-rebuild, darwin-rebuild, home-manager switch, nix develop, overlays, derivations, or anything involving declarative system/package configuration on Linux or macOS — even if they don't explicitly say 'Nix'. NOT for the dendritic flake-parts pattern — if the query mentions import-tree, `flake.modules.<class>.<aspect>`, aspect-oriented config, generic module class, or feature-based module sharing across NixOS/darwin, see nix-dendritic instead.
 ---
 
 # Nix Ecosystem Guide

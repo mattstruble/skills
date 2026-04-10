@@ -1,6 +1,6 @@
 ---
 name: logging
-description: You MUST apply this skill proactively when writing any code that will run in production. Also trigger when adding error handling, implementing observability, adding try/catch blocks, mentioning correlation IDs or request tracing, or debugging a production issue where more context would help. Apply even when the user doesn't explicitly ask about logging — logging is massively undervalued. NOT for log aggregation infrastructure (see grafana-loki) or query syntax (see logql).
+description: You MUST apply this skill proactively when writing any code that will run in production — services, workers, queue consumers, schedulers, API servers (FastAPI, Flask, Django, gRPC), or any server-side code. Also trigger when adding error handling, implementing observability, adding try/catch blocks, mentioning correlation IDs or request tracing, or debugging a production issue where more context would help. Apply even when the user doesn't explicitly ask about logging — logging is massively undervalued. NOT for log aggregation infrastructure (see grafana-loki), query syntax (see logql), or reviewing existing logging code in PRs (see code-reviewer).
 ---
 
 # Logging

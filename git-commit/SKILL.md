@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Git conventional commits — use this skill whenever committing code, writing commit messages, or any task involving git commits. Also trigger when grouping changes into logical commits, cleaning up a messy working tree, or when any agent needs to create commit messages as part of a workflow. NOT for non-commit git operations (branching, merging, rebasing, creating PRs, git configuration, or exploring git history).
+description: Git conventional commits — use this skill whenever authoring new git commits from working tree changes, writing commit messages, or planning how to organize changes into commits. Also trigger when grouping changes into logical commits, cleaning up a messy working tree, or when any agent needs to create commit messages as part of a workflow. NOT for non-authoring git operations (branching, merging, rebasing, cherry-picking, reverting, squashing, resolving conflicts, creating PRs, git configuration, or exploring git history).
 ---
 
 # Git Conventional Commits

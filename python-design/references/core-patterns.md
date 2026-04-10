@@ -236,22 +236,13 @@ class CardDeclined(PaymentError): ...
 class PaymentTimeout(PaymentError): ...
 ```
 
-### Never Bare Except
+### Exception Specificity
 
-Catch specific exceptions. `except Exception` is the broadest acceptable
-catch — and even that should be rare, typically at system boundaries where
-you need to convert exceptions to error responses.
+Catch the specific exceptions that the called code raises — see the Code
+Hygiene rules in SKILL.md for the prescriptive guidance and examples. The
+pattern here focuses on how this fits into the broader error handling
+hierarchy:
 
-**Before (bare except swallows everything including KeyboardInterrupt):**
-```python
-try:
-    result = process_payment(order)
-except:
-    log.error("Something went wrong")
-    return None
-```
-
-**After (specific exception, meaningful error handling):**
 ```python
 try:
     result = process_payment(order)
@@ -280,7 +271,7 @@ def db_transaction(conn):
     try:
         yield conn
         conn.commit()
-    except Exception:
+    except Exception:  # must rollback on any application exception, then re-raise
         conn.rollback()
         raise
 ```

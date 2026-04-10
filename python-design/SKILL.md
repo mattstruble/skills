@@ -1,6 +1,6 @@
 ---
 name: python-design
-description: Python-specific design patterns and idioms for writing clean, well-structured Python code. Use this skill whenever writing or reviewing Python code, designing Python APIs, choosing between Python-specific abstractions (Protocol vs ABC, TypedDict vs dataclass, Enum vs string), or refactoring Python modules. Also trigger when the user asks how to structure a Python module, when to use Pydantic vs dataclasses, how to design a clean Python interface, how to organize domain objects, or when to use TypeVar and generics — even if they don't explicitly ask about "design patterns". Trigger on mentions of functools (partial, singledispatch, cache), generator pipelines, validation boundaries (Pydantic at edges, dataclasses internally), context managers, error hierarchies, or advanced typing patterns (@overload, TypeGuard). Complements the language-agnostic software-design skill with concrete Python tooling. NOT for debugging Python errors, framework-specific setup (Django, Flask, FastAPI config), package management, or writing tests (see test-design).
+description: Use this skill whenever writing, reviewing, or generating Python code. Covers Python-specific design patterns and idioms for writing clean, well-structured Python code — designing Python APIs, choosing between abstractions (Protocol vs ABC, TypedDict vs dataclass, Enum vs string), refactoring Python modules, structuring a Python module, using Pydantic vs dataclasses, designing clean Python interfaces, organizing domain objects, and using TypeVar and generics. Also trigger on mentions of functools (partial, singledispatch, cache), generator pipelines, validation boundaries (Pydantic at edges, dataclasses internally), context managers, error hierarchies, or advanced typing patterns (@overload, TypeGuard). Trigger on code style anti-patterns: broad exception handling (except Exception), sentinel defaults (empty string, empty list, empty dict), redundant docstrings that duplicate type annotations, or unnecessary future imports (from __future__ import annotations). Complements the language-agnostic software-design skill with concrete Python tooling. NOT for debugging Python errors, framework-specific setup (Django, Flask, FastAPI config), package management, or writing tests (see test-design).
 ---
 
 # Python Design Patterns
@@ -100,6 +100,103 @@ mismatches.
 ```python
 __all__ = ["process_orders", "Order", "OrderSummary", "OrderError"]
 ```
+
+---
+
+## Code Hygiene
+
+### No Unnecessary `from __future__ import annotations`
+
+Only add it for genuine circular type references via `TYPE_CHECKING`. Modern
+Python (3.10+) has `X | Y` and `list[int]` natively. See the `TYPE_CHECKING`
+section in `references/advanced-patterns.md` for the legitimate use case.
+
+### Specific Exception Types
+
+Never bare `except:` or `except BaseException` — these catch `KeyboardInterrupt`
+and `SystemExit`. Never `except Exception` without justification. Look up which
+exceptions the called code actually raises and catch those. When genuinely
+warranted, add an inline comment explaining why.
+
+```python
+# Bad
+except Exception:
+    log.error("failed")
+
+# Good
+except KeyError:
+    ...
+
+# Also fine
+except (KeyError, TypeError):
+    ...
+
+# Acceptable when justified with a comment
+# Plugin loader must never crash the host process.
+except Exception:
+    logger.exception("plugin failed to load")
+
+# Also acceptable in rollback/teardown paths — must always re-raise
+except Exception:  # must rollback on any application exception, then re-raise
+    conn.rollback()
+    raise
+```
+
+### No Empty-String Defaults
+
+`""` is not "no value." Use `None`, or better, require the argument. Same
+applies to `[]` and `{}` as sentinels.
+
+```python
+# Bad — "" is not "no value"
+def find_user(name: str = "") -> User: ...
+
+# Good
+def find_user(name: str | None = None) -> User: ...
+
+# Best — require it
+def find_user(name: str) -> User: ...
+```
+
+### Docstring Discipline
+
+Google-style docstrings. Two sub-rules:
+
+- **Never put type annotations in docstrings** — types belong in PEP 484
+  annotations on the signature. Duplicating them creates noise and a second
+  source of truth that drifts.
+- **Omit sections that restate what the signature already says.** If `Args`
+  names and types tell the whole story, or `Returns` type is self-explanatory,
+  skip those sections.
+
+```python
+# Bad — redundant types and sections
+def fetch_user(user_id: int, timeout: float = 5.0) -> User:
+    """Fetch a user by ID.
+
+    Args:
+        user_id (int): The user's ID.
+        timeout (float): Request timeout in seconds.
+
+    Returns:
+        User: The fetched user.
+    """
+
+# Good — only document what isn't obvious
+def fetch_user(user_id: int, timeout: float = 5.0) -> User:
+    """Fetch a user by ID.
+
+    Raises:
+        UserNotFoundError: If no user exists for the given ID.
+    """
+```
+
+### Be Concise
+
+- No docstrings that restate the signature.
+- No comments that restate the code.
+- No single-use type aliases.
+- No unnecessary helper functions that are only called once and don't simplify.
 
 ---
 

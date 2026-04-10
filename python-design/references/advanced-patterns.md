@@ -287,31 +287,11 @@ def _validate_quantity(qty: int) -> None:
 
 ### Docstring Style
 
-Use Google-style docstrings. They read naturally as plain text, which is
-how most developers encounter them — in source code, IDE hovers, and
-`help()` output, not rendered Sphinx pages.
-
-```python
-from collections.abc import Callable
-from typing import Any
-
-def retry(fn: Callable, *, max_attempts: int = 3) -> Any:
-    """Call fn up to max_attempts times, re-raising on final failure.
-
-    Args:
-        fn: Callable to invoke.
-        max_attempts: Number of tries before giving up.
-
-    Returns:
-        The return value of fn on success.
-
-    Raises:
-        RuntimeError: If all attempts fail.
-    """
-```
+See the Code Hygiene rules in SKILL.md for Google-style docstring
+conventions (no types in docstrings, omit redundant sections). The Sphinx/RST
+guidance below remains relevant:
 
 Avoid Sphinx/RST markup in docstrings — directives like `.. note::`,
 `.. warning::`, `.. code-block::`, and field-list syntax like `:param:`,
 `:type:`, `:rtype:` are meant for documentation build systems, not for
-code that humans read directly. They add visual noise without benefit in
-the contexts where docstrings are actually consumed.
+code that humans read directly.

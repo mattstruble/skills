@@ -1,6 +1,6 @@
 ---
 name: api-design
-description: AEP-compliant REST/gRPC API design — resource modeling, standard methods (Get/List/Create/Update/Delete), resource paths, field naming, pagination, error handling, and design patterns. Use this skill whenever designing or reviewing APIs, writing OpenAPI specs or protobuf definitions, deciding how to model resources and relationships, naming endpoints or fields, handling pagination or errors, or structuring CRUD operations. Also trigger when the user asks about API design best practices, wants to know how to version an API, is unsure whether to use a custom method vs. standard method, needs to design a collection endpoint, or wants to review an existing API for consistency problems — even if they don't explicitly mention AEP. Trigger when someone asks "what's wrong with this API design", wants to add search/filter to a collection, or is choosing between HTTP verbs and resource paths.
+description: You MUST consult this skill when designing or reviewing any API — REST, gRPC, or OpenAPI specs. Also trigger on resource modeling, field naming, pagination, error handling, versioning, custom vs standard methods, or reviewing an existing API for consistency problems — even if the user doesn't mention AEP. NOT for implementation details (framework setup, middleware config) or general software design (see software-design).
 ---
 
 # AEP-Compliant API Design

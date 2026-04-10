@@ -1,6 +1,6 @@
 ---
 name: logging
-description: Use when writing a new service, adding error handling, implementing observability, or any time logging comes up. Also trigger when the user is debugging a production issue and wishes they had more context, when they ask what to log, when they're adding try/catch blocks, when they mention correlation IDs or request tracing, or when they're building anything that will run in production. Logging is massively undervalued — apply this skill proactively whenever the code being written will need to be operated or debugged later, even if the user doesn't explicitly ask about logging.
+description: You MUST apply this skill proactively when writing any code that will run in production. Also trigger when adding error handling, implementing observability, adding try/catch blocks, mentioning correlation IDs or request tracing, or debugging a production issue where more context would help. Apply even when the user doesn't explicitly ask about logging — logging is massively undervalued. NOT for log aggregation infrastructure (see grafana-loki) or query syntax (see logql).
 ---
 
 # Logging

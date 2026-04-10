@@ -1,6 +1,6 @@
 ---
 name: test-design
-description: "Test Design Desiderata -- guides writing focused, resilient tests across all languages and test levels (unit, integration, e2e). Use this skill whenever writing tests, adding test coverage, reviewing test code, fixing failing tests, or delivering features where tests are expected as part of the work. Trigger on any task involving test creation, test refactoring, or test review -- even if the user didn't explicitly say 'write tests' but the task naturally calls for them. Also trigger for fragile-test questions (tests breaking on refactors, what makes a good test, why tests are brittle). NOT for TDD workflow (use test-driven-development skill instead). NOT for test infrastructure setup like CI configuration or test runner configuration. NOT for diagnosing why production code is broken."
+description: You MUST consult this skill when writing, reviewing, or fixing tests at any level (unit, integration, e2e). Also trigger when delivering features where tests are expected, when tests break on refactors, or when asking what makes a good test — even if 'write tests' wasn't explicitly requested. NOT for TDD workflow (see test-driven-development), test infrastructure setup (CI config, test runners), or diagnosing production code bugs.
 ---
 
 # Test Design Desiderata

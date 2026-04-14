@@ -82,6 +82,7 @@ EntityDebugInfo debug[MAX];    // cold — never evicted during gameplay
 - SoA is less ergonomic — you can't pass a single "particle" around; you pass an index.
 - Premature optimization: profile first. AoS is fine for small counts or infrequent updates.
 - Pointer-heavy structures (linked lists, trees) defeat cache optimization — prefer arrays.
+- **Scale indicator**: Measurable gains typically start at 10,000+ entities in a tight per-frame loop. Below that, AoS is fine. Profile with your engine's profiler before restructuring — the cost of SoA's reduced readability must be justified by measured cache miss reduction.
 
 **Game applications**: Particle systems, physics bodies, AI agents, any system with thousands of objects updated every frame.
 
@@ -134,6 +135,7 @@ private:
 - If derived data is needed every frame anyway, the flag adds overhead without benefit.
 - Dirty propagation can cascade — marking a root dirty marks the entire subtree.
 - Watch for "always dirty" bugs where the flag is set but never cleared.
+- **Scale indicator**: Worthwhile when recomputation takes >0.5ms AND the source data changes on fewer than half of frames. If the data changes every frame, the flag overhead is pure cost.
 
 **Game applications**: Scene graph world transforms, pathfinding caches (recompute path only when obstacles change), UI layout (recompute only when content changes), shadow maps (recompute only when lights/geometry move), minimap rendering.
 
@@ -208,6 +210,7 @@ union PoolSlot {
 - Objects must be fully re-initialized on reuse — stale state from previous use causes bugs.
 - Pool size must be tuned: too small drops objects, too large wastes memory.
 - Scanning for free slots is O(n) — use a free list for high-frequency allocation.
+- **Scale indicator**: Beneficial when allocating/freeing 100+ objects per second, or on platforms where GC pauses are unacceptable. For <50 objects with low allocation frequency, `new`/`delete` (or engine instantiation) is fine.
 
 **Game applications**: Bullets, particles, explosions, audio sources, network packets, UI notifications, any object with high allocation frequency and short lifetime.
 
@@ -277,6 +280,7 @@ public:
 - Moving objects must be removed and re-inserted when they cross cell boundaries.
 - Cell size tuning: too small → many empty cells, high overhead; too large → too many objects per cell, queries slow.
 - Don't implement from scratch for physics — use the engine's built-in broadphase.
+- **Scale indicator**: The naive O(n²) approach is fine for <50 objects. At 100+ objects with frequent proximity queries, a spatial partition pays for itself. At 1000+, it's essential.
 
 **Game applications**: Collision broadphase, AI range queries ("find nearest enemy"), fog of war, audio occlusion, pathfinding node lookup, level streaming.
 

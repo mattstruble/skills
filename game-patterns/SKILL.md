@@ -15,12 +15,14 @@ Engine-agnostic pattern reference for game systems. Synthesized from Nystrom's *
 
 ### "I need to decouple things"
 
-| Problem | Pattern |
-|---|---|
-| Game systems (physics, audio, AI) shouldn't know about each other | **Component** — split entity behavior into isolated domain objects |
-| One system needs to react to events in another without coupling | **Observer** — subject notifies listeners without knowing who they are |
-| Systems need to communicate but shouldn't be directly wired | **Event Queue** — buffer events; consumers pull when ready |
-| A subsystem needs a global access point but Singleton is too rigid | **Service Locator** — register/retrieve services through a central registry |
+| Problem | Pattern | Choose when... |
+|---|---|---|
+| Entity behavior spans multiple domains (physics, rendering, AI) | **Component** — split into isolated domain objects | You're structuring an entity, not connecting systems |
+| One system reacts to events in another, response needed immediately | **Observer** — subject notifies listeners synchronously | Few listeners, no performance concern in the handler |
+| Systems communicate asynchronously, or events need batching/dedup | **Event Queue** — buffer events; consumers pull when ready | Observer is too synchronous, or you need cross-thread safety |
+| A subsystem needs a global access point with swappable implementations | **Service Locator** — register/retrieve through a central registry | You need global access AND testability (mock services) |
+
+**Disambiguation**: Observer vs Event Queue is the most common confusion. Use Observer when the response must happen *now* (UI updating a health bar on damage). Use Event Queue when the response can happen *later* (audio playing a sound next frame) or when you need to aggregate events (10 "footstep" events → 1 sound).
 
 ### "I need to structure entity behavior"
 
@@ -40,23 +42,25 @@ Engine-agnostic pattern reference for game systems. Synthesized from Nystrom's *
 
 ### "I need performance"
 
-| Problem | Pattern |
-|---|---|
-| Frequent allocation/deallocation of short-lived objects (bullets, particles) | **Object Pool** — pre-allocate a fixed pool; recycle instead of free |
-| Spatial queries (collision, visibility, range checks) are too slow | **Spatial Partition** — grid, quadtree, or BSP to limit candidates |
-| Derived data is expensive to recompute every frame | **Dirty Flag** — mark stale, recompute lazily only when needed |
-| Many objects share identical data (same sprite, same mesh) | **Flyweight** — share the immutable data; store only per-instance delta |
-| Cache misses are killing performance in hot loops | **Data Locality** — restructure data for sequential memory access (SoA) |
+| Problem | Pattern | Scale indicator |
+|---|---|---|
+| Frequent allocation/deallocation of short-lived objects (bullets, particles) | **Object Pool** — pre-allocate; recycle instead of free | 100+ allocations/sec or GC-sensitive platforms |
+| Spatial queries (collision, visibility, range checks) are too slow | **Spatial Partition** — grid, quadtree, or BSP to limit candidates | 100+ objects in query space; O(n²) becoming measurable |
+| Derived data is expensive to recompute every frame | **Dirty Flag** — mark stale, recompute lazily only when needed | Recomputation takes >0.5ms AND source data changes infrequently |
+| Many objects share identical data (same sprite, same mesh) | **Flyweight** — share immutable data; store only per-instance delta | 1000+ instances with shared intrinsic state |
+| Cache misses are killing performance in hot loops | **Data Locality** — restructure for sequential memory access (SoA) | 10,000+ entities in a tight loop; profile confirms cache misses |
+
+**Disambiguation**: If your game has <100 entities and no measurable performance issue, skip this section. Profile first, pattern second.
 
 ### "I need scripting or data-driven behavior"
 
-| Problem | Pattern |
-|---|---|
-| Designers need to define behavior without recompiling | **Bytecode** — compile behavior to a simple VM; interpret at runtime |
-| Need to spawn entities from data (JSON, prefabs) | **Prototype** — clone a template object; or use it as a data-driven archetype |
-| Need pluggable algorithms (pathfinding strategies, AI behaviors) | **Strategy** — swap algorithm implementations behind a common interface |
-| Need to add behavior to objects at runtime without subclassing | **Decorator** — wrap objects to layer on additional behavior |
-| Need a consistent way to create families of objects | **Factory** — centralize construction logic; decouple callers from concrete types |
+| Problem | Pattern | Choose when... |
+|---|---|---|
+| Designers need to define behavior without recompiling | **Bytecode** — compile to a simple VM; interpret at runtime | You need sandboxed, hot-reloadable scripting AND your engine's built-in scripting isn't sufficient |
+| Need to spawn entities from data (JSON, prefabs) | **Prototype** — clone a template object or data-driven archetype | Construction is straightforward; combine with Factory for complex construction |
+| Need pluggable algorithms (pathfinding, AI behaviors) | **Strategy** — swap implementations behind a common interface | The algorithm varies at runtime or per-instance; otherwise just call the function |
+| Need to add behavior to objects at runtime without subclassing | **Decorator** — wrap objects to layer on additional behavior | Effects are composable and order-dependent; for flat effects, use a list instead |
+| Need a consistent way to create families of objects | **Factory** — centralize construction; decouple callers from concrete types | Construction logic is complex, varies by type, or reads from data files |
 
 ### "I need to manage time and sequencing"
 
@@ -64,6 +68,40 @@ Engine-agnostic pattern reference for game systems. Synthesized from Nystrom's *
 |---|---|
 | Game must run at consistent speed across hardware | **Game Loop** — fixed-update with variable render; decouple sim from display |
 | Two buffers must swap atomically (graphics, physics state) | **Double Buffer** — write to back buffer; swap at frame boundary |
+
+---
+
+## Core Patterns — Start Here
+
+For indie and hobbyist games, these five patterns solve the majority of architecture problems. Reach for these first before exploring the full catalog:
+
+| Pattern | Why it's core |
+|---|---|
+| **State** | Almost every game entity has modes (idle, attacking, dead). Eliminates unmanageable if/else chains. |
+| **Observer** | Decouples game systems cleanly. You'll use this constantly for UI updates, achievements, audio triggers. |
+| **Command** | Makes input rebindable and undoable. Essential once you need replays, AI actors, or an undo system. |
+| **Component** | Your engine already uses this (Godot nodes, Unity MonoBehaviours). Understanding it prevents monolithic entity classes. |
+| **Factory** | Spawning entities from data files. Every game with diverse content needs this. |
+
+The remaining 18 patterns are situational — reach for them when you hit the specific problem they solve, not preemptively.
+
+---
+
+## Pattern Combinations
+
+Patterns rarely appear alone. These are the most common compositions:
+
+| Combination | Use case |
+|---|---|
+| **Command + State** | Input handling that varies by entity state. Each state returns different commands for the same inputs. |
+| **Observer + Event Queue** | When Observer's synchronous notification is too rigid. Queue events for async, batched processing. |
+| **Type Object + Factory** | Data-driven spawning: Factory reads a type name from JSON, looks up the Type Object, constructs the instance. |
+| **Component + Update Method** | The entity system pattern. Each component has `update(dt)`, called by the game loop. Foundation of most engines. |
+| **Object Pool + Flyweight** | Pool instances share a Flyweight for immutable data (sprite, stats). Pool handles lifecycle; Flyweight handles memory. |
+| **State + Observer** | State machine that broadcasts state transitions. UI, audio, and animation systems observe state changes without coupling. |
+| **Strategy + Component** | Swap algorithms on a per-component basis. An AI component holds a pathfinding Strategy that can change at runtime. |
+
+When the agent recommends a pattern, consider whether a complementary pattern strengthens the design.
 
 ---
 

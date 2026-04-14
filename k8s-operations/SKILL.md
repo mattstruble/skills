@@ -92,7 +92,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 | **Blue/Green** | None | 2× | Atomic cutover needed; requires double resources at rollout time |
 | **Canary** | None | Small % extra | Large deployments with monitoring; needs metrics to gate progression |
 
-**Recommendation:** Use `RollingUpdate` with `maxUnavailable: 0` for zero-downtime. Blue/Green and Canary require additional tooling (Argo Rollouts, Flagger) for production use.
+**Recommendation:** Use `RollingUpdate` with `maxUnavailable: 0` for zero-downtime. Do not use `maxUnavailable: 1` — with 3 replicas, that drops capacity to 2/3 during rollout and risks downtime if another pod fails simultaneously. `maxUnavailable: 0` ensures replica count never drops below the desired value. Blue/Green and Canary require additional tooling (Argo Rollouts, Flagger) for production use.
 
 ### Production Deployment Template
 
@@ -112,7 +112,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 25%                       # ceil(25% × 3) = 1 extra pod during rollout
-      maxUnavailable: 0                   # never drop below replica count
+      maxUnavailable: 0                   # ZERO, not 1 — never drop below replica count; use maxSurge to add capacity instead
   selector:
     matchLabels:
       app: my-app

@@ -49,7 +49,7 @@ helm install postgres0 bitnami/postgresql \
 ```
 
 **Flag decisions:**
-- `--version` — always pin; unpinned installs break on chart updates
+- `--version` — **always pin**; omitting this is the single most common Helm mistake — unpinned installs silently pull the latest chart version, which may restructure values, rename keys, or change defaults. Every `helm install` and `helm upgrade` command must include `--version`.
 - `--values` — prefer a values file over `--set` for anything going into version control
 - `--namespace` — isolate releases by namespace; create the namespace first with `kubectl create namespace db`
 - `--atomic` — wait for completion; roll back automatically on failure; recommended for CI and first installs. Note: on a failed atomic install, the release is deleted entirely — re-run `helm install` (not `helm upgrade`) to retry.
@@ -78,7 +78,12 @@ helm upgrade postgres0 bitnami/postgresql \
 
 Some chart values cannot be changed after install (e.g., auth passwords managed by the chart). Check chart docs before upgrading. Use `--dry-run` to preview changes without applying.
 
-> **Bitnami auth credentials on upgrade:** Bitnami charts read auth passwords from the existing Kubernetes secret on upgrade — changing `auth.password` in your values file has no effect. Retrieve the current password first: `helm get values postgres0 -n db` or `kubectl get secret postgres0 -n db -o jsonpath="{.data.postgres-password}" | base64 -d`. Pass it explicitly with `--set auth.postgresPassword=<existing>` if you need to keep it consistent.
+> **⚠ Bitnami auth credentials on upgrade:** Bitnami charts auto-generate passwords on first install and store them in a Kubernetes Secret. On `helm upgrade`, the chart reads from that Secret — any `auth.password` or `auth.postgresPassword` in your values file is **silently ignored**. If you don't pass the existing password, the chart generates a **new** password, the Secret is updated, but the running database still has the old one — breaking all connections. Always retrieve and pass the existing password:
+>
+> ```bash
+> export POSTGRES_PASSWORD=$(kubectl get secret postgres0 -n db -o jsonpath="{.data.postgres-password}" | base64 -d)
+> helm upgrade postgres0 bitnami/postgresql --version 16.4.9 -f postgres0_values.yaml -n db --set auth.postgresPassword="$POSTGRES_PASSWORD" --atomic
+> ```
 
 ### 6. History and rollback
 
@@ -309,8 +314,8 @@ helm show values <chart> --version <ver>
 helm show chart <chart>
 
 # Release lifecycle
-helm install <release> <chart> --version <ver> -f values.yaml -n <ns> --atomic
-helm upgrade <release> <chart> --version <ver> -f values.yaml -n <ns> --atomic
+helm install <release> <chart> --version <ver> -f values.yaml -n <ns> --atomic   # ALWAYS pin --version
+helm upgrade <release> <chart> --version <ver> -f values.yaml -n <ns> --atomic  # ALWAYS pin --version
 helm history <release> -n <ns>
 helm rollback <release> [revision] -n <ns>
 helm uninstall <release> -n <ns>

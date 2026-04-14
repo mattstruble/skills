@@ -168,6 +168,8 @@ kubectl describe certificate example-com-tls -n production
 
 ## Network Policies
 
+> **⚠ Flannel alone does not enforce NetworkPolicies.** k3s embeds the kube-router network policy controller to handle enforcement via iptables — this runs internally, not as a visible pod. If you replaced the default CNI or disabled kube-router, install a policy-capable CNI (Calico, Cilium) before creating NetworkPolicy resources, or they will be silently ignored.
+
 **Default behavior:** Without any NetworkPolicy, all pods can reach all other pods and the internet ("default allow").
 
 **When a NetworkPolicy is applied:** It switches the selected pods to "deny all" for the specified direction (Ingress, Egress, or both). Rules then selectively allow traffic. Multiple rules within a policy are OR'd — any matching rule allows the traffic.

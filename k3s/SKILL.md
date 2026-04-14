@@ -55,8 +55,9 @@ In k3s, server nodes run both by default. Control-plane-only nodes require taint
 ```bash
 # On the server (Ubuntu 24.04, as root)
 apt install curl -y
-# Replace cluster.local with your domain if needed; replace YOUR_PUBLIC_IP with the server's public IP
-curl -sfL https://get.k3s.io | sh -s - server \
+# Pin the version — check https://github.com/k3s-io/k3s/releases for the latest stable
+# Replace YOUR_PUBLIC_IP with the server's public IP
+curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.32.3+k3s1 sh -s - server \
   --disable=traefik \
   --cluster-init \
   --cluster-domain=cluster.local \
@@ -69,6 +70,7 @@ k3s kubectl get nodes
 ```
 
 **Flag decisions:**
+- `INSTALL_K3S_VERSION` — always pin to a specific release; without it, the install script pulls the latest version, which may differ from what you tested or from what other nodes in your cluster are running; version skew between nodes causes instability
 - `--disable=traefik` — remove the default ingress controller; install ingress-nginx separately for more control
 - `--cluster-init` — use embedded etcd instead of SQLite; required if you ever want to add more control-plane nodes; enables automatic migration path
 - `--cluster-domain` — set a custom cluster domain for CoreDNS; must match across all nodes; defaults to `cluster.local`

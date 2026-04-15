@@ -293,7 +293,11 @@ Modulate property) to offset the phase per image:
 ```glsl
 void vertex() {
     // ...
-    float color_id = dot(COLOR.rgb, COLOR.rgb);  // grayscale ID from modulate color
+    // dot(COLOR.rgb, COLOR.rgb) = squared RGB magnitude — not luminance, but a
+    // cheap per-instance differentiator. Requires intentionally varied Modulate
+    // colors per instance. Default white Modulate gives color_id = 3.0 for all
+    // instances (no differentiation). Black Modulate gives 0.0 (all sync).
+    float color_id = dot(COLOR.rgb, COLOR.rgb);
     float time = (color_id + TIME * _VertexSpeed) * PI;
     // ...
 }
@@ -447,6 +451,7 @@ void vertex() {
                    * RZ((angle_map * 0.1567) - ct);
 
     VERTEX = EULER_ZXY * vertex_os * clamp(angle_map, 0.4, 1.0);
+    NORMAL = normalize(EULER_ZXY * NORMAL);  // must rotate normals to match displaced geometry
 }
 ```
 

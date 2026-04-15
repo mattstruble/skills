@@ -606,9 +606,11 @@ Reusable shader code in `.gdshaderinc` files. Only `res://` absolute paths are v
 
 ```glsl
 // res://shaders/utils.gdshaderinc
-// Precondition: in_max != in_min (division by zero produces NaN/Inf)
+// Returns out_min when in_max == in_min (avoids division by zero / NaN propagation)
 float remap(float v, float in_min, float in_max, float out_min, float out_max) {
-    return out_min + (v - in_min) / (in_max - in_min) * (out_max - out_min);
+    float range = in_max - in_min;
+    if (abs(range) < 1e-6) return out_min;
+    return out_min + (v - in_min) / range * (out_max - out_min);
 }
 ```
 

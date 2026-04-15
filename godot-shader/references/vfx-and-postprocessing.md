@@ -371,7 +371,10 @@ void fragment() {
     vec3 ray_origin_ws = (INV_VIEW_MATRIX * vec4(VERTEX.xyz, 1.0)).xyz;
 
     // Ray direction: from camera toward this fragment
-    vec3 ray_direction = normalize(ray_origin_ws - CAMERA_POSITION_WORLD);
+    // Guard: if camera is exactly at the surface (ray_origin_ws == CAMERA_POSITION_WORLD),
+    // normalize(vec3(0)) produces NaN. This is rare but possible when camera snaps to origin.
+    vec3 ray_dir_raw = ray_origin_ws - CAMERA_POSITION_WORLD;
+    vec3 ray_direction = length(ray_dir_raw) > 1e-6 ? normalize(ray_dir_raw) : vec3(0.0, 0.0, 1.0);
 
     // World-space position of the box pivot — anchors volume to the mesh
     vec4 transform = MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0);

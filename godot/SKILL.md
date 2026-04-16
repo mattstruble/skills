@@ -28,6 +28,8 @@ Godot 4.x (baseline: 4.6) with GDScript. All code examples target GDScript — n
 
 **Flat over deep.** A node tree 4+ levels deep is a design smell. If you're writing `get_node("../../Player/Stats")`, the scene needs restructuring. Pass references via `@export` or signals instead.
 
+**File naming:** `snake_case` for all directories, scenes, and scripts in Godot 4. Name scripts and scenes after the scene's root node (`player.tscn` + `player.gd`).
+
 **Split a scene when:**
 - It's reused in multiple parent scenes
 - It has its own independent state and lifecycle
@@ -65,6 +67,27 @@ Use `preload` for scenes known at compile time. Use `load` only for paths determ
 
 ## GDScript Idioms
 
+### Script File Ordering
+
+Follow this order in every `.gd` file:
+
+```gdscript
+# 1. class_name / extends
+# 2. ## docstring
+# 3. signals
+# 4. enums
+# 5. constants
+# 6. @export vars
+# 7. public vars
+# 8. private vars (_prefix)
+# 9. @onready vars
+# 10. _init / _ready / _enter_tree
+# 11. _process / _physics_process / _unhandled_input
+# 12. signal callbacks (_on_*)
+# 13. public methods
+# 14. private methods (_prefix)
+```
+
 ### Signals
 
 Signals decouple emitters from listeners. The emitter knows nothing about who's listening.
@@ -90,6 +113,11 @@ func _on_health_changed(new_health: int, max_health: int) -> void:
 
 **Signal bus (EventBus AutoLoad):** For truly global events (game over, scene transition, achievement unlocked), a signal bus AutoLoad is appropriate. See `references/gdscript-patterns.md`.
 
+**Naming conventions:**
+- **Signals:** past tense (`moved`, `died`). Append `_started`/`_finished` for process signals (`talk_started`, `talk_finished`).
+- **Booleans:** prefix with `is_`, `can_`, or `has_` (`is_active`, `can_jump`, `has_key`).
+- **Methods:** don't repeat the class name in arguments — `Inventory.add(item)` not `Inventory.add_item(item)`.
+
 ### Exports and Resources
 
 ```gdscript
@@ -112,15 +140,30 @@ Custom Resources are the right tool for item databases, enemy stats, level confi
 
 ### Static Typing
 
-Always use type hints. GDScript's type inference catches bugs at edit time and makes autocompletion reliable.
+Always use type hints. Prefer `:=` (type inference) when the right-hand side makes the type obvious. Use explicit annotation when the compiler can't infer.
 
 ```gdscript
-# Bad — no types
+# Inference — type is obvious from the right-hand side
+var speed := 200.0
+var direction := Vector2.ZERO
+var timer := Timer.new()
+```
+
+```gdscript
+# Explicit — compiler can't infer (Variant returns, typed arrays, PackedScene.instantiate())
+var text: String = array.pop_back()
+var enemy: Enemy = EnemyScene.instantiate()
+var enemies: Array[Enemy] = []
+var damage_values: Array[int] = [10, 20, 30]
+```
+
+```gdscript
+# Bad — no types at all
 var speed = 200
 func take_damage(amount):
     health -= amount
 
-# Good — typed
+# Good — typed variable and typed parameters/return
 var speed: float = 200.0
 func take_damage(amount: int) -> void:
     health -= amount
@@ -223,3 +266,7 @@ func _die() -> void:
 **Skipping static types:** Untyped GDScript loses editor autocompletion, misses type errors until runtime, and makes refactoring painful. Type everything — variables, parameters, return types.
 
 **Overusing `_process`:** `_process` runs every frame. For things that only change on events (health bar, score display), connect to a signal instead. For timers, use `Timer` nodes or `get_tree().create_timer()`. Reserve `_process` for things that genuinely need per-frame updates (movement, continuous animation).
+
+**Returning mid-function:** Use `return` only at the start (guard clause) or end of a function. Mid-function returns hide control flow and make methods harder to trace.
+
+**Using `null` when a typed default exists:** Prefer `Vector2.ZERO`, `""`, `[]`, or `.new()` over `null`. Null checks proliferate and mask missing initialization. Use `null` only when the engine API forces it.

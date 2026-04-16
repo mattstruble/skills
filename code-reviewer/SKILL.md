@@ -60,7 +60,35 @@ Use this template when spawning each reviewer. Populate all fields before spawni
 **Prior findings to verify:** initial review
 ```
 
-### Re-Review (Verifying a Fix)
+### Verification Resume (Step 2 — Fix Cycle)
+
+Used when resuming a reviewer via `task_id` to verify its prior blocking findings were addressed. The reviewer already has its findings in context from the initial round — no need to restate them.
+
+```
+## Verification Re-Review
+
+**Diff source:** git diff base..HEAD
+**Worktree:** /tmp/opencode-wt/session-xyz/wave-1-task-1/
+
+Verify your prior blocking findings against the current diff. Confirm each was addressed and check that the fixes did not introduce new issues within your domain.
+```
+
+### Final Sweep Resume (Step 3)
+
+Used when resuming all reviewers via `task_id` for the final sweep after fixes are complete.
+
+```
+## Final Sweep Re-Review
+
+**Diff source:** git diff base..HEAD
+**Worktree:** /tmp/opencode-wt/session-xyz/wave-1-task-1/
+
+The fix cycle is complete. Re-review the full diff (base to HEAD). Focus on areas changed since your initial review — fixes may have introduced new issues. Report any new findings; do not re-report findings that were already addressed.
+```
+
+### Fallback Re-Review (Fresh Spawn)
+
+Used when a resumed reviewer fails (error, malformed output, or session cannot be resumed). Falls back to a fresh spawn with full context.
 
 ```
 ## Review Request
@@ -80,10 +108,10 @@ Use this template when spawning each reviewer. Populate all fields before spawni
 
 **Field guidance:**
 - `Diff source`: the exact command or label used to produce the diff
-- `Plan/spec`: a file path when a spec exists; `"none"` for ad-hoc reviews
-- `Review focus`: the reviewer's domain — one per reviewer
+- `Plan/spec`: a file path when a spec exists; `"none"` for ad-hoc reviews (initial and fallback templates only)
+- `Review focus`: the reviewer's domain (initial and fallback templates only)
 - `Worktree`: absolute path to the coder's worktree for automated review; `"n/a"` for manual review
-- `Prior findings to verify`: paste the full finding block(s) from the original review output so the reviewer has exact context; use `"initial review"` on the first pass
+- `Prior findings to verify`: paste the full finding block(s) from the original review output (fallback template only); not needed for resumed sessions since the reviewer retains its prior context
 
 ---
 
@@ -120,22 +148,24 @@ This is the core orchestration logic. Follow it precisely.
 
 ### Cycle Structure
 
-**Step 1 — Initial round:** Spawn all four reviewers in parallel. Each receives:
+**Step 1 — Initial round:** Spawn all four reviewers in parallel as fresh agents. Each receives:
 - The full branch diff (base to HEAD)
 - The plan/spec reference (file path or inline content), if available
 - `Prior findings to verify: initial review`
+
+**Capture the `task_id` returned by each reviewer.** Maintain a mapping of `{reviewer_type: task_id}` for use in subsequent steps. All reviewer reuse in Steps 2 and 3 depends on these IDs.
 
 If the initial round produces no blocking findings, exit immediately — no fix cycle or final sweep is needed.
 
 Reviewers run independently in their own context windows. They do not share context with each other. Each reviewer gathers additional context (codebase samples, dependency info, etc.) using its own tools.
 
-**Step 2 — Fix cycle:** Address blocking findings. Fix all blocking findings from a given reviewer, then re-run that reviewer once to verify all fixes in that domain. Once all targeted re-reviews pass, proceed to the final sweep. Each re-run receives:
-- The full branch diff (base to HEAD, now including the fixes)
-- The specific finding(s) being verified (pasted in full from the original output)
+**Step 2 — Fix cycle:** Address blocking findings. Fix all blocking findings from a given reviewer, then **resume that reviewer via its `task_id`** to verify all fixes in that domain. Use the Verification Resume template — the resumed reviewer already has its prior findings in context, so only provide the updated diff source and verification directive. Once all targeted re-reviews pass, proceed to the final sweep.
 
-The reviewer confirms the findings are resolved and checks that the fixes did not introduce new issues within its domain.
+**Fallback:** If a resumed reviewer fails (error, malformed output, or session cannot be resumed), discard its `task_id` and fall back to a fresh spawn using the Fallback Re-Review template with the full finding context. Update the `task_id` mapping with the new session ID.
 
-**Step 3 — Final sweep:** Run all four reviewers again on the full branch diff (base to HEAD, including all fixes). This catches cross-domain issues introduced by the fixes.
+**Step 3 — Final sweep:** **Resume all four reviewers via their `task_id`s** using the Final Sweep Resume template. Each reviewer re-examines the full diff with attention to areas changed by fixes. This catches cross-domain issues introduced during the fix cycle.
+
+**Fallback:** If a resumed reviewer fails, discard its `task_id` and fall back to a fresh spawn using the initial Review Request template. Update the `task_id` mapping with the new session ID for any subsequent cycles.
 
 **Step 4 — Exit conditions:**
 - All four return `LGTM: no findings` on the final sweep → review complete
@@ -157,7 +187,11 @@ Drop non-blocking findings that become stale — if the code they reference was 
 
 ## Spawning Instructions
 
+### Initial Round (Fresh Spawn)
+
 Issue all four as tool calls in a single message so they run in parallel. These are tool invocations — not code output. Use the `task` tool with the appropriate subagent type for each. The subagent types (`correctness-reviewer`, `failure-path-reviewer`, `readability-reviewer`, `security-reviewer`) are registered agent types in the platform.
+
+**Capture the `task_id` from each return value.** You need these to resume reviewers in subsequent steps.
 
 ```
 task(subagent_type="correctness-reviewer", description="Correctness review", prompt="
@@ -201,9 +235,43 @@ task(subagent_type="security-reviewer", description="Security review", prompt="
 ")
 ```
 
-**All four run on every review pass — no conditional skipping.**
-
 For manual review, set `Worktree: n/a` in each prompt.
+
+### Verification Resume (Step 2)
+
+Resume only the reviewer(s) that reported blocking findings. Use their captured `task_id` to continue the existing session.
+
+```
+task(subagent_type="security-reviewer", task_id="<captured_task_id>", description="Verify security fixes", prompt="
+## Verification Re-Review
+
+**Diff source:** git diff main..HEAD
+**Worktree:** /tmp/opencode-wt/session-xyz/wave-1-task-1/
+
+Verify your prior blocking findings against the current diff. Confirm each was addressed and check that the fixes did not introduce new issues within your domain.
+")
+```
+
+### Final Sweep Resume (Step 3)
+
+Resume all four reviewers via their `task_id`s. Issue all four in a single message for parallel execution.
+
+```
+task(subagent_type="correctness-reviewer", task_id="<captured_task_id>", description="Final correctness sweep", prompt="
+## Final Sweep Re-Review
+
+**Diff source:** git diff main..HEAD
+**Worktree:** /tmp/opencode-wt/session-xyz/wave-1-task-1/
+
+The fix cycle is complete. Re-review the full diff (base to HEAD). Focus on areas changed since your initial review — fixes may have introduced new issues. Report any new findings; do not re-report findings that were already addressed.
+")
+```
+
+Repeat for all four reviewer types with their respective `task_id`s.
+
+### Fallback (Fresh Spawn on Resume Failure)
+
+If resuming a reviewer fails (error, malformed output, or session cannot be resumed), discard the `task_id` and spawn a fresh reviewer using the initial Review Request template (for final sweeps) or the Fallback Re-Review template (for verification, including the prior findings in full). Update the `task_id` mapping with the new session ID.
 
 ---
 

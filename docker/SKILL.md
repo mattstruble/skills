@@ -59,6 +59,7 @@ COPY --from=builder /usr/src/app/package.json ./package.json
 COPY --from=builder /usr/src/app/.next ./.next
 COPY --from=builder /usr/src/app/public ./public
 
+USER 65534:65534
 EXPOSE 3000
 ENV NODE_ENV=production
 CMD ["npm", "run", "start"]   # exec form: forwards signals correctly
@@ -80,6 +81,49 @@ CMD ["npm", "run", "start"]   # exec form: forwards signals correctly
 **Never use `latest` in production.** Pin to at least a major version tag (`node:24-alpine`, not `node:alpine`). For maximum reproducibility, pin to a patch version (`node:24.7-alpine`). `latest` is a moving target that breaks reproducibility.
 
 **Alpine trade-off:** Alpine uses musl libc instead of glibc. Most apps work fine, but some native extensions (certain Python packages, some Node.js addons) require glibc. If you hit mysterious runtime errors with Alpine, switch to `-slim` (Debian-based).
+
+### Distroless and Minimal Runtime Images
+
+Distroless images strip out the shell, package manager, and OS utilities entirely. Less software means fewer CVEs and a smaller attack surface — an attacker who gains code execution can't use `curl`, `wget`, or `bash` if they don't exist in the image.
+
+| Image | Use case |
+|---|---|
+| `gcr.io/distroless/static` | Go, Rust, any static binary (includes CA certs, tzdata, `/etc/passwd`) |
+| `gcr.io/distroless/base` | C/C++ needing glibc (adds glibc, libssl, openssl) |
+| `gcr.io/distroless/nodejs` | Node.js apps |
+| `gcr.io/distroless/python3` | Python apps |
+
+**Go example** — static binary into distroless:
+
+```dockerfile
+# syntax=docker/dockerfile:1
+FROM golang:1.23-bookworm AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod go mod download
+COPY . .
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/server
+
+FROM gcr.io/distroless/static AS runner
+COPY --from=builder /app/server /server
+USER 65534:65534
+EXPOSE 8080
+ENTRYPOINT ["/server"]
+```
+
+**Limitation:** No package manager means you can't install missing shared libraries at runtime. Native extensions requiring uncommon `.so` files may not work — use `gcr.io/distroless/base` (glibc) or fall back to Alpine if you need more.
+
+**`FROM scratch`** is the extreme version: zero OS layer, static binary only. Works for Go and Rust with full static compilation (`CGO_ENABLED=0` for Go; `-C target-feature=+crt-static` for Rust). Not practical for interpreted languages.
+
+**Debugging without a shell:** When a distroless container misbehaves, use `nsenter` to run host binaries inside the container's namespace:
+
+```bash
+nsenter -t $(docker inspect -f '{{.State.Pid}}' container_name) -n netstat -tulpn
+```
+
+This attaches to the container's network namespace and runs `netstat` from the host — no shell needed inside the container.
 
 ---
 
@@ -167,6 +211,46 @@ CMD ["--help"]   # default: show help; override: docker run myimage ls s3://buck
 
 ---
 
+## Running as Non-Root
+
+Always include a `USER` directive in production Dockerfiles. Docker defaults to root (UID 0). Even container-root carries capabilities like `cap_chown` and `cap_net_raw` that can be exploited if a process is compromised. A non-root user has zero capabilities by default.
+
+**Create a dedicated user and switch to it:**
+
+```dockerfile
+RUN addgroup --gid 65534 appgroup && \
+    adduser --uid 65534 --ingroup appgroup --disabled-password --no-create-home appuser
+USER 65534:65534
+```
+
+Place `USER` as the last directive before `ENTRYPOINT`/`CMD`. Using numeric UID:GID (not name) works in distroless images that lack `/etc/passwd` entries.
+
+**Volume permissions:** Files written by the container will be owned by UID 65534 on the host. Two options:
+- `chown 65534:65534 /host/path` before mounting
+- Override in Compose with `user: "1000:1000"` to match your host UID
+
+**Compose hardening:**
+
+```yaml
+services:
+  app:
+    image: myapp:1.0.0
+    user: "65534:65534"
+    security_opt:
+      - no-new-privileges=true   # prevents setuid/setgid escalation
+    read_only: true              # optional: make root filesystem read-only
+    tmpfs:
+      - /tmp                     # writable scratch space if needed
+```
+
+`no-new-privileges=true` prevents the process from gaining additional privileges via setuid binaries or file capabilities — a defense-in-depth measure even when already running as non-root.
+
+**PUID/PGID images:** Images using `PUID`/`PGID` environment variables (common in LinuxServer.io images) still start the entrypoint as root before dropping privileges. Prefer images that set `USER` to never run as root at all.
+
+**Kubernetes:** Clusters can enforce non-root at the pod level with `securityContext.runAsNonRoot: true` — pods that don't set a non-root `USER` will fail to schedule.
+
+---
+
 ## Docker Compose
 
 Use Compose for local development and simple self-hosted deployments. It is not a substitute for Kubernetes: no self-healing, no rolling updates, no secret management, single-machine only.
@@ -225,6 +309,8 @@ networks:
 - Never hardcode secrets in `compose.yaml` — use `${VAR}` with `.env` file or `env_file`
 - Use named volumes (not bind mounts) for database data — named volumes survive `compose down`
 - `compose down` removes containers and networks but **not** volumes; add `--volumes` to also remove data
+
+For Docker daemon hardening (log rotation, storage, network subnets), see [`references/daemon-config.md`](references/daemon-config.md).
 
 ### Compose commands
 
@@ -293,6 +379,39 @@ docker network inspect no_internet
 ```
 
 **User-defined bridge networks** (not the default `bridge`) enable DNS resolution by container name. Containers on the same user-defined network can reach each other at `http://container-name:port`. The default `bridge` network does not support this.
+
+### Named Volumes with Remote Backends
+
+Named volumes aren't limited to local disk. The `local` driver accepts `driver_opts` to mount NFS shares, CIFS/SMB shares, or tmpfs:
+
+```yaml
+volumes:
+  # NFS share
+  nfs_data:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.1.30,nolock,soft,nfsvers=4"
+      device: ":/volume1/appdata"
+
+  # CIFS/SMB share
+  smb_data:
+    driver: local
+    driver_opts:
+      type: cifs
+      o: "username=svc_user,password=${SMB_PASSWORD},uid=65534,gid=65534"
+      device: "//192.168.1.40/appdata"
+
+  # tmpfs (in-memory, cleared on restart — good for scratch/cache)
+  tmp_cache:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "size=256m,uid=65534,gid=65534"
+```
+
+Prefer named volumes over bind mounts. Docker manages creation, permissions, and quotas. Use bind mounts only when you need a specific host path (e.g., `/etc/localtime`, a hardware device, or a path managed by another tool).
 
 ---
 

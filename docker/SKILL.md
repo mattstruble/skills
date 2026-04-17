@@ -54,14 +54,14 @@ RUN npm prune --omit=dev --omit=optional  # removes dev + optional deps
 FROM node:24-alpine AS runner
 
 WORKDIR /usr/src/app
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/package.json ./package.json
-COPY --from=builder /usr/src/app/.next ./.next
-COPY --from=builder /usr/src/app/public ./public
+COPY --chown=65534:65534 --from=builder /usr/src/app/node_modules ./node_modules
+COPY --chown=65534:65534 --from=builder /usr/src/app/package.json ./package.json
+COPY --chown=65534:65534 --from=builder /usr/src/app/.next ./.next
+COPY --chown=65534:65534 --from=builder /usr/src/app/public ./public
 
-USER 65534:65534
 EXPOSE 3000
 ENV NODE_ENV=production
+USER 65534:65534
 CMD ["npm", "run", "start"]   # exec form: forwards signals correctly
 ```
 
@@ -89,9 +89,11 @@ Distroless images strip out the shell, package manager, and OS utilities entirel
 | Image | Use case |
 |---|---|
 | `gcr.io/distroless/static` | Go, Rust, any static binary (includes CA certs, tzdata, `/etc/passwd`) |
-| `gcr.io/distroless/base` | C/C++ needing glibc (adds glibc, libssl, openssl) |
-| `gcr.io/distroless/nodejs` | Node.js apps |
-| `gcr.io/distroless/python3` | Python apps |
+| `gcr.io/distroless/base` | C/C++ needing glibc (adds glibc and OpenSSL runtime libraries (libssl, libcrypto)) |
+| `gcr.io/distroless/nodejs22-debian12` | Node.js apps |
+| `gcr.io/distroless/python3-debian12` | Python apps |
+
+Unversioned tags (`/nodejs`, `/python3`) exist but are not pinned to a runtime version.
 
 **Go example** — static binary into distroless:
 
@@ -108,22 +110,24 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 FROM gcr.io/distroless/static AS runner
 COPY --from=builder /app/server /server
-USER 65534:65534
+USER nonroot  # distroless provides this user (UID 65532)
 EXPOSE 8080
 ENTRYPOINT ["/server"]
 ```
 
 **Limitation:** No package manager means you can't install missing shared libraries at runtime. Native extensions requiring uncommon `.so` files may not work — use `gcr.io/distroless/base` (glibc) or fall back to Alpine if you need more.
 
-**`FROM scratch`** is the extreme version: zero OS layer, static binary only. Works for Go and Rust with full static compilation (`CGO_ENABLED=0` for Go; `-C target-feature=+crt-static` for Rust). Not practical for interpreted languages.
+**`FROM scratch`** is the extreme version: zero OS layer, static binary only. Works for Go (`CGO_ENABLED=0`) and Rust when targeting musl (`cargo build --target x86_64-unknown-linux-musl`). On glibc hosts, `-C target-feature=+crt-static` alone does not produce a fully static binary. Not practical for interpreted languages.
 
-**Debugging without a shell:** When a distroless container misbehaves, use `nsenter` to run host binaries inside the container's namespace:
+**Debugging without a shell (Linux hosts only):** `nsenter` runs host binaries inside a container's namespace. This does not work on macOS or Windows — Docker Desktop runs containers in a VM whose PIDs aren't accessible from the host.
 
 ```bash
-nsenter -t $(docker inspect -f '{{.State.Pid}}' container_name) -n netstat -tulpn
+# Requires root on the host; -n enters the network namespace only
+PID=$(docker inspect -f '{{.State.Pid}}' container_name)
+[ "$PID" -gt 0 ] && sudo nsenter -t "$PID" -n ss -tulpn || echo "container not running"
 ```
 
-This attaches to the container's network namespace and runs `netstat` from the host — no shell needed inside the container.
+The `-n` flag is the least-privileged option — it only enters the network namespace. Avoid `-a` or `-m` in production; they give full filesystem and process access, equivalent to `docker exec` as root.
 
 ---
 
@@ -213,15 +217,23 @@ CMD ["--help"]   # default: show help; override: docker run myimage ls s3://buck
 
 ## Running as Non-Root
 
-Always include a `USER` directive in production Dockerfiles. Docker defaults to root (UID 0). Even container-root carries capabilities like `cap_chown` and `cap_net_raw` that can be exploited if a process is compromised. A non-root user has zero capabilities by default.
+Always include a `USER` directive in production Dockerfiles. Docker defaults to root (UID 0), which carries capabilities like `cap_chown` and `cap_net_raw` that can be exploited if a process is compromised. Combine `USER` with `no-new-privileges=true` and `cap_drop: [ALL]` in Compose to fully eliminate capability escalation paths — a non-root process's effective capabilities are empty, but the permitted set is still inherited from the container's bounding set without these.
 
 **Create a dedicated user and switch to it:**
 
 ```dockerfile
-RUN addgroup --gid 65534 appgroup && \
-    adduser --uid 65534 --ingroup appgroup --disabled-password --no-create-home appuser
+# Alpine / BusyBox
+RUN addgroup -g 65534 appgroup && \
+    adduser -u 65534 -G appgroup -D -H appuser
+
+# Debian / Ubuntu
+RUN groupadd --gid 65534 appgroup && \
+    useradd --uid 65534 --gid appgroup --no-create-home --shell /sbin/nologin appuser
+
 USER 65534:65534
 ```
+
+Or skip user creation entirely and use `USER 65534:65534` with a numeric UID — the user doesn't need to exist in `/etc/passwd` for most applications.
 
 Place `USER` as the last directive before `ENTRYPOINT`/`CMD`. Using numeric UID:GID (not name) works in distroless images that lack `/etc/passwd` entries.
 
@@ -238,6 +250,8 @@ services:
     user: "65534:65534"
     security_opt:
       - no-new-privileges=true   # prevents setuid/setgid escalation
+    cap_drop:
+      - ALL                      # drop all capabilities; add back specific ones if needed
     read_only: true              # optional: make root filesystem read-only
     tmpfs:
       - /tmp                     # writable scratch space if needed
@@ -247,7 +261,7 @@ services:
 
 **PUID/PGID images:** Images using `PUID`/`PGID` environment variables (common in LinuxServer.io images) still start the entrypoint as root before dropping privileges. Prefer images that set `USER` to never run as root at all.
 
-**Kubernetes:** Clusters can enforce non-root at the pod level with `securityContext.runAsNonRoot: true` — pods that don't set a non-root `USER` will fail to schedule.
+**Kubernetes:** Clusters can enforce non-root at the pod level with `securityContext.runAsNonRoot: true` — containers that would run as UID 0 will fail to **start** with a `RunAsNonRoot` violation error.
 
 ---
 
@@ -310,8 +324,6 @@ networks:
 - Use named volumes (not bind mounts) for database data — named volumes survive `compose down`
 - `compose down` removes containers and networks but **not** volumes; add `--volumes` to also remove data
 
-For Docker daemon hardening (log rotation, storage, network subnets), see [`references/daemon-config.md`](references/daemon-config.md).
-
 ### Compose commands
 
 ```bash
@@ -326,6 +338,8 @@ docker compose watch                # rebuild/sync on file changes (dev mode)
 docker compose -f custom.yaml up    # use a non-default compose file
 docker compose -p myproject ps      # target a project by name
 ```
+
+For Docker daemon hardening (log rotation, storage, network subnets), see [`references/daemon-config.md`](references/daemon-config.md).
 
 ---
 
@@ -384,14 +398,16 @@ docker network inspect no_internet
 
 Named volumes aren't limited to local disk. The `local` driver accepts `driver_opts` to mount NFS shares, CIFS/SMB shares, or tmpfs:
 
+> **Host prerequisites:** NFS requires `nfs-common` (Debian/Ubuntu) or `nfs-utils` (RHEL/Alpine). CIFS requires `cifs-utils`. Without these, `docker compose up` fails with a cryptic mount error.
+
 ```yaml
 volumes:
   # NFS share
   nfs_data:
     driver: local
     driver_opts:
-      type: "nfs"
-      o: "addr=192.168.1.30,nolock,soft,nfsvers=4"
+      type: nfs
+      o: "addr=192.168.1.30,nolock,hard,timeo=600,retrans=3,nfsvers=4"
       device: ":/volume1/appdata"
 
   # CIFS/SMB share
@@ -399,7 +415,7 @@ volumes:
     driver: local
     driver_opts:
       type: cifs
-      o: "username=svc_user,password=${SMB_PASSWORD},uid=65534,gid=65534"
+      o: "username=svc_user,password=${SMB_PASSWORD},uid=65534,gid=65534,vers=3.0"
       device: "//192.168.1.40/appdata"
 
   # tmpfs (in-memory, cleared on restart — good for scratch/cache)
@@ -410,6 +426,10 @@ volumes:
       device: tmpfs
       o: "size=256m,uid=65534,gid=65534"
 ```
+
+> **NFS mount modes:** Use `hard` (shown above) for stateful workloads — databases, write-ahead logs, anything using `fsync`. A `hard` mount retries indefinitely rather than returning errors on transient network blips. Use `soft` only for read-heavy or cache workloads where data loss is tolerable — a timed-out `soft` write may be partially committed, corrupting data.
+
+> **CIFS credentials:** Credentials passed via `driver_opts` are stored in plaintext in Docker's volume metadata (visible via `docker volume inspect`). For production, use a credentials file with restricted permissions (`chmod 600`) mounted separately, rather than embedding the password in volume options.
 
 Prefer named volumes over bind mounts. Docker manages creation, permissions, and quotas. Use bind mounts only when you need a specific host path (e.g., `/etc/localtime`, a hardware device, or a path managed by another tool).
 

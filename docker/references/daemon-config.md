@@ -49,7 +49,6 @@ Docker's default bridge network uses `172.17.0.0/16`. This range frequently coll
 ```json
 {
   "bip": "169.254.1.1/24",
-  "fixed-cidr": "169.254.1.0/24",
   "default-address-pools": [
     {
       "base": "169.254.0.0/16",
@@ -60,10 +59,13 @@ Docker's default bridge network uses `172.17.0.0/16`. This range frequently coll
 }
 ```
 
-`169.254.0.0/16` is link-local (RFC 3927) — non-routable and not assigned to any corporate network. Each Compose project gets a `/28` subnet (14 usable addresses), supporting up to 4,096 projects from the pool.
+Use `fixed-cidr` only when you want to restrict container IPs to a sub-range of the `bip` network — for example, reserving IPs for static assignment. When `fixed-cidr` equals the `bip` network it has no effect.
+
+`169.254.0.0/16` is link-local (RFC 3927) — non-routable and not assigned to any corporate network. Each Compose project gets a `/28` subnet (14 usable addresses), supporting up to 4,096 projects (a `/16` pool divided into `/28` blocks of 16 addresses each).
 
 **Caveats:**
 - Some P2P and VPN applications ignore or filter link-local interfaces. Test your specific VPN client.
+- **Cloud providers:** On AWS EC2 (and similar), `169.254.169.254` is the Instance Metadata Service (IMDS) endpoint. Containers on a bridge in the 169.254.0.0/16 range may reach IMDS and retrieve IAM credentials. On cloud VMs, prefer `192.168.0.0/16` or `10.0.0.0/8` subnets instead, or enforce IMDSv2 with `HttpPutResponseHopLimit: 1`.
 - `mtu`: Set to `9000` for jumbo frames if your switch/NIC supports it. Must match the physical network MTU — mismatches cause silent packet fragmentation. Default `1500` is safe for most environments.
 
 ---
@@ -105,11 +107,17 @@ User namespace remapping is a kernel-level feature that maps UID 0 inside the co
 | `--privileged` incompatible | Cannot combine `userns-remap` with `--privileged` containers |
 | Performance | Slight overhead from UID translation in the kernel |
 
-**Recommendation:** For most self-hosted setups, `USER` + `no-new-privileges=true` in the Dockerfile/Compose provides adequate isolation without the compatibility headaches of `userns-remap`. Reserve `userns-remap` for high-security environments running untrusted images.
+**Recommendation:** For most self-hosted setups, `USER` + `no-new-privileges=true` in the Dockerfile/Compose provides adequate isolation without the compatibility headaches of `userns-remap`. Enable `userns-remap` when running third-party or community images you cannot audit — self-hosted media servers, databases, and SaaS replacements like Nextcloud or Bitwarden are good candidates. For images you build and control, `USER` + `no-new-privileges=true` is sufficient.
+
+See the "Running as Non-Root" section in the main skill for Dockerfile and Compose-level hardening.
 
 ---
 
 ## Complete Example
+
+> **Cloud VMs (AWS EC2, GCP, Azure):** Replace the `169.254.x.x` ranges below with `192.168.0.0/16` or `10.0.0.0/8` — see the Network Address Pools section above.
+
+The `live-restore` and `icc` keys below are not covered in individual sections; they are hardening defaults worth including in any production daemon configuration.
 
 ```json
 {
@@ -120,7 +128,6 @@ User namespace remapping is a kernel-level feature that maps UID 0 inside the co
   },
   "data-root": "/opt/docker",
   "bip": "169.254.1.1/24",
-  "fixed-cidr": "169.254.1.0/24",
   "default-address-pools": [
     {
       "base": "169.254.0.0/16",
@@ -128,6 +135,10 @@ User namespace remapping is a kernel-level feature that maps UID 0 inside the co
     }
   ],
   "mtu": 1500,
+  "live-restore": true,
+  "icc": false,
   "registry-mirrors": []
 }
 ```
+
+`live-restore` keeps containers running during daemon restarts. `icc: false` disables inter-container communication on the default bridge — user-defined networks are unaffected. There is no daemon-level `no-new-privileges` setting; use `security_opt: [no-new-privileges=true]` per-container in Compose (see the "Running as Non-Root" section in the main skill).

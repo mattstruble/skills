@@ -135,16 +135,14 @@ Run these questions when evaluating a design:
 
 ## References
 
-*Reference files are planned for future waves and not yet populated. The table below describes what each will contain.*
-
 | File | Contents | Read when... |
 |---|---|---|
-| `references/frameworks.md` *(not yet available)* | MDA, DDE, Schell's Tetrad, Costikyan, Lazzaro | You need full framework context or want to analyze a game through multiple lenses |
-| `references/depth-and-dynamics.md` *(not yet available)* | Interplay, counterpoint, complexity vs depth, emergence, DKART deep-dive | You're diagnosing depth problems or analyzing skill spectrums |
+| `references/frameworks.md` | MDA, DDE, Schell's Tetrad, Costikyan, Lazzaro | You need full framework context or want to analyze a game through multiple lenses |
+| `references/depth-and-dynamics.md` | Interplay, counterpoint, complexity vs depth, emergence, DKART deep-dive | You're diagnosing depth problems or analyzing skill spectrums |
+| `references/player-experience.md` | 4 Keys to Fun, flow theory, player motivation, game feel, communicating rules | You're evaluating player experience, motivation, difficulty, or game feel |
 | `references/systems-and-rules.md` *(not yet available)* | Systemic design, permissions/restrictions/conditions, state-space decomposition | You're designing rule systems or building a systemic game |
 | `references/balance-and-competition.md` *(not yet available)* | Solvability, slippery slope, subtractive design, economy design | You're tuning balance, competitive design, or resource systems |
 | `references/narrative-integration.md` *(not yet available)* | Ludo-narrative coherence, embedded vs emergent narrative, Player-Subject, Antagonist | You're integrating story with gameplay or diagnosing narrative dissonance |
-| `references/player-experience.md` *(not yet available)* | 4 Keys to Fun, flow theory, player motivation, game feel, communicating rules | You're evaluating player experience, motivation, difficulty, or game feel |
 | `references/design-artifacts.md` *(not yet available)* | One-page designs, state-space maps, commitment artifacts, game loops | You need to document or communicate design decisions |
 
 ---

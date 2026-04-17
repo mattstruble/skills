@@ -12,8 +12,9 @@ Deep-dive reference for connecting story and gameplay. Load this when integratin
 4. [The Player-Subject and Narrative](#the-player-subject-and-narrative)
 5. [The DDE Three Journeys](#the-dde-three-journeys)
 6. [Interactive Narrative Structures](#interactive-narrative-structures)
-7. [Worked Example: BioShock and Dark Souls](#worked-example-bioshock-and-dark-souls)
-8. [Diagnostic Questions](#diagnostic-questions)
+7. [The World-Plot Interface](#the-world-plot-interface)
+8. [Worked Example: BioShock and Dark Souls](#worked-example-bioshock-and-dark-souls)
+9. [Diagnostic Questions](#diagnostic-questions)
 
 ---
 
@@ -179,7 +180,7 @@ Player choices create divergent paths. Heavy authoring cost — every branch mus
 
 ### Storylets / Quality-Based Narrative
 
-**Source:** Emily Short, "Quality-Based Narrative" (2011).
+**Source:** Emily Short, "Beyond Branching" (2016). The QBN/storylet pattern originated with Failbetter Games' *Fallen London* (~2009); Short named and analyzed it.
 
 Self-contained narrative chunks that become available based on player state. The player's choices don't branch the story — they change which storylets are available.
 
@@ -188,6 +189,40 @@ Self-contained narrative chunks that become available based on player state. The
 **Weaknesses**: The narrative can feel episodic rather than continuous. The player may notice the seams between storylets.
 
 **Examples**: Fallen London, 80 Days, Wildermyth. These games have enormous narrative variety without the exponential authoring cost of branching.
+
+**Why QBN scales where branching collapses**: From Emily Short's "Beyond Branching" (2016): QBN elegantly handles the case where the player needs to acquire multiple pieces of information in any order. In branching, this creates combinatorial explosion — 3 information-gathering beats produce 6 permutations, each requiring its own authored path. In QBN, it's 4 storylets: 3 information-gathering chunks plus 1 gated conclusion that fires once all three are satisfied. The authoring cost stays flat regardless of acquisition order.
+
+QBN also enables modular content addition — new storylets can be dropped alongside existing content without destabilizing the system. This is critical for games with episodic content or multiple contributing authors. Adding a new branch in a branching structure commits you to writing every downstream consequence; adding a new storylet commits you to nothing beyond that storylet itself.
+
+### Salience-Based Narrative
+
+**Source:** Emily Short, "Beyond Branching" (2016). Short coined the category label "salience-based narrative" to describe a technique already in use (cf. Ruskin, GDC 2012).
+
+The system picks the most applicable content from a pool based on world state, rather than letting the player choose. Content is tagged with conditions; the system selects the most specifically matching content for the current situation.
+
+Unlike QBN — where the *player* chooses from available storylets — salience-based systems make that selection automatically based on context matching. More specific matches (more conditions satisfied) are preferred over general ones.
+
+**Examples**: Left 4 Dead's AI dialogue system (Elan Ruskin, "AI-Driven Dynamic Dialog," GDC 2012). Dialogue is tagged with location, nearby objects, team health, and recent events. The system selects the most contextually appropriate line. Players rarely notice the selection — they just feel like the characters are reacting naturally. Firewatch layers reactive dialogue onto environmental exploration: the narrator comments on what the player is doing without conversation being the primary interaction.
+
+**Key advantages**: Easy to build incrementally — start with broad defaults, then add more specific content for individual situations. You're never committed to uniform coverage for every possible state. Adding new content doesn't create ripple effects: a new line tagged for a specific situation doesn't affect any other line, the opposite of branching where every addition potentially requires downstream reconciliation.
+
+**Key limitation**: The system can only be as good as its tagging. If the conditions don't capture the distinctions that matter narratively, the most specific match won't feel specific. Salience-based systems require careful upfront design of the condition vocabulary — what dimensions of world state are worth tracking.
+
+### Waypoint Narrative
+
+**Source:** Emily Short, "Beyond Branching" (2016). Implemented in Short's game *Glass*.
+
+NPCs pathfind through a conversation topic graph toward authored story beats. The player can redirect by introducing topics NPCs don't want to discuss, diverting the narrative. The system constantly "heals" back toward authored beats.
+
+The conversation is a graph of topics with transitions between them. Each transition has associated dialogue. NPCs have a target topic — the next story beat — and pathfind through the topic graph toward it. The player can change the current topic, forcing the NPC to find a new path. This changes what gets said, but the NPC still works toward the story beat. World state can also affect which topics are available or which beats the NPC is targeting — a character who knows the player has already discovered a secret will pathfind toward a different beat than one who doesn't.
+
+**Key insight**: Adding more content makes the system *more* robust — more paths through the topic space means better healing toward story beats. This is the inverse of branching, where adding content commits you to writing yet more content to handle the new branch's downstream consequences.
+
+**Useful for**: Stories with a strong narrative voice, unreliable narrators, or situations where the primary interaction is a tug-of-war between player curiosity and NPC agenda.
+
+**Contrast with salience-based narrative**: Salience-based systems are passive — the world state triggers content automatically. Waypoint narrative is active — the NPC is pursuing a goal and the player is trying to redirect it. The player's agency is in the redirection, not the selection.
+
+**Contrast with branching**: In branching, the designer writes every path. In waypoint narrative, the designer writes the topic graph and the story beats; the paths emerge from the NPC's pathfinding. The designer controls the destination, not the route.
 
 ### Environmental Storytelling
 
@@ -204,6 +239,34 @@ Narrative delivered through the world itself — item placement, architectural d
 From Playtank's framework: games are overrated as authoring tools but underrated as experience generators. The more the designer tries to control the narrative, the less the player can generate their own. The more the designer trusts the rules to generate narrative, the more personal and memorable the player's experience becomes.
 
 **Design implication**: Push toward emergence rather than control. Write rules that generate stories rather than stories that constrain rules. The designer's job is to create conditions for narrative, not to write the narrative itself.
+
+---
+
+## The World-Plot Interface
+
+**Source:** Emily Short, "Tightening the World-Plot Interface" (2015).
+
+Games have rich world models (physics, inventory, spatial relationships) and authored plots (character arcs, revelations, themes). These two layers barely interact in most games. The world model knows about objects and positions; the plot knows about character motivations and dramatic beats. The gap between them is the **world-plot interface**.
+
+### Conversation as Bridge
+
+Better conversation systems are one approach to bridging this gap. When NPCs reason about what the player knows, what they want to discuss, and what they're hiding, conversation becomes a gameplay system that connects world state to narrative state.
+
+A guard NPC who knows you were seen near the crime scene creates a different conversation than one who doesn't — the world state (player position history) affects the narrative (accusation vs. small talk). This is the world-plot interface working: a fact about the world model propagates into a change in the narrative layer.
+
+The salience-based and waypoint narrative structures described above are both mechanisms for building this bridge. Salience-based systems let world state select which narrative content fires; waypoint systems let world state determine which conversational paths are available. Both are implementations of the same underlying idea: the world model and the plot model should talk to each other.
+
+### Dialogue Expressiveness
+
+**Dialogue expressiveness** is how the NPC's way of speaking changes based on relationship, mood, and knowledge — not just what is said, but how it's said.
+
+A character who is friendly says the same information differently than one who is hostile. A character who knows the player already has a piece of information skips the exposition. This requires **player knowledge management**: the system tracks what the player has been told and adjusts dialogue accordingly. It prevents the "as you already know" problem (characters re-explaining things the player already learned) and enables dramatic irony (the player knows something the character doesn't, or vice versa).
+
+Expressiveness creates perceived depth even with limited content. A character who speaks differently based on context feels more alive than one who delivers the same lines regardless of situation — the player infers a rich inner life from the variation, even if the underlying system is simple.
+
+**Examples**: Disco Elysium's skill system gives each internal voice a distinct personality that reacts to the same situation differently. The player's own stats become characters with opinions — the world model (skill values) directly shapes the narrative voice. This is a particularly tight world-plot interface: the same data that governs gameplay mechanics also governs who speaks and how.
+
+**Design implication**: The richer the world-plot interface, the more the embedded and emergent narratives can harmonize — provided the plot layer is designed to handle the range of world states the player can produce. A world-plot interface that reacts to world states the plot wasn't authored to handle produces more dissonance, not less. This is exactly what ludo-narrative coherence requires: the authored narrative must respond to what the player has done, not just to what the designer expected them to do.
 
 ---
 
@@ -252,5 +315,12 @@ From Playtank's framework: games are overrated as authoring tools but underrated
 - Does the narrative structure match the game's design goals?
 - Is the authoring cost proportionate to the narrative value?
 - Does the structure allow for emergent narrative, or does it suppress it?
+- Does the condition vocabulary (tags, state flags, world model dimensions) capture the distinctions that matter narratively?
+- If using waypoint narrative, is the topic graph dense enough that the NPC can always find a path toward the story beat from any player-reachable topic?
+
+**World-plot interface:**
+- Do NPCs react differently based on what the player has done and what they know?
+- Does the game track player knowledge to avoid re-explaining things the player already learned?
+- Is there a mechanism for world state to propagate into narrative state, or do the two layers run in parallel without touching?
 
 For framework-level analysis of the DDE model and the Antagonist concept, see the "DDE Framework" section in `frameworks.md` if not already loaded. For how narrative relates to player motivation, see the "Player Motivation Models" section in `player-experience.md` if not already loaded.

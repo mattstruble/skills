@@ -8,7 +8,6 @@ description: Git conventional commits — use this skill whenever authoring new 
 Analyze working tree changes, group by intent, write conventional commit messages that respect repo conventions.
 
 **References** (read when needed):
-- `references/commit-format.md` — read when composing messages or unsure about type/scope rules
 - `references/worked-example.md` — read when grouping is ambiguous or changes span multiple intents
 
 ## Workflow
@@ -81,7 +80,60 @@ The user might adjust groupings, rename messages, or reorder commits — this is
 
 For each group: `git add <files>` → compose message → `git commit -m "<message>"`
 
-Format: `<type>(<scope>): <description>` — lowercase, imperative, under 72 chars. See `references/commit-format.md` for the full spec.
+#### Message format
+
+```
+<type>(<scope>): <description>
+```
+
+**Subject-line only. No body.** Every commit is a single line. If the subject can't convey the change, rewrite the subject — don't append a body. The diff shows the how; the subject captures the what.
+
+The only exception is footers for breaking changes or issue refs, separated by a blank line:
+
+```
+feat(api)!: change auth token format
+
+BREAKING CHANGE: tokens issued before v2 are no longer accepted
+Refs: #452
+```
+
+No other footers. Never add `Co-authored-by`.
+
+**Subject line rules:**
+- `type` is required
+- `scope` is optional — a short noun for the affected area (e.g., `auth`, `api`, `cli`)
+- `description`: lowercase, imperative mood ("add" not "added"), no trailing period
+- Under 72 characters total
+- Breaking changes: append `!` before colon
+
+**Change types:**
+
+| Type | When to use |
+|------|-------------|
+| `feat` | New capability that didn't exist before |
+| `fix` | Corrects incorrect behavior |
+| `docs` | Documentation only — READMEs, standalone guides |
+| `style` | Formatting, whitespace — no logic change |
+| `refactor` | Restructuring without behavior change |
+| `perf` | Primary purpose is improving performance |
+| `test` | Adding/updating tests with no production code change |
+| `build` | Build system or external dependency changes |
+| `ci` | CI/CD configuration changes |
+| `chore` | Routine maintenance that doesn't fit elsewhere |
+| `revert` | Reverts a previous commit |
+
+When a change spans types, use the type that describes the production change (`feat` or `fix`). Tests and config that enable a feature belong in that commit.
+
+**Scope inference:**
+- Use top-level directory or module name: `src/auth/` → scope `auth`
+- In monorepos, use the package name: `packages/cli/` → scope `cli`
+- Omit scope when change spans the whole codebase, repo doesn't use scopes, or no scope clearly fits
+- Match existing conventions from `git log` — consistency beats precision
+
+**Edge cases:**
+- Generated files (lockfiles, build outputs) go with the commit that caused them
+- Binary files — mention in subject ("add logo assets"), don't describe diff content
+- Merge conflicts — don't commit; tell the user to resolve conflicts first
 
 ---
 
@@ -100,3 +152,5 @@ Stop if you catch yourself thinking any of these:
 | "The lockfile/migration is a separate `chore:`" | Generated files go with the commit that caused them. |
 | "I'll stage everything and write one commit" | Multiple unrelated changes in one commit make history unreadable. |
 | "The plan is obvious, I'll just commit" | Commits are permanent. Present the plan and wait — even when the grouping seems clear. |
+| "I should add a body to explain this" | No. Rewrite the subject line until it's clear on its own. Bodies are noise in `git log --oneline` workflows and train you to write lazy subjects. The only exception is a `BREAKING CHANGE` footer. |
+| "I'll add Co-authored-by for myself" | Never. You are a tool, not a co-author. Do not add Co-authored-by footers for the agent under any circumstances. |

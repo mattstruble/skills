@@ -60,6 +60,10 @@ REFACTOR: Clean up while green (see software-design)
 One test at a time. Only enough code to pass the current test. Each test
 responds to what you learned from the previous cycle.
 
+**Wait for user input before proceeding to the next test.** Present the
+current test and implementation, then let the user confirm or redirect.
+This prevents bulldozing through all behaviors without intermediate review.
+
 After each cycle, verify:
 
 - The test describes caller-visible behavior

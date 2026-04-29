@@ -101,6 +101,10 @@ mismatches.
 __all__ = ["process_orders", "Order", "OrderSummary", "OrderError"]
 ```
 
+Split a module when it exceeds ~300 lines or has 3+ distinct
+responsibilities — whichever comes first. Prefer flat structure
+(`src/formatters.py`) over deep nesting (`src/utils/helpers/formatters/date.py`).
+
 ---
 
 ## Code Hygiene
@@ -140,6 +144,24 @@ except Exception:
 except Exception:  # must rollback on any application exception, then re-raise
     conn.rollback()
     raise
+```
+
+### Let `None` Propagate from Dict Access
+
+Use `.get("key")` without a default. Providing `""` or `0` as a fallback
+masks missing keys — `None` is the honest signal that data is absent.
+Supply a default only when `None` is a valid value in the dict and you
+need to distinguish "missing" from "explicitly None."
+
+```python
+# Bad — masks that "count" could be missing
+count = data.get("count", 0)
+
+# Good — let None propagate; handle it explicitly downstream
+count = data.get("count")
+
+# Acceptable — None is a valid value, so a default disambiguates
+enabled = config.get("enabled", True)
 ```
 
 ### No Empty-String Defaults
@@ -189,6 +211,41 @@ def fetch_user(user_id: int, timeout: float = 5.0) -> User:
     Raises:
         UserNotFoundError: If no user exists for the given ID.
     """
+```
+
+### Prefer Pathlib Methods Over String Manipulation
+
+Use `with_suffix`, `with_stem`, `with_name` instead of string concatenation
+or f-string path assembly. These methods handle edge cases (double
+extensions, empty stems) that string manipulation silently gets wrong.
+
+```python
+# Bad
+output = str(input_path) + ".json"
+output = f"{input_path.parent}/{input_path.stem}.json"
+
+# Good
+output = input_path.with_suffix(".json")
+output = input_path.with_name("output.json")
+```
+
+### Imports at Module Top
+
+All imports belong at the top of the file — never inside functions. Lazy
+imports hide dependencies and make it harder to see what a module depends
+on at a glance. Sort: stdlib, third-party, local.
+
+```python
+# Bad
+def process():
+    from pathlib import Path
+    ...
+
+# Good
+from pathlib import Path
+
+def process():
+    ...
 ```
 
 ### Be Concise

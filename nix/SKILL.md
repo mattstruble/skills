@@ -1,6 +1,6 @@
 ---
 name: nix
-description: Use this skill for any Nix, NixOS, Flakes, Home Manager, or nix-darwin task. Also trigger when the user mentions flake.nix, devShells, mkShell, nixos-rebuild, darwin-rebuild, home-manager switch, nix develop, overlays, derivations, or anything involving declarative system/package configuration on Linux or macOS — even if they don't explicitly say 'Nix'. NOT for the dendritic flake-parts pattern — if the query mentions import-tree, `flake.modules.<class>.<aspect>`, aspect-oriented config, generic module class, or feature-based module sharing across NixOS/darwin, see nix-dendritic instead.
+description: Use this skill for any Nix, NixOS, Flakes, Home Manager, or nix-darwin task. Also trigger when the user mentions flake.nix, devShells, mkShell, nixos-rebuild, darwin-rebuild, home-manager switch, nix develop, overlays, derivations, or anything involving declarative system/package configuration on Linux or macOS — even if they don't explicitly say 'Nix'. NOT for writing packages from scratch with stdenv.mkDerivation or language-specific builders (see nix-packaging). NOT for the dendritic flake-parts pattern — if the query mentions import-tree, `flake.modules.<class>.<aspect>`, aspect-oriented config, generic module class, or feature-based module sharing across NixOS/darwin, see nix-dendritic instead.
 ---
 
 # Nix Ecosystem Guide
@@ -180,6 +180,8 @@ home-manager switch --flake .#username@hostname
 | List generations | `nix profile history --profile /nix/var/nix/profiles/system` |
 | Debug build | `sudo nixos-rebuild switch --show-trace -L -v` |
 | REPL | `nix repl` then `:lf .` to load flake |
+| Search packages | `nix search nixpkgs#<term>` |
+| Explore flake outputs | `nix flake show` or `nix flake show github:owner/repo` |
 
 ## Common Gotchas
 
@@ -190,6 +192,7 @@ home-manager switch --flake .#username@hostname
 5. **Downloaded binaries crash** - Pre-built binaries expect FHS paths (`/lib`, `/usr`) that don't exist on NixOS. Use `pkgs.buildFHSEnv` or `nix-ld`. See `references/dev-environments.md`.
 6. **String interpolation in multi-line strings** - Use `''$` to escape `${` inside `''...''` strings. See `references/nix-language.md` for the full escaping table.
 7. **Build from source unexpectedly** - Overlays change derivation hashes, invalidating binary cache. Consider a separate nixpkgs instance for overlayed packages. See `references/nixpkgs-advanced.md`.
+8. **`legacyPackages` is not legacy** - When using `nix search` or consuming Nixpkgs outputs directly, packages appear under `legacyPackages` not `packages`. The name is misleading — it's how Nixpkgs exposes its deep nested package set through the flake interface. Use `nixpkgs.legacyPackages.${system}` to access them programmatically.
 
 ## References
 

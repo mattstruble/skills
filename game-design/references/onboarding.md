@@ -38,9 +38,11 @@ The investment curve governs *when* to introduce peripheral mechanics, complex s
 
 ### Fun Prevails Over Perfect Teaching
 
-When teaching and fun conflict, fun wins. In Plants vs. Zombies, George Fan considered adding a walnut bowling minigame early to teach the walnut's defensive properties. The minigame was fun but didn't teach the lesson cleanly. The lesson was cut. The fun stayed.
+When teaching and fun conflict, fun wins — but "fun wins" means *redesign the teaching moment*, not *abandon teaching*.
 
-This is the discipline of invisible onboarding: you don't get to sacrifice fun for the sake of a cleaner tutorial. If the teaching moment isn't also a fun moment, redesign the teaching moment. If you can't, cut the lesson and find another way.
+In Plants vs. Zombies (George Fan, GDC 2012), the shovel mechanic needed a tutorial. Fan tried multiple minigames to teach it: one had you dig up weeds (wrong lesson — taught "shovel removes bad things"), another had you remove walnuts to place peashooters (right lesson but not fun). Meanwhile, the team developed walnut bowling — a genuinely fun minigame that had nothing to do with the shovel. The compromise: prepend a brief structural moment ("use your shovel to dig up these three peashooters to prepare for bowling"), then let the player enjoy the fun minigame. The teaching survived, but the fun wasn't sacrificed to make the teaching more thorough.
+
+This is the discipline: you don't get to sacrifice fun for the sake of a cleaner tutorial. But you also don't get to skip teaching because it's inconvenient. The answer is always redesign — find a teaching approach that's also fun, or attach a brief structural teaching moment to something that is.
 
 ---
 
@@ -64,11 +66,13 @@ Introduce new mechanics at a rate the player can absorb. The pattern: introduce 
 
 In Plants vs. Zombies, George Fan introduced one new zombie type every other level. Each new zombie type required a new response. Players had time to understand the threat before it became dangerous. The game never introduced two new threats simultaneously.
 
-Peripheral mechanics are delayed further:
-- Shovel (remove plants): level 5
-- Money (coin collection): level 10
-- Store (purchasing): level 25
-- Zen Garden (optional mode): level 45
+Peripheral mechanics are delayed further. In PvZ (50 levels total):
+- Shovel (remove plants): level 5 (~10% through)
+- Money (coin collection): level 10 (~20% through)
+- Store (purchasing): level 25 (~50% through)
+- Zen Garden (optional mode): level 45 (~90% through)
+
+These specific numbers are calibrated to PvZ's arc length and session structure. The generalizable principle is the *ratio*: introduce core tools early (first 10-20% of the arc), secondary systems in the middle (40-60%), and optional/complex modes near the end (80%+). A 2-hour game and a 40-hour game both follow this curve — the absolute timing differs but the investment proportion is the same.
 
 Each delay is calibrated to the investment curve. By level 5, the player understands the core loop and can absorb a new tool. By level 45, the player is committed enough to engage with an entirely new mode.
 

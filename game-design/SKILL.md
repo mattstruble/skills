@@ -137,6 +137,8 @@ Run these questions when evaluating a design:
 
 **Feel**: Does moment-to-moment interaction feel responsive and satisfying? Is feedback layered appropriately?
 
+**Onboarding**: Can a new player reach minute 5 without reading a word? Does the game's structure guide correct behavior without explanation? Are mechanics introduced at a rate matching the investment curve?
+
 ---
 
 ## References

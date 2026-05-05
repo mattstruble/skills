@@ -29,6 +29,10 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 
 **4 Keys to Fun** — From Nicole Lazzaro (XEODesign). Hard Fun (challenge/mastery), Easy Fun (curiosity/exploration), People Fun (social interaction), Serious Fun (meaning/value). Most successful games serve multiple keys. Useful for diagnosing why a game feels one-note — it's usually serving only one key.
 
+**Invisible Onboarding** — Teaching indistinguishable from playing. The best tutorial provokes "there was a tutorial?" from players. Achieved through structural decisions (economy design, mechanic pacing), play-based learning, and adaptive guidance that appears only when needed. The test: if you must label something "Tutorial," the onboarding has failed. Distinct from Perceived Affordances (which is whether a thing *looks* like what it does) — Invisible Onboarding is whether the *act of teaching* is invisible.
+
+**Investment Curve** — Player willingness to absorb new information is proportional to their existing investment in the game. At minute 1, tolerance for teaching is near-zero — players need to be playing immediately. At level 45, a 3-minute tutorial for an optional mode is acceptable because the player is committed. Governs *when* to introduce peripheral mechanics, complex stores, optional modes, and character-heavy exposition. The corollary: make the right action the most available action early on, because you cannot rely on the player understanding *why* it's right.
+
 ### Evaluating Your Design
 
 **Solvability** — From Sirlin. *Pure solutions* (one best strategy) cause games to degenerate into memorization. *Mixed solutions* (optimal play involves probability distributions) keep games strategically alive. Hidden information, randomness, and real-time execution all push toward mixed solutions. Ask: can a player find a dominant strategy and stop thinking?
@@ -67,6 +71,8 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 | "My game feels like every other [genre] game" | Interplay, Counterpoint, Subtractive Design | What unique interplay exists? What conventions can you subtract? |
 | "Players aren't motivated to continue" | 4 Keys to Fun, Player-Subject | Which emotional needs are unserved? Does the Player-Subject have meaningful agency? |
 | "The difficulty feels wrong" | DKART, Slippery Slope | Which skills are overtaxed? Is challenge calibrated to skill growth? |
+| "Players quit in the first few minutes" | Invisible Onboarding, Investment Curve | Is the game playable immediately? Are you front-loading teaching? Check `references/onboarding.md` |
+| "My tutorial feels heavy or forced" | Invisible Onboarding | Is the teaching labeled, separated, or interruptive? Can it be structural instead? Check `references/onboarding.md` |
 
 ---
 
@@ -144,6 +150,7 @@ Run these questions when evaluating a design:
 | `references/balance-and-competition.md` | Solvability, slippery slope, subtractive design, economy design | You're tuning balance, competitive design, or resource systems |
 | `references/narrative-integration.md` | Ludo-narrative coherence, embedded vs emergent narrative, Player-Subject, Antagonist | You're integrating story with gameplay or diagnosing narrative dissonance |
 | `references/design-artifacts.md` | One-page designs, state-space maps, commitment artifacts, game loops | You need to document or communicate design decisions |
+| `references/onboarding.md` | Invisible onboarding techniques, investment curve, adaptive messaging, mechanic pacing, economy-as-guidance, writing style | You're designing how a game teaches itself, players aren't learning mechanics, or early retention is poor |
 
 ---
 

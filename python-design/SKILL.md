@@ -33,6 +33,16 @@ genuinely dict-shaped and must stay a plain dict for serialization or
 library interop — use TypedDict. The access pattern tells you:
 `data["user_id"]` → TypedDict; `summary.total_revenue` → dataclass.
 
+**`Literal` vs `Enum`:** For fields on Pydantic models with a small, stable
+set of values, `Literal["idle", "busy", "dead"]` gives you validation and
+IDE autocomplete without a separate class. Reach for `Enum`/`StrEnum` when
+the set is reused across multiple models or needs methods/behavior. Note
+that `Literal` values are not iterable and have no runtime members — if you
+ever need to enumerate valid values or use them in a `match` guard, use
+`StrEnum` instead. This complements the `Enum`/`StrEnum` row in the table
+above — use `Literal` only when the field is a local discriminator, not a
+shared domain concept.
+
 **Interface contracts:**
 
 | Need | Reach for | Why |
@@ -42,6 +52,11 @@ library interop — use TypedDict. The access pattern tells you:
 | Shared behavior across unrelated classes | Mixin | Implementation without contract |
 
 **Generics restraint:** `TypeVar` and generics shine in container and collection abstractions — type-safe wrappers, reusable data structures, utility functions like `first(items: Sequence[T]) -> T`. The trap is over-genericizing business logic that only ever has one concrete type: if `UserRepository` will never be anything other than a `UserRepository`, making it `Repository[T]` adds abstraction without value. Even when multiple concrete types exist, if every subclass adds domain-specific methods anyway, the generic base captures only the trivial skeleton — evaluate whether that skeleton justifies the abstraction overhead. A caller-facing `Protocol` often provides more value than a generic concrete base. Reach for generics when the type relationship is genuinely reusable across multiple concrete types; otherwise, name the type directly. See `references/advanced-patterns.md` for `TypeVar` syntax and examples.
+
+**Collection semantics:** Match the collection to the operation — `set` for
+membership tests, `list` for ordered/indexed access, `dict` for keyed
+lookup. Using a `dict` for membership checks or a `list` for uniqueness
+signals unreviewed code.
 
 ---
 
@@ -167,7 +182,8 @@ enabled = config.get("enabled", True)
 ### No Empty-String Defaults
 
 `""` is not "no value." Use `None`, or better, require the argument. Same
-applies to `[]` and `{}` as sentinels.
+applies to `[]` and `{}` as sentinels. Same for model/dataclass fields — if
+a field can be absent, type it as `T | None = None`, not `str = ""`.
 
 ```python
 # Bad — "" is not "no value"

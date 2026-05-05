@@ -25,6 +25,8 @@ If the line is absent, ask the user once: "Where's your knowledge base — what'
 
 If the path doesn't exist on disk, tell the user and stop — don't guess or create one elsewhere.
 
+If the path exists but `INDEX.md` is absent, the wiki is uninitialized. Offer to scaffold it: "Your knowledge base directory exists but has no INDEX.md — want me to create the initial structure?" If they agree, create `INDEX.md` with the MOC-of-MOCs template from the Graph model section below.
+
 ---
 
 ## Reading
@@ -45,9 +47,10 @@ Do NOT read for:
 1. **Read `INDEX.md`** to see what MOCs exist.
 2. **Read the relevant MOC.** It points to the atomic notes in that domain.
 3. **Pick the 1-5 atomic notes most relevant** to the current conversation. Read them.
-4. **Follow wikilinks selectively.** If a loaded note links to a relevant entity, read that note too. Don't follow every link — follow the ones that earn it.
-5. **Use grep for backlinks** when needed. To find what decisions touched a topic, grep for its wikilink path.
+4. **Follow wikilinks selectively.** If a loaded note links to a relevant entity, read that note too. Don't follow every link — follow the ones that earn it. Never read the same file twice in one traversal — maintain a visited set.
+5. **Use grep for backlinks** when needed. To find what decisions touched a topic, grep for its wikilink path. If grep returns more than 10 matches, load only the 3-5 most recently updated.
 6. **Use tags to find clusters.** To find every active decision, grep for `tags:.*status/active` inside `decisions/`.
+7. **Check decision status.** When loading a decision note, check its `status` field. If `status: superseded`, follow the supersession chain to the current active decision.
 
 ### Don't narrate
 
@@ -75,14 +78,28 @@ Don't propose writes for: today's mood, a passing question, a half-formed though
 ### How to write
 
 1. **Identify the node type.** Person, org, decision, topic, or MOC?
-2. **Check whether a node already exists.** Grep filenames and aliases. If it exists, update — don't duplicate.
-3. **Create the atomic file** with proper frontmatter, wikilinks, and folder placement.
-4. **Update the relevant MOC** to include the new note.
-5. **Bump `updated:`** on any note whose body or frontmatter you changed.
+2. **Check whether a node already exists.** Grep filenames and `aliases:` fields in the relevant folder. If it exists, update — don't duplicate.
+3. **Check for contradictions.** If the new content contradicts an existing note, surface the conflict to the user before writing: "This conflicts with what's in `topics/X.md` — should I update the existing note or create a new decision that supersedes it?"
+4. **Create the atomic file** with proper frontmatter, wikilinks, and folder placement.
+5. **Update the relevant MOC** to include the new note.
+6. **Bump `updated:`** on any note whose body or frontmatter you changed.
 
-### One write per turn
+### Batching writes
 
 If a conversation surfaces multiple durable facts, batch them into one write session at a natural break (or when the user says "wrap up"). Don't interrupt flow with five separate "want me to log this?" prompts.
+
+When proposing a batch, present a numbered list in a single proposal:
+
+> I'd like to log a few things from this session:
+> 1. `decisions/2026-05-05-redis-for-session-cache.md` — the caching decision
+> 2. `people/jordan.md` — new infra team lead
+> 3. Update `topics/data-pipeline.md` — current migration state
+>
+> Want me to write all of these, or just some?
+
+Write only the items the user approves.
+
+Explicit user commands ("log this") always trigger an immediate write regardless of batching state — don't defer them.
 
 ---
 
@@ -230,8 +247,8 @@ updated: 2026-05-05
 - **Headings:** `#` for file title (one per file), `##` for sections, `###` for subsections.
 - **Frontmatter:** YAML, fenced with `---`. Required on every note.
 - **Tags:** hierarchical, slash-separated. Always include `type/<node-type>`.
-- **No secrets:** never write API keys, passwords, or credentials.
-- **No PII drift:** don't accumulate third-party personal info unless directly relevant and authorized.
+- **No secrets:** never write API keys, passwords, tokens, private keys, connection strings, JWTs, or any credentials. If the user asks to log something containing secrets, decline and suggest a password manager or secrets store instead.
+- **No PII drift:** don't accumulate third-party personal info (contact details, addresses, etc.) unless directly relevant to the work and the user explicitly authorizes it.
 
 ---
 

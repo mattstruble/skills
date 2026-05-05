@@ -98,6 +98,11 @@ ones.
 - **Declarative over imperative**: express *what* should happen, not *how*.
   Comprehensions and map/filter communicate intent. But when they become hard
   to read, a named loop is clearer -- don't force it.
+- **Framework composition over ad-hoc**: when you've chosen a framework, use
+  its native composition mechanisms (dependency injection, middleware, lifecycle
+  hooks, fixtures) rather than closures, globals, or manual wiring. Ad-hoc
+  patterns bypass the testability, discoverability, and lifecycle management
+  the framework provides -- and surprise readers who know the framework.
 
 ```
 # Before: logic tangled with side effects — hard to test, hard to reuse

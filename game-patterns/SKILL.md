@@ -18,6 +18,7 @@ Engine-agnostic pattern reference for game systems. Synthesized from Nystrom's *
 | Problem | Pattern | Choose when... |
 |---|---|---|
 | Entity behavior spans multiple domains (physics, rendering, AI) | **Component** — split into isolated domain objects | You're structuring an entity, not connecting systems |
+| Need composable entities with emergent interactions AND 100+ entity types in data files, or confirmed cache-miss bottleneck in entity loops | **ECS Architecture** — entities as IDs, components as data, systems as behavior | You need data-driven content scale AND no engine component model, OR profiled cache pressure — not just organization |
 | One system reacts to events in another, response needed immediately | **Observer** — subject notifies listeners synchronously | Few listeners, no performance concern in the handler |
 | Systems communicate asynchronously, or events need batching/dedup | **Event Queue** — buffer events; consumers pull when ready | Observer is too synchronous, or you need cross-thread safety |
 | A subsystem needs a global access point with swappable implementations | **Service Locator** — register/retrieve through a central registry | You need global access AND testability (mock services) |
@@ -139,11 +140,15 @@ When the agent recommends a pattern, consider whether a complementary pattern st
 
 ### Decoupling Patterns
 
-**Component** — Splits a monolithic entity class into isolated domain components (physics, rendering, AI, input). Each component knows its domain; the entity is a thin container. Foundation of ECS architectures. **Engine note**: Unity's `GetComponent`, Godot's node tree, and Bevy's ECS all implement this. See `references/decoupling.md`.
+**Component** — Splits a monolithic entity class into isolated domain components (physics, rendering, AI, input). Each component knows its domain; the entity is a thin container. Foundation of ECS architectures. **Engine note**: Unity's `GetComponent`, Godot's node tree implement this; Bevy implements full ECS (see below). See `references/decoupling.md`. *Full ECS differs — see `references/ecs-architecture.md`.*
 
 **Event Queue** — Decouples event producers from consumers in time, not just structure. Events are buffered; consumers process them at their own pace. Solves the "slow observer" problem and enables cross-thread communication. See `references/decoupling.md`.
 
 **Service Locator** — A registry that maps service interfaces to concrete implementations. Provides global access without hard-coding dependencies. Better than Singleton because the implementation is swappable (useful for null/test services). See `references/decoupling.md`.
+
+### ECS Architecture
+
+**ECS Architecture** — Full Entity Component System: entities are bare integer IDs, components are plain data structs attached to entity IDs, and systems query and iterate component sets in bulk. Achieves cache-friendly performance (contiguous component arrays) and data-driven content scale (entity types defined in data files, no code change per new type). Use when you have profiled cache misses as a bottleneck in entity loops, OR when content breadth is large (100+ types) AND designers need to iterate without code changes AND your engine has no built-in component model. For most games, the simpler Component pattern suffices. See `references/ecs-architecture.md`.
 
 ### Optimization Patterns
 
@@ -171,7 +176,8 @@ These patterns are worth understanding conceptually, but you should not implemen
 
 - **Game Loop** — Godot: `_process`/`_physics_process`. Unity: `Update`/`FixedUpdate`. Love2d: `love.update`.
 - **Double Buffer** — Handled by the renderer. Understand it to debug vsync/tearing issues.
-- **Component** — Godot nodes, Unity components, Bevy ECS. Use the engine's system; don't roll your own.
+- **Component** — Godot nodes, Unity components (MonoBehaviour). Use the engine's system; don't roll your own.
+- **ECS** — Bevy ECS, Unity DOTS implement full ECS. Use their built-in query/system APIs directly.
 - **Data Locality** — Unity DOTS/ECS, Bevy ECS enforce this. In other engines, be aware of cache effects in hot loops.
 
 ---
@@ -186,3 +192,4 @@ These patterns are worth understanding conceptually, but you should not implemen
 | `references/decoupling.md` | Component, Event Queue, Service Locator |
 | `references/optimization.md` | Data Locality, Dirty Flag, Object Pool, Spatial Partition |
 | `references/additional-patterns.md` | Factory, Strategy, Decorator |
+| `references/ecs-architecture.md` | Full ECS Architecture — Entity/Component/System, emergence, data-driven construction, when to use vs. Component pattern |

@@ -1,6 +1,6 @@
 ---
 name: knowledge-base
-description: "Maintains and consults a personal markdown knowledge base structured as a navigable graph so agents can pick up where prior sessions left off. Use this skill aggressively when the user says \"log this\", \"remember this\", \"wrap up\", \"load context\", \"check the wiki\", or \"check the knowledge base\". Also use proactively at the start of planning, brainstorming, strategy, or discussion conversations to load relevant prior context, and mid-conversation when you realize you're missing context the user expects you to have. NOT for coding subagent tasks, trivial one-off questions, or ephemeral conversation."
+description: "You MUST use this skill proactively to maintain cross-session memory. Load context when resuming prior work, when the user references past sessions, or at the start of planning/strategy conversations. Propose writes whenever durable new information surfaces — decisions, constraints, preferences, new entities, investigation findings, or anything a future session would benefit from knowing, whether or not related content exists in the wiki yet. Explicit triggers: \"log this\", \"remember\", \"check the wiki\", \"load context\". NOT for self-contained coding tasks, one-off factual questions, or trivial conversation with no cross-session value."
 ---
 
 # Knowledge Base
@@ -70,8 +70,11 @@ Don't say "let me load your context" or "I've reviewed your wiki." Absorb it and
 - A new entity (a person, a collaborator, a tool choice)
 - An ongoing investigation's conclusion or current state
 - A constraint or commitment that will affect future work
+- A novel discovery during active work (library quirks, environmental constraints, non-obvious behaviors, hard-won debugging findings)
 
 When you detect one of these, **propose the write before doing it**: "Sounds like a new decision — want me to add `decisions/2026-04-12-cache-strategy.md` and link it from the Project MOC?" If they agree, write. If they decline, drop it.
+
+A write doesn't require pre-existing wiki content on the topic. If nothing related exists yet, that's a reason to create a new note, not a reason to skip the write.
 
 Don't propose writes for: today's mood, a passing question, a half-formed thought, speculation the user hasn't committed to, content already in conversation memory.
 

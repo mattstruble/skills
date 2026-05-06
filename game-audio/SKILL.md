@@ -33,7 +33,7 @@ Vocabulary and frameworks for reasoning about audio design in games — how soun
 
 **Analog Chain as Instrument** — Treating an entire signal chain (pedals, tape machines, spring reverbs, compressors) as a single instrument. The chain's emergent properties — ground hum, harmonic distortion, feedback behavior — become part of the sonic identity. Swap components freely; the concept (pure input → complex chain) remains.
 
-**Shepard Tone** — An endlessly-rising audio illusion: notes fade in at the bottom as they fade out at the top, creating perpetual tension without resolution. Used for gameplay events of indeterminate duration (e.g., glory kills) where a riser must loop indefinitely while feeling like it's always building.
+**Shepard Tone** — An endlessly-rising audio illusion: notes fade in at the bottom as they fade out at the top, creating perpetual tension without resolution. Used for gameplay events of indeterminate duration (e.g., glory kills) where a riser must loop indefinitely while feeling like it's always building. See **Reactive Audio** for the gameplay context where duration-indeterminate audio is needed.
 
 ---
 
@@ -47,7 +47,7 @@ Vocabulary and frameworks for reasoning about audio design in games — how soun
 | "The dynamic music system keeps interrupting the groove" | Reactive Audio | Is the gameplay structure actually complex enough to need dynamic music? Simpler may be better. |
 | "The music and sound effects clash in the mix" | Tonal Integration | Identify which SFX produce tones. Tune them to the music's root note (or vice versa). This cannot be fixed in post-processing. |
 | "The audio feels generic despite good technical execution" | Process-Breaking, Constraint-Driven Composition | The process produced a genre-typical result. What constraint would force a different direction? |
-| "I can't figure out how to make this sound unique to this game" | Constraint-Driven Composition, Sine Wave as Pure Input | Start from the game's own assets (sounds, identity). Morph them into your instruments. |
+| "I can't figure out how to make this sound unique to this game" | Process-Breaking, Constraint-Driven Composition | Start from the game's own assets (weapon sounds, environmental audio). Use spectral morphing to transform game-specific sounds into instruments. |
 | "The OST release feels like an afterthought" | Soundtrack as Artifact | Treat it as a separate project. Structure it as a concept album, not a loop dump. |
 | "The composer is playing it safe" | Comfortable Failure | Examine team culture. Are failed experiments punished or encouraged? |
 
@@ -89,7 +89,7 @@ Run these questions when evaluating an audio design:
 
 **Reactivity**: Does your gameplay structure actually need dynamic music? Map the structure first, then decide how much reactivity serves it.
 
-**Tonal Integration**: Which sound effects in this context produce tones? Are they tuned to the music's root note? Is this designed in, or left to post-processing?
+**Tonal Integration**: Which sound effects in this context produce tones? Are they tuned to the music's root note (or vice versa)? Is this designed in, or left to post-processing?
 
 **Culture**: Does your team respond to failed audio experiments with encouragement or correction? Fear of rejection produces safe, genre-typical results.
 
@@ -112,3 +112,5 @@ Run these questions when evaluating an audio design:
 **game-design** — Game feel and feedback layering theory. Audio is a primary feedback layer in game feel (alongside animation, camera, hitpause, screenshake). For the theory of why feedback layering matters and how it creates game feel, see `game-design`. This skill covers *how to design the audio layer*; game-design covers *why that layer matters in the whole system*.
 
 **game-patterns** — Implementation patterns for game systems. If you're implementing an adaptive audio system (state machine for music layers, event-driven sound triggers), game-patterns covers the structural patterns. This skill covers the design reasoning for *what* that system should do.
+
+**brainstorm** — This skill provides domain vocabulary that brainstorm sessions draw on when working on audio direction. They co-trigger naturally: brainstorm drives the ideation process, game-audio provides the concepts to reason with.

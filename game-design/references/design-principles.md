@@ -104,13 +104,13 @@ These can diverge dramatically. When they do, the mechanics win. Players experie
 
 The rules define the actual experience. Two games with identical themes but different mechanics are fundamentally different games. Two games with different themes but identical mechanics are fundamentally the same game.
 
-*Starcraft vs. Warcraft:* Starcraft (different mechanics, same genre) is the true descendant of Warcraft. World of Warcraft (same theme, different mechanics) is a different game.
+*Starcraft vs. Warcraft:* Starcraft (different mechanics, same genre) is the mechanical descendant of Warcraft. World of Warcraft (same theme, different mechanics) is a fundamentally different game.
 
 ### Players Optimize the Fun Out
 
 When mechanics and theme conflict, players follow the mechanics. If the optimal strategy contradicts the intended experience, players will pursue the optimal strategy and feel cheated by the experience.
 
-*BioShock example:* The game presented a moral choice (harvest vs. rescue Little Sisters). But the mechanics made rescuing strictly better in the long run. Players saw through it — the "choice" was illusory because the mechanics didn't support the moral weight.
+*BioShock example:* The game presented a moral choice (harvest vs. rescue Little Sisters). But the mechanics made the "good" choice mechanically competitive or superior in the long run. Players saw through it — the "choice" lacked weight because the mechanics didn't create a genuine dilemma.
 
 **Design implication:** If you want your game to be about something, the mechanics must make that thing the optimal or most engaging path. Theme alone cannot carry meaning.
 

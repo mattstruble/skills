@@ -17,7 +17,7 @@ Applied mechanics for interactive storytelling — how to design deduction syste
 
 **Player Imagination Gap** — The space between what the game shows and what the player infers. Non-linear or fragmented narrative forces the player to fill gaps with their own interpretation, making them a co-author. This gap is a feature, not a bug: a player who constructs meaning is more engaged than one who receives it. The iceberg principle applied to games — the story happening "off the page" is often richer than what's on it.
 
-**Sculptural Narrative** — A story structure where the player explores a complete, pre-existing story from any entry point, assembling understanding non-linearly. Contrast with linear narrative (a path) or branching narrative (a tree). The player is a sculptor revealing a form, not a traveler following a road. Robustness: any fragment contains enough context to orient the player; the story cannot be "broken" by early discovery.
+**Sculptural Narrative** — A story structure where the player explores a complete, pre-existing story from any entry point, assembling understanding non-linearly. Contrast with linear narrative (a path) or branching narrative (a tree). The player is a sculptor revealing a form, not a traveler following a road. Robustness requires that any fragment contain enough context to orient the player — achieved through character depth and thematic consistency, not guaranteed by the structure alone.
 
 **Writing From the Character Out** — A writing discipline where scenes are written from the character's authentic headspace, not from the designer's structural needs. The character's agenda, voice, and psychology drive the scene; structural requirements are satisfied after the fact. Produces dialogue that feels alive rather than functional.
 
@@ -27,7 +27,7 @@ Applied mechanics for interactive storytelling — how to design deduction syste
 
 **Deduction Space** — The full set of possible player actions that express understanding. Narrow deduction spaces (one correct action) create frustration when players know the answer but can't express it. Wide deduction spaces (many valid paths to truth) feel fair and reward creative thinking. Truth is broad — there is never only one way to arrive at a correct conclusion.
 
-**Constructed Argument** — An alternative to the combination-lock deduction model. Instead of finding the single correct answer, the player builds a case: assembling evidence, testing it against a judge (NPC or system), and refining until the argument is watertight. The player is Watson feeding ideas to Holmes, not Holmes who already knows. Multiple valid arguments can reach the same conclusion.
+**Constructed Argument** — An alternative to the combination-lock deduction model. Instead of finding the single correct answer, the player builds a case: assembling evidence, testing it against a judge (NPC or system), and refining until the argument is watertight. The external judge creates space for the player to be wrong, refine, and improve — the loop is construct → test → revise, not construct → submit. Multiple valid arguments can reach the same conclusion.
 
 **Two-Story Structure** — Every mystery has two stories: the story of the crime (what happened and why) and the story of the investigation (the detective and characters dealing with the aftermath). The crime story is the secret history being uncovered; the investigation story is the adventure the player is living. Both must be compelling. Most detective games over-invest in the crime story and under-invest in the investigation story.
 
@@ -57,6 +57,8 @@ Applied mechanics for interactive storytelling — how to design deduction syste
 | "My romance/relationship system feels transactional" | NPC Agency, Entitlement Simulation | Does the NPC have desires that conflict with the player's? Does the relationship continue after the "win state"? |
 | "Players solve the mystery too fast / too slow" | Deduction Space, Burden of Proof | Is the deduction space calibrated? Can early discovery still reward deeper engagement? |
 | "My world feels thin despite lots of lore" | NPC Agency, Protagonist Constraint | Do NPCs have contradictory opinions about the world? Does the protagonist's limited perspective force the player to construct their own understanding? |
+| "My solve scene feels disconnected from the rest of the game" | Two-Story Structure, Constructed Argument | Does the accusation scene reflect the full range of states the player can arrive in? Is the high-agency phase feeding into the high-impact phase? |
+| "My story branches but all paths feel the same" | Player Imagination Gap, NPC Agency | Are branches cosmetic or do they affect NPC behavior? Consider routing to `game-design` for depth analysis |
 
 ---
 
@@ -119,7 +121,7 @@ Run these questions when evaluating a narrative design:
 
 **Deduction**: Can players express what they understand? Is the deduction space wide enough for multiple valid approaches? Is the burden of proof calibrated?
 
-**NPCs**: Do NPCs have independent goals? Can they act against the player? Does the protagonist's power leave room for NPC agency?
+**NPCs**: Do NPCs have independent goals? Can they act against the player? Does the protagonist's power leave room for NPC agency? Does any NPC bear the weight of representing an entire culture or background?
 
 **Structure**: Is the story written from character headspace? Does each fragment contain enough context to orient the player? Does the story survive non-linear discovery?
 
@@ -147,3 +149,5 @@ Run these questions when evaluating a narrative design:
 **godot / love2d** — Engine-specific implementation. This skill is engine-agnostic. When both fire, the engine skill handles concrete code; this skill handles narrative design reasoning.
 
 **brainstorm** — Ideation process. This skill provides the domain vocabulary that brainstorm sessions draw on when working on narrative games.
+
+**game-patterns** — Implementation patterns for game systems. When designing a deduction loop or NPC state machine, game-patterns provides the structural implementation vocabulary (State pattern, Observer for NPC reactions, Event Queue for evidence tracking).

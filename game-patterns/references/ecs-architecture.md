@@ -2,7 +2,7 @@
 
 Full Entity Component System architecture — entities as IDs, components as data, systems as behavior. Distinct from the simpler Component pattern (see `decoupling.md`).
 
-*Synthesized from Bob Nystrom's GDC talk on ECS and roguelike architecture.*
+*Synthesized from GDC talks on ECS architecture and data-driven game design; also draws on Nystrom's* Game Programming Patterns *(gameprogrammingpatterns.com).*
 
 ---
 
@@ -97,6 +97,8 @@ ECS pairs naturally with external data files. Entity definitions live in JSON/YA
 ```
 
 **Designer impact**: New entity types require no programmer involvement. A designer adds a component to a data file; the system picks it up automatically. This is the primary reason content-heavy games (roguelikes, RPGs) adopt ECS — it decouples content creation from engineering cycles.
+
+**Security note for moddable games**: When loading entity definitions from untrusted sources (mods, user content), validate component type names against a whitelist registry and clamp numeric fields to game-defined bounds. An unvalidated component name could reference internal-only systems; unbounded numeric values could break balance or crash systems.
 
 ---
 

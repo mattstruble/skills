@@ -94,7 +94,7 @@ Structure the game in two phases:
 1. **High agency, low impact**: the player makes many choices (where to go, what to do, what evidence to gather or destroy) but individual actions have limited immediate consequences
 2. **Low agency, high impact**: the accusation/solve scene — the player's options are now constrained, but every choice matters because the initial conditions have been set
 
-This structure creates dramatic tension: the player spends the game setting up their position, then watches it play out with limited ability to course-correct.
+This structure creates dramatic tension: the player spends the game setting up their position, then watches it play out with limited ability to course-correct. The accusation scene must be designed to handle the full range of states the player can arrive in — see "The Linear Accusation Scene" anti-pattern below.
 
 ### Curated Input Systems
 

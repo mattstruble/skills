@@ -51,8 +51,9 @@ Vocabulary and frameworks for expressing design intent through spatial layout �
 | Spatial choices feel cosmetic | Spatial Choice, Prioritization Choice | Do the paths have meaningfully different strategic values? Do they interact with enemy behaviors differently? |
 | Encounters feel like scripted set pieces | Prioritization Choice, Encounter Composition | Are enemies placed in fixed-script waves? Can the player approach the configuration differently each time? |
 | The level feels like a corridor with decoration | Spatial Choice, Legibility | Does the geometry create decisions, or just route the player? Are there meaningful approach vectors? |
-| Players don't engage with the most dangerous enemies | Arena Pressure, Encounter Composition | Is there a resource incentive to engage the most dangerous enemies first? Does the Captain drop more rewards? |
+| Players don't engage with the most dangerous enemies | Arena Pressure, Encounter Composition | Is there a resource incentive to engage the most dangerous enemies first? Does the Captain drop more health/resources? |
 | Encounters lose momentum between waves | Last Heavy Standing, Encounter Composition | Are reinforcements tied to health percentage, not death? Does the encounter have a clear climax? |
+| Encounters feel cheap — too many simultaneous attacks | Encounter Composition, Environmental Behavior | How many enemies are actively attacking at once? Use enemy placement and arena geometry to gate simultaneous threats. See token systems in `references/encounter-design.md` |
 | AI feels like it has no personality or behavior | Environmental Behavior, Encounter Composition | Are enemies placed to exploit their archetype's strengths? Does placement create the illusion of contextual behavior? |
 
 ---
@@ -77,7 +78,7 @@ Apply **Prioritization Choice** and **Encounter Composition**. If all enemies ar
 
 Compose the encounter with orthogonally differentiated archetypes: one hitscan ranged unit (immediate threat, must be addressed), one slow charger (dangerous but telegraphed), one fast flanker (unpredictable positioning). Now the player must decide: address the hitscan unit first (immediate damage prevention) or the flanker (positional threat)? The charger is dangerous but readable. No single script dominates all configurations of this encounter.
 
-Run the **Checkpoint Test**: die and restart. Does the configuration feel different? If the hitscan unit is in a different position relative to the flanker, the prioritization changes. If it always feels the same, the encounter is too scripted.
+Run the **Checkpoint Test**: die and restart. Does the configuration feel different? If no single dominant script emerges — if the player must reassess priorities each time — the encounter has meaningful prioritization choice.
 
 ---
 

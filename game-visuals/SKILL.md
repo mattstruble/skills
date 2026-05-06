@@ -63,6 +63,7 @@ Visual design principles for games — how art communicates, guides attention, a
 | "Animated effects look mechanical / synchronized" | Color Cycling | Are cycling gradients phase-offset? Vary gradient lengths and starting positions for organic motion |
 | "I need multiple scene variants (day/night/environments) without redrawing assets" | Palette Shifting, Constraint-Driven Art | Are color regions non-overlapping per element? Can palette slots be swapped independently? |
 | "My game's tone feels wrong for the genre" | Emotional Register | Audit each style element: saturation, proportion, line, shadow. Which one is signaling the wrong tone? |
+| "My procedurally-generated content looks visually inconsistent" | Post-Processing Unification, Palette Discipline | Are scene-level passes binding varied assets? Does each generated element use a consistent palette with assigned roles? See `references/simulation-art.md` |
 
 ---
 

@@ -31,6 +31,8 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 
 **Invisible Onboarding** — Teaching indistinguishable from playing. The best tutorial provokes "there was a tutorial?" from players. Achieved through structural decisions (economy design, mechanic pacing), play-based learning, and adaptive guidance that appears only when needed. The test: if you must label something "Tutorial," the onboarding has failed. Distinct from Perceived Affordances (which is whether a thing *looks* like what it does) — Invisible Onboarding is whether the *act of teaching* is invisible.
 
+**Perceived Affordances** — Can the player intuit what interactions are possible by looking at the game? Spiky things should look dangerous. Flammable things should look flammable. When affordances are clear, players discover rules through play instead of tutorials. When affordances are opaque, players feel cheated by deaths they couldn't predict.
+
 **Investment Curve** — Player willingness to absorb new information is proportional to their existing investment in the game. At minute 1, tolerance for teaching is near-zero — players need to be playing immediately. At level 45, a 3-minute tutorial for an optional mode is acceptable because the player is committed. Governs *when* to introduce peripheral mechanics, complex stores, optional modes, and character-heavy exposition. The corollary: make the right action the most available action early on, because you cannot rely on the player understanding *why* it's right.
 
 ### Evaluating Your Design
@@ -45,13 +47,19 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 
 **Game Feel** — How responsive and satisfying moment-to-moment interaction feels. Achieved through feedback layering: animation, sound, camera, particles, hitpause, screenshake. A well-designed mechanic with poor game feel still fails. Distinct from whether the mechanic is strategically interesting — both layers matter independently.
 
+**Design Hook** — The unique, specific thing that makes a game different from everything else that already exists. Not a genre description, not production values, not design pillars — the one mechanic, constraint, or combination that produces a new type of decision or experience. A game without a clear hook cannot be explained in one sentence and cannot be differentiated from competitors. The test: "Why would someone buy this instead of what's already out there?" See `references/design-communication.md`.
+
 ### Building Your Systems
+
+**Cursed Problem** — From Alex Jaffe (GDC 2019). A design problem with no good solution, only least-bad tradeoffs. Arises when two core player promises are logically incompatible — not just hard to satisfy simultaneously, but structurally contradictory. Recognizing a cursed problem prevents wasting months searching for a solution that doesn't exist. The four responses: barriers (make the problematic behavior impossible), gates (make it difficult), carrots (change the objective), s'mores (lean into the behavior and make it the game). See `references/cursed-problems.md`.
+
+**Push-Forward Loop** — A system architecture where the optimal strategy is always aggressive engagement. Resources replenish through combat, not through waiting; enemies punish passivity; movement is mechanically safer than cover. The loop: engage → kill → gain resources → must engage again. Generalizes beyond combat to any system where you want players to move forward rather than retreat or optimize passively.
+
+**Mechanics-as-Meaning** — From Soren Johnson (GDC 2010). A game's mechanics determine what it is actually about, regardless of theme. When mechanics and theme conflict, mechanics win — players follow the optimal path, not the intended narrative. Risk is about risk (probabilistic combat). Diplomacy is about diplomacy (simultaneous turns). Super Mario Bros. is about timing, not plumbing. Designing a game to be "about" something requires making that thing the mechanically optimal or most engaging path. See `references/design-principles.md`.
 
 **Permissions / Restrictions / Conditions** — Three rule types for systemic design. *Permissions*: what you can do ("wood burns"). *Restrictions*: exceptions to permissions ("water douses flames"). *Conditions*: the framework for the other two ("most wood is in the forest"). Simple rules in each category combine into complex emergent behavior. The key: keep each rule simple; let combinations do the work.
 
 **Consistency** — Rules must behave the same everywhere. Three aspects: *Predictability* (same inputs → same outputs), *Coherence* (rules work the same in all areas of the game), *Variability* (consistency enables mixing things up because players can reason about outcomes). Inconsistency is the primary source of exploits in systemic games.
-
-**Perceived Affordances** — Can the player intuit what interactions are possible by looking at the game? Spiky things should look dangerous. Flammable things should look flammable. When affordances are clear, players discover rules through play instead of tutorials. When affordances are opaque, players feel cheated by deaths they couldn't predict.
 
 ---
 
@@ -73,6 +81,14 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 | "The difficulty feels wrong" | DKART, Slippery Slope | Which skills are overtaxed? Is challenge calibrated to skill growth? |
 | "Players quit in the first few minutes" | Invisible Onboarding, Investment Curve | Is the game playable immediately? Are you front-loading teaching? Check `references/onboarding.md` |
 | "My tutorial feels heavy or forced" | Invisible Onboarding | Is the teaching labeled, separated, or interruptive? Can it be structural instead? Check `references/onboarding.md` |
+| "We've been iterating for months and can't solve this design problem" | Cursed Problem | Are two core player promises logically incompatible? If yes, stop looking for a solution — choose a sacrifice. Check `references/cursed-problems.md` |
+| "Players retreat or play passively instead of engaging" | Push-Forward Loop | Does your resource system reward engagement or passivity? Are enemies punishing standing still? Check `references/push-forward-design.md` |
+| "The game's theme doesn't match how it actually plays" | Mechanics-as-Meaning, Ludo-narrative Coherence | What does the game mechanically reward? Is that the same as what the theme promises? Check `references/design-principles.md` |
+| "I can't explain what makes my game unique" | Design Hook | Can you state the hook in one sentence? Does the moment-to-moment play demonstrate the differentiating idea? Check `references/design-communication.md` |
+| "My game feels shallow after players exhaust the content" | Live Design, Emergence, Solvability | Is there a content cadence that brings players back? Are there multiple axes of randomness? Check `references/live-design.md` |
+| "I want to add procedural generation but don't know where to start" | Procedural Design | What specifically are you generating? Which method fits the content type? Check `references/procedural-design.md` |
+| "My game world feels arbitrary or inconsistent" | World Design, Consistency | Are you conforming to reality where you have no reason not to? Are you simulating the previous game instead of reasoning from first principles? Check `references/world-design.md` |
+| "Players aren't engaging with the moral choices in my game" | Mechanics-as-Meaning, Ludo-narrative Coherence | Do the mechanics support the moral weight, or does the optimal path undermine the intended choice? Check `references/design-principles.md` |
 
 ---
 
@@ -153,6 +169,13 @@ Run these questions when evaluating a design:
 | `references/narrative-integration.md` | Ludo-narrative coherence, embedded vs emergent narrative, Player-Subject, Antagonist | You're integrating story with gameplay or diagnosing narrative dissonance |
 | `references/design-artifacts.md` | One-page designs, state-space maps, commitment artifacts, game loops | You need to document or communicate design decisions |
 | `references/onboarding.md` | Invisible onboarding techniques, investment curve, adaptive messaging, mechanic pacing, economy-as-guidance, writing style | You're designing how a game teaches itself, players aren't learning mechanics, or early retention is poor |
+| `references/cursed-problems.md` | Taxonomy of unsolvable design tensions, player promises, four sacrifice techniques (barriers/gates/carrots/s'mores), canonical examples | You've been iterating on a design problem for months without progress, or two core promises seem incompatible |
+| `references/push-forward-design.md` | Push-forward as a motivation system, resource scarcity loops, threat management, enemy design for aggression, failure conditions | Players are retreating or playing passively; you want combat or engagement to feel aggressive and rewarding |
+| `references/design-principles.md` | Rosewater's 20 MTG lessons, mechanics-as-meaning (Soren Johnson), player psychographics, restrictions breed creativity, theme vs. meaning | Making high-level design philosophy decisions, evaluating whether a mechanic serves its game, diagnosing theme/mechanic misalignment |
+| `references/world-design.md` | First-principles persistent world design, immersion through consistency, simulation vs. abstraction, achievement system design, setting as resonance/dissonance | Designing persistent worlds or multiplayer spaces; diagnosing why a world feels arbitrary or inconsistent |
+| `references/live-design.md` | Content cadence, 13-week league model, economy resets, marketing threshold, player psychographic targeting, ethical monetization | Designing a game-as-a-service, planning content release schedules, diagnosing player number decline |
+| `references/design-communication.md` | Hook identification, moment-to-moment clarity, common pitch pitfalls, one-sentence game description, scope communication | Pitching a game concept, evaluating whether a design has a clear identity, diagnosing why a game is hard to explain |
+| `references/procedural-design.md` | PCG method catalog (tiles/grammars/distribution/parametric/interpretive/simulation), subtractive methods, oatmeal problem, ownership design, multiple axes of randomness | Considering procedural generation for any system; diagnosing why generated content feels shallow or repetitive |
 
 ---
 

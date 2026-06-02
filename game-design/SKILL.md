@@ -63,6 +63,8 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 
 **Choice Architecture** — How options are structured and presented to players. The number of simultaneous options has cognitive consequences grounded in subitizing (instant perception of 1-4 items), working memory limits (5-7 comfortable, 8+ feels boundless), and the decoy effect (a contextually inferior option makes the remaining choices feel more satisfying). Three is the minimum count that supports the decoy pattern while staying within effortless perception. See `references/choice-architecture.md`.
 
+**Draw-Forward Formula** — From Dan Felder (ex-Legends of Runeterra / Hearthstone designer). A synergy design pattern: give a component a meaningful drawback, then offer a second component that converts that drawback into an advantage. Players perceive the combination as a discovery rather than a power addition — the psychological satisfaction comes from transforming bad-into-good, not from raw stat increases. Grounded in loss aversion (Kahneman/Tversky) and the "free" effect (Ariely). See `references/design-principles.md`.
+
 ---
 
 ## Problem → Concept Routing
@@ -80,6 +82,7 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 | "The game is fun but I can't explain why" | 4 Keys to Fun, DKART, Emergence | Which keys does it serve? What skills does it test? Where does emergence happen? |
 | "My game feels like every other [genre] game" | Interplay, Counterpoint, Subtractive Design | What unique interplay exists? What conventions can you subtract? |
 | "Players aren't motivated to continue" | 4 Keys to Fun, Player-Subject | Which emotional needs are unserved? Does the Player-Subject have meaningful agency? |
+| "Players aren't discovering or engaging with synergies" | Draw-Forward, Interplay | Are individual components strong-with-drawback, or just weak? Does finding the combo feel like a discovery? Check `references/design-principles.md` |
 | "The difficulty feels wrong" | DKART, Slippery Slope | Which skills are overtaxed? Is challenge calibrated to skill growth? |
 | "Players quit in the first few minutes" | Invisible Onboarding, Investment Curve | Is the game playable immediately? Are you front-loading teaching? Check `references/onboarding.md` |
 | "My tutorial feels heavy or forced" | Invisible Onboarding | Is the teaching labeled, separated, or interruptive? Can it be structural instead? Check `references/onboarding.md` |
@@ -175,7 +178,7 @@ Run these questions when evaluating a design:
 | `references/onboarding.md` | Invisible onboarding techniques, investment curve, adaptive messaging, mechanic pacing, economy-as-guidance, writing style | You're designing how a game teaches itself, players aren't learning mechanics, or early retention is poor |
 | `references/cursed-problems.md` | Taxonomy of unsolvable design tensions, player promises, four sacrifice techniques (barriers/gates/carrots/s'mores), canonical examples | You've been iterating on a design problem for months without progress, or two core promises seem incompatible |
 | `references/push-forward-design.md` | Push-forward as a motivation system, resource scarcity loops, threat management, enemy design for aggression, failure conditions | Players are retreating or playing passively; you want combat or engagement to feel aggressive and rewarding |
-| `references/design-principles.md` | Rosewater's MTG design lessons (selected from GDC 2016 talk), mechanics-as-meaning (Soren Johnson), player psychographics, restrictions breed creativity, theme vs. meaning | Making high-level design philosophy decisions, evaluating whether a mechanic serves its game, diagnosing theme/mechanic misalignment |
+| `references/design-principles.md` | Rosewater's MTG design lessons (selected from GDC 2016 talk), mechanics-as-meaning (Soren Johnson), player psychographics, restrictions breed creativity, theme vs. meaning, Draw-Forward Formula (Dan Felder) | Making high-level design philosophy decisions, evaluating whether a mechanic serves its game, diagnosing theme/mechanic misalignment, designing synergy systems |
 | `references/world-design.md` | First-principles persistent world design, immersion through consistency, simulation vs. abstraction, achievement system design, setting as resonance/dissonance | Designing persistent worlds or multiplayer spaces; diagnosing why a world feels arbitrary or inconsistent |
 | `references/live-design.md` | Content cadence, 13-week league model, economy resets, marketing threshold, player psychographic targeting, ethical monetization | Designing a game-as-a-service, planning content release schedules, diagnosing player number decline |
 | `references/design-communication.md` | Hook identification, moment-to-moment clarity, common pitch pitfalls, one-sentence game description, scope communication | Pitching a game concept, evaluating whether a design has a clear identity, diagnosing why a game is hard to explain |

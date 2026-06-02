@@ -139,6 +139,24 @@ Together: **Your game is what your mechanics make players do. Design the mechani
 
 ---
 
+## Draw-Forward Formula
+
+**Source:** Dan Felder (ex-Legends of Runeterra / Hearthstone designer).
+
+Create an option with a significant upside and a meaningful drawback (+2/-1). Then offer a second option that converts the drawback into an advantage. The player perceives massive value (+3) even when the net outcome is equivalent to simpler alternatives.
+
+**Cognitive basis:** Loss aversion (Kahneman/Tversky) combined with the "free" effect (Ariely). Removing a negative feels like gaining a positive, so the brain double-counts the benefit. A drawback-that-becomes-advantage triggers a discovery/cleverness response that flat power never achieves.
+
+**Game examples:**
+- *Magic: The Gathering* — Lightning Axe (discard a card to cast for {R} instead of {5}{R}, dealing 5 damage) + Roar of the Wurm (costs less when cast from graveyard). The discard "cost" becomes fuel.
+- *Pokémon* — Flame Orb (burns the holder) + Guts ability (attack boost when statused). The item's "downside" activates the payoff.
+- *Slay the Spire* — Rupture (gain Strength when you lose HP from a card) + Offering/Brutality (lose HP for cards/draw). Self-damage becomes a build-around.
+- *Path of Exile* — Unique items with harsh drawbacks that specific builds convert into advantages.
+
+**Design application:** When building synergy systems, front-load drawbacks on individual components so that combinations feel like discoveries. Players who find the combo feel clever; players who don't still have functional (if suboptimal) pieces. The key insight: synergy satisfaction comes from perceived transformation of bad-into-good, not from raw power addition.
+
+---
+
 ## Diagnostic Questions
 
 **Emotional response:**

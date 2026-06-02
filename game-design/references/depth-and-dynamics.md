@@ -12,7 +12,8 @@ Deep-dive reference for what makes games deep, how dynamics emerge, and how to a
 4. [Emergence](#emergence)
 5. [DKART Deep-Dive](#dkart-deep-dive)
 6. [Worked Example: MOBA Item Shop Depth Analysis](#worked-example-moba-item-shop-depth-analysis)
-7. [Diagnostic Questions](#diagnostic-questions)
+7. [Command Granularity](#command-granularity)
+8. [Diagnostic Questions](#diagnostic-questions)
 
 ---
 
@@ -251,6 +252,18 @@ When evaluating an item shop (or any large collection of options):
 1. Pick any two items. Does item A change how you think about item B? If yes, they're in counterpoint. If no, they're parallel.
 2. Count the items that create interplay vs. items that are pure stat additions. The ratio is your depth/complexity score.
 3. If most items are stat sticks, the shop is a knowledge problem, not a strategic system. Consider: fewer items with richer interactions, or items that explicitly modify other items.
+
+---
+
+## Command Granularity
+
+The granularity of available commands should match the granularity of meaningful decisions. If the interesting decision is "which enemy to attack," fine-grained tile movement adds friction without depth — the player is executing, not deciding. If the interesting decision is "how to position," fine-grained movement IS the depth.
+
+**The X-COM spectrum**: Original X-COM uses fine-grained Action Points — each move, turn, and shot costs AP independently. This creates emergent tactics (spend AP now for position vs. save AP for reaction fire) at the cost of high cognitive load. XCOM: Enemy Unknown collapses this to a move-or-shoot binary: lower overhead, fewer emergent moments. Neither is wrong; they serve different audiences and different depth profiles.
+
+**Chess as the gold standard**: Every move is simultaneously a tactical command and a strategic decision. There is zero gap between command granularity and decision granularity — you cannot issue a command that contains no decision.
+
+**Diagnostic**: For each command the player can issue, ask: is there a meaningful decision embedded in this command, or is it execution overhead between decisions? Execution overhead is not always bad — it can create pacing and tension — but it should be a deliberate choice, not an accidental one.
 
 ---
 

@@ -6,11 +6,12 @@ Concrete techniques for making games teach themselves. Load this when designing 
 
 ## Table of Contents
 1. [Core Philosophy](#core-philosophy)
-2. [Structural Decisions](#structural-decisions)
-3. [Runtime Techniques](#runtime-techniques)
-4. [Writing Style](#writing-style)
-5. [Anti-Patterns](#anti-patterns)
-6. [Diagnostic Questions](#diagnostic-questions)
+2. [Presentation as Trust Signal](#presentation-as-trust-signal)
+3. [Structural Decisions](#structural-decisions)
+4. [Runtime Techniques](#runtime-techniques)
+5. [Writing Style](#writing-style)
+6. [Anti-Patterns](#anti-patterns)
+7. [Diagnostic Questions](#diagnostic-questions)
 
 ---
 
@@ -43,6 +44,18 @@ When teaching and fun conflict, fun wins — but "fun wins" means *redesign the 
 In Plants vs. Zombies (George Fan, GDC 2012), the shovel mechanic needed a tutorial. Fan tried multiple minigames to teach it: one had you dig up weeds (wrong lesson — taught "shovel removes bad things"), another had you remove walnuts to place peashooters (right lesson but not fun). Meanwhile, the team developed walnut bowling — a genuinely fun minigame that had nothing to do with the shovel. The compromise: prepend a brief structural moment ("use your shovel to dig up these three peashooters to prepare for bowling"), then let the player enjoy the fun minigame. The teaching survived, but the fun wasn't sacrificed to make the teaching more thorough.
 
 This is the discipline: you don't get to sacrifice fun for the sake of a cleaner tutorial. But you also don't get to skip teaching because it's inconvenient. The answer is always redesign — find a teaching approach that's also fun, or attach a brief structural teaching moment to something that is.
+
+---
+
+## Presentation as Trust Signal
+
+First-session (D1) presentation determines whether players ever reach deeper D30+ systems. A perfect engine in a broken chassis still fails.
+
+Presentation isn't cosmetic — it's the trust signal that gates engagement. Players judge whether a game deserves their investment within seconds. Placeholder art, clunky UI, and generic effects communicate "not worth my time" regardless of underlying systems quality.
+
+The asymmetry: good systems with bad presentation fail at D1 (players never discover the depth). Bad systems with good presentation fail at D30 (players discover the shallowness). Both fail, but only one gets played.
+
+**Application**: Invest in first-impression polish proportional to how much your game relies on word-of-mouth or store-page conversion. The first 30 seconds must communicate the game's hook clearly.
 
 ---
 

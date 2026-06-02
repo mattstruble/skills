@@ -205,3 +205,38 @@ Weapon* mySword = new PoisonEnchantment(
 **Game applications**: Item enchantments, status effects (burning, poisoned, slowed), UI component composition (scrollable + bordered + shadowed panel), logging/profiling wrappers, network message transformations.
 
 **Engine note**: In Godot, composing nodes achieves similar results without the wrapper pattern. In Unity, multiple `MonoBehaviour` components on a `GameObject` compose behavior. The flat-list-of-effects approach is often more practical than classical Decorator in game engines.
+
+---
+
+## Procedural Animation (IK + Raycasting)
+
+**Intent**: Replace pre-baked walk cycles with runtime-computed limb placement. Works for any creature topology: bipeds, quadrupeds, spiders, mechs, tentacles.
+
+**Problem**: Pre-baked animations assume fixed terrain and creature proportions. Slopes, stairs, debris, and procedurally-generated worlds break the illusion — feet float above or clip through surfaces. Scaling a creature changes its stride, but not its animation. The state space (terrain angle × creature size × gait speed) is too large to author by hand.
+
+**Solution**: Four-step runtime algorithm:
+
+1. **Target acquisition**: Raycast from each limb's "rest position" (relative to the body) downward — or along the creature's local gravity direction — to find terrain contact points. The raycast origin moves with the body; the result is where the foot should land. If the raycast finds no surface (gap, ledge, zero-gravity), fall back to the limb's rest pose relative to the body — never leave the IK target undefined, as an unset target produces degenerate joint angles.
+
+2. **IK chain solving**: Given the target position, compute joint angles using Inverse Kinematics. FABRIK is the simplest solver (iterative, handles any chain length, integrates constraints naturally via position clamping); CCD is simpler to reason about per-joint but can oscillate near joint limits. The chain runs from hip/shoulder through intermediate joints to the foot/hand endpoint.
+
+3. **Step interpolation**: When the distance between a foot's current grounded position and its target exceeds a threshold, trigger a step. Interpolate along an arc — not linearly — lifting the foot, moving it to the new target, and placing it down. Arc height scales with step distance. Never retrigger a step on a limb already mid-step — this causes oscillation. If the body moves significantly while a step is in progress, either update the arc destination mid-flight or commit to the original target and accept minor error.
+
+4. **Gait coordination**: Prevent all limbs from stepping simultaneously. Enforce patterns: diagonal pairs for quadrupeds (trot gait; lateral pairs for walk gait), left-right alternation for bipeds, wave patterns for hexapods. Simple rule: a leg can only step if its adjacent legs are grounded. Deadlock escape: if a large body displacement leaves all legs needing to step simultaneously (e.g., after a teleport or respawn), release the constraint and step in a fixed priority order rather than freezing.
+
+**Trade-offs**:
+- Procedural animation can hit the uncanny valley when almost-but-not-quite natural. Hand-crafted animations often look better on fixed terrain.
+- Raycasting every limb every frame has a CPU cost; cache results and update at reduced frequency for distant creatures.
+- Blending procedural placement with authored animations (e.g., attack cycles) requires careful weight management.
+- Debugging IK chains is harder than debugging keyframe data — invest in visualization tools (draw the chain, the target, the raycast hit).
+
+**When to use**: Dynamic terrain (slopes, stairs, debris), variable creature sizes, procedural creatures, climbing systems, any situation where pre-baked animations can't cover the state space.
+
+**When NOT to use**: Fixed-terrain games where hand-crafted animations look better (2D platformers, fighting games).
+
+**Engine note**:
+- Godot: `SkeletonIK3D` (deprecated in Godot 4.x — still functional but prefer `SkeletonModifier3D`-based solutions for new projects); raycasts via `PhysicsDirectSpaceState3D.intersect_ray()`
+- Love2D: Manual 2D IK math — law of cosines solves 2-bone chains analytically; FABRIK for longer chains
+- General: Any engine with raycasting and skeletal animation supports this pattern; the algorithm is engine-agnostic
+
+**Game applications**: Rain World (slugcat and creature locomotion), Grow Home (BUD's climbing system), Spore (creature locomotion adapting to procedural body topology), Assassin's Creed series (IK foot placement on uneven terrain).

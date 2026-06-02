@@ -33,6 +33,18 @@ Applied mechanics for interactive storytelling — how to design deduction syste
 
 **Burden of Proof** — The threshold of evidence the game requires before accepting a conclusion. Too low: players can brute-force solutions without understanding. Too high: players who understand the story can't express it. The ideal burden is calibrated so that a player who genuinely understands the situation can construct a convincing argument, while a player guessing randomly cannot.
 
+### Quest Movement Patterns
+
+**A-B-A (Return to Quest-Giver)** — Player departs from a hub, completes an objective elsewhere, and returns to the origin. Reinforces hub familiarity, NPC relationships, and the feeling of "reporting back." Works well for side quests, faction missions, and detective games where the hub is a character in itself. Risk: backtracking tedium if travel between A and B isn't interesting in its own right.
+
+**A-B-C (Move Forward)** — Player departs and never returns; each location is new. Maintains momentum, rewards exploration, and makes the world feel larger. Works for main progression and journey narratives. Risk: players lose connection to NPCs left behind, and the world can feel disposable.
+
+**A-B-C-A (Journey and Return)** — Full arc: departure, adventure, homecoming with new perspective. The return recontextualizes the origin. Works for act-level structure and coming-of-age stories.
+
+Across all three patterns: *EarthBound* is exemplary hub-based A-B-A; *Outer Wilds* is pure A-B-C exploration; *The Witcher 3* uses hybrid structure with act-level A-B-C-A transitions.
+
+Neither pattern is inherently superior — context determines which serves pacing. A game that is entirely A-B-A feels like a hub-and-spoke job board. A game that is entirely A-B-C feels like being pushed through a tunnel.
+
 ### NPC Agency
 
 **NPC Agency** — NPCs that pursue their own goals, hold their own opinions, and act independently of the player's wishes. An NPC with agency can refuse the player, lie to the player, or act in ways that complicate the player's goals — because the NPC has pressures and motivations the player doesn't fully control. Agency makes NPCs feel like people rather than quest dispensers.
@@ -47,6 +59,7 @@ Applied mechanics for interactive storytelling — how to design deduction syste
 
 | Problem | Concepts | What to Check |
 |---|---|---|
+| "My quest pacing feels off — either too much backtracking or players feel railroaded" | A-B-A, A-B-C, A-B-C-A | Is the movement pattern serving the story's emotional arc? Is A-B-A travel interesting, or is it pure chore? Does A-B-C leave players feeling disconnected from earlier NPCs? |
 | "Players aren't engaging with my detective mechanic" | Deduction Loop, Deduction Space | Can players express what they know? Is the "prove it" step too narrow or too abstract? |
 | "My mystery feels like a checklist, not a revelation" | Two-Story Structure, Constructed Argument | Is there an investigation story alongside the crime story? Is the solve a construction or a combination lock? |
 | "Players brute-force my deduction puzzles" | Burden of Proof, Constructed Argument | Is the deduction space too narrow? Can players reach the answer without understanding? |
@@ -123,7 +136,7 @@ Run these questions when evaluating a narrative design:
 
 **NPCs**: Do NPCs have independent goals? Can they act against the player? Does the protagonist's power leave room for NPC agency? Does any NPC bear the weight of representing an entire culture or background?
 
-**Structure**: Is the story written from character headspace? Does each fragment contain enough context to orient the player? Does the story survive non-linear discovery?
+**Structure**: Is the story written from character headspace? Does each fragment contain enough context to orient the player? Does the story survive non-linear discovery? Does the quest movement pattern match the emotional arc?
 
 **Revelation**: Is the climactic solve a construction or a combination lock? Does the investigation story (the adventure) hold up alongside the crime/secret story?
 

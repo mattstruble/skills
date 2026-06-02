@@ -119,3 +119,27 @@ An NPC whose only function is to deliver exposition or represent a cultural/poli
 ### Treating "Unfair" as the Worst Thing a Game Can Be
 
 Games train players to expect that all problems can be solved by the protagonist if they try hard enough. When an NPC refuses to be helped, players often experience this as unfair. But unfair isn't the worst thing a game can be — and sometimes the refusal is the entire point. Design for the possibility that the player cannot fix everything.
+
+---
+
+## World Agency Patterns
+
+NPC agency can operate at the systems level — not just individual characters with goals, but entire worlds that move without the player.
+
+### Time-Based Scheduling
+
+*Majora's Mask*: NPCs follow fixed schedules that advance regardless of player action. The world doesn't wait. This creates urgency and the feeling of independent existence — the player must observe and intercept rather than initiate.
+
+### Faction Warfare Simulation
+
+*Mount & Blade*, *Crusader Kings*: AI factions pursue goals, conquer territory, and form alliances. The player is one actor among many rather than the sole mover of history.
+
+### Emergent Procedural Quests
+
+*Drox Operative 2*: Quests generate from world-state changes rather than being hand-placed. A faction conquers a settlement; a quest to reclaim it spawns organically. The world produces its own narrative.
+
+### Why Oblivion's Radiant AI Failed
+
+NPC agency without supporting game systems produces chaos that's visible but not meaningful. NPCs killing each other for bread is emergent but not interesting — the player has no way to predict, prevent, or exploit it. Agency requires player-legible consequences.
+
+**Design implication**: NPC agency is a core-design commitment, not a bolt-on feature. It requires the entire game to be built around a world that moves without the player.

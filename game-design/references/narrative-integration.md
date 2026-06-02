@@ -14,7 +14,8 @@ Deep-dive reference for connecting story and gameplay. Load this when integratin
 6. [Interactive Narrative Structures](#interactive-narrative-structures)
 7. [The World-Plot Interface](#the-world-plot-interface)
 8. [Worked Example: BioShock and Dark Souls](#worked-example-bioshock-and-dark-souls)
-9. [Diagnostic Questions](#diagnostic-questions)
+9. [Urgency Mismatch](#urgency-mismatch)
+10. [Diagnostic Questions](#diagnostic-questions)
 
 ---
 
@@ -291,6 +292,27 @@ Expressiveness creates perceived depth even with limited content. A character wh
 **The harmony**: The embedded narrative (a dying world, the cycle of struggle and persistence) reinforces the emergent narrative (the player's own cycle of struggle and persistence). The Antagonist is consistent — the world, the enemies, and the rules all say the same thing: *you are not welcome here, but you can learn.*
 
 **The lesson**: Dark Souls doesn't fight its dynamics. The designers didn't write a story about overcoming adversity and then create gameplay that contradicts it. They created gameplay that generates stories of overcoming adversity, and then wrote an embedded narrative that harmonizes with those stories. The embedded and emergent narratives are the same story told at different levels.
+
+---
+
+## Urgency Mismatch
+
+When narrative framing creates time pressure ("Save the world NOW!") but the game systems impose no actual consequences for delay.
+
+**The problem**: Players either rush the main story (missing side content the designers spent months building) or ignore the urgency entirely (breaking narrative immersion). Both outcomes represent a design failure — the game is working against itself.
+
+**The framework**: Distinguish **narrative urgency** (the story says hurry) from **mechanical urgency** (the systems enforce consequences). When these diverge, players experience dissonance. The narrative becomes untrustworthy — players learn to ignore the story's emotional signals because the game has taught them those signals are decorative.
+
+**Solution patterns**:
+
+- **Real timers** (Majora's Mask, Outer Wilds, Unsighted): Time actually passes and consequences happen. High-commitment design — the entire game must be built around the constraint. Not a bolt-on.
+- **Chapter pacing** (Persona 5, Witcher 3's act structure): Alternate urgent narrative chapters with mechanical downtime. Side content lives in the gaps between urgent beats. Players never feel torn because the game explicitly signals "now is the time to explore."
+- **Problem framing** (Disco Elysium): Reframe the situation as "here's a mystery to figure out" rather than "you must act immediately." Maintains stakes and player motivation without false time pressure.
+- **Consequence gradient** (Kingdom Come: Deliverance): Some quests have real deadlines; others don't. The player learns which signals are real through experience. Partial consequences (NPC dies, quest fails, world changes) rather than binary game-over.
+
+**Diagnostic**: If your game simultaneously tells the player "the villain attacks at dawn" and "go collect 10 mushrooms for the alchemist," one of those is lying. Either make the mushroom quest unavailable during the urgent phase, or remove the artificial time pressure from the narrative framing.
+
+This is a specific instance of ludo-narrative dissonance: the embedded narrative (urgency) conflicts with the emergent narrative (open-world exploration). The fix is always the same — make the mechanical reality match the narrative claim, or change the narrative claim to match the mechanical reality.
 
 ---
 

@@ -96,6 +96,7 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 | "I want to add procedural generation but don't know where to start" | Procedural Design | What specifically are you generating? Which method fits the content type? Check `references/procedural-design.md` |
 | "My game world feels arbitrary or inconsistent" | World Design, Consistency | Are you conforming to reality where you have no reason not to? Are you simulating the previous game instead of reasoning from first principles? Check `references/world-design.md` |
 | "Players aren't engaging with the moral choices in my game" | Mechanics-as-Meaning, Ludo-narrative Coherence | Do the mechanics support the moral weight, or does the optimal path undermine the intended choice? Check `references/design-principles.md` |
+| "My narrative creates urgency but players ignore it" or "Players rush the main quest and skip side content" | Urgency Mismatch, Ludo-narrative Coherence | Does your game have real consequences for delay, or is the urgency purely narrative? Check `references/narrative-integration.md` |
 
 ---
 

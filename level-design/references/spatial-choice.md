@@ -106,3 +106,18 @@ After designing an encounter, play it multiple times as if dying and restarting.
 
 If the encounter passes: it has prioritization choice and supports systemic agency.
 If it fails: the encounter is either too scripted (patterns don't rearrange) or too simple (one approach dominates).
+
+---
+
+## Wrong-Path Psychology
+
+Players explore "wrong" paths before following the obvious one. This is not defiance — it is FOMO and completionism. Players assume the designer hid something valuable off the beaten track, so they check before committing forward.
+
+**Design responses:**
+
+1. **Reward dalliance.** Place hidden content — ammo, lore, a shortcut — on optional branches. Confirms the player's instinct and builds trust that exploration pays off.
+2. **Eliminate dead-ends via interconnected layout.** Loop side paths back into the critical route so "wrong" paths become detours, not penalties.
+3. **Keep optional branches short.** 15 seconds of empty corridor punishes curiosity. If a branch has no payoff, it should cost no more than 5 seconds to discover that.
+4. **Signal path type through visual language.** Distinguish optional-side-path from critical-path-forward using lighting, geometry scale, or surface wear — without resorting to yellow paint. The player should read the difference, not be told it.
+
+The insight: exploratory behavior is an asset. Players who check side paths are engaged, not lost. Design for it rather than against it.

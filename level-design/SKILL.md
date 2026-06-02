@@ -118,7 +118,7 @@ Run these questions when evaluating a combat level or encounter:
 
 | File | Contents | Read when... |
 |---|---|---|
-| `references/spatial-choice.md` | Meaningful choice theory applied to level design, discernibility, the checkpoint test, prioritization choice, autonomy vs. scripting | You're designing encounter layouts, evaluating whether spatial choices are meaningful, or diagnosing scripted-feeling encounters |
+| `references/spatial-choice.md` | Meaningful choice theory applied to level design, discernibility, the checkpoint test, prioritization choice, autonomy vs. scripting, wrong-path psychology, exploratory behavior design responses | You're designing encounter layouts, evaluating whether spatial choices are meaningful, diagnosing scripted-feeling encounters, or when players explore side paths before committing to the critical route |
 | `references/encounter-design.md` | Arena geometry principles, right-sized spaces, asymmetry, half-walls, push-forward resource placement, encounter structure (arena fights vs. wave fights), last heavy standing, token systems | You're building combat arenas, structuring encounter pacing, or placing resources to incentivize aggression |
 | `game-design` skill | Mechanic depth, interplay, enemy differentiation theory, orthogonal unit differentiation, DKART skill analysis | You need to evaluate *why* a mechanic or enemy type creates depth — the spatial expression of that depth is this skill's domain |
 

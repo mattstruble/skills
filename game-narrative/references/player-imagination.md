@@ -105,3 +105,17 @@ Scenes written to hit structural beats rather than from character headspace feel
 ### Assuming the Story Can Be Broken
 
 A story with authentic character psychology and consistent thematic imagery is robust to non-linear discovery. Don't over-engineer discoverability at the expense of authenticity. Trust the story.
+
+---
+
+## The Branching Limit
+
+k choices at n decision points produces k^n possible outcomes. True branching narratives are mathematically impossible at scale — 3 choices over 10 decision points generates 59,049 unique paths. No studio can write that.
+
+Three practical solutions:
+
+1. **Linear with illusion** — paths reconverge; choice affects tone and details, not structure (Telltale).
+2. **Smaller scope, real branching** — fewer decisions, each genuinely diverges (Heavy Rain, Detroit: Become Human).
+3. **Emergent consequences** — choice matters through relationship and reputation systems rather than plot divergence (Disco Elysium, Crusader Kings).
+
+**Design implication**: meaningful choice ≠ branching plot. A linear plot where choices change *how* you experience it — who trusts you, what resources you have, which NPCs survived — can feel more meaningful than a branching structure where the branches are thin.

@@ -9,9 +9,10 @@ A diagnostic framework for identifying and fixing visual design failures in game
 1. [The Critique Framework](#the-critique-framework)
 2. [Core Vocabulary](#core-vocabulary)
 3. [Diagnosing Common Problems](#diagnosing-common-problems)
-4. [Accessibility Beyond Color](#accessibility-beyond-color)
-5. [Practical Critique Process for Games](#practical-critique-process-for-games)
-6. [Anti-Patterns](#anti-patterns)
+4. [Diegetic vs Non-Diegetic Signaling](#diegetic-vs-non-diegetic-signaling)
+5. [Accessibility Beyond Color](#accessibility-beyond-color)
+6. [Practical Critique Process for Games](#practical-critique-process-for-games)
+7. [Anti-Patterns](#anti-patterns)
 
 ---
 
@@ -136,6 +137,20 @@ The ordering of visual importance. The most important element (player character,
 - Ensure they're cohesive — a stylized game can have any combination of these elements, but they need to be chosen deliberately
 
 **Principle**: Cohesion comes from intentionality. You can combine stylized color with realistic shadow, but you have to choose that combination on purpose.
+
+---
+
+## Diegetic vs Non-Diegetic Signaling
+
+Not all color-coding is equal. The distinction is whether a signal *enables* player decisions (option) or *replaces* them (instruction).
+
+**Red explosive barrels work** because real-world hazard labeling provides in-world justification — the color is diegetic. More importantly, they signal an *option*, not a requirement. Players choose whether to engage; the signal expands their decision space.
+
+**Yellow climbable surfaces fail** when there's no in-world reason for the paint — the signal is non-diegetic. Worse, it typically marks the *only* path forward, making it mandatory. Players have no real choice; the signal replaces navigation with instruction.
+
+**Good pattern**: Mirror's Edge Runner's Vision — thematically grounded, toggleable, and it shows *one possible path* among many. Players can ignore it and route differently.
+
+**Principle**: Does your visual signal say "you CAN go here" (option) or "you MUST go here" (command)? Signals that communicate options build player agency; signals that communicate commands erode it.
 
 ---
 

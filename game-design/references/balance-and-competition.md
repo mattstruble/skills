@@ -13,7 +13,8 @@ Deep-dive reference for balancing games, designing competitive systems, and buil
 5. [Balancing Multiplayer Games](#balancing-multiplayer-games)
 6. [Worked Example: Mario Kart's Balance Systems](#worked-example-mario-karts-balance-systems)
 7. [Individual Empowerment](#individual-empowerment)
-8. [Diagnostic Questions](#diagnostic-questions)
+8. [Interruption Economy](#interruption-economy)
+9. [Diagnostic Questions](#diagnostic-questions)
 
 ---
 
@@ -248,6 +249,16 @@ Three approaches that work:
 The failure mode: slow TTK combined with weak utility produces a teamshot meta. Solo players feel useless regardless of skill. Destiny 2's 4v4 era exemplified this — slow TTK plus weak grenades meant "whoever has more guns pointed at the same target wins." No individual action could overcome the numbers.
 
 Empowerment ≠ high skill ceiling. It means moderate-skill solo players can impact matches meaningfully, not just survive them.
+
+---
+
+## Interruption Economy
+
+Some competitive games replace resource accumulation with **negate management** as the primary skill axis. Rather than building up mana or units, players manage a limited budget of interruptions — counterspells, handtraps, frame traps. The core skill expression is baiting opponents into spending their interruptions on low-value plays, then resolving high-value plays through the opened gap.
+
+This creates a distinct competitive dynamic: the player who exhausts their negates early loses to the patient opponent who saved theirs. Examples: Yu-Gi-Oh handtraps, fighting game frame traps baiting reversals, MTG counterspell wars, poker bluffing as bait.
+
+**Design implication**: if your game has interruption mechanics, depth comes from knowing *when not to interrupt* — not from the interrupt itself.
 
 ---
 

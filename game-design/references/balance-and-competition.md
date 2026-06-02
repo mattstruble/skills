@@ -12,7 +12,8 @@ Deep-dive reference for balancing games, designing competitive systems, and buil
 4. [Game Economy Design](#game-economy-design)
 5. [Balancing Multiplayer Games](#balancing-multiplayer-games)
 6. [Worked Example: Mario Kart's Balance Systems](#worked-example-mario-karts-balance-systems)
-7. [Diagnostic Questions](#diagnostic-questions)
+7. [Individual Empowerment](#individual-empowerment)
+8. [Diagnostic Questions](#diagnostic-questions)
 
 ---
 
@@ -231,6 +232,22 @@ Mario Kart's balance works because each system addresses a different failure mod
 - Coins create a secondary decision axis (depth problem)
 
 No single system does all the work. The balance emerges from the interaction of multiple overlapping systems — which is itself a form of systemic design.
+
+---
+
+## Individual Empowerment
+
+In multiplayer, outnumbered players face compounding disadvantages: more total health to burn through, more damage output converging on them, crossfire angles they can't cover. Games that want solo players to feel impactful must build empowerment in deliberately.
+
+Three approaches that work:
+
+- **Fast kill times**: Even in a 1v3, if you shoot first you win. CoD and CS reward positioning and awareness over raw numbers. The gun that finds the enemy first wins the fight.
+- **Powerful utility**: Grenades, environmental damage, and abilities that let one player affect multiple enemies simultaneously. Halo's grenade/precision-weapon sandbox lets a skilled player thin a group before the close-range fight starts.
+- **High-damage close-range tools**: Weapons that kill instantly at close range but require aggressive, risky positioning to use. Gears of War's Gnasher shotgun rewards players willing to close distance.
+
+The failure mode: slow TTK combined with weak utility produces a teamshot meta. Solo players feel useless regardless of skill. Destiny 2's 4v4 era exemplified this — slow TTK plus weak grenades meant "whoever has more guns pointed at the same target wins." No individual action could overcome the numbers.
+
+Empowerment ≠ high skill ceiling. It means moderate-skill solo players can impact matches meaningfully, not just survive them.
 
 ---
 

@@ -240,3 +240,22 @@ Weapon* mySword = new PoisonEnchantment(
 - General: Any engine with raycasting and skeletal animation supports this pattern; the algorithm is engine-agnostic
 
 **Game applications**: Rain World (slugcat and creature locomotion), Grow Home (BUD's climbing system), Spore (creature locomotion adapting to procedural body topology), Assassin's Creed series (IK foot placement on uneven terrain).
+
+---
+
+## Hex Grid
+
+**When hex grids beat square grids**: Every hex has exactly 6 equidistant neighbors — no diagonal bias (square grids have 4 cardinal + 4 diagonal neighbors at √2 distance). This produces organic-looking terrain, natural frontlines, and clean flanking geometry. Common in strategy games, colony sims, and procedural map generation.
+
+**Coordinate systems**: Pick flat-top or pointy-top orientation at project start — the two use different neighbor direction vectors and different pixel conversion matrices; mixing references silently produces wrong results.
+- **Offset coordinates**: Rows/columns with alternating offsets per row. Simple to store in a 2D array; neighbor lookup varies by row parity, making math awkward.
+- **Cube coordinates**: Three axes (x, y, z) constrained by x + y + z = 0. Distance = `(|dx| + |dy| + |dz|) / 2`. Clean math, one redundant axis.
+- **Axial coordinates**: Drop the redundant axis from cube — store only (q, r), compute s = −q − r on demand. Best balance of storage efficiency and math clarity. **Standard recommendation.** Pixel-to-axial conversion requires cube rounding: convert to fractional cube, round all three components, then fix the component with the largest rounding delta — rounding q and r independently produces wrong results near cell boundaries.
+
+**Pathfinding**: A* works identically to square grids for uniform-cost movement; only the neighbor enumeration changes — six neighbors instead of 4 or 8. For weighted terrain, ensure the heuristic is admissible: `hex_distance(a, b) * min_movement_cost`. If any terrain cost is < 1, scale the heuristic accordingly.
+
+**Chunking for performance**: Large hex maps divide into screen-space rectangular chunks for rendering and streaming. Each chunk owns a fixed cell count; chunk membership is computed via axial-to-chunk mapping (not a simple 2D array index), and boundaries must account for hex stagger.
+
+**Engine note**:
+- Godot: `TileMapLayer` with hex mode (Godot 4.2+; `TileMap` is deprecated), or custom implementation using axial coordinates with `Vector2i`
+- Love2D: Manual coordinate math with axial-to-pixel and pixel-to-axial conversion functions

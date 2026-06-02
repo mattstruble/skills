@@ -61,6 +61,8 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 
 **Consistency** — Rules must behave the same everywhere. Three aspects: *Predictability* (same inputs → same outputs), *Coherence* (rules work the same in all areas of the game), *Variability* (consistency enables mixing things up because players can reason about outcomes). Inconsistency is the primary source of exploits in systemic games.
 
+**Choice Architecture** — How options are structured and presented to players. The number of simultaneous options has cognitive consequences grounded in subitizing (instant perception of 1-4 items), working memory limits (5-7 comfortable, 8+ feels boundless), and the decoy effect (a contextually inferior option makes the remaining choices feel more satisfying). Three is the minimum count that supports the decoy pattern while staying within effortless perception. See `references/choice-architecture.md`.
+
 ---
 
 ## Problem → Concept Routing
@@ -86,6 +88,8 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 | "The game's theme doesn't match how it actually plays" | Mechanics-as-Meaning, Ludo-narrative Coherence | What does the game mechanically reward? Is that the same as what the theme promises? Check `references/design-principles.md` |
 | "I can't explain what makes my game unique" | Design Hook | Can you state the hook in one sentence? Does the moment-to-moment play demonstrate the differentiating idea? Check `references/design-communication.md` |
 | "My game feels shallow after players exhaust the content" | Live Design, Emergence, Solvability | Is there a content cadence that brings players back? Are there multiple axes of randomness? Check `references/live-design.md` |
+| "Players feel overwhelmed by choices" or "How many options should I offer?" | Choice Architecture | Are you above the subitizing range (4)? Is there structural support for narrowing (archetypes, rarity, resource gating)? Check `references/choice-architecture.md` |
+| "Players don't feel good about their picks" | Choice Architecture, Decoy Effect | Is there a contextually inferior option making the real choices feel satisfying? Is the decoy's inferiority obvious at a glance? Check `references/choice-architecture.md` |
 | "I want to add procedural generation but don't know where to start" | Procedural Design | What specifically are you generating? Which method fits the content type? Check `references/procedural-design.md` |
 | "My game world feels arbitrary or inconsistent" | World Design, Consistency | Are you conforming to reality where you have no reason not to? Are you simulating the previous game instead of reasoning from first principles? Check `references/world-design.md` |
 | "Players aren't engaging with the moral choices in my game" | Mechanics-as-Meaning, Ludo-narrative Coherence | Do the mechanics support the moral weight, or does the optimal path undermine the intended choice? Check `references/design-principles.md` |
@@ -175,6 +179,7 @@ Run these questions when evaluating a design:
 | `references/world-design.md` | First-principles persistent world design, immersion through consistency, simulation vs. abstraction, achievement system design, setting as resonance/dissonance | Designing persistent worlds or multiplayer spaces; diagnosing why a world feels arbitrary or inconsistent |
 | `references/live-design.md` | Content cadence, 13-week league model, economy resets, marketing threshold, player psychographic targeting, ethical monetization | Designing a game-as-a-service, planning content release schedules, diagnosing player number decline |
 | `references/design-communication.md` | Hook identification, moment-to-moment clarity, common pitch pitfalls, one-sentence game description, scope communication | Pitching a game concept, evaluating whether a design has a clear identity, diagnosing why a game is hard to explain |
+| `references/choice-architecture.md` | Decoy effect, option count thresholds (2/3/4/5/8), subitizing, player heuristics, analysis paralysis, compression techniques | Deciding how many options to present at a choice point, or diagnosing why choices feel overwhelming or unsatisfying |
 | `references/procedural-design.md` | PCG method catalog (tiles/grammars/distribution/parametric/interpretive/simulation), subtractive methods, oatmeal problem, ownership design, multiple axes of randomness | Considering procedural generation for any system; diagnosing why generated content feels shallow or repetitive |
 
 ---

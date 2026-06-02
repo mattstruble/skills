@@ -59,6 +59,7 @@ Visual design principles for games — how art communicates, guides attention, a
 | "My 3D scene is too dark but lights look harsh" | Value Contrast, Post-Processing Unification | Use ambient/environment light to lift shadow floor; then add colored lights for mood |
 | "Assets look disconnected / don't feel like one scene" | Post-Processing Unification | Is ambient occlusion in? Is color grading applied? Are atmospherics creating depth? |
 | "Colorblind players can't distinguish elements" | Color as Information, Redundant Cues, Value Contrast | Value contrast is universal — does it differentiate elements without color? Add shape/symbol redundancy |
+| "My colorblind mode is just a full-screen color filter" | Redundant Cues, Color as Information | Filters shift problems, not solve them. Each information channel needs a non-color backup (shape, pattern, label, animation). See `references/visual-problems.md` — Accessibility Beyond Color |
 | "My palette feels random / colors don't harmonize" | Palette Discipline, Constraint-Driven Art | Does each color have a job? Try deliberately limiting your palette and assigning roles |
 | "Animated effects look mechanical / synchronized" | Color Cycling | Are cycling gradients phase-offset? Vary gradient lengths and starting positions for organic motion |
 | "I need multiple scene variants (day/night/environments) without redrawing assets" | Palette Shifting, Constraint-Driven Art | Are color regions non-overlapping per element? Can palette slots be swapped independently? |

@@ -9,8 +9,9 @@ A diagnostic framework for identifying and fixing visual design failures in game
 1. [The Critique Framework](#the-critique-framework)
 2. [Core Vocabulary](#core-vocabulary)
 3. [Diagnosing Common Problems](#diagnosing-common-problems)
-4. [Practical Critique Process for Games](#practical-critique-process-for-games)
-5. [Anti-Patterns](#anti-patterns)
+4. [Accessibility Beyond Color](#accessibility-beyond-color)
+5. [Practical Critique Process for Games](#practical-critique-process-for-games)
+6. [Anti-Patterns](#anti-patterns)
 
 ---
 
@@ -110,9 +111,9 @@ The ordering of visual importance. The most important element (player character,
 - Value contrast works for everyone — if elements differ in value, they're distinguishable regardless of color vision
 - Add shape/symbol differentiation alongside color (stars for good, X's for bad)
 - Use size to communicate type (small bullets = friendly, large = enemy)
-- Color lookup table (LUT) transforms can remap the entire game's colors for colorblind modes — cheap to implement, high accessibility value
+- Color lookup table (LUT) transforms can remap the entire game's colors for colorblind modes — useful as a supplemental option, but not a substitute for redundant encoding
 
-**Principle**: Every accessibility improvement for colorblind users also improves legibility for everyone. Value contrast is universal.
+**Principle**: Every accessibility improvement for colorblind users also improves legibility for everyone. Value contrast is universal. For redundant encoding strategies that go beyond value contrast, see [Accessibility Beyond Color](#accessibility-beyond-color).
 
 ### Problem: "Too Cute" / Wrong Emotional Register
 
@@ -135,6 +136,29 @@ The ordering of visual importance. The most important element (player character,
 - Ensure they're cohesive — a stylized game can have any combination of these elements, but they need to be chosen deliberately
 
 **Principle**: Cohesion comes from intentionality. You can combine stylized color with realistic shadow, but you have to choose that combination on purpose.
+
+---
+
+## Accessibility Beyond Color
+
+Color alone must never be the sole carrier of critical gameplay information. The solution is redundant encoding, not color filters.
+
+**Why color filters fail**: Full-screen deuteranopia/protanopia filters shift the problem rather than solving it — they make some things visible while making others invisible. Players don't want their whole screen tinted; they want to read the game's information channels clearly.
+
+**The redundant encoding principle**: Every piece of information conveyed by color must also be conveyed by at least one additional channel:
+- **Shape**: Team indicators use icon shape AND color (triangle vs. circle, not just red vs. blue)
+- **Pattern**: Loot rarity uses background pattern/texture AND color border
+- **Size/position**: Health uses fill amount AND color gradient
+- **Label/text**: Status effects show icon AND text name, not just a colored dot
+- **Animation**: Interactable objects pulse or shimmer in addition to being highlighted
+
+**Testing**: Desaturate your game to grayscale. If you can't distinguish all critical information, you have a redundant encoding gap.
+
+**Good examples**: World of Warcraft (color intensity sliders per channel), Fortnite (distinct shapes for each rarity tier), Splatoon (pattern-coded ink), Celeste (customizable UI colors).
+
+**Bad patterns**: Full-screen color filters as the only accessibility option. "Just make the reds more blue." Assuming the default palette works for everyone.
+
+**Principle**: Accessibility isn't a filter bolted onto finished work — it's a constraint that produces clearer visual design for all players. Redundantly-encoded UI is more readable for everyone, not just colorblind players.
 
 ---
 

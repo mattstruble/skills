@@ -211,6 +211,14 @@ main :: proc() {
 
 See `references/game-architecture.md` for asset caching, level serialization, camera smoothing, and editor/game coupling patterns.
 
+### Custom Rendering on Raylib
+
+For CPU-side rendering — software rasterizers, raymarchers, fractal viewers, retro demos — the central performance technique is the **`rl.Image` framebuffer pattern**: draw to a backing image with `rl.ImageDrawPixel`, upload it to a texture once per frame with `rl.UpdateTexture`, then blit it with `rl.DrawTexture`. Per-pixel `rl.DrawPixel` calls go through the GPU pipeline individually and become the bottleneck.
+
+For the **rendering theory itself** — coordinate spaces, perspective projection, triangle rasterization, barycentric coordinates, z-buffering, backface culling, UV mapping with perspective-correct interpolation, lighting models — see the `game-rendering` skill.
+
+For **Odin/raylib implementation specifics** — `[^]rl.Color` multi-pointers from `rl.LoadImageColors`, the framebuffer lifecycle, power-of-2 texture sampling, FPS overlay — see `references/raylib-rendering.md`.
+
 ---
 
 ## Pattern Mapping (Quick Reference)
@@ -242,3 +250,4 @@ See `references/game-architecture.md` for asset caching, level serialization, ca
 | `references/handle-systems.md` | Three handle map implementations, free list pattern, iteration |
 | `references/game-architecture.md` | Game loop, asset caching, level serialization, camera, undo system |
 | `references/odin-pattern-mappings.md` | Full Odin code for all 12 pattern mappings with NOT-to-do examples |
+| `references/raylib-rendering.md` | Software framebuffer pattern, per-pixel rendering, texture interop on raylib |

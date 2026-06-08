@@ -265,7 +265,7 @@ The vertex lands at approximately `(457, 270)` — right of center and slightly 
 
 **game-performance** — Diagnosing and fixing frame-rate problems: GPU bottlenecks, fill-rate, bandwidth, CPU submission overhead. This skill explains how the pipeline works; game-performance explains how to measure and fix it when it's too slow.
 
-**odin-gamedev** — Odin/raylib implementation specifics. `odin-gamedev/references/raylib-rendering.md` will contain a complete worked implementation of this pipeline in Odin using raylib, based on Pekar's tutorial series (in progress).
+**odin-gamedev** — Odin/raylib glue patterns for custom rendering: the `rl.Image` software-framebuffer pattern, `[^]rl.Color` multi-pointer interop, power-of-2 texture sampling, and FPS overlay (see `odin-gamedev/references/raylib-rendering.md`). This skill covers the rendering math; Pekar's tutorial series at https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-i is the complete worked implementation in Odin.
 
 ---
 

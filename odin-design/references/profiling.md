@@ -72,16 +72,19 @@ spall_ctx:    spall.Context
 @(thread_local) spall_buffer: spall.Buffer
 
 main :: proc() {
-    spall_ctx = spall.context_create("trace.spall")
+    ok: bool
+    spall_ctx, ok = spall.context_create("trace.spall")
+    assert(ok, "failed to open trace file")
     defer spall.context_destroy(&spall_ctx)
 
     buffer_backing := make([]u8, spall.BUFFER_DEFAULT_SIZE)
     defer delete(buffer_backing)
 
-    spall_buffer = spall.buffer_create(
+    spall_buffer, ok = spall.buffer_create(
         buffer_backing,
         u32(sync.current_thread_id()),
     )
+    assert(ok, "failed to create spall buffer")
     defer spall.buffer_destroy(&spall_ctx, &spall_buffer)
 
     // Mark this procedure in the trace
@@ -99,6 +102,8 @@ game_loop :: proc() {
 }
 ```
 
+Both `context_create` and `buffer_create` return `(T, bool) #optional_ok`. The `#optional_ok` annotation lets callers ignore the bool, but a failed `context_create` leaves `spall_ctx.fd` as `0` — stdin on Unix — so binary trace data is silently written to stdin. Assert both to catch file-open and allocation failures immediately.
+
 `#procedure` is a compile-time constant string containing the current
 procedure's name. Pass any string literal if you want a custom label.
 
@@ -115,6 +120,8 @@ buffer; all share one `spall_ctx`.
 The compiler can insert profiling calls at every Odin procedure boundary when
 you define procedures with `@(instrumentation_enter)` and
 `@(instrumentation_exit)`. The signatures are mandated by the compiler:
+
+> **Note:** Auto-instrumentation requires the same `main()` setup as the Manual Scoping example above — the `@(instrumentation_enter)`/`@(instrumentation_exit)` callbacks reference the package-level `spall_ctx` and `spall_buffer` globals; without `context_create`/`buffer_create` they silently no-op.
 
 ```odin
 package main
@@ -158,8 +165,10 @@ spall_exit :: proc "contextless" (
 
 ```odin
 when ODIN_DEBUG {
-    spall_ctx = spall.context_create("trace.spall")
-    // ... buffer setup ...
+    ok: bool
+    spall_ctx, ok = spall.context_create("trace.spall")
+    assert(ok, "failed to open trace file")
+    // ... buffer setup with ok check ...
 }
 ```
 

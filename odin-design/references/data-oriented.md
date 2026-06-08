@@ -87,6 +87,106 @@ xxx := v.xxx      // [3]f32{1, 1, 1}
 
 Fields: `.x`, `.y`, `.z`, `.w` (or `.r`, `.g`, `.b`, `.a` for colors).
 
+The array-alias pattern is idiomatic for vector types. `Vector3 :: [3]f32`
+gets all array-programming arithmetic and swizzle for free. `Vector3 :: struct
+{ x, y, z: f32 }` gets none of it and is unidiomatic — avoid.
+
+---
+
+## Built-in Matrix Type (`matrix[R, C]T`)
+
+Odin has a built-in `matrix[R, C]T` type with native multiplication,
+transpose, and element access. **Stored column-major** (internally `[C][R]T`).
+Element types: integers, floats, complex numbers. No booleans or quaternions.
+
+### Declaration and basic operations
+
+```odin
+m := matrix[2, 3]f32{
+    1, 2, 3,
+    4, 5, 6,
+}
+m[0, 1]  // row 0, col 1 → 2
+
+// Matrix × matrix: type-checked at compile time
+a := matrix[2, 3]f32{1, 0, 0,  0, 1, 0}
+b := matrix[3, 2]f32{1, 2,  3, 4,  5, 6}
+c := a * b   // type: matrix[2, 2]f32
+
+// Matrix × vector (column-vector convention)
+M := matrix[3, 3]f32{
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+}
+v := [3]f32{3, 2, 1}
+result := M * v   // [3]f32{3, 2, 1} for identity
+
+// Scalar assignment yields scaled identity
+I: matrix[3, 3]f32 = 1   // identity matrix
+S: matrix[3, 3]f32 = 2   // 2× scaled identity
+```
+
+### Built-in operations
+
+| Operation | Syntax | Notes |
+|-----------|--------|-------|
+| Matrix multiply | `a * b` | Dimensions must be compatible; result type is inferred |
+| Matrix × vector | `M * v` | `v` treated as column vector |
+| Vector × matrix | `v * M` | `v` treated as row vector |
+| Transpose | `transpose(m)` | Built-in; returns transposed matrix |
+| Component-wise multiply | `hadamard_product(a, b)` | Use instead of `*` when you want element-wise, not matrix, multiply |
+| Element access | `m[row, col]` | Zero-indexed |
+| Scalar identity | `m = scalar` | Assigns scaled identity |
+
+`+`, `-`, `&`, `|`, `~`, `&~` all work component-wise. `/`, `%`, `%%` are
+not supported on matrices.
+
+### Submatrix casting
+
+Square matrices of the same element type can be cast between sizes:
+- Casting to a **smaller** matrix takes the top-left submatrix.
+- Casting to a **larger** matrix extends with zeros and ones on the diagonal.
+
+```odin
+mat2 :: distinct matrix[2, 2]f32
+mat4 :: distinct matrix[4, 4]f32
+
+m2 := mat2{1, 3, 2, 4}
+m4 := mat4(m2)   // extends with identity padding
+assert(m4[2, 2] == 1)
+assert(m4[3, 3] == 1)
+assert(mat2(m4) == m2)
+```
+
+Non-square matrices can be cast between shapes as long as the total element
+count (`R × C`) is the same and the element type matches. Column-major order
+is preserved across the cast.
+
+### `matrix[R,C]T` vs nested arrays
+
+| Use | Type | Reason |
+|-----|------|--------|
+| Any matrix math | `matrix[R, C]T` | Gets `*`, `transpose`, `hadamard_product` for free |
+| FFI to row-major C library | `[R][C]T` or `#row_major matrix[R,C]T` | Control over memory layout |
+| File I/O / serialization | `[R][C]T` | Explicit layout, no surprises |
+
+### `core:math/linalg`
+
+For production use, prefer `core:math/linalg` over hand-rolling. It provides
+`Matrix4f32`, `Matrix3f32`, and ready-made constructors:
+
+```odin
+import "core:math/linalg"
+
+view := linalg.matrix4_look_at_f32(eye, target, up)
+proj := linalg.matrix4_perspective_f32(fov_radians, aspect, near, far)
+mvp  := proj * view * model
+```
+
+For educational renderers, hand-rolling matrix multiplication is common (see
+Marian Pekar's software renderer series). For production, use `core:math/linalg`.
+
 ---
 
 ## Bit Sets

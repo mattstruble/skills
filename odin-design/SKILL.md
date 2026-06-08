@@ -319,7 +319,10 @@ PI : f64 : 3.14159        // typed constant
 add :: proc(a, b: int) -> int { return a + b }
 
 // Structs
-Vector3 :: struct { x, y, z: f32 }
+Player :: struct { pos: [3]f32, health: int, name: string }
+
+// Vector type alias (idiomatic — gets array programming + swizzle for free)
+Vector3 :: [3]f32
 
 // Enums
 Direction :: enum { North, South, East, West }
@@ -341,8 +344,10 @@ All declarations use `name : type = value` or `name :: value` (constant).
 - `references/allocators.md` — Arena pitfalls, tracking allocator setup,
   dynamic arrays in arenas
 - `references/data-oriented.md` — #soa, array programming, bit_set,
-  struct-of-arrays patterns
+  struct-of-arrays patterns, built-in matrix type
 - `references/context-system.md` — Context propagation, custom context
   fields, thread-local behavior, `using` for subtype polymorphism
 - `references/procedures-and-polymorphism.md` — Procedure groups, vtable
   pattern, and non-capturing closures
+- `references/profiling.md` — Spall profiler, hot vs cold code, instrumentation
+  attributes, optimization workflow

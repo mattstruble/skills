@@ -28,12 +28,25 @@ Before writing any Odin code, internalize these corrections:
 | camelCase or PascalCase for procedures | `snake_case` procedures; `Ada_Case` types; `SCREAMING_SNAKE_CASE` constants |
 | Constructors / destructors / RAII | Zero-value initialization; explicit `_init`/`_destroy` procs; `defer` |
 | `slice.map()`, `list.append()` method calls | Free procedures: `append(&arr, val)`, `slice.map(...)` via import |
-| Closures / lambdas capturing state | No capturing closures; pass state explicitly via `rawptr` + context |
+| Closures / lambdas capturing state | Non-capturing lambdas only; for callbacks use `proc(user_data: rawptr)` + explicit data pointer |
 | `impl` blocks / extension methods | Procedures are standalone; group by file and naming prefix |
 | Package manager (`go get`, `cargo add`) | Vendor dependencies manually; no package manager by design |
 | Implementing your own hash map or dynamic array | `map[K]V` and `[dynamic]T` are built-in language types |
 | `for item in iterator.next()` | `for item in collection` — iteration is built into `for` |
 | Null/nil checks everywhere | Zero-initialization makes zero values useful; fewer nil pointers in practice |
+| `i++` or `++i` increment/decrement | `i += 1` — no `++`/`--` operators exist |
+| `while condition { }` loop | `for condition { }` — only `for` exists (no while/do-while) |
+| Implicit numeric type conversions | All conversions explicit: `f := f64(my_int)` |
+| `switch` falls through by default | Cases do NOT fall through; use explicit `fallthrough` keyword |
+| Operator overloading (`+`, `-`, `*`) | Not supported; use named procedures. Array programming provides element-wise ops on fixed arrays. |
+| Private-by-default visibility | Public by default; use `@(private)` or `@(private="file")` to restrict |
+| `static const` / `constexpr` | `::` is compile-time (not addressable by runtime index); for addressable constant data use a package-level variable |
+| Type aliases and newtypes are the same | `Foo :: int` is alias (same type); `Foo :: distinct int` is a new type |
+| `free()` and `delete()` are interchangeable | `free(ptr)` deallocates memory; `delete(collection)` deinitializes dynamic arrays/maps/strings |
+| `new()` and `make()` are interchangeable | `new(T)` allocates single value → `^T`; `make([]T, len)` allocates slices/dynamic arrays/maps |
+| Pointer arithmetic (`ptr + offset`) | No pointer arithmetic; use `mem.ptr_offset()` or multi-pointers `[^]T` for FFI |
+| Mutable strings / byte-level string ops | Strings are immutable `ptr+len`; iteration yields `rune`s (Unicode codepoints); use `cstring` for C interop |
+| Implicit function overloading | Explicit overloading only via procedure groups: `draw :: proc{draw_circle, draw_rect}` |
 
 ---
 
@@ -212,9 +225,9 @@ defer os.close(f)
 // defer runs at scope exit in reverse declaration order
 arena: mem.Arena
 mem.arena_init(&arena, backing_buf)
-defer mem.arena_destroy(&arena)
+defer free_all(mem.arena_allocator(&arena))  // resets arena; caller frees backing_buf
 
-// Allocate into arena — all freed on arena_destroy
+// Allocate into arena — all freed on free_all
 context.allocator = mem.arena_allocator(&arena)
 tiles := make([]Tile, count)
 ```
@@ -251,8 +264,9 @@ tilemap_load :: proc(path: string) -> (Tilemap, Load_Error) {
 }
 
 tilemap_destroy :: proc(tm: ^Tilemap) {
+    backing := tm.arena.data  // capture before reset
     free_all(mem.arena_allocator(&tm.arena))
-    // Single deallocation frees everything
+    delete(backing)           // free the backing buffer itself
 }
 ```
 
@@ -330,3 +344,5 @@ All declarations use `name : type = value` or `name :: value` (constant).
   struct-of-arrays patterns
 - `references/context-system.md` — Context propagation, custom context
   fields, thread-local behavior, `using` for subtype polymorphism
+- `references/procedures-and-polymorphism.md` — Procedure groups, vtable
+  pattern, and non-capturing closures

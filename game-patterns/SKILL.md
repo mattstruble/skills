@@ -1,13 +1,13 @@
 ---
 name: game-patterns
-description: Consult this skill when making game architecture decisions, choosing how to structure game systems, or asking which pattern fits a problem. Also trigger when designing entity/component systems, input handling, game state machines, event/messaging systems, object pooling, spatial queries, or scripting/modding support. NOT for engine-specific implementation (see godot, love2d, unity). NOT for general software design outside game development (see software-design).
+description: Consult this skill when making game architecture decisions, choosing how to structure game systems, or asking which pattern fits a problem. Also trigger when designing entity/component systems, input handling, game state machines, event/messaging systems, object pooling, spatial queries, or scripting/modding support. NOT for engine-specific implementation (see godot, love2d, odin-gamedev). NOT for general software design outside game development (see software-design).
 ---
 
 # Game Programming Patterns
 
 Engine-agnostic pattern reference for game systems. Synthesized from Nystrom's *Game Programming Patterns* (gameprogrammingpatterns.com).
 
-**Relationship to engine skills**: This skill provides the *why* and *when*. Your engine skill (e.g., godot, love2d) provides the idiomatic *how*. When both fire, the engine skill takes precedence on implementation details — use this skill to understand which pattern to reach for, then let the engine skill guide the concrete code.
+**Relationship to engine skills**: This skill provides the *why* and *when*. Your engine skill (e.g., godot, love2d, odin-gamedev) provides the idiomatic *how*. When both fire, the engine skill takes precedence on implementation details — use this skill to understand which pattern to reach for, then let the engine skill guide the concrete code.
 
 ---
 

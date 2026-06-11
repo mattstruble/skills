@@ -89,7 +89,16 @@ Don't propose writes for: today's mood, a passing question, a half-formed though
 
 ### Batching writes
 
-If a conversation surfaces multiple durable facts, batch them into one write session at a natural break (or when the user says "wrap up"). Don't interrupt flow with five separate "want me to log this?" prompts.
+If a conversation surfaces multiple durable facts, batch them into one write session triggered by a concrete signal — don't interrupt flow with five separate "want me to log this?" prompts.
+
+**Concrete triggers for batched writes:**
+
+- **Beads task closure** — when closing a beads task (`bd close <id>`), review the session's `bd remember` entries and any durable context that surfaced. Propose wiki writes for anything with cross-project value.
+- **Commit** — when committing code (in projects without beads, or when a commit represents a natural unit of completed work), assess whether durable context surfaced that warrants a wiki write.
+- **Session end** — in projects without beads and when no commit occurs (planning discussions, debugging sessions, etc.), review for durable context when the conversation is wrapping up and propose a batch if any exists.
+- **Explicit request** — user says "wrap up", "log this", "save this", etc.
+
+In beads-enabled projects, task closure is the primary signal. The agent does not need to guess at "natural breaks" — the task lifecycle provides them.
 
 When proposing a batch, present a numbered list in a single proposal:
 
@@ -103,6 +112,16 @@ When proposing a batch, present a numbered list in a single proposal:
 Write only the items the user approves.
 
 Explicit user commands ("log this") always trigger an immediate write regardless of batching state — don't defer them.
+
+---
+
+### Beads integration
+
+In projects with beads (`.beads/` exists), the `bd remember` command stores project-specific operational notes. These are scoped to one project and surfaced by `bd prime` at session start.
+
+**Boundary rule:** if the insight only matters inside this repo, use `bd remember`. If a future session in a different repo would benefit from knowing it, write to the wiki.
+
+The promotion review (triggered by task closure) is the mechanism that catches `bd remember` entries worth elevating to the wiki. Not every entry warrants promotion — most project-specific notes stay in beads.
 
 ---
 
@@ -308,6 +327,6 @@ You: Don't propose a wiki entry. Just respond.
 - **Don't use markdown links for inter-wiki references.** `[[people/jordan|Jordan]]` builds the graph; `[Jordan](./people/jordan.md)` does not.
 - **Don't skip frontmatter.** Type, tags, dates, related. Every note.
 - **Don't narrate reads or writes.** Just do it.
-- **Don't propose logging mid-flow on minor details.** Batch at breaks.
+- **Don't propose logging mid-flow on minor details.** Batch at task closure, commit, session end, or explicit request.
 - **Don't restructure the wiki unprompted.** Suggest once, let user decide.
 - **Don't write speculation as fact.** Wait until the user commits.

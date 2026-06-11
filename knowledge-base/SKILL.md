@@ -1,6 +1,6 @@
 ---
 name: knowledge-base
-description: "You MUST use this skill proactively to maintain cross-session memory. Load context when resuming prior work, when the user references past sessions, or at the start of planning/strategy conversations. Propose writes whenever durable new information surfaces — decisions, constraints, preferences, new entities, investigation findings, or anything a future session would benefit from knowing, whether or not related content exists in the wiki yet. Explicit triggers: \"log this\", \"remember\", \"check the wiki\", \"load context\". NOT for self-contained coding tasks, one-off factual questions, or trivial conversation with no cross-session value."
+description: "Load when writing to the wiki, proposing wiki writes, or performing advanced graph operations (backlink queries, tag searches, decision-chain traversal). Explicit triggers: \"log this\", \"remember\", \"add to the wiki\", \"wrap up\". Also load on beads task closure when the promotion review requires wiki writes. NOT for reading alone — the AGENTS.md reading protocol handles session-start context loading without requiring this skill."
 ---
 
 # Knowledge Base
@@ -31,18 +31,11 @@ If the path exists but `INDEX.md` is absent, the wiki is uninitialized. Offer to
 
 ## Reading
 
-### When to read
+Basic reading (INDEX → MOC → 1-5 notes) is triggered automatically by the
+AGENTS.md protocol at session start. This skill is not needed for basic
+reads. Load this skill for advanced graph operations described below.
 
-- **At the start of any planning, brainstorming, strategy, or discussion conversation** that touches a known topic (project, person, ongoing investigation). Start at `INDEX.md`, jump to the relevant MOC, then load only the atomic notes you need.
-- **Mid-conversation when you notice a context gap** — the user references something as if you should know it. Stop, traverse, then continue.
-- **When the user explicitly asks** — "load context", "check the wiki", "what do we know about X".
-
-Do NOT read for:
-- Trivial conversations (a quick factual question, a one-off coding task)
-- Coding subagent tasks spawned by an orchestrator
-- Conversations that clearly have no cross-session context
-
-### How to traverse
+### Advanced traversal
 
 1. **Read `INDEX.md`** to see what MOCs exist.
 2. **Read the relevant MOC.** It points to the atomic notes in that domain.

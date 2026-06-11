@@ -65,7 +65,7 @@ Don't say "let me load your context" or "I've reviewed your wiki." Absorb it and
 - A constraint or commitment that will affect future work
 - A novel discovery during active work (library quirks, environmental constraints, non-obvious behaviors, hard-won debugging findings)
 
-When you detect one of these, **propose the write before doing it**: "Sounds like a new decision — want me to add `decisions/2026-04-12-cache-strategy.md` and link it from the Project MOC?" If they agree, write. If they decline, drop it.
+When you detect one of these, **write immediately** — create the note, update the MOC, and confirm briefly what was logged. Do not ask for permission; the user trusts the agent to maintain the wiki autonomously.
 
 A write doesn't require pre-existing wiki content on the topic. If nothing related exists yet, that's a reason to create a new note, not a reason to skip the write.
 
@@ -82,29 +82,25 @@ Don't propose writes for: today's mood, a passing question, a half-formed though
 
 ### Batching writes
 
-If a conversation surfaces multiple durable facts, batch them into one write session triggered by a concrete signal — don't interrupt flow with five separate "want me to log this?" prompts.
+If a conversation surfaces multiple durable facts, batch them into one write session triggered by a concrete signal — don't interrupt flow with individual writes mid-conversation.
 
 **Concrete triggers for batched writes:**
 
-- **Beads task closure** — when closing a beads task (`bd close <id>`), review the session's `bd remember` entries and any durable context that surfaced. Propose wiki writes for anything with cross-project value.
+- **Beads task closure** — when closing a beads task (`bd close <id>`), review the session's `bd remember` entries and any durable context that surfaced. Write wiki entries for anything with cross-project value.
 - **Commit** — when committing code (in projects without beads, or when a commit represents a natural unit of completed work), assess whether durable context surfaced that warrants a wiki write.
-- **Session end** — in projects without beads and when no commit occurs (planning discussions, debugging sessions, etc.), review for durable context when the conversation is wrapping up and propose a batch if any exists.
+- **Session end** — in projects without beads and when no commit occurs (planning discussions, debugging sessions, etc.), review for durable context when the conversation is wrapping up.
 - **Explicit request** — user says "wrap up", "log this", "save this", etc.
 
 In beads-enabled projects, task closure is the primary signal. The agent does not need to guess at "natural breaks" — the task lifecycle provides them.
 
-When proposing a batch, present a numbered list in a single proposal:
+When writing a batch, execute all writes and then report what was logged:
 
-> I'd like to log a few things from this session:
+> Logged from this session:
 > 1. `decisions/2026-05-05-redis-for-session-cache.md` — the caching decision
 > 2. `people/jordan.md` — new infra team lead
-> 3. Update `topics/data-pipeline.md` — current migration state
->
-> Want me to write all of these, or just some?
+> 3. Updated `topics/data-pipeline.md` — current migration state
 
-Write only the items the user approves.
-
-Explicit user commands ("log this") always trigger an immediate write regardless of batching state — don't defer them.
+Do not ask for permission. Write and report.
 
 ---
 

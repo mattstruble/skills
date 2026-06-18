@@ -80,6 +80,16 @@ The user might adjust groupings, rename messages, or reorder commits — this is
 
 For each group: `git add <files>` → compose message → `git commit -m "<message>"`
 
+### Step 7: Beads task closure (if applicable)
+
+After all commits are made, check for beads context:
+
+1. If `.beads/` does not exist in the project root → skip, done.
+2. Run `bd mine` — if no claimed tasks → skip, done.
+3. If claimed tasks exist, ask the user: *"Does this commit close task `<id>`(`<title>`), or is this intermediate progress?"*
+   - **Close** → `bd close <id> --reason "<brief reason from commit message>"`
+   - **Intermediate** → no action
+
 #### Message format
 
 ```

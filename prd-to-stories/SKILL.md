@@ -100,6 +100,37 @@ Example: "5 of 7 behaviors in the Search capability group are covered. Not yet c
 
 If fewer than half the behaviors in the selected scope are covered, ask whether the user wants to continue with the remaining behaviors now or in a future session.
 
+### Step 9: Create beads tasks (conditional)
+
+Check if `.beads/` exists in the project root. If it does not exist, skip this step entirely — behavior is unchanged.
+
+If `.beads/` exists, create beads tasks mirroring the story files:
+
+1. **One epic per capability group** covered in this session:
+   ```
+   bd create "<capability group name>" --description="<capability group description from PRD>" -t epic -p 1 --json
+   ```
+   Capture the returned epic ID (e.g., `bd-42`).
+
+2. **One task per story** under its epic:
+   ```
+   bd create "<story title>" \
+     --description="<story summary paragraph>" \
+     -t task \
+     --parent <epic-id> \
+     --acceptance="<acceptance criteria as newline-separated list>" \
+     --json
+   ```
+   The `--description` value is the Summary section from the story file. The `--acceptance` value is the Acceptance Criteria section (criteria joined with newlines, without checkbox syntax).
+
+3. After all tasks are created, report the IDs created:
+   "Created beads epic `bd-42` with tasks `bd-43`, `bd-44`, `bd-45`."
+
+**Constraints:**
+- Markdown files are always written (Step 7) regardless of beads existence. They are the committed source of truth; beads is the local execution plan.
+- If a beads command fails, log the error and continue — do not abort story creation.
+- Do not create duplicate epics if an epic for the same capability group already exists. Check with `bd ready --json` or `bd show` if unsure.
+
 ## Story Template
 
 ```markdown

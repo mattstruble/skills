@@ -5,6 +5,8 @@
 !plan-critic-eval/evals/evals.json
 !prd-to-stories/evals/
 !prd-to-stories/evals/evals.json
+!git-commit/evals/
+!git-commit/evals/evals.json
 
 # Beads / Dolt files (added by bd init)
 .dolt/

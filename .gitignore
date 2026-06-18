@@ -3,6 +3,8 @@
 # Skill eval definitions are tracked; only workspace run artifacts are excluded
 !plan-critic-eval/evals/
 !plan-critic-eval/evals/evals.json
+!prd-to-stories/evals/
+!prd-to-stories/evals/evals.json
 
 # Beads / Dolt files (added by bd init)
 .dolt/

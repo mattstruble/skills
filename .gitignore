@@ -7,6 +7,12 @@
 !prd-to-stories/evals/evals.json
 !git-commit/evals/
 !git-commit/evals/evals.json
+!coder-beads-eval/evals/
+!coder-beads-eval/evals/evals.json
+!reviewer-beads-eval/evals/
+!reviewer-beads-eval/evals/evals.json
+!integration-beads-eval/evals/
+!integration-beads-eval/evals/evals.json
 
 # Beads / Dolt files (added by bd init)
 .dolt/

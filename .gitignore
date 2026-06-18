@@ -13,6 +13,8 @@
 !reviewer-beads-eval/evals/evals.json
 !integration-beads-eval/evals/
 !integration-beads-eval/evals/evals.json
+!planner-orchestrator-split-eval/evals/
+!planner-orchestrator-split-eval/evals/evals.json
 
 # Beads / Dolt files (added by bd init)
 .dolt/

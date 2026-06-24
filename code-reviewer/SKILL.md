@@ -58,6 +58,7 @@ Use this template when spawning each reviewer. Populate all fields before spawni
 **Review focus:** <correctness | failure-path | readability | security>
 **Worktree:** <absolute path to worktree, or "n/a" for manual review>
 **Prior findings to verify:** initial review
+**Positive observation:** Note one genuinely positive observation about the diff — something done well (clean abstraction, good test coverage, well-named variable, thoughtful error handling, etc.). Include it in your findings output.
 ```
 
 ### Verification Resume (Step 2 — Fix Cycle)
@@ -140,6 +141,22 @@ Raise a readability finding when code is genuinely hard to follow, even if you c
 
 These two principles are complementary: Chesterton's Fence says *don't tear down what you don't understand*; FOLD says *it's okay to admit you don't understand*.
 
+### Continuous Improvement, Not Perfection
+
+The goal of review is to ensure the code improves the overall health of the system — not to achieve a perfect CL. Approve once the code is in a state that clearly improves maintainability, readability, or correctness, even if it isn't perfect. Don't hold up a CL over minor issues that don't affect code health. Reserve blocking findings for things that genuinely degrade the system.
+
+This principle governs how to handle minor, non-blocking issues — it does not override blocking findings in any domain. A CL that introduces a regression (security, correctness, or reliability) is not an improvement to system health regardless of other gains.
+
+### Navigation Strategy — Broad Before Narrow
+
+Assess overall design coherence before diving into line-level details. Ask: does this change make sense at the system level? Does the design integrate well with the existing architecture? Flag major design problems immediately — a design flaw may make many line-level findings irrelevant. Only after confirming the design is sound should you move to detailed analysis of individual functions, lines, and naming.
+
+If design soundness is uncertain, proceed to line-level analysis anyway — design concerns and line-level findings are not mutually exclusive. Flag the design concern at its appropriate severity and continue the full review.
+
+### Over-Engineering and YAGNI
+
+Flag code that is more complex than it needs to be to solve the current problem. This includes: abstractions with only one implementation, factories with one product, config for values that never change, generic solutions to problems that aren't yet general, and functionality added for speculative future needs. The right time to solve a future problem is when it arrives and its actual shape is known.
+
 ---
 
 ## Review Loop
@@ -202,6 +219,9 @@ task(subagent_type="correctness-reviewer", description="Correctness review", pro
 **Review focus:** correctness
 **Worktree:** /tmp/opencode-wt/session-xyz/wave-1-task-1/
 **Prior findings to verify:** initial review
+**Positive observation:** Note one genuinely positive observation about the diff.
+
+**YAGNI:** Flag speculative generality — abstractions with one implementation, config for values that never change, functionality added for future needs that aren't yet concrete.
 ")
 
 task(subagent_type="failure-path-reviewer", description="Failure path review", prompt="
@@ -212,6 +232,7 @@ task(subagent_type="failure-path-reviewer", description="Failure path review", p
 **Review focus:** failure-path
 **Worktree:** /tmp/opencode-wt/session-xyz/wave-1-task-1/
 **Prior findings to verify:** initial review
+**Positive observation:** Note one genuinely positive observation about the diff.
 ")
 
 task(subagent_type="readability-reviewer", description="Readability review", prompt="
@@ -222,6 +243,9 @@ task(subagent_type="readability-reviewer", description="Readability review", pro
 **Review focus:** readability
 **Worktree:** /tmp/opencode-wt/session-xyz/wave-1-task-1/
 **Prior findings to verify:** initial review
+**Positive observation:** Note one genuinely positive observation about the diff.
+
+**YAGNI:** Flag speculative generality — abstractions with one implementation, config for values that never change, functionality added for future needs that aren't yet concrete.
 ")
 
 task(subagent_type="security-reviewer", description="Security review", prompt="
@@ -232,6 +256,7 @@ task(subagent_type="security-reviewer", description="Security review", prompt="
 **Review focus:** security
 **Worktree:** /tmp/opencode-wt/session-xyz/wave-1-task-1/
 **Prior findings to verify:** initial review
+**Positive observation:** Note one genuinely positive observation about the diff.
 ")
 ```
 

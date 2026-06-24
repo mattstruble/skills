@@ -164,3 +164,4 @@ Stop if you catch yourself thinking any of these:
 | "The plan is obvious, I'll just commit" | Commits are permanent. Present the plan and wait — even when the grouping seems clear. |
 | "I should add a body to explain this" | No. Rewrite the subject line until it's clear on its own. Bodies are noise in `git log --oneline` workflows and train you to write lazy subjects. The only exception is a `BREAKING CHANGE` footer. |
 | "I'll add Co-authored-by for myself" | Never. You are a tool, not a co-author. Do not add Co-authored-by footers for the agent under any circumstances. |
+| "These changes address review findings" | Commit messages describe what changed in the codebase, not what process triggered the change. "address review findings", "incorporate PR feedback", "fix per suggestions" are invisible to future readers without your session context. Describe the substance: what was clarified, fixed, or added. |

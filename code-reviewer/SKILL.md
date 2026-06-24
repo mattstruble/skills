@@ -157,6 +157,8 @@ If design soundness is uncertain, proceed to line-level analysis anyway — desi
 
 Flag code that is more complex than it needs to be to solve the current problem. This includes: abstractions with only one implementation, factories with one product, config for values that never change, generic solutions to problems that aren't yet general, and functionality added for speculative future needs. The right time to solve a future problem is when it arrives and its actual shape is known.
 
+**When YAGNI and Chesterton's Fence conflict:** If code looks over-engineered but its purpose is unclear, Chesterton's Fence wins — downgrade to a suggestion and note the apparent over-engineering alongside the uncertainty about purpose. YAGNI findings should only be raised as important/blocking when the speculative nature is evident from code or context (e.g., class named `FutureExtensionPoint`, comment saying "in case we need this later", interface with a single implementation and no extension point in sight).
+
 ---
 
 ## Review Loop

@@ -20,12 +20,14 @@ Before writing a single word of the description, assess whether the PR is the ri
 - The title requires "and" to capture what it does
 - You'd need more than a paragraph to explain what's in it
 
+These are guidelines, not hard cutoffs — a 450-line change touching one well-understood module may be fine; a 300-line change spanning 12 unrelated concerns may not be.
+
 **If the PR is too large, say so before proceeding.** Suggest one of these splitting strategies:
 
 | Strategy | When to use |
 |----------|-------------|
 | **Stacked branches** | Layered changes — refactor first (no behavior change), feature second. Stack the PRs; merge in order. `git checkout -b feat/step-2 feat/step-1` |
-| **Draft PR** | You need visibility while you keep splitting. Open a draft PR for the full change, then carve reviewable chunks off it. |
+| **Draft PR** | You need visibility while you keep splitting. Open a draft PR for the full change, then carve reviewable chunks off it. Only use this if the repo doesn't auto-assign reviewers on PR open — otherwise you'll trigger premature notifications on a PR you intend to close. |
 | **Feature flag** | The code is ready but the feature shouldn't activate yet. Ship behind a flag; flag removal is a separate small PR. |
 | **Interface first** | Define the types/contracts/interfaces in one PR, implement in the next. Reviewers can validate the design before the implementation lands. |
 

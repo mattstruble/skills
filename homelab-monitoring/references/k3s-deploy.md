@@ -43,8 +43,13 @@ grafana:
       searchNamespace: ALL
     datasources:
       enabled: true
-  # Admin password — change this
-  adminPassword: "changeme"
+  # Admin password from pre-created Secret (never store in values.yaml):
+  #   kubectl create secret generic grafana-admin \
+  #     --from-literal=admin-password="$(openssl rand -base64 24)" -n monitoring
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
 
 alertmanager:
   alertmanagerSpec:
@@ -68,7 +73,11 @@ alertmanager:
     receivers:
       - name: 'discord'
         discord_configs:
-          - webhook_url: 'https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN'
+          - webhook_url_file: '/etc/alertmanager/secrets/discord-webhook-url'
+          # Create the Secret:
+          #   kubectl create secret generic alertmanager-discord \
+          #     --from-literal=discord-webhook-url="https://discord.com/api/webhooks/..." -n monitoring
+          # Mount via alertmanagerSpec.secrets: ['alertmanager-discord']
 
 # Disable GPU-specific components not needed for homelab
 kubeEtcd:
@@ -95,7 +104,7 @@ singleBinary:
     size: 20Gi
 
 loki:
-  auth_enabled: false
+  auth_enabled: false  # single-user homelab; set true + auth proxy if exposing externally
   commonConfig:
     replication_factor: 1
   storage:

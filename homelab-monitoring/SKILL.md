@@ -203,6 +203,16 @@ logging:
 
 **Long-term fix:** Switch to Alloy for log collection. Alloy runs as a separate process, buffers locally, and never blocks your application containers.
 
+## Security
+
+Homelab doesn't mean insecure. Three rules:
+
+1. **Never commit secrets.** Use `.env` files (Compose) or Kubernetes Secrets (k3s). Add `.env` to `.gitignore`.
+2. **Bind internal services to localhost.** Loki, Prometheus, and Alertmanager don't need network exposure — only Grafana needs to be reachable. In Compose: `127.0.0.1:3100:3100`.
+3. **Change defaults before first boot.** Generate passwords: `openssl rand -base64 24`. The reference files show `.env` patterns for this.
+
+If you ever expose Loki or Grafana beyond your LAN (reverse proxy, VPN exit), enable `auth_enabled: true` on Loki and put an auth proxy in front.
+
 ## Upgrade Paths
 
 These are one-line decisions — don't add them until you hit the specific need:

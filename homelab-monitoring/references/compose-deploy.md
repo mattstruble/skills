@@ -19,6 +19,20 @@ monitoring/
             └── dashboards.yaml
 ```
 
+## .env (secrets — add to .gitignore)
+
+```bash
+# Generate: openssl rand -base64 24
+GRAFANA_ADMIN_PASSWORD=your-generated-password-here
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
+SMTP_PASSWORD=your-app-password
+```
+
+Add to `.gitignore`:
+```
+.env
+```
+
 ## docker-compose.yml
 
 ```yaml
@@ -41,7 +55,7 @@ services:
     image: grafana/loki:3.6.0
     container_name: loki
     ports:
-      - "3100:3100"
+      - "127.0.0.1:3100:3100"  # internal only — no network exposure needed
     volumes:
       - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
       - loki_data:/var/loki
@@ -59,7 +73,7 @@ services:
     image: prom/prometheus:v3.0.0
     container_name: prometheus
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"  # internal only — access via Grafana
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro  # needed for docker_sd_configs
@@ -83,12 +97,12 @@ services:
     image: grafana/grafana:11.0.0
     container_name: grafana
     ports:
-      - "3000:3000"
+      - "3000:3000"  # user-facing UI — keep accessible on LAN
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=changeme  # CHANGE THIS before deploying
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
       - monitoring
@@ -103,7 +117,7 @@ services:
     image: prom/alertmanager:v0.27.0
     container_name: alertmanager
     ports:
-      - "9093:9093"
+      - "127.0.0.1:9093:9093"  # internal only
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager_data:/alertmanager
@@ -260,6 +274,9 @@ scrape_configs:
 
 ## alertmanager.yml
 
+> **Never commit secrets.** Use environment variables for webhook URLs and passwords.
+> Alertmanager supports `$ENV_VAR` substitution natively in its config file.
+
 ```yaml
 global:
   resolve_timeout: 5m
@@ -281,7 +298,7 @@ route:
 receivers:
   - name: 'discord'
     discord_configs:
-      - webhook_url: 'https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN'
+      - webhook_url: '$DISCORD_WEBHOOK_URL'
         title: '{{ .GroupLabels.alertname }}'
         message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ end }}'
 
@@ -291,7 +308,7 @@ receivers:
         from: 'alertmanager@example.com'
         smarthost: 'smtp.gmail.com:587'
         auth_username: 'you@example.com'
-        auth_password: 'your-app-password'
+        auth_password: '$SMTP_PASSWORD'
         require_tls: true
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: grafana
-description: "You MUST consult this skill when authoring Grafana dashboards, configuring panels or template variables, wiring datasources, or setting up alerting rules and contact points. Also trigger on GrafanaDashboard/GrafanaDatasource CRDs (Grafana Operator), file-based provisioning for Docker Compose, Discord/email alert routing, and drilldown dashboard design. NOT for PromQL query syntax (see promql), LogQL syntax (see logql), or deploying the Prometheus stack (see prometheus-grafana)."
+description: "You MUST consult this skill when authoring Grafana dashboards, configuring panels or template variables, wiring datasources, or setting up alerting rules and contact points. Also trigger on GrafanaDashboard/GrafanaDatasource CRDs (Grafana Operator), file-based provisioning for Docker Compose, Discord/email alert routing, and drilldown dashboard design. NOT for PromQL query syntax (see promql), LogQL syntax (see logql), or deploying the monitoring stack (see homelab-monitoring)."
 ---
 
 # Grafana

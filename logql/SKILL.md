@@ -1,6 +1,6 @@
 ---
 name: logql
-description: "You MUST consult this skill when writing or debugging LogQL queries for Grafana Loki. Also trigger when building Grafana dashboard panels backed by Loki, creating log-based alerting rules, diagnosing empty results or parser errors, extracting metrics from logs with rate/count_over_time/unwrap, or correlating logs across multiple services. NOT for Loki deployment or configuration (see grafana-loki), Prometheus metrics (see promql), or PromQL dashboards."
+description: "You MUST consult this skill when writing or debugging LogQL queries for Grafana Loki. Also trigger when building Grafana dashboard panels backed by Loki, creating log-based alerting rules, diagnosing empty results or parser errors, extracting metrics from logs with rate/count_over_time/unwrap, or correlating logs across multiple services. NOT for Loki deployment or configuration (see homelab-monitoring), Prometheus metrics (see promql), or PromQL dashboards."
 ---
 
 # LogQL Reference
@@ -214,7 +214,7 @@ groups:
 |---------|-------------|
 | Empty results | Stream selector matches nothing — test `{container="x"}` alone first; check exact label name/value in Loki |
 | `__error__` labels appear | Parser failed on some lines. Debug: `\| __error__ != ""` to see failing lines. Drop them: `\| __error__ = ""`. For JSON: add `\|= "{"` before `\| json`. For pattern: verify pattern matches actual log format. |
-| Query timeout | Causes: `regexp` parser on high-volume stream, `\|~` regex filter without a preceding `\|=` string filter, long time range with unwrap aggregations. Fixes: add exact-match labels, place `\|=` before `\|~`, reduce time range. Recording rules require Loki ruler (see grafana-loki skill). |
+| Query timeout | Causes: `regexp` parser on high-volume stream, `\|~` regex filter without a preceding `\|=` string filter, long time range with unwrap aggregations. Fixes: add exact-match labels, place `\|=` before `\|~`, reduce time range. Recording rules require Loki ruler (see homelab-monitoring skill). |
 
 ## LogQL vs PromQL
 

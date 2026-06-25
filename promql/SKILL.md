@@ -1,6 +1,6 @@
 ---
 name: promql
-description: You MUST consult this skill when writing or debugging PromQL queries for Prometheus — dashboards, alerting rules, recording rules, or ad-hoc metric exploration. Also trigger on rate vs irate decisions, histogram quantiles, predict_linear for capacity planning, absent() for uptime alerts, or vector matching errors. NOT for Prometheus server deployment (see prometheus-grafana), Loki log queries (see logql), or Grafana datasource configuration.
+description: You MUST consult this skill when writing or debugging PromQL queries for Prometheus — dashboards, alerting rules, recording rules, or ad-hoc metric exploration. Also trigger on rate vs irate decisions, histogram quantiles, predict_linear for capacity planning, absent() for uptime alerts, or vector matching errors. NOT for Prometheus server deployment (see homelab-monitoring), Loki log queries (see logql), or Grafana datasource configuration.
 ---
 
 # PromQL

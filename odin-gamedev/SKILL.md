@@ -219,6 +219,45 @@ For the **rendering theory itself** — coordinate spaces, perspective projectio
 
 For **Odin/raylib implementation specifics** — `[^]rl.Color` multi-pointers from `rl.LoadImageColors`, the framebuffer lifecycle, power-of-2 texture sampling, FPS overlay — see `references/raylib-rendering.md`.
 
+### Low-Level GPU Access in Odin
+
+Raylib and Sokol are the default. Drop below them — to SDL3 GPU, raw Vulkan, or the `no_gfx` paradigm — only for: **bindless textures**, **GPU-driven/indirect rendering**, **compute shaders**, or **hardware raytracing**.
+
+The `gpu-rendering-architecture` skill covers the GPU model (descriptor sets, barriers, render passes). This section covers Odin-specific idioms from [`leotmp/no_gfx_api`](https://github.com/leotmp/no_gfx_api).
+
+**ZII (Zero-Is-Initialization)** — zero struct = valid default; no nil checks, no sentinels.
+```odin
+depth := gpu.Depth_State{mode = {.Read, .Write}, compare = .Less_Equal}
+// gpu.Depth_State{} = no depth test/write — also valid, not a crash
+```
+
+**`{cpu, gpu}` allocation pairs** — `gpu.arena_alloc` returns `ptr_t(T)`; write via `.cpu`, GPU address flows implicitly to commands.
+```odin
+gpu.arena_free_all(frame_arena) // reset at start of each frame
+data := gpu.arena_alloc(frame_arena, ShaderData)
+data.cpu.transform   = calculate_mvp()
+data.cpu.texture_idx = tex_id
+gpu.cmd_dispatch(cmd, data, num_groups_x, num_groups_y) // .gpu implicit
+```
+
+**Timeline-semaphore frame pacing** — one `Semaphore` + incrementing `u64`; wait before recycling frame resources.
+```odin
+frame_sem, next_frame := gpu.semaphore_create(0), u64(1)
+for !quit {
+    if next_frame > Frames_In_Flight do gpu.semaphore_wait(frame_sem, next_frame - Frames_In_Flight)
+    // acquire swapchain image; record commands into cmd; present after submit — not shown
+    gpu.cmd_add_signal_semaphore(cmd, frame_sem, next_frame)
+    gpu.queue_submit(.Main, {cmd})
+    next_frame += 1
+}
+```
+
+**`#load` SPIR-V** — embed bytecode at compile time; pass `[]u32` directly.
+```odin
+vert := gpu.shader_create(#load("shaders/main.vert.spv", []u32), .Vertex)
+comp := gpu.shader_create_compute(#load("shaders/cull.comp.spv", []u32), 64, 1, 1)
+```
+
 ---
 
 ## Pattern Mapping (Quick Reference)

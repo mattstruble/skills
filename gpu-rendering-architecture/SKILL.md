@@ -1,6 +1,6 @@
 ---
 name: gpu-rendering-architecture
-description: Consult when reasoning about how modern GPUs are *driven* — bindless resources and descriptor heaps, 64-bit GPU pointers / buffer-device-address, GPU-driven and indirect/multidraw rendering, struct-based shader data model, PSO/state management and the PSO-permutation problem, modern stage-based barriers and timeline-semaphore synchronization. Engine-agnostic, grounded in Vulkan 1.3+ / DX12 SM6.6 / Metal 3+. NOT for software-rasterizer math (see game-rendering) · NOT for engine/GDSL shader authoring (see godot-shader) · NOT for GPU perf profiling or bottleneck diagnosis (see game-performance).
+description: "You MUST consult this skill when reasoning about how modern GPUs are *driven* — bindless resources and descriptor heaps, 64-bit GPU pointers / buffer-device-address, GPU memory type selection (CPU-mapped vs GPU-private), GPU-driven and indirect/multidraw rendering, struct-based shader data model, PSO/state management and the PSO-permutation problem, modern stage-based barriers and timeline-semaphore synchronization. Engine-agnostic, grounded in Vulkan 1.3+ / DX12 SM6.6 / Metal 3+. NOT for software-rasterizer math (see game-rendering). NOT for engine/GDSL shader authoring (see godot-shader). NOT for GPU perf profiling or bottleneck diagnosis (see game-performance)."
 ---
 
 # GPU Rendering Architecture

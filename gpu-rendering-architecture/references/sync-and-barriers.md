@@ -79,7 +79,8 @@ gpuBarrier(commandBuffer, STAGE_RASTER_COLOR_OUT | STAGE_RASTER_DEPTH_OUT, STAGE
 
 // Compute writes indirect draw/dispatch args → command processor reads them
 // HAZARD_DRAW_ARGUMENTS stalls the CP prefetcher
-gpuBarrier(commandBuffer, STAGE_COMPUTE, STAGE_COMPUTE, HAZARD_DRAW_ARGUMENTS);
+// dstStage must be STAGE_DRAW_INDIRECT (the CP argument-fetch stage), not STAGE_COMPUTE
+gpuBarrier(commandBuffer, STAGE_COMPUTE, STAGE_DRAW_INDIRECT, HAZARD_DRAW_ARGUMENTS);
 
 // Transfer (copy/clear) → compute reads result
 gpuBarrier(commandBuffer, STAGE_TRANSFER, STAGE_COMPUTE);
@@ -91,6 +92,7 @@ gpuBarrier(commandBuffer, STAGE_TRANSFER, STAGE_COMPUTE);
 |-------|-------------------|
 | `STAGE_TRANSFER` | Copy, clear, blit commands |
 | `STAGE_COMPUTE` | Compute dispatch |
+| `STAGE_DRAW_INDIRECT` | Command-processor argument-fetch (indirect draw/dispatch) |
 | `STAGE_VERTEX_SHADER` | Vertex and mesh shader stages |
 | `STAGE_PIXEL_SHADER` / `STAGE_FRAGMENT_SHADER` | Pixel/fragment shader |
 | `STAGE_RASTER_COLOR_OUT` | ROP write (render target blending/output) |
@@ -108,6 +110,7 @@ cmd_barrier :: proc(cmd_buf: Command_Buffer, before: Stage, after: Stage, hazard
 Stage :: enum {
     Transfer      = 0,
     Compute,
+    Draw_Indirect,
     Raster_Color_Out,
     Raster_Depth_Out,
     Fragment_Shader,
@@ -148,7 +151,8 @@ Hazard :: enum { Draw_Arguments = 0, Descriptors, Depth_Stencil, BVHs }
 Hazard_Flags :: bit_set[Hazard]
 
 // Example: indirect dispatch after compute writes the argument buffer
-gpu.cmd_barrier(cmd_buf, .Compute, .Compute, {.Draw_Arguments})
+// dstStage must be .Draw_Indirect (the CP argument-fetch stage), not .Compute
+gpu.cmd_barrier(cmd_buf, .Compute, .Draw_Indirect, {.Draw_Arguments})
 gpu.cmd_dispatch_indirect(cmd_buf, arg_buffer, 0)
 ```
 
@@ -360,7 +364,7 @@ queue_submit    :: proc(queue: Queue_Type, cmd_bufs: []Command_Buffer)
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
-| Indirect draw reads wrong counts | Missing `HAZARD_DRAW_ARGUMENTS` after compute writes arg buffer | Add `gpuBarrier(cmd, STAGE_COMPUTE, STAGE_COMPUTE, HAZARD_DRAW_ARGUMENTS)` |
+| Indirect draw reads wrong counts | Missing `HAZARD_DRAW_ARGUMENTS` after compute writes arg buffer | Add `gpuBarrier(cmd, STAGE_COMPUTE, STAGE_DRAW_INDIRECT, HAZARD_DRAW_ARGUMENTS)` |
 | Bindless texture reads stale data | Missing `HAZARD_DESCRIPTORS` after descriptor heap update | Add `HAZARD_DESCRIPTORS` to barrier before the shader dispatch |
 | Render target sample shows previous frame | Missing barrier between `STAGE_RASTER_COLOR_OUT` and `STAGE_PIXEL_SHADER` | `gpuBarrier(cmd, STAGE_RASTER_COLOR_OUT, STAGE_PIXEL_SHADER)` |
 | Depth test accepts fragments that should be occluded | Reusing depth attachment without `HAZARD_DEPTH_STENCIL` | Add `HAZARD_DEPTH_STENCIL` to flush HiZ cache |

@@ -25,6 +25,8 @@ Engine-agnostic pattern reference for game systems. Synthesized from Nystrom's *
 
 **Disambiguation**: Observer vs Event Queue is the most common confusion. Use Observer when the response must happen *now* (UI updating a health bar on damage). Use Event Queue when the response can happen *later* (audio playing a sound next frame) or when you need to aggregate events (10 "footstep" events → 1 sound).
 
+**Jonathan Blow's counterpoint**: An event queue is trivial to implement and often overrated. For scripted sequences, plain sequential code is clearer — put it on a thread if it must span frames. For "run a function when a variable changes," decide deliberately whether per-frame polling is acceptable and exactly *when* in the frame the reaction fires; code that reacts at an arbitrary time will crash in ways that are hard to reproduce.
+
 ### "I need to structure entity behavior"
 
 | Problem | Pattern |
@@ -193,3 +195,4 @@ These patterns are worth understanding conceptually, but you should not implemen
 | `references/optimization.md` | Data Locality, Dirty Flag, Object Pool, Spatial Partition |
 | `references/additional-patterns.md` | Factory, Strategy, Decorator |
 | `references/ecs-architecture.md` | Full ECS Architecture — Entity/Component/System, emergence, data-driven construction, when to use vs. Component pattern |
+| `references/serialization-and-asset-loading.md` | Custom serialization, save formats, asset pipeline, level loading — read when serializing game data, designing save formats, or loading levels/assets |

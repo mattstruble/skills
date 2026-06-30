@@ -33,6 +33,8 @@ Visual design principles for games — how art communicates, guides attention, a
 
 ### Craft and Production
 
+**Information Channels** — The independent visual channels through which a scene communicates: color, shape, and surface contrast (value variation across a surface). Each channel can be read without the others. Removing a channel — monochrome removes color; uniform roughness removes surface contrast — costs legibility. Games can't rely on film's perceptual shortcuts (face/scene recognition), so protecting all three channels is a playability concern, not just an aesthetic one.
+
 **Palette Discipline** — Treating a color palette as a design instrument, not a list of options. Each color slot has a job: highlight, shadow, cycling animation, state indicator. Minimum colors per element is a discipline that produces coherence and leaves room for dynamic effects.
 
 **Constraint-Driven Art** — Working within severe limits (palette size, polygon budget, texture memory) forces creative problem-solving that unlimited resources never demand. Constraints produce mastery; abundance produces dabbling. To apply: cap your palette deliberately, assign every slot a role before painting, and treat the constraint as a design tool rather than a problem to escape.
@@ -51,6 +53,9 @@ Visual design principles for games — how art communicates, guides attention, a
 |---|---|---|
 | "Players can't see their character against the background" | Visual Hierarchy, Value Contrast | Grayscale test: does the character pop? Reduce background value contrast; increase character contrast |
 | "My game looks muddy or flat" | Value Contrast, Saturation Contrast | Is there a full value range? Are some elements vivid and some muted, or is everything the same saturation? |
+| "Scene reads as noise — nothing pops even with good contrast" | Information Channels, Value Contrast | Is surface contrast (roughness/value variation) flattened? Squint test: do important elements separate from background? |
+| "Background is eating the foreground / play space feels small" | Density Balance, Information Channels | Active-play-area ratio: is most of the screen decorative? Tighten camera angle; ensure foreground/background use distinct visual vocabularies |
+| "I need to brief an artist but don't know how to describe the look" | Information Channels | Gather concrete image references + make a rough programmer-art sketch; see `references/art-direction.md` |
 | "Colors are too garish / painful to look at" | Saturation Contrast, Palette Discipline | Is saturation maxed everywhere? Vary it — not everything needs to be vivid |
 | "Players can't tell what's interactive / dangerous" | Color as Information, Redundant Cues, Visual Hierarchy | Does color carry meaning? Is it backed by shape/value for colorblind users? |
 | "My simulation game is hard to read at a glance" | Simulation Legibility, Color as Information | Does each asset communicate category and state? Are states unambiguously differentiated? |
@@ -133,6 +138,7 @@ The turning edge is often the missing piece. Without it, forms read as flat. Wit
 | `references/constrained-palette.md` | Palette as design tool, color cycling, dithering, value ramps, constraint-driven art | You're designing a limited palette, working with pixel art, or want to use color more intentionally |
 | `references/visual-problems.md` | Diagnosing and fixing common visual failures: contrast, hierarchy, saturation, density, accessibility | You're critiquing visuals, fixing a specific problem, or need vocabulary to communicate with artists |
 | `references/simulation-art.md` | Art as information layer, simulation legibility, post-processing unification, procedural art direction | You're making a simulation/strategy game where art must communicate system state |
+| `references/art-direction.md` | Visual information channels, screen composition and active-play-area ratio, art direction over rendering tech, reference-gathering workflow, artist briefing, production heuristics | You're diagnosing why a scene plays badly despite looking fine, briefing artists, or validating assets before committing art-team time |
 
 ---
 

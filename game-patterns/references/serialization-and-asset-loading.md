@@ -2,7 +2,7 @@
 
 Covers save formats, custom binary serialization, asset pipeline design, and level loading strategies. Read this when serializing game data, designing save formats, or loading levels/assets.
 
-Synthesized from Jonathan Blow stream clips (youtube.com/@JBH-p5b); per-topic sources in docs/sources/jonathan-blow.md.
+*Synthesized from [Jonathan Blow stream clips](https://www.youtube.com/@JBH-p5b) — full per-topic sources in [docs/sources/jonathan-blow.md](../../docs/sources/jonathan-blow.md).*
 
 ---
 

@@ -2,7 +2,7 @@
 
 Covers the craft disciplines that separate a shipped game from a good one — first-impression friction, difficulty calibration, mechanic depth, contrivance cost, production value, input feel, design process, and evaluation lenses. Load this when a game's opening isn't landing, a mechanic feels exhausted or shallow, difficulty is calibrated wrong, or you need a process check on whether you're building the right thing.
 
-Synthesized from Jonathan Blow stream clips (youtube.com/@JBH-p5b); per-topic sources in docs/sources/jonathan-blow.md.
+*Synthesized from [Jonathan Blow stream clips](https://www.youtube.com/@JBH-p5b) — full per-topic sources in [docs/sources/jonathan-blow.md](../../docs/sources/jonathan-blow.md).*
 
 ---
 

@@ -7,7 +7,7 @@ rules themselves are the problem. Read this when you're about to change code
 you don't fully understand, when a profile is flat and you're not sure where
 to push, or when a blanket rule is pulling you toward obviously worse code.
 
-Synthesized from Jonathan Blow stream clips (youtube.com/@JBH-p5b); per-topic sources in docs/sources/jonathan-blow.md.
+*Synthesized from [Jonathan Blow stream clips](https://www.youtube.com/@JBH-p5b) — full per-topic sources in [docs/sources/jonathan-blow.md](../../docs/sources/jonathan-blow.md).*
 
 ---
 

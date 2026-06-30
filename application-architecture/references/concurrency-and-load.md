@@ -2,6 +2,8 @@
 
 Thread and task management, async trade-offs, mutex discipline, queueing theory, and infrastructure minimalism.
 
+*Synthesized from [Jonathan Blow stream clips](https://www.youtube.com/@JBH-p5b) — full per-topic sources in [docs/sources/jonathan-blow.md](../../docs/sources/jonathan-blow.md).*
+
 ## Concurrency is not parallelism
 
 Parallelism means using the hardware to finish work faster — thread count

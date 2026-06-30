@@ -2,7 +2,7 @@
 
 Covers how visual information channels work, how to compose a screen for maximum playability, why art direction beats rendering tech, and how to gather references and brief artists effectively. Read this when a scene looks technically fine but plays badly, when the background is eating the foreground, or when you need to brief an artist and don't know where to start.
 
-Synthesized from Jonathan Blow stream clips (youtube.com/@JBH-p5b); per-topic sources in docs/sources/jonathan-blow.md.
+*Synthesized from [Jonathan Blow stream clips](https://www.youtube.com/@JBH-p5b) — full per-topic sources in [docs/sources/jonathan-blow.md](../../docs/sources/jonathan-blow.md).*
 
 ---
 

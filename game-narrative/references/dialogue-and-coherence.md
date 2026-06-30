@@ -2,7 +2,7 @@
 
 Covers two interlocking craft concerns: how to write reactive dialogue lines that earn their place (the reactive-dialogue rule), and how incoherent or hand-wavy world details undermine audience investment (coherence as a buy-in mechanism). Read this when writing moment-to-moment dialogue that responds to recent events, when trimming dialogue that feels redundant or out-of-character, or when your world's details feel thin and players aren't investing in the fiction.
 
-Synthesized from Jonathan Blow stream clips (youtube.com/@JBH-p5b); per-topic sources in docs/sources/jonathan-blow.md.
+*Synthesized from [Jonathan Blow stream clips](https://www.youtube.com/@JBH-p5b) — full per-topic sources in [docs/sources/jonathan-blow.md](../../docs/sources/jonathan-blow.md).*
 
 ---
 

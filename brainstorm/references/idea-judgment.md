@@ -5,7 +5,7 @@ when something isn't working, auditing your assumptions, and distinguishing genu
 depth from novelty. Read this when stress-testing a design before converging, or
 when you suspect you're defending an idea rather than examining it.
 
-Synthesized from Jonathan Blow stream clips (youtube.com/@JBH-p5b); per-topic sources in docs/sources/jonathan-blow.md.
+*Synthesized from [Jonathan Blow stream clips](https://www.youtube.com/@JBH-p5b) — full per-topic sources in [docs/sources/jonathan-blow.md](../../docs/sources/jonathan-blow.md).*
 
 ---
 

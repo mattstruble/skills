@@ -49,6 +49,12 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 
 **Design Hook** — The unique, specific thing that makes a game different from everything else that already exists. Not a genre description, not production values, not design pillars — the one mechanic, constraint, or combination that produces a new type of decision or experience. A game without a clear hook cannot be explained in one sentence and cannot be differentiated from competitors. The test: "Why would someone buy this instead of what's already out there?" See `references/design-communication.md`.
 
+**Difficulty ≠ Quality** — Difficulty and quality are orthogonal axes. A higher skill ceiling is not automatically a better game. The designer's job is an operative theory of *good*, not an operative theory of *hard*. The exchange rate between what a game demands and what it returns is the relevant metric. See `references/craft-and-refinement.md`.
+
+**Idea Density** — The count of distinct ideas surfaced per N levels or encounters. A low idea density means the game is not mining its own mechanic's depth — the same lesson is being repeated rather than extended. A useful diagnostic when a game feels exhausted before its content runs out. See `references/craft-and-refinement.md`.
+
+**Contrivance Budget** — Every rule adds "weight" measured in the player's cognitive cost. A rule must return more than the weight it adds. The minimum discipline is noticing how much you're adding. Pace contrivance modularly so internalized rules stop feeling like contrivance and the budget resets. See `references/craft-and-refinement.md`.
+
 ### Building Your Systems
 
 **Cursed Problem** — From Alex Jaffe (GDC 2019). A design problem with no good solution, only least-bad tradeoffs. Arises when two core player promises are logically incompatible — not just hard to satisfy simultaneously, but structurally contradictory. Recognizing a cursed problem prevents wasting months searching for a solution that doesn't exist. The four responses: barriers (make the problematic behavior impossible), gates (make it difficult), carrots (change the objective), s'mores (lean into the behavior and make it the game). See `references/cursed-problems.md`.
@@ -97,6 +103,11 @@ Vocabulary and frameworks for reasoning about game design problems — what to b
 | "My game world feels arbitrary or inconsistent" | World Design, Consistency | Are you conforming to reality where you have no reason not to? Are you simulating the previous game instead of reasoning from first principles? Check `references/world-design.md` |
 | "Players aren't engaging with the moral choices in my game" | Mechanics-as-Meaning, Ludo-narrative Coherence | Do the mechanics support the moral weight, or does the optimal path undermine the intended choice? Check `references/design-principles.md` |
 | "My narrative creates urgency but players ignore it" or "Players rush the main quest and skip side content" | Urgency Mismatch, Ludo-narrative Coherence | Does your game have real consequences for delay, or is the urgency purely narrative? Check `references/narrative-integration.md` |
+| "The game opens well but players feel like they've seen everything by level 5" | Idea Density, Depth vs Complexity | Are you surfacing new ideas per level, or repeating the same lesson? Check `references/craft-and-refinement.md` |
+| "My game is hard but players say it doesn't feel worth it" | Difficulty ≠ Quality, Game Feel | Is the difficulty paid back with interesting situations? Is the exchange rate positive? Check `references/craft-and-refinement.md` |
+| "Players complain about controls but I can't reproduce the problem" | Input Feel, Game Feel | Are you playing differently than your players (discrete taps vs hold-and-time)? Check `references/craft-and-refinement.md` |
+| "I've been designing in a doc but the prototype doesn't match the vision" | Anti-GDD, Design Artifacts | Does the design live in the playable build? Check `references/craft-and-refinement.md` and `references/design-artifacts.md` for the counterpoint |
+| "Some parts of my game feel polished but others feel weak" | Marginal Parts, Production Value | Are you polishing the already-good parts? Concentrate effort on the marginal ones first. Check `references/craft-and-refinement.md` |
 
 ---
 
@@ -185,6 +196,7 @@ Run these questions when evaluating a design:
 | `references/design-communication.md` | Hook identification, moment-to-moment clarity, common pitch pitfalls, one-sentence game description, scope communication | Pitching a game concept, evaluating whether a design has a clear identity, diagnosing why a game is hard to explain |
 | `references/choice-architecture.md` | Decoy effect, option count thresholds (2/3/4/5/8), subitizing, player heuristics, analysis paralysis, compression techniques | Deciding how many options to present at a choice point, or diagnosing why choices feel overwhelming or unsatisfying |
 | `references/procedural-design.md` | PCG method catalog (tiles/grammars/distribution/parametric/interpretive/simulation), subtractive methods, oatmeal problem, ownership design, multiple axes of randomness | Considering procedural generation for any system; diagnosing why generated content feels shallow or repetitive |
+| `references/craft-and-refinement.md` | Openings/first-impression friction, difficulty vs quality (exchange rate), idea density, contrivance budget, marginal-parts heuristic, production value, input feel, silent playtesting, anti-GDD counterpoint, evaluation lenses | A game's opening isn't landing; a mechanic feels exhausted or shallow; difficulty is calibrated wrong; you need a process check on whether you're building the right thing |
 
 ---
 

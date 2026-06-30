@@ -221,7 +221,7 @@ them only when a measured problem demands them.
 
 | Situation | Preferred approach | Watch for |
 |---|---|---|
-| **Blocking I/O (DB, HTTP)** | Thread pool sized to core count, or explicit task-state + scheduler loop | Spinning a thread per task; coroutines as a language feature (Jonathan Blow argues they add infrastructure for syntactic sugar you don't need) |
+| **Blocking I/O (DB, HTTP)** | Thread pool sized to core count, or explicit task-state + scheduler loop | Spinning a thread per task; treating coroutines as a free abstraction (see reference for trade-offs) |
 | **Shared mutable state** | Minimal lock scope; assertable ownership; static lock-order priority | Code under a lock that acquires other locks; complex logic inside a critical section |
 | **Load spikes** | Model realistic concurrency; over-provision for launch; degrade gracefully | Assuming utilization headroom is linear — wait times blow up non-linearly as capacity is approached |
 | **Infrastructure choices** | Use the simplest stack the problem actually requires | Importing Docker/K8s/microservices because "that's how web services work" when the problem doesn't demand it |

@@ -1,13 +1,6 @@
 # Concurrency and Load
 
-Covers thread and task management, async trade-offs, mutex discipline,
-queueing theory, and infrastructure minimalism. Read this when your
-application is adding threads, async primitives, or distributed infrastructure
-and you want to reason carefully about the costs before committing.
-
-Synthesized from Jonathan Blow stream clips (youtube.com/@JBH-p5b); per-topic sources in docs/sources/jonathan-blow.md.
-
----
+Thread and task management, async trade-offs, mutex discipline, queueing theory, and infrastructure minimalism.
 
 ## Concurrency is not parallelism
 
@@ -126,8 +119,8 @@ Jonathan Blow frames this as a language-substrate argument: a source
 representation should not matter because the machine runs a backend
 representation. Piling adapters over a wrong abstraction (his example:
 JavaScript and the DOM) is the smell; the right fix is a language-agnostic
-substrate. Present this as his view — the general principle (fix the source)
-is uncontested.
+substrate. The general principle — fix the source — is uncontested; Blow's
+framing is specific to language substrates.
 
 ---
 

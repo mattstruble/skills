@@ -272,5 +272,17 @@ The vertex lands at approximately `(457, 270)` — right of center and slightly 
 ## Further Reading
 
 - Marian Pekar, *3D Software Renderer in Odin from Scratch* (14-part series): https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-i — a complete ground-up implementation covering every topic in this skill
-- [learnopengl.com](https://learnopengl.com) — Comprehensive OpenGL tutorial covering the same pipeline concepts with GLSL shader implementations
+- [learnopengl.com](https://learnopengl.com) — Comprehensive OpenGL tutorial covering the same pipeline concepts with GLSL shader implementations. *Counterpoint*: Jonathan Blow argues that funneling beginners straight to OpenGL is a mistake — it is long obsolete, recompiles shaders behind your back, and teaches wrong intuitions before you have the fundamentals to filter them.
 - [scratchapixel.com](https://www.scratchapixel.com) — Deep mathematical derivations of rasterization, projection, and shading from first principles
+
+---
+
+## Learning Path & Philosophy (Jonathan Blow's view)
+
+**Where to start.** Don't learn graphics on OpenGL (long obsolete; recompiles shaders behind your back; teaches wrong intuitions) or Vulkan (too low-level for fundamentals — you'll spend months on API ceremony before drawing a triangle). Start on a higher-level layer — raylib, SDL3, three.js — or by writing your own software renderer. The software renderer path is particularly effective: every concept in this skill becomes concrete and debuggable without a driver in the way.
+
+**What knowledge lasts.** The durable knowledge is the math and algorithms — linear algebra, transforms, clipping, sampling, dithering — not any specific API. APIs change; the math doesn't. Investing in the math pays off across every renderer you'll ever touch.
+
+**Math prerequisites.** The core requirement is linear algebra: matrices, eigenvectors, SVD. There is almost no calculus in game programming — a physics engine is the rare exception. "Working with vectors" is linear algebra, not vector calculus; don't let the name mislead you into thinking you need a calculus background first.
+
+**Rendering philosophy.** All real-time computer graphics is hacky approximations of a correct answer that is too expensive to compute. The craft is choosing the hack that fits *your* game. A hyper-specific hack that no one else would use — one tuned to your art style, your scene complexity, your target hardware — can pay off far better than a general-purpose solution. Don't be embarrassed by the hack; be precise about what it trades away.

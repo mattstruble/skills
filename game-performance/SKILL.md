@@ -16,6 +16,8 @@ Systematic methodology for diagnosing and fixing game performance problems. Prof
 - **Isolate variables.** Change one thing at a time, observe the metric, conclude. Changing three things simultaneously makes it impossible to know which one helped.
 - **Leave headroom.** Never target 100% utilization. Background OS tasks, worst-case game moments (explosions, many entities), and thermal variance all eat into margin. Target 60–75% utilization at your FPS goal on min-spec hardware.
 - **Utilization ≠ performance.** ~29% GPU at 1600MHz delivers the same FPS as 55% GPU at 830MHz — with roughly half the power draw. When the hardware has spare capacity, it downclocks to save power. Lower utilization at a lower clock is better than high utilization at a high clock.
+- **Flat profiles are the mature case.** Jonathan Blow observes that once obvious hotspots are eliminated, a mature profile is "flat" — many items each at ~0.3–1%, no single dominant win. If one change *does* give a huge speedup at that stage, you were probably previously negligent. Your options become "accept the profile" or "make an architectural change"; grinding down many small contributors is the expensive, incremental reality. The diagnostic decision tree below assumes a hotspot exists; this principle covers the flat case where it doesn't.
+- **Measure work per unit time, not raw throughput.** Don't compare raw rates (fps, draw calls/sec) across different workloads — compare work and features delivered per unit time. A rich scene running at 120fps and an empty room running at 2000fps are not comparable; the empty room number tells you nothing about your game's actual budget. Evaluate performance in the context of what is being rendered.
 
 ---
 

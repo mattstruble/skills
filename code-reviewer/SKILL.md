@@ -159,6 +159,16 @@ Flag code that is more complex than it needs to be to solve the current problem.
 
 **When YAGNI and Chesterton's Fence conflict:** If code looks over-engineered but its purpose is unclear, Chesterton's Fence wins — downgrade to a suggestion and note the apparent over-engineering alongside the uncertainty about purpose. YAGNI findings should only be raised as important/blocking when the speculative nature is evident from code or context (e.g., class named `FutureExtensionPoint`, comment saying "in case we need this later", interface with a single implementation and no extension point in sight).
 
+### Copy-Paste Defects
+
+A high-frequency bug class even among strong programmers: code copied from a nearby working block, edited incompletely, that still compiles — so it passes the compiler while doing something other than intended. The correctness reviewer in particular should scan for regions that look structurally similar to adjacent code and check that every variable name, index, field reference, or condition that differs between the original and the copy was actually updated. The one spot that wasn't changed is where the bug lives.
+
+### Review and Pairing Have Real Costs
+
+Jonathan Blow argues that mandatory review layers add latency and can hurt morale, and that pairing roughly halves nominal throughput. His alternative is trust-based gating: hire people you trust, and treat a pattern of bad commits as a hiring signal rather than a process problem. This is worth keeping in mind as a "Continuous Improvement, Not Perfection"–adjacent reminder: don't add heavy process to low-risk changes where the overhead clearly exceeds the benefit, particularly on small, high-trust teams.
+
+This principle is subordinate to the blocking-findings rules. It does not authorize skipping review on changes with real correctness, security, or reliability risk — it applies only to the question of how much process to layer on top of a change that is already clearly safe.
+
 ---
 
 ## Review Loop

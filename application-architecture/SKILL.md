@@ -205,6 +205,44 @@ pseudocode.
 
 ---
 
+## 6. Concurrency, Load & Infrastructure Realism
+
+**The question**: How should the application handle threads, async I/O, load
+spikes, and infrastructure choices?
+
+### YAGNI Gate
+
+Single-threaded, low-traffic service with no blocking I/O contention and no
+infrastructure complexity? -> Do nothing here. Concurrency primitives,
+async runtimes, and distributed infrastructure all carry real costs. Add
+them only when a measured problem demands them.
+
+### Decision Criteria
+
+| Situation | Preferred approach | Watch for |
+|---|---|---|
+| **Blocking I/O (DB, HTTP)** | Thread pool sized to core count, or explicit task-state + scheduler loop | Spinning a thread per task; coroutines as a language feature (Jonathan Blow argues they add infrastructure for syntactic sugar you don't need) |
+| **Shared mutable state** | Minimal lock scope; assertable ownership; static lock-order priority | Code under a lock that acquires other locks; complex logic inside a critical section |
+| **Load spikes** | Model realistic concurrency; over-provision for launch; degrade gracefully | Assuming utilization headroom is linear — wait times blow up non-linearly as capacity is approached |
+| **Infrastructure choices** | Use the simplest stack the problem actually requires | Importing Docker/K8s/microservices because "that's how web services work" when the problem doesn't demand it |
+| **Async non-determinism** | Keep async at the user level; prefer serial code or threads | Async baked into the architecture — its failure mode is wrong answers, not crashes |
+
+**Substrate note**: when a layer spawns endless workaround layers (framework
+churn, adapter chains), the defect is usually the layer beneath. Fix the
+source. This extends the Anti-Corruption Layer guidance in §4: an ACL is
+appropriate for external systems you don't control; for systems you do
+control, fix the source instead.
+
+**Events note**: for sequential actions, write serial code or use a thread.
+For reactive patterns, decide *exactly when* in the execution cycle the
+handler fires before reaching for an event system. This reinforces the
+Domain Events caution in §5.
+
+-> Read `references/concurrency-and-load.md` for thread/async trade-offs,
+mutex discipline, queueing theory, and infrastructure minimalism.
+
+---
+
 ## References
 
 | Reference | When to read |
@@ -214,3 +252,4 @@ pseudocode.
 | `references/domain-modeling.md` | Designing Value Objects, Entities, Aggregates, and Special Case objects. Aggregate boundary rules and common mistakes. |
 | `references/cross-boundary-communication.md` | DTOs, Remote Facade, and Anti-Corruption Layer. How data should cross service and process boundaries. |
 | `references/state-changes-side-effects.md` | Unit of Work, Domain Events, CQRS, and Event Sourcing. When to escalate from simple transactions to event-driven patterns. |
+| `references/concurrency-and-load.md` | Thread/async trade-offs, mutex discipline, queueing theory, and infrastructure minimalism. When concurrency primitives and distributed infrastructure are and aren't warranted. |

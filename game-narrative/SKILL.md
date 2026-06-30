@@ -45,6 +45,10 @@ Across all three patterns: *EarthBound* is exemplary hub-based A-B-A; *Outer Wil
 
 Neither pattern is inherently superior — context determines which serves pacing. A game that is entirely A-B-A feels like a hub-and-spoke job board. A game that is entirely A-B-C feels like being pushed through a tunnel.
 
+### Dialogue Craft
+
+**Reactive Dialogue Rule** — A line triggered by a recent event must reveal something new about the character, situation, or world — or it must be cut. Confirmation lines (restating what just happened) add no information and train players to skip dialogue. The test is not "does this line make sense?" but "does this line earn its place?" Draft for pacing first; review for character-truth and value second.
+
 ### NPC Agency
 
 **NPC Agency** — NPCs that pursue their own goals, hold their own opinions, and act independently of the player's wishes. An NPC with agency can refuse the player, lie to the player, or act in ways that complicate the player's goals — because the NPC has pressures and motivations the player doesn't fully control. Agency makes NPCs feel like people rather than quest dispensers.
@@ -59,6 +63,7 @@ Neither pattern is inherently superior — context determines which serves pacin
 
 | Problem | Concepts | What to Check |
 |---|---|---|
+| "My reactive dialogue feels redundant — characters just narrate what happened" | Reactive Dialogue Rule | Does each line reveal something new? Is it written from character headspace, not as a plot summary? |
 | "My quest pacing feels off — either too much backtracking or players feel railroaded" | A-B-A, A-B-C, A-B-C-A | Is the movement pattern serving the story's emotional arc? Is A-B-A travel interesting, or is it pure chore? Does A-B-C leave players feeling disconnected from earlier NPCs? |
 | "Players aren't engaging with my detective mechanic" | Deduction Loop, Deduction Space | Can players express what they know? Is the "prove it" step too narrow or too abstract? |
 | "My mystery feels like a checklist, not a revelation" | Two-Story Structure, Constructed Argument | Is there an investigation story alongside the crime story? Is the solve a construction or a combination lock? |
@@ -151,6 +156,7 @@ Run these questions when evaluating a narrative design:
 | `references/player-imagination.md` | Sam Barlow / *Her Story*: search-based narrative, sculptural story, writing from character out, balancing discovery | You're designing non-linear story discovery, search mechanics, or want to use player imagination as a narrative tool |
 | `references/deduction-mechanics.md` | Jon Ingold / *Overboard*: deduction loops, combination lock problems, constructed argument model, two-story structure | You're designing a detective game, deduction system, or mystery climax |
 | `references/npc-agency.md` | Meg Jayanth / *80 Days*: NPC agency, protagonist constraint, entitlement simulation, world-building through NPC perspective | You're writing NPCs, designing relationships, or want to move beyond the power fantasy |
+| `references/dialogue-and-coherence.md` | Jonathan Blow: reactive-dialogue rule (lines must reveal something new or be cut), two-pass drafting (pacing then character-truth), coherence as buy-in mechanism, incoherent details cap emotional ceiling | You're writing moment-to-moment reactive dialogue, trimming lines that feel redundant or out-of-character, or diagnosing why players aren't investing in your world's fiction |
 | `game-design/references/narrative-integration.md` | Ludo-narrative coherence theory, embedded vs emergent narrative, Player-Subject, DDE Three Journeys, interactive narrative structures, world-plot interface | You're diagnosing story-gameplay conflict, not designing narrative mechanics — "is my story fighting my gameplay?" |
 
 ---

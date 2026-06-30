@@ -11,6 +11,18 @@ Design APIs following [AEP](https://aep.dev/) (Google, Microsoft, Roblox, IBM). 
 
 ---
 
+## Designing around caller intent
+
+Design the API surface around what callers actually want, expressed in their vocabulary — not around how the implementation is structured internally. A networking API should expose `connect`, `read_message`, `write_message`, and `disconnect`. Exposing a "socket" instead leaks a Unix implementation concept that bundles unrelated concerns (files, network, device I/O) into a single abstraction callers never asked for. The right question is: what does the caller need to accomplish, and what are the fewest, most coherent calls that let them do it?
+
+**No footgun-by-omission.** Nothing should fail silently because the caller forgot to set an obscure flag or initialize an optional field. Mandatory low-level knobs are a design smell; sensible, safe behavior should be the default, with explicit opt-in for deviation.
+
+**Separate the escape hatch.** Provide raw or low-level bindings as a distinct layer for the rare callers who genuinely need them. The common-case API should not force everyone through low-level machinery. (See software-design's "layered interfaces" for the structural pattern.)
+
+**Difficulty is not a virtue.** Jonathan Blow argues — with OpenGL and Vulkan as examples — that keeping a hard API because you feel pride in having mastered it is not a design principle; it is a cost imposed on every future caller. Complexity is only justified when it is essential to the problem domain, which is rare.
+
+---
+
 ## Design Process
 
 For every API, answer these four questions in order:
@@ -88,6 +100,7 @@ These AEP rules are the ones most likely to be missed. Each exists for a specifi
 - [ ] `create_time`, `update_time`, `etag` on mutable resources
 - [ ] `path` field is output-only on every resource
 - [ ] Long-running operations (LROs) return `202 Accepted` with Operation resource
+- [ ] Does the surface expose caller intent, or leak an internal implementation concept?
 
 ---
 

@@ -16,6 +16,8 @@ Before writing any test, ask:
 - **If I refactored the internals tomorrow, would this test still pass?** If not, you're testing structure, not behavior.
 - **Does each assertion earn its keep?** Every assertion is a maintenance commitment. If it doesn't catch a meaningful regression, remove it.
 
+**Apply the same cost/benefit lens to the test suite itself.** Jonathan Blow argues that test infrastructure is maintenance debt in its own right: a faster or extra test mode isn't free -- it's one more thing to maintain for the life of the project. If a test runs rarely, its runtime usually isn't worth optimizing; you risk getting "drowned by one-more-things," each individually reasonable but collectively a burden. The skill's tradeoff mindset applies not just to individual assertions but to the suite as a whole: every piece of test infrastructure should justify its ongoing maintenance cost.
+
 ## The 12 Properties
 
 No single test can maximize all of them -- the art is choosing the right tradeoffs.
@@ -63,6 +65,8 @@ For most codebases, **integration tests return the most value per test written**
 Keep a small, curated suite covering the most common user flows and a handful of critical edge cases. Run them religiously -- a failing e2e test is a production risk. Don't let the suite grow large; each addition should be justified by a flow that can't be adequately covered at the integration level.
 
 **The practical bias:** When deciding where to add a new test, default to integration unless there's a clear reason to go lower (pure logic, speed requirements) or higher (critical user journey). This isn't a pyramid -- it's a judgment call, and integration is usually the right default.
+
+**Aim tests where failures actually concentrate.** Jonathan Blow argues that developers often assume two code paths "do the same thing" without validating that assumption -- and that validation is the real testing work. In his experience, crashes concentrate in the most complex subsystems (in his game, the graphics code), not in the simple gameplay logic. Tests that don't exercise the genuinely failure-prone areas aren't really testing the system. The transferable kernel: before adding a test, ask where bugs have actually appeared or are most likely to appear. Spend your test budget on the components with real complexity and real failure history, not on the parts that feel easy to test.
 
 ## Checklist
 

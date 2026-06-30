@@ -183,7 +183,7 @@ narrate the code. No single-use abstractions (type aliases, helper functions,
 wrapper classes) that exist only to "be clean" but add indirection without
 simplifying. Remove documentation that adds no information beyond what the
 signature and code already express; keep documentation that explains the "why,"
-not the "what."
+not the "what" — and document the alternatives you rejected.
 
 ```
 # Before: comment restates the code
@@ -250,6 +250,7 @@ When reviewing code or making design decisions:
 10. **Am I guessing at behavior, or did I confirm it?** (Ask at decision points)
 11. **Does every line carry information?** (Conciseness)
 12. **If I'm breaking a convention, did I say why?** (Comment when breaking a convention)
+13. **Do I actually understand what this does at runtime, or am I papering over it?** (Engineering Judgment)
 
 These are lenses, not laws. They sometimes conflict -- minimalism might suggest
 fewer types while thoroughness demands explicit error handling. Use judgment.
@@ -263,3 +264,4 @@ respectful of the humans who interact with it.
 | Reference | When to read |
 |---|---|
 | `references/patterns.md` | Full before/after catalog for specific refactoring patterns -- bloated config, deep inheritance, hidden side effects, immutability, declarative style, etc. Consult when you need a concrete model for a specific principle. |
+| `references/engineering-judgment.md` | Optimization judgment, understand-before-you-change, invariants, root-cause discipline, state calibration, and design-for-hard-cases. Consult when reasoning about runtime behavior, calibrating optimization effort, or applying principles with judgment. |

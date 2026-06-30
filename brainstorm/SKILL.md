@@ -94,6 +94,9 @@ Before wrapping up, actively challenge your own conclusions:
 - What alternative approaches didn't we explore?
 - Are there trade-offs we accepted implicitly?
 
+Be honest about your own ideas — call your own bluff, audit the beliefs you started
+with, and check that novelty isn't masquerading as depth. See `references/idea-judgment.md`.
+
 Present these to the user as a genuine attempt to find blind spots. They either
 dig deeper (extending the session) or confirm satisfaction (moving to summary).
 

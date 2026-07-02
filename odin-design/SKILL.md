@@ -351,3 +351,6 @@ All declarations use `name : type = value` or `name :: value` (constant).
   pattern, and non-capturing closures
 - `references/profiling.md` — Spall profiler, hot vs cold code, instrumentation
   attributes, optimization workflow
+- `references/sanitizer-integration.md` — Read when integrating ASan with
+  arena allocators, debugging stale-pointer bugs in reused memory, or adding
+  sanitizer hooks to ownership transitions

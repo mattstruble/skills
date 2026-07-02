@@ -165,14 +165,91 @@ painful.
 
 ---
 
+## Worked Example: Go Pipeline with Fault Isolation
+
+A Kafka→Postgres pipeline — four stages, buffered channels, worker pool. This
+example shows how the five decisions interact.
+
+**Topology**: work-stealing (Go's M:N scheduler). Correct for mixed I/O + CPU
+with variable task sizes. No topology change needed.
+
+**Fault boundary**: goroutines have no fault boundary by default — an
+unrecovered panic kills the process. Fix: `defer/recover` in every worker
+goroutine, supervised by a goroutine that restarts crashed workers.
+
+```go
+// Worker with trap boundary
+func runWorker(id int, in <-chan Event, out chan<- Result, faults chan<- int) {
+    defer func() {
+        if r := recover(); r != nil {
+            log.Printf("worker %d panic: %v\n%s", id, r, debug.Stack())
+            faults <- id  // signal supervisor to restart
+        }
+    }()
+    for event := range in {
+        out <- process(event)
+    }
+}
+
+// Supervisor: one-for-one restart with recovery budget
+// one-for-one because workers are independent — a crash in one doesn't
+// affect the others. Budget: 5 restarts in 30s; exceed → escalate.
+func supervise(ctx context.Context, count int, in <-chan Event, out chan<- Result) {
+    faults := make(chan int, count)
+    history := make([][]time.Time, count)
+    for i := range count { go runWorker(i, in, out, faults) }
+    for {
+        select {
+        case <-ctx.Done(): return
+        case id := <-faults:
+            if exceedsBudget(history, id, 5, 30*time.Second) {
+                cancelPipeline()  // escalate: budget exceeded
+                return
+            }
+            time.AfterFunc(backoff(history[id]), func() {
+                go runWorker(id, in, out, faults)
+            })
+        }
+    }
+}
+```
+
+**Communication**: CSP channels. Bounded (capacity 1000) — backpressure
+propagates upstream automatically: slow Postgres → aggregator blocks →
+workers block → Kafka consumer stops reading. This is correct; don't fight it.
+
+**Supervision strategy**: **one-for-one** — workers are independent. If the
+aggregator and writer shared invariants, use **one-for-all**.
+
+**Control vs data plane**: shutdown signal (`ctx.Done()`) travels on a
+separate path from data channels. Every stage has a `select` watching both.
+A congested data channel must not block a shutdown signal.
+
+```go
+// Each stage: ctx.Done() is a separate select arm, not in the data path
+for {
+    select {
+    case <-ctx.Done(): flush(); return   // control plane
+    case event := <-in: process(event)  // data plane
+    }
+}
+```
+
+**Graceful drain**: close channels in pipeline order. Consumer closes its
+output when done → workers drain → aggregator closes its output → writer
+drains. `sync.WaitGroup` lets main wait for complete drain.
+
+---
+
 ## Decision Checklist
 
 1. **Topology first**: thread-per-core, work-stealing, event loop, or thread pool?
 2. **Fault boundary**: what is the unit that crashes independently?
 3. **Communication**: message passing, channels, shared memory, or lock-free?
 4. **Supervision**: who restarts what, under what conditions?
+   - *One-for-one*: independent workers. *One-for-all*: shared invariants. *Rest-for-one*: ordered pipeline.
 5. **Message patterns**: fire-and-forget, request-reply (with timeout!), pub/sub, scatter-gather?
-6. **Control vs data plane**: are they separated?
+6. **Control vs data plane**: are they separated? Control signals must not be blocked by data congestion.
 7. **Backpressure**: does pressure propagate upstream, or does it accumulate?
 
 ---

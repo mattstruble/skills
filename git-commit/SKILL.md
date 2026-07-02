@@ -115,6 +115,7 @@ No other footers. Never add `Co-authored-by`.
 - `description`: lowercase, imperative mood ("add" not "added"), no trailing period
 - Under 72 characters total
 - Breaking changes: append `!` before colon
+- Describe the change, not what triggered it — never "address review findings", "code review fixes", "apply feedback", or "per suggestions"; state what was clarified, fixed, or added
 
 **Change types:**
 

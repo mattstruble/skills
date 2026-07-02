@@ -188,7 +188,7 @@ If the initial round produces no blocking findings, exit immediately — no fix 
 
 Reviewers run independently in their own context windows. They do not share context with each other. Each reviewer gathers additional context (codebase samples, dependency info, etc.) using its own tools.
 
-**Step 2 — Fix cycle:** Address blocking findings. Fix all blocking findings from a given reviewer, then **resume that reviewer via its `task_id`** to verify all fixes in that domain. Use the Verification Resume template — the resumed reviewer already has its prior findings in context, so only provide the updated diff source and verification directive. Once all targeted re-reviews pass, proceed to the final sweep.
+**Step 2 — Fix cycle:** Address blocking findings. Fix all blocking findings from a given reviewer, then **resume that reviewer via its `task_id`** to verify all fixes in that domain. Use the Verification Resume template — the resumed reviewer already has its prior findings in context, so only provide the updated diff source and verification directive. Once all targeted re-reviews pass, proceed to the final sweep. When committing fixes, describe what changed in the code — not the review process that triggered it (see git-commit skill).
 
 **Fallback:** If a resumed reviewer fails (error, malformed output, or session cannot be resumed), discard its `task_id` and fall back to a fresh spawn using the Fallback Re-Review template with the full finding context. Update the `task_id` mapping with the new session ID.
 

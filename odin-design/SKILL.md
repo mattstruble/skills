@@ -354,3 +354,7 @@ All declarations use `name : type = value` or `name :: value` (constant).
 - `references/sanitizer-integration.md` — Read when integrating ASan with
   arena allocators, debugging stale-pointer bugs in reused memory, or adding
   sanitizer hooks to ownership transitions
+- `references/concurrency.md` — Read when building concurrent Odin systems —
+  state machines with tagged unions, cooperative scheduling via Effects,
+  per-shard context setup, trap boundaries with sigsetjmp/siglongjmp, or
+  lock-free primitives via core:sync

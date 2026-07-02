@@ -90,6 +90,7 @@ actor processes one message, transitions to the next state, and returns. The
 scheduler calls back when the next event arrives.
 
 ```
+// Odin-style pseudocode — adapt to your language
 // Conceptual state machine for a request handler
 State :: enum {
     Waiting_For_Request,
@@ -197,6 +198,7 @@ A TCP connection handler that reads a request, processes it, and sends a
 response. Implemented as a state machine actor.
 
 ```
+// Odin-style pseudocode — adapt to your language
 Connection_State :: enum {
     Reading_Header,
     Reading_Body,

@@ -50,6 +50,14 @@ worked examples.
 Once you've chosen a topology, decide what the *unit* of concurrent execution
 is. This is also your fault boundary — what crashes independently.
 
+| Unit | Fault boundary | Scheduling | When to choose |
+|---|---|---|---|
+| **Actors / isolates** | Per-actor — crash doesn't corrupt neighbors | Cooperative mailbox; sequential per actor | Long-lived stateful entities, maximum fault isolation |
+| **OS threads** | Process — a thread crash (SIGSEGV) kills the process unless trapped | Preemptive, OS-managed | Legacy systems, FFI-heavy code, blocking I/O you can't avoid |
+| **Green threads / goroutines** | Runtime-dependent — Go panics kill the program unless recovered | M:N, cooperative or preemptive (Go 1.14+) | High concurrency with cheap creation; accept weaker fault isolation |
+| **Coroutines** | Caller — no isolation | Cooperative, explicit yield points | I/O-bound code in an existing async ecosystem |
+| **State machine encoding** | Per-struct — explicit state, no hidden frames | Driven by event loop or scheduler | Coroutine-like behavior without colored functions or runtime complexity |
+
 **Actors / isolates**: independent units with private state, communicating
 only via messages. Process messages sequentially from a mailbox. No shared
 memory. A crash in one actor doesn't corrupt another's state. Erlang
@@ -252,13 +260,4 @@ drains. `sync.WaitGroup` lets main wait for complete drain.
 6. **Control vs data plane**: are they separated? Control signals must not be blocked by data congestion.
 7. **Backpressure**: does pressure propagate upstream, or does it accumulate?
 
----
 
-## References
-
-| Reference | When to read |
-|---|---|
-| `references/topology.md` | Choosing between thread-per-core, work-stealing, event loop, and thread pool. Decision matrix with trade-offs and real-world examples (Seastar, Go, Tokio, nginx). |
-| `references/actors-and-state-machines.md` | Designing the unit of concurrency. Actor/isolate model, state machine encoding as an alternative to coroutines, shared-nothing constraint, comparison with CSP and async/await. |
-| `references/lock-free-structures.md` | High-throughput communication on hot paths. SPSC ring buffers (Rigtorp, Snellman optimizations), MPMC patterns (LMAX Disruptor, Vyukov), cache-line alignment, memory ordering. |
-| `references/fault-isolation.md` | Designing for failure. Trap boundaries, supervision trees (Erlang/OTP), recovery budgets, "let it crash" prerequisites, simulation testability. |

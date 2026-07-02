@@ -6,14 +6,14 @@ bottleneck. Covers SPSC ring buffers (with Rigtorp and Snellman optimizations),
 MPMC patterns (LMAX Disruptor, Vyukov), cache-line alignment, memory ordering,
 and when to use each structure.
 
+---
+
+## When to Use Lock-Free vs Alternatives
+
 **Warning**: lock-free structures are harder to implement correctly than
 locks. Use well-tested implementations. The value here is understanding the
 design so you can evaluate implementations and apply them correctly — not so
 you can write your own from scratch.
-
----
-
-## When to Use Lock-Free vs Alternatives
 
 Lock-free structures are not the default. Apply this decision tree first:
 

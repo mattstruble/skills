@@ -68,38 +68,6 @@ Keep a small, curated suite covering the most common user flows and a handful of
 
 **Aim tests where failures actually concentrate.** Jonathan Blow argues that developers often assume two code paths "do the same thing" without validating that assumption -- and that validation is the real testing work. In his experience, crashes concentrate in the most complex subsystems (in his game, the graphics code), not in the simple gameplay logic. Tests that don't exercise the genuinely failure-prone areas aren't really testing the system. The transferable kernel: before adding a test, ask where bugs have actually appeared or are most likely to appear. Spend your test budget on the components with real complexity and real failure history, not on the parts that feel easy to test.
 
-## Checklist
-
-When writing or reviewing a test:
-
-1. **Clear reason to exist?** It protects against a specific regression. If you can't say what bug it would catch, it probably shouldn't exist.
-2. **Named for the behavior it verifies?** `test_expired_subscription_blocks_access` tells you what broke without opening the file.
-3. **Minimum setup needed?** Only create objects that affect the behavior under test. Use factory functions with sensible defaults.
-4. **Assertions focused on observable behavior?** Assert on return values, visible side effects, and meaningful state changes. Not internal method calls or private state.
-5. **Would survive a refactor?** Extracting a helper or renaming an internal method shouldn't break it.
-6. **Each assertion earning its keep?** 15 assertions usually means testing too many things at once.
-7. **Useful failure message?** When it fails, will the developer know what went wrong?
-
-## Anti-Patterns and Patterns
-
-Read `references/anti-patterns.md` for detailed examples. The key anti-patterns to watch for:
-
-- **Echo-back assertions**: Asserting the function returns the same values you passed in. Test derived/consequential state instead.
-- **Over-mocking**: Mocking every collaborator and verifying calls makes tests mirror the implementation. Mocks should be rare -- approaching never for stateful collaborators. When you do mock, do it only at coarse-grain system boundaries: external HTTP services, payment processors, third-party APIs. Use fakes with in-memory state for everything else; verify outcomes, not interactions.
-- **Testing private methods**: Test through the public API. If a private method needs direct testing, it should be its own unit.
-- **Excessive setup**: 30 lines of construction for 2 lines of testing. Use factory functions with sensible defaults.
-- **Snapshot overuse**: Snapshots break on any change, including cosmetic ones. Assert on specific properties you care about.
-- **Flaky tests**: Fix the nondeterminism source (real clock, shared state, uncontrolled concurrency) rather than adding retries.
-- **Redundant tests**: Five tests with the same setup checking one field each. Compose tests to cover different behavioral dimensions.
-
-The key patterns to follow:
-
-- **Factory functions over raw constructors**: Helpers that build test objects with sensible defaults, so tests only specify what matters for their scenario.
-- **One behavioral concern per test**: Not one assertion, but one *concern*. "inventory decreases and email is sent" is two concerns -- split them.
-- **Arrange-Act-Assert**: Three clear phases with blank lines between them.
-- **Boundary behavior**: Happy paths are the least likely to catch bugs. Focus on edge cases, error conditions, and boundary values.
-- **Fakes over mock-call verification**: Verify outcomes (data persisted, state changed) rather than interactions (method called with args). At the integration level, use real or local equivalents. At the unit level, use fakes with in-memory state for stateful collaborators. Reserve mocks for true external boundaries (third-party APIs, payment processors) where a real or fake equivalent isn't practical.
-
 ## Deterministic Simulation Testing (DST)
 
 DST is a methodology for testing concurrent, distributed, or fault-tolerant systems where traditional mocking of concurrency is fragile or impossible. The system runs inside a simulation engine that controls every source of nondeterminism — scheduling, I/O, timing, faults — seeded by a single integer. If a bug occurs, replaying the same seed reproduces the exact failure. No flaky tests, no "works on my machine."
@@ -156,6 +124,38 @@ Tests define **invariants** that must hold after every scheduling step, not just
 ### Architectural prerequisite
 
 DST only works if the system is designed for it: deterministic scheduling, an abstracted I/O layer, and injectable faults. This section covers how to write and run simulation tests. For how to design a system that enables DST — fault isolation, topology, I/O abstraction boundaries — see the `concurrency-design` skill.
+
+## Checklist
+
+When writing or reviewing a test:
+
+1. **Clear reason to exist?** It protects against a specific regression. If you can't say what bug it would catch, it probably shouldn't exist.
+2. **Named for the behavior it verifies?** `test_expired_subscription_blocks_access` tells you what broke without opening the file.
+3. **Minimum setup needed?** Only create objects that affect the behavior under test. Use factory functions with sensible defaults.
+4. **Assertions focused on observable behavior?** Assert on return values, visible side effects, and meaningful state changes. Not internal method calls or private state.
+5. **Would survive a refactor?** Extracting a helper or renaming an internal method shouldn't break it.
+6. **Each assertion earning its keep?** 15 assertions usually means testing too many things at once.
+7. **Useful failure message?** When it fails, will the developer know what went wrong?
+
+## Anti-Patterns and Patterns
+
+Read `references/anti-patterns.md` for detailed examples. The key anti-patterns to watch for:
+
+- **Echo-back assertions**: Asserting the function returns the same values you passed in. Test derived/consequential state instead.
+- **Over-mocking**: Mocking every collaborator and verifying calls makes tests mirror the implementation. Mocks should be rare -- approaching never for stateful collaborators. When you do mock, do it only at coarse-grain system boundaries: external HTTP services, payment processors, third-party APIs. Use fakes with in-memory state for everything else; verify outcomes, not interactions.
+- **Testing private methods**: Test through the public API. If a private method needs direct testing, it should be its own unit.
+- **Excessive setup**: 30 lines of construction for 2 lines of testing. Use factory functions with sensible defaults.
+- **Snapshot overuse**: Snapshots break on any change, including cosmetic ones. Assert on specific properties you care about.
+- **Flaky tests**: Fix the nondeterminism source (real clock, shared state, uncontrolled concurrency) rather than adding retries.
+- **Redundant tests**: Five tests with the same setup checking one field each. Compose tests to cover different behavioral dimensions.
+
+The key patterns to follow:
+
+- **Factory functions over raw constructors**: Helpers that build test objects with sensible defaults, so tests only specify what matters for their scenario.
+- **One behavioral concern per test**: Not one assertion, but one *concern*. "inventory decreases and email is sent" is two concerns -- split them.
+- **Arrange-Act-Assert**: Three clear phases with blank lines between them.
+- **Boundary behavior**: Happy paths are the least likely to catch bugs. Focus on edge cases, error conditions, and boundary values.
+- **Fakes over mock-call verification**: Verify outcomes (data persisted, state changed) rather than interactions (method called with args). At the integration level, use real or local equivalents. At the unit level, use fakes with in-memory state for stateful collaborators. Reserve mocks for true external boundaries (third-party APIs, payment processors) where a real or fake equivalent isn't practical.
 
 ## References
 

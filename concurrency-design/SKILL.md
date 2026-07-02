@@ -1,6 +1,6 @@
 ---
 name: concurrency-design
-description: You MUST consult this skill when designing concurrent systems, choosing between concurrency models, or reviewing inter-component communication architecture. Also trigger when selecting thread topology (thread-per-core vs work-stealing vs event loop), designing fault isolation boundaries, scaling a system to multiple cores, or evaluating message-passing vs shared-memory tradeoffs. NOT for language-specific async runtimes (tokio internals, asyncio event loop), compute parallelism (SIMD, GPU kernels, fork-join data parallelism), distributed consensus (Raft, Paxos), or debugging specific race conditions in existing code.
+description: You MUST consult this skill when choosing a concurrency architecture: thread topology (thread-per-core, work-stealing, event loop), unit of concurrency (actors, goroutines, state machines), or inter-component communication model (message passing, channels, shared memory). Also trigger when designing fault isolation boundaries, supervision trees, or backpressure propagation; when scaling a single-threaded design to multi-core; or when choosing between actor vs CSP channel models. NOT for lock primitive implementation, network protocol state machines, database connection pooling, language-specific async runtime config (tokio, asyncio), compute parallelism (SIMD, GPU), or distributed consensus (Raft, Paxos).
 ---
 
 # Concurrency Design

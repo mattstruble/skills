@@ -1,0 +1,102 @@
+[
+  {
+    "query": "I'm building a game server that handles 10k concurrent connections. Should I use an actor model or Go channels for isolating per-player state? Worried about one player's crash affecting others.",
+    "should_trigger": true,
+    "reasoning": "Explicitly asks about actor vs channel model selection and fault isolation — core concurrency design decisions"
+  },
+  {
+    "query": "We're migrating a single-threaded Rust service to use all CPU cores. Trying to decide between thread-per-core (Seastar-style) and a Tokio work-stealing pool. What are the tradeoffs?",
+    "should_trigger": true,
+    "reasoning": "Directly asks about thread topology selection (thread-per-core vs work-stealing) for scaling to multi-core"
+  },
+  {
+    "query": "Designing a message-passing topology for a pipeline: Kafka consumer → enrichment workers → Postgres writer. How should I structure the channels and what happens when the writer falls behind?",
+    "should_trigger": true,
+    "reasoning": "Message-passing topology design with backpressure concern — exactly what this skill covers"
+  },
+  {
+    "query": "I want to review the fault isolation boundaries in our microservice. Right now a crash in the auth component takes down the whole request handler. How do I design independent crash domains?",
+    "should_trigger": true,
+    "reasoning": "Fault isolation boundary design is a named trigger in the description"
+  },
+  {
+    "query": "Should my connection handler be a state machine or use async/await? I'm worried about the colored function problem spreading through the codebase.",
+    "should_trigger": true,
+    "reasoning": "State machine vs coroutine architecture decision — covered explicitly in the skill's unit-of-concurrency section"
+  },
+  {
+    "query": "We have a CPU-bound image processing service. Tasks vary wildly in size — some take 1ms, some take 500ms. Which thread model handles load balancing best without manual work distribution?",
+    "should_trigger": true,
+    "reasoning": "Implicit thread topology question (work-stealing fits variable task sizes) without using concurrency vocabulary directly"
+  },
+  {
+    "query": "How do I separate the control plane from the data plane in a streaming pipeline? I need shutdown signals to get through even when the data channel is saturated.",
+    "should_trigger": true,
+    "reasoning": "Control vs data plane separation is a named pattern in the skill"
+  },
+  {
+    "query": "I'm designing a supervisor tree for a set of independent workers. If one worker crashes, should the others keep running or restart together? How do I set a restart budget?",
+    "should_trigger": true,
+    "reasoning": "Supervision strategy selection (one-for-one vs one-for-all) and recovery budgets — core fault isolation content"
+  },
+  {
+    "query": "We're building a trading system where producers and consumers run at different rates. How do I propagate backpressure from a slow consumer back to the producer without unbounded queues?",
+    "should_trigger": true,
+    "reasoning": "Backpressure design via bounded channels/mailboxes — explicitly covered in the communication section"
+  },
+  {
+    "query": "Our service processes events from multiple sources. I need to fan out each event to 5 downstream processors and collect all their responses before replying. What's the right pattern?",
+    "should_trigger": true,
+    "reasoning": "Scatter-gather message pattern — covered in the message patterns section; implicit need without concurrency vocabulary"
+  },
+  {
+    "query": "My Tokio application has high tail latency. How do I tune the worker thread count and the I/O driver polling interval to reduce p99?",
+    "should_trigger": false,
+    "reasoning": "Tokio runtime configuration and performance tuning — explicitly excluded as 'language-specific async runtimes (tokio internals)'"
+  },
+  {
+    "query": "I need to implement Raft consensus for a distributed key-value store. How do I handle leader election and log replication across nodes?",
+    "should_trigger": false,
+    "reasoning": "Distributed consensus (Raft) — explicitly excluded in the description"
+  },
+  {
+    "query": "We have a hot path that's bottlenecked on a mutex. I ran perf and see 40% of time in lock contention. How do I profile which specific critical section is the problem?",
+    "should_trigger": false,
+    "reasoning": "Performance profiling of an existing race/contention issue — excluded as 'debugging specific race conditions in existing code'"
+  },
+  {
+    "query": "I want to vectorize my matrix multiply using AVX-512 SIMD intrinsics. How do I structure the loop to maximize throughput on a single core?",
+    "should_trigger": false,
+    "reasoning": "SIMD compute parallelism — explicitly excluded as 'compute parallelism (SIMD, GPU kernels)'"
+  },
+  {
+    "query": "How do I configure a PostgreSQL connection pool size for a web service with 200 concurrent requests? Should I use pgBouncer or the driver's built-in pooling?",
+    "should_trigger": false,
+    "reasoning": "Database connection pooling — infrastructure/config concern, not concurrency architecture design"
+  },
+  {
+    "query": "I'm getting a data race in my Go code between two goroutines accessing a shared map. The race detector shows the exact line. How do I fix it?",
+    "should_trigger": false,
+    "reasoning": "Debugging a specific race condition in existing code — explicitly excluded"
+  },
+  {
+    "query": "How do I implement a spinlock in C++ with the right memory ordering semantics? I need acquire/release on the lock and unlock operations.",
+    "should_trigger": false,
+    "reasoning": "Lock implementation internals — low-level primitive implementation, not architectural design"
+  },
+  {
+    "query": "I want to run my test suite in parallel across 8 GitHub Actions runners. How do I split the test matrix and cache dependencies between runs?",
+    "should_trigger": false,
+    "reasoning": "CI/CD pipeline parallelism — build infrastructure, not concurrent system design"
+  },
+  {
+    "query": "How do Python asyncio coroutines work under the hood? I want to understand the event loop's selector and how await suspends execution.",
+    "should_trigger": false,
+    "reasoning": "Language-specific coroutine internals (asyncio) — excluded as 'language-specific async runtimes'"
+  },
+  {
+    "query": "I'm implementing the TCP three-way handshake state machine in a custom network stack. How should I handle the SYN_RECEIVED → ESTABLISHED transition and timeout retries?",
+    "should_trigger": false,
+    "reasoning": "Network protocol state machine implementation — protocol engineering, not concurrency architecture; the state machine here is a protocol FSM, not a concurrency unit-of-execution pattern"
+  }
+]

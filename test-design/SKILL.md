@@ -100,9 +100,67 @@ The key patterns to follow:
 - **Boundary behavior**: Happy paths are the least likely to catch bugs. Focus on edge cases, error conditions, and boundary values.
 - **Fakes over mock-call verification**: Verify outcomes (data persisted, state changed) rather than interactions (method called with args). At the integration level, use real or local equivalents. At the unit level, use fakes with in-memory state for stateful collaborators. Reserve mocks for true external boundaries (third-party APIs, payment processors) where a real or fake equivalent isn't practical.
 
+## Deterministic Simulation Testing (DST)
+
+DST is a methodology for testing concurrent, distributed, or fault-tolerant systems where traditional mocking of concurrency is fragile or impossible. The system runs inside a simulation engine that controls every source of nondeterminism — scheduling, I/O, timing, faults — seeded by a single integer. If a bug occurs, replaying the same seed reproduces the exact failure. No flaky tests, no "works on my machine."
+
+### When to use DST
+
+**Good fit:**
+- Concurrent systems with complex scheduling (actors, state machines, cooperative schedulers)
+- Systems with recovery/supervision logic (crash → restart paths)
+- Networked systems where you need to test partial failures, dropped messages, or message reordering
+- Any system where the interesting bugs only surface under specific interleavings
+
+**Poor fit:** Sequential logic, pure functions, systems with no meaningful failure modes. For those, unit and integration tests are cheaper and sufficient.
+
+### How it works
+
+The system under test runs in simulation mode on a single thread. The simulation engine controls:
+- Which actor or coroutine runs next (scheduling)
+- When timeouts and timers fire
+- Whether I/O operations succeed, fail, or are delayed
+- Message ordering and delivery (drop, reorder, duplicate)
+
+Tests define **invariants** that must hold after every scheduling step, not just at the end. The engine explores many interleavings per run by varying the seed.
+
+### Writing effective simulation tests
+
+**Define structural invariants, not just outcome assertions:**
+```
+# Instead of: assert final_state == expected
+# Write: after every step, no two actors hold the same lock
+#        message count_in + count_out == count_produced
+```
+
+**Check invariants at recovery boundaries:** After a crash-and-restart, verify the system reaches a consistent state before continuing. Don't only check the happy path end state.
+
+**Use random seeds + many iterations over hand-crafted scenarios:** A single seed that exercises one interleaving is weaker than 10,000 random seeds that collectively explore the space. Hand-crafted scenarios miss the interleavings you didn't think of.
+
+**Inject faults deliberately:** Crash actors mid-operation, drop messages, inject network partitions, delay responses. The recovery path is where bugs hide.
+
+**Seed management:** On failure, print the seed. Plug it back in to reproduce the exact failure deterministically:
+```
+# Run: seed=42 → FAIL: invariant violated at step 1337
+# Reproduce: seed=42 → same failure, every time
+```
+
+**Track fault coverage:** Know which fault patterns (crash-before-commit, message-drop-during-handshake, etc.) have been exercised. Gaps in fault coverage are gaps in confidence.
+
+### Production examples
+
+- **TigerBeetle VOPR**: Continuous simulation testing of a distributed database. Runs millions of simulated operations per night, catching bugs that would take months to surface in production. The entire storage engine is designed to run inside the simulator.
+- **Tina**: Deterministic scheduling + injectable I/O + seed replay for testing actor recovery. Demonstrates DST applied to a smaller-scale actor system.
+- **FoundationDB**: Pioneered simulation testing at scale for distributed systems; the approach is credited with FoundationDB's reliability.
+
+### Architectural prerequisite
+
+DST only works if the system is designed for it: deterministic scheduling, an abstracted I/O layer, and injectable faults. This section covers how to write and run simulation tests. For how to design a system that enables DST — fault isolation, topology, I/O abstraction boundaries — see the `concurrency-design` skill.
+
 ## References
 
 | Reference | When to read it |
 |-----------|----------------|
 | `references/anti-patterns.md` | Detailed before/after examples of anti-patterns and patterns |
 | `references/test-levels.md` | Deeper guidance on tradeoffs by test level (unit, integration, e2e) |
+| `concurrency-design` skill | Architectural prerequisites for DST: deterministic scheduling, I/O abstraction, fault isolation |

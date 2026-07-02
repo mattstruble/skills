@@ -232,6 +232,47 @@ user = get_user(user_id)
 cache.set(user_id, user)
 ```
 
+### Bounded Resources as API Honesty
+
+An unbounded queue is a lie. It promises infinite capacity and delivers
+catastrophic failure — silently, minutes later, far from the code that caused
+it. A bounded resource with an explicit rejection is honest: *"I am full.
+Decide what to do."*
+
+**Result types force capacity handling at the right moment.** When `send()`
+returns `.mailbox_full` or `.pool_exhausted`, the caller must handle it at the
+instant the system reaches capacity — not via a downstream timeout two minutes
+later. This is the same principle as `or_return` for errors: make the failure
+path visible and force a decision.
+
+```
+# Unbounded: caller never knows the queue is 50,000 items deep
+queue.push(task)
+
+# Bounded: caller handles capacity at the call site
+match worker_pool.submit(task):
+    case .ok:         proceed()
+    case .pool_full:  shed_load(task)  # explicit, immediate, recoverable
+```
+
+**Predictability beats brevity.** Forcing callers to handle a capacity result
+on every operation is more verbose than dumping into an unbounded channel.
+Accept this trade-off. The system degrades gracefully, sheds excess load
+instantly, and recovers the moment pressure normalizes — instead of spending
+the next 20 minutes processing dead requests that were queued during the spike.
+
+**Drop explicitly, not implicitly.** When hardware limits are exceeded, the
+only engineering choice is *where* and *how* you drop work. Implicit dropping
+(OOM crash, process kill) loses everything. Explicit dropping (immediate
+rejection, load shedding at the entry point) preserves everything else and
+gives the caller a chance to respond — log it, retry later, return a 503,
+or route to a fallback.
+
+> For the structural mechanisms that implement this principle — bounded
+> mailboxes, ring buffers, back-pressure propagation, supervision trees — see
+> `concurrency-design`. This section covers the design principle; that skill
+> covers the architecture.
+
 ---
 
 ## Decision Checklist
@@ -251,6 +292,7 @@ When reviewing code or making design decisions:
 11. **Does every line carry information?** (Conciseness)
 12. **If I'm breaking a convention, did I say why?** (Comment when breaking a convention)
 13. **Do I actually understand what this does at runtime, or am I papering over it?** (Engineering Judgment)
+14. **Are my queues and pools bounded? Does the caller see rejection explicitly?** (Bounded Resources as API Honesty)
 
 These are lenses, not laws. They sometimes conflict -- minimalism might suggest
 fewer types while thoroughness demands explicit error handling. Use judgment.

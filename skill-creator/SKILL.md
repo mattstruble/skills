@@ -157,6 +157,25 @@ Try to explain to the model why things are important in lieu of heavy-handed mus
 
 For skills that need to enforce discipline or stay lean under pressure, see the hardening patterns below.
 
+### The Invisibility Test
+
+A good skill is invisible. The agent produces better output without feeling
+constrained — it doesn't spend tokens satisfying the skill's own ceremony. If
+a skill adds ritualistic steps, verbose templates, or process-for-the-sake-of-
+process, it's a tool that's become visible in the wrong way: the agent is
+solving the skill's puzzle instead of the user's problem.
+
+The honest test: did the skill produce better output in the same or fewer
+tokens? A skill that adds 30% more tokens for 5% better output is the
+equivalent of a vim macro that took longer than selecting and typing. When
+reviewing a skill draft, read the test run transcripts and ask: is the agent
+doing work that serves the user, or work that serves the skill's structure?
+
+Be opinionated. A skill that presents neutral choices ("you could do X or Y
+or Z") is the designer declining to make a decision. Lead with a
+recommendation — the agent adopts it by default, and the user overrides only
+when they disagree. Configurability without opinion is burden-shifting.
+
 ### Skill Hardening Patterns
 
 A few patterns that come up when writing skills that need to be effective and robust in practice.

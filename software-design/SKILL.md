@@ -59,7 +59,11 @@ the first two cases but fight the third.
 **Layered interfaces**: Design for the 80% use case first; make the 20%
 possible without making the 80% harder. A simple API for simple cases, with
 the full API available when needed. Don't force every caller to supply
-parameters they don't care about just because one caller does.
+parameters they don't care about just because one caller does. "Highly
+configurable" is often the designer declining to make a decision — shipping
+the burden to every caller instead of doing the thinking once. Good defaults
+are respect for the caller's time; escape hatches are for the genuine minority
+who need something unusual.
 
 ```
 # Before: every caller must handle the full complexity
@@ -306,4 +310,4 @@ respectful of the humans who interact with it.
 | Reference | When to read |
 |---|---|
 | `references/patterns.md` | Full before/after catalog for specific refactoring patterns -- bloated config, deep inheritance, hidden side effects, immutability, declarative style, etc. Consult when you need a concrete model for a specific principle. |
-| `references/engineering-judgment.md` | Optimization judgment, understand-before-you-change, invariants, root-cause discipline, state calibration, and design-for-hard-cases. Consult when reasoning about runtime behavior, calibrating optimization effort, or applying principles with judgment. |
+| `references/engineering-judgment.md` | Optimization judgment, understand-before-you-change, invariants, root-cause discipline, state calibration, activity-vs-output, and design-for-hard-cases. Consult when reasoning about runtime behavior, calibrating optimization effort, or applying principles with judgment. |

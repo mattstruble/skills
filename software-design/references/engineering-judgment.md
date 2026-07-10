@@ -62,6 +62,24 @@ notice. Schedule deliberate stops to re-harden instead of only piling on.
 
 ---
 
+## Activity vs Output
+
+There is a gap between feeling productive and being productive. Building a
+clever abstraction, solving a fiddly configuration puzzle, or crafting an
+elegant type hierarchy can feel like achievement — intellectual engagement
+registers as output. The honest test is wall-clock time to a correct result
+and the mistake rate getting there. A lot of code that feels powerful to write
+would lose that test against the boring approach.
+
+This is the individual-level version of "Complexity Overshoots Its Optimum":
+the team adds features past the value peak, and the individual writes code
+past the usefulness peak — both while believing they're creating value. The
+signal is the same: if you felt clever, audit whether the cleverness was
+necessary. The best code doesn't reward you with a sense of accomplishment —
+it's forgettable, because it just works.
+
+---
+
 ## Optimization Judgment
 
 Measure work-per-unit-time, not raw throughput. Frames per second mean nothing

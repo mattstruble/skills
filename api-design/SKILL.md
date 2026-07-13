@@ -101,6 +101,7 @@ These AEP rules are the ones most likely to be missed. Each exists for a specifi
 - [ ] `path` field is output-only on every resource
 - [ ] Long-running operations (LROs) return `202 Accepted` with Operation resource
 - [ ] Does the surface expose caller intent, or leak an internal implementation concept?
+- [ ] When the API accepts raw input, does conversion raise on invalid data rather than silently accepting it? (parse, don't validate — see `software-design/references/type-driven-design.md`)
 
 ---
 

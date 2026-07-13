@@ -147,6 +147,36 @@ Code should communicate its purpose and not promise more than it delivers.
   implementations. Wrap external dependencies so you can swap them. Write for
   the reader who comes after you.
 
+### Parse, Don't Validate
+
+Validation checks a condition and discards the result. Parsing checks a
+condition and *returns a refined type* that carries the proof forward. The
+difference is information preservation: a validator answers "is this valid?"
+and throws the knowledge away; a parser answers "is this valid?" and hands
+back a value that *cannot be invalid*.
+
+Alexis King argues: prefer functions that return a refined type over
+functions that return `None` or `bool`. Downstream code that receives a
+refined type needs no re-checks; downstream code that receives a raw type
+must re-validate at every use site.
+
+**Before** (validates, discards proof — downstream must re-check):
+```
+validate_non_empty(items: list) -> None   # raises on empty; caller still holds list
+```
+
+**After** (parses, returns refined type — downstream has a guarantee):
+```
+parse_non_empty(items: list) -> NonEmpty   # raises on empty; caller holds NonEmpty
+```
+
+Make illegal states unrepresentable: pick data structures that rule out bad
+states by construction. Parse at the boundary; once parsed, downstream code
+never re-checks. In Python, enforcement is runtime via smart constructors —
+see `python-design` for mechanics. See `references/type-driven-design.md`
+for depth and `references/engineering-judgment.md` "Validate Fully at Load"
+for the related frontier-of-uncertainty principle.
+
 **Locality of Behavior**: The behavior of a code unit should be obvious by
 looking only at that unit. When you have to chase through five files to
 understand what a single function does, the behavior has been spread too thin.
@@ -297,6 +327,7 @@ When reviewing code or making design decisions:
 12. **If I'm breaking a convention, did I say why?** (Comment when breaking a convention)
 13. **Do I actually understand what this does at runtime, or am I papering over it?** (Engineering Judgment)
 14. **Are my queues and pools bounded? Does the caller see rejection explicitly?** (Bounded Resources as API Honesty)
+15. **Does this function return a refined type, or does it validate and discard the proof?** (Parse, Don't Validate)
 
 These are lenses, not laws. They sometimes conflict -- minimalism might suggest
 fewer types while thoroughness demands explicit error handling. Use judgment.
@@ -311,3 +342,4 @@ respectful of the humans who interact with it.
 |---|---|
 | `references/patterns.md` | Full before/after catalog for specific refactoring patterns -- bloated config, deep inheritance, hidden side effects, immutability, declarative style, etc. Consult when you need a concrete model for a specific principle. |
 | `references/engineering-judgment.md` | Optimization judgment, understand-before-you-change, invariants, root-cause discipline, state calibration, activity-vs-output, and design-for-hard-cases. Consult when reasoning about runtime behavior, calibrating optimization effort, or applying principles with judgment. |
+| `references/type-driven-design.md` | Parse vs validate (information preservation), make illegal states unrepresentable, shotgun parsing antipattern, push the burden of proof upward. Consult when designing boundary types or eliminating redundant downstream checks. |

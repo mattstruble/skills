@@ -85,6 +85,54 @@ def create_order(request: CreateOrderRequest) -> Order:
     return Order(**request.model_dump())
 ```
 
+**Refine fields into proven types.** The domain object should carry proof
+that its fields satisfy domain invariants — not just copy the raw values.
+Use `__post_init__` validation or a class-method factory to enforce
+constraints on construction; downstream code then needs no re-checks.
+
+```python
+@dataclass(frozen=True)
+class Order:
+    product_id: str      # ponytail: NewType('ProductId', str) if ID format matters
+    quantity: int
+    price: Decimal
+
+    def __post_init__(self) -> None:
+        if self.quantity <= 0:
+            raise ValueError(f"quantity must be positive, got {self.quantity}")
+        if self.price <= 0:
+            raise ValueError(f"price must be positive, got {self.price}")
+
+def create_order(request: CreateOrderRequest) -> Order:
+    # Raises on invalid data — caller holds an Order known to be valid.
+    return Order(
+        product_id=request.product_id,
+        quantity=request.quantity,
+        price=request.price,
+    )
+```
+
+Enforcement is **runtime**: the smart constructor raises on bad data; type
+checkers (pyright/mypy) narrow types after `isinstance`/`assert` but cannot
+prove field-level numeric constraints from the type alone. Do not claim
+compile-time proofs. The value is that all callers are protected by one
+construction-time guard, not per-caller re-checks. See
+`software-design/references/type-driven-design.md` for the language-agnostic
+principle.
+
+### Avoiding None in Domain Logic
+
+When `None` spreads through domain code, the root cause is usually raw
+external data entering the domain core without refinement (see above). When
+the refined-type approach doesn't cover a case:
+
+- **Better defaults** — use `[]`, `False`, or `0` instead of `None` when empty is valid.
+- **Raise instead of returning `None`** — domain exception makes the return type non-optional.
+- **Model states as distinct classes** — `OfflineDrone`, `ConnectedDrone`, `ReadyDrone`; each function accepts only the state it needs.
+- **Null Object** — `NullDiagnostics` implementing the same `Protocol` eliminates `if x is not None:` guards.
+- **Sentinel** — `MISSING = object()` distinguishes "caller passed `None`" from "caller omitted the argument."
+- **Result types** (`Route | RouteFailed`) — ArjanCodes argues prefer exceptions over Result types in Python; the `returns` package exists but is not recommended for typical Python code.
+
 ### Protocols Over ABCs for Callers
 
 Define caller-facing interfaces as `Protocol`. Any object with matching

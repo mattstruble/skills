@@ -124,6 +124,52 @@ def calculate_total(order: Order) -> Decimal:
     return order.price * order.quantity  # order is immutable
 ```
 
+### Refine Fields at the Boundary
+
+Once external data is validated at the boundary (above), the domain type
+itself should enforce its own invariants. A smart constructor (`__post_init__`
+or a class-method factory) validates on construction; downstream code
+receives a type that *cannot be invalid*.
+
+**Before (domain type copies raw values — downstream must re-check):**
+```python
+@dataclass(frozen=True)
+class Order:
+    product_id: str
+    quantity: int   # could be 0 or negative; caller must re-check
+    price: Decimal  # could be zero or negative; caller must re-check
+
+def calculate_total(order: Order) -> Decimal:
+    if order.quantity <= 0:          # re-check — proof was discarded
+        raise ValueError("...")
+    return order.price * order.quantity
+```
+
+**After (domain type enforces invariants — downstream has a guarantee):**
+```python
+@dataclass(frozen=True)
+class Order:
+    product_id: str
+    quantity: int
+    price: Decimal
+
+    def __post_init__(self) -> None:
+        if self.quantity <= 0:
+            raise ValueError(f"quantity must be positive, got {self.quantity}")
+        if self.price <= 0:
+            raise ValueError(f"price must be positive, got {self.price}")
+
+def calculate_total(order: Order) -> Decimal:
+    return order.price * order.quantity  # no re-check needed
+```
+
+Python enforces this at **runtime** (smart constructor raises on bad data),
+not at compile time. Type checkers (pyright/mypy) narrow types after
+`isinstance` checks and `assert` statements, but cannot prove field-level
+constraints from the type alone. The value is that *all callers* of
+`calculate_total` are protected by the single `__post_init__` guard, not by
+per-caller re-checks.
+
 ### Frozen Dataclasses for Domain Objects
 
 Use `@dataclass(frozen=True)` for any object that represents a concept in

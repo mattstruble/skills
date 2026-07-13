@@ -154,6 +154,9 @@ where. Concrete techniques: default-value diffing, per-field version stamps,
 deprecated fields kept while old versions load and deleted at ship. This
 extends the skill's "validate at boundaries" guidance to the load path.
 
+For the information-preservation framing (returning a refined type that
+carries proof rather than discarding it), see `references/type-driven-design.md`.
+
 ---
 
 ## Design for the Hard Cases

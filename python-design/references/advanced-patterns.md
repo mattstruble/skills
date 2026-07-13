@@ -256,13 +256,14 @@ principle — the most important audience sees what they need first.
 def _normalize_price(price: Decimal) -> Decimal:
     return price.quantize(Decimal("0.01"))
 
-def _validate_quantity(qty: int) -> None:
+def _parse_quantity(qty: int) -> int:
     if qty <= 0:
         raise ValueError(f"Quantity must be positive, got {qty}")
+    return qty  # caller holds an int known to be positive
 
 def calculate_total(price: Decimal, quantity: int) -> Decimal:
-    _validate_quantity(quantity)
-    return _normalize_price(price) * quantity
+    qty = _parse_quantity(quantity)
+    return _normalize_price(price) * qty
 ```
 
 **After (public API first, helpers below):**
@@ -272,17 +273,18 @@ from decimal import Decimal
 __all__ = ["calculate_total"]
 
 def calculate_total(price: Decimal, quantity: int) -> Decimal:
-    _validate_quantity(quantity)
-    return _normalize_price(price) * quantity
+    qty = _parse_quantity(quantity)
+    return _normalize_price(price) * qty
 
 # --- private helpers ---
 
 def _normalize_price(price: Decimal) -> Decimal:
     return price.quantize(Decimal("0.01"))
 
-def _validate_quantity(qty: int) -> None:
+def _parse_quantity(qty: int) -> int:
     if qty <= 0:
         raise ValueError(f"Quantity must be positive, got {qty}")
+    return qty  # caller holds an int known to be positive
 ```
 
 ### Docstring Style

@@ -1,6 +1,6 @@
 ---
 name: agent-memory
-description: You MUST consult this skill when designing memory for personalized agents — choosing storage formats, building consolidation or compression pipelines, evaluating memory quality, handling contradictory memories, or deciding what to persist across sessions. Trigger when an agent forgets user preferences, surfaces conflicting facts, grows unbounded memory, or can't anticipate user needs. NOT for operating an existing knowledge base (see knowledge-base), managing the context window (see context-engineering), or building a retrieval pipeline for a document corpus (see rag-design).
+description: You MUST consult this skill when designing cross-session memory for personalized agents — choosing storage formats, handling contradictory memories, building consolidation pipelines, evaluating memory quality, or deciding what to persist. Also trigger when an agent forgets user preferences across sessions, surfaces conflicting facts, grows unbounded memory, or needs to anticipate user needs from past context. NOT for operating an existing knowledge base (see knowledge-base), managing the context window within a session (see context-engineering), building a retrieval pipeline for a document corpus (see rag-design), or agent runtime orchestration (see agent-architecture).
 ---
 
 # Agent Memory

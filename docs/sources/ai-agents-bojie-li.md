@@ -54,7 +54,7 @@ durable chapter→skill→reference map only.
 
 | Chapter | Skill | Reference file(s) |
 | --- | --- | --- |
-| Ch1 | agent-architecture | TBD |
+| Ch1 | agent-architecture | orchestration-patterns.md, guardrails-and-safety.md |
 | Ch2 (§2.1–2.4, 2.6, 2.7) | context-engineering | TBD |
 | Ch2 §2.5 | skill-creator (body weave) | SKILL.md body weave |
 | Ch3 | agent-memory-rag *(split decided in-session)* | TBD |

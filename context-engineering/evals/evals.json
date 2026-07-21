@@ -1,0 +1,197 @@
+{
+  "skill_name": "context-engineering",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My coding agent keeps re-running tools it already used. It'll call `read_file` on the same path three times in a row, or search for the same symbol twice. The context window is only at 40% so it's not a truncation issue. What's going wrong and how do I fix it?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I'm designing the system prompt for a customer support agent. Right now it's a wall of bullet points — 47 rules covering tone, escalation criteria, what to never say, how to handle refunds, etc. The agent follows maybe 60% of them. How should I restructure this?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "We're seeing really inconsistent cache hit rates on our Claude API calls. Some requests are 10x cheaper than others for what looks like the same prompt. I think it's a KV-cache issue but I'm not sure what we're doing wrong.",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Our research agent runs for 20-30 steps and by step 15 it starts ignoring instructions from the system prompt — like it forgets it's supposed to cite sources or stops using the structured output format we specified. The system prompt is fine at step 1. What's happening?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "I'm building a coding agent from scratch. I need to decide on the orchestration loop (ReAct vs plan-then-execute vs something else) AND figure out how to structure the system prompt so the agent doesn't lose track of the original task as the context fills up. Where do I start?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": ["agent-architecture"],
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "how do i add few-shot examples to my agent's system prompt without blowing up the context window? i have about 15 good examples but adding them all makes the prompt 8k tokens and the agent gets slower and more expensive",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "We're designing a multi-step document analysis agent. The agent reads a 200-page PDF, extracts claims, cross-references them against a database, and writes a report. By the time it gets to the report-writing step the context is enormous. Should we compress intermediate results, use sub-agents, or something else?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "I want my agent to have a 'status bar' — a compact summary of what it's done so far, what it's currently working on, and what's left. Where in the context should this live and how should it be formatted?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "We're building a long-running autonomous agent (think: runs for hours, hundreds of tool calls). The main concern is context window management — we'll hit the limit eventually. What's the right strategy for deciding what to keep, what to compress, and what to drop?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "I'm designing a new agent system where a planner agent breaks down tasks and spawns worker agents. I need to figure out both the orchestration pattern (how planner and workers communicate) and how each worker's context should be structured so they don't need the full conversation history. How do I think about both of these together?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": ["agent-architecture"],
+      "files": []
+    },
+    {
+      "id": 11,
+      "prompt": "My agent's system prompt has a section that says 'IMPORTANT: always respond in JSON'. The agent follows it at the start but by message 10 it's back to prose. I haven't changed the system prompt. What's going on?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 12,
+      "prompt": "We're seeing unexplained latency spikes on about 20% of our agent requests — same prompt, same tools, but some requests take 3x longer. Our infra team says it's not network. Could this be a KV-cache miss issue?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 13,
+      "prompt": "how should i structure the context for a sub-agent that's been delegated a specific subtask? the parent agent has a lot of history i don't want to pass down, but the sub-agent needs enough context to do its job without asking clarifying questions",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 14,
+      "prompt": "We want to set up a vector database so our agent can retrieve relevant documents on demand instead of loading everything into context upfront. We're thinking Pinecone or Weaviate. Which should we use and how do we chunk the documents for embedding?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 15,
+      "prompt": "I need to store user preferences across sessions so our agent remembers things like 'this user prefers bullet points' or 'they work in Python not JavaScript'. What's the best way to persist and retrieve this kind of user-specific memory?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 16,
+      "prompt": "write me a ChatGPT prompt that generates professional cover letters. i want it to ask for the job description and my resume and then produce a tailored letter",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 17,
+      "prompt": "help me craft a system prompt for a marketing email generator. it should take a product description and target audience and produce 3 subject line variants and a full email body",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 18,
+      "prompt": "how do i organize my microservice's data access layer? i have a bunch of repository classes and i'm not sure whether to use a unit of work pattern or just inject the repos directly into my service classes",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 19,
+      "prompt": "We're building a knowledge base for our support team — employees can ask questions and the system retrieves relevant docs from Confluence and Notion. I need to set up the RAG pipeline: ingestion, chunking strategy, embedding model, and retrieval. Where do I start?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 20,
+      "prompt": "our agent needs to remember what happened in previous conversations with the same user. right now every session starts fresh and the user has to re-explain their project context every time. how do we build cross-session memory?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 21,
+      "prompt": "I'm reviewing a PR where someone added a new LLM call to our FastAPI service. The call is in the route handler, it's synchronous, and the result goes straight to the database. Is this the right place for it architecturally?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 22,
+      "prompt": "We have a coding agent that's been running well for simple tasks but falls apart on multi-file refactors. It reads 15-20 files, makes a plan, then starts editing — but by the time it gets to file 10 it's making changes that contradict what it did in file 3. The context window isn't full. Design a better context structure for this agent.",
+      "expected_output": "Good output should: (1) Diagnose the root cause — the agent is accumulating raw file contents and tool outputs in context, so by file 10 the relevant plan and earlier decisions are buried under noise. This is a context organization problem, not a context length problem. (2) Recommend a structured context layout: stable prefix (system prompt + task description + the plan), then a compact 'decisions made' section that gets appended as the agent works (not the full file contents), then the current working context (the file being edited now). (3) Address the plan specifically — the plan should be in the stable prefix and never move, so it stays in the high-attention zone throughout the run. (4) Suggest compressing intermediate tool outputs: instead of keeping the full content of all 15 files in context, keep a summary of each file's role and what was changed. The full content only needs to be in context when that file is being edited. (5) Consider whether sub-agent delegation makes sense here: each file edit could be a sub-agent that receives only the plan + the specific file + a summary of decisions made so far, rather than the full accumulated context. Output should be concrete and specific to the multi-file refactor failure mode, not generic context management advice.",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 23,
+      "prompt": "I'm building a customer support agent that handles billing questions, technical issues, and account management. The system prompt is currently 3,000 tokens of mixed instructions, policies, and examples. The agent is inconsistent — it handles billing well but fumbles technical questions. Walk me through how to redesign the system prompt and context structure for this agent.",
+      "expected_output": "Good output should: (1) Diagnose the inconsistency — 3,000 tokens of mixed content means the billing instructions are likely earlier in the prompt (higher attention) while technical instructions are buried. The agent isn't 'bad at technical questions'; it's not seeing those instructions clearly. (2) Recommend restructuring around process, not rules: instead of 47 rules, define a decision process ('first classify the issue type, then follow the relevant procedure'). This is the process-driven vs rule-stacking distinction. (3) Address the entropy problem: mixed instructions, policies, and examples in one block create high entropy — the model has to figure out what's relevant. Separate these into clearly labeled sections with consistent structure. (4) Recommend moving few-shot examples out of the system prompt entirely or to the end — they're high-token and should only be included when the task type is known. (5) Suggest a stable prefix / volatile suffix layout: the core identity and process instructions stay fixed (cache-friendly), while task-specific context (the current ticket, customer history) goes at the end. (6) Address the 3,000-token size directly — this is large but not the main problem; reorganization will help more than trimming. Output should feel like a concrete redesign recommendation, not a list of general prompt engineering tips.",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 24,
+      "prompt": "We're starting from scratch on an autonomous research agent. It'll be given a research question, spend 30-60 minutes searching the web, reading papers, and synthesizing findings into a structured report. I need to design both the orchestration loop and the context strategy — how do I think about these together, and what are the failure modes I should design against from day one?",
+      "expected_output": "Good output should: (1) Address both dimensions — orchestration and context — and explain how they interact. The orchestration pattern (ReAct loop, plan-then-execute, or hierarchical) determines how context accumulates; you can't design context strategy without knowing the loop structure. (2) For a 30-60 minute run, recommend a hierarchical approach: a planner that maintains the research plan in a stable prefix, and worker sub-agents that handle individual search/read tasks with isolated contexts. This is the 'isolation over compression' principle — don't compress, delegate. (3) Identify the key context failure modes for long research runs: (a) the original research question getting buried under accumulated tool outputs; (b) the agent losing track of what it's already covered and re-searching the same ground; (c) contradictory findings accumulating without reconciliation. (4) Recommend concrete mitigations: the research question and plan stay in the stable prefix and never move; a running 'findings so far' summary gets updated (not appended) after each sub-task; a 'sources visited' list prevents redundant searches. (5) Address the synthesis step specifically — by the time the agent writes the report, it should be working from a structured findings summary, not the raw accumulated context. The report-writing step should be a fresh sub-agent with a clean, structured handoff. Output should be actionable design guidance, not a survey of agent architectures.",
+      "should_trigger": true,
+      "co_triggers": ["agent-architecture"],
+      "files": []
+    }
+  ]
+}

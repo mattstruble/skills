@@ -57,7 +57,9 @@ durable chapter→skill→reference map only.
 | Ch1 | agent-architecture | orchestration-patterns.md, guardrails-and-safety.md |
 | Ch2 (§2.1–2.4, 2.6, 2.7) | context-engineering | prompt-design.md, kv-cache-context.md, compression-strategies.md |
 | Ch2 §2.5 | skill-creator (body weave) | SKILL.md body weave |
-| Ch3 | agent-memory-rag *(split decided in-session)* | TBD |
+| Ch3 §3.1 | agent-memory | memory-formats.md, memory-evaluation.md |
+| Ch3 §3.2-3.3 | rag-design *(planned)* | retrieval-infrastructure.md, knowledge-organization.md |
+<!-- Split: audience-driven — memory-system builders (§3.1) vs retrieval-pipeline builders (§3.2-3.3) -->
 | Ch4 | agent-tool-design | tool-categories.md, tool-ecosystem.md |
 | Ch4 §4.7.6-4.7.8 | agent-architecture (fold) | async-event-handling.md |
 | Ch5 | coding-agent-design | TBD |

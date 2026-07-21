@@ -1,6 +1,6 @@
 ---
 name: context-engineering
-description: You MUST consult this skill when designing or reviewing what an agent sees at each inference call — system prompt organization, KV-cache layout, or context growth management. Trigger when a prompt has drifted into contradictions, cache-hit rates are low, costs balloon as conversation grows, or an agent repeats tool calls it already ran. Also trigger when deciding how to structure a system prompt, where to place volatile data, or how to handle bulky intermediate content. NOT for memory that persists across sessions (see agent-memory-rag), tool interface design (see agent-tool-design), or the harness model itself (see agent-architecture).
+description: You MUST consult this skill when designing or reviewing the context an LLM agent sees at each inference call — system prompt structure, KV-cache layout, or context growth strategy. Also trigger when an agent repeats tool calls it already ran, when system prompt instructions fade mid-conversation, when cache-hit rates are unexpectedly low, or when deciding where to place volatile vs stable content in a long-running agent. NOT for cross-session memory (see agent-memory-rag), application code structure (see application-architecture), or orchestration patterns (see agent-architecture).
 ---
 
 # Context Engineering

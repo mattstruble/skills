@@ -67,7 +67,7 @@ durable chapter→skill→reference map only.
 | Ch7 | agent-post-training *(fit decided in-session)* | TBD |
 | Ch8 | agent-self-evolution *(fold decided in-session)* | TBD |
 | Ch9 | multimodal-agents *(fold/defer decided in-session)* | TBD |
-| Ch10 | multi-agent-collaboration | TBD |
+| Ch10 | multi-agent-collaboration | collaboration-patterns.md, multi-agent-infrastructure.md |
 
 Working skill names above are placeholders from the epic task graph
 (`mattstruble-skills-u9i`); the final name for each skill is chosen

@@ -225,7 +225,7 @@ call several tools to reconstruct context — wasting steps and budget.
 
 For the runtime mechanism that handles event interruptions and maintains
 trajectory integrity, see
-`agent-architecture/references/async-event-handling.md` *(not yet authored — see task u9i.4.2)*.
+`agent-architecture/references/async-event-handling.md`.
 
 ---
 
@@ -257,4 +257,4 @@ Match channel to urgency and context:
 
 For the runtime event-handling mechanism (how the agent manages async
 communication without blocking), see
-`agent-architecture/references/async-event-handling.md` *(not yet authored — see task u9i.4.2)*.
+`agent-architecture/references/async-event-handling.md`.

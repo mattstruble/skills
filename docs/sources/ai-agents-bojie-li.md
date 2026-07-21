@@ -59,6 +59,7 @@ durable chapter→skill→reference map only.
 | Ch2 §2.5 | skill-creator (body weave) | SKILL.md body weave |
 | Ch3 | agent-memory-rag *(split decided in-session)* | TBD |
 | Ch4 | agent-tool-design | tool-categories.md, tool-ecosystem.md |
+| Ch4 §4.7.6-4.7.8 | agent-architecture (fold) | async-event-handling.md |
 | Ch5 | coding-agent-design | TBD |
 | Ch6 | agent-evaluation | TBD |
 | Ch7 | agent-post-training *(fit decided in-session)* | TBD |

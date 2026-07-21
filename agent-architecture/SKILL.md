@@ -77,6 +77,8 @@ explain what it does, rename the tool.
 | Irreversible action fired with no confirmation | §3 — execution-side guardrail / HITL |
 | Half-finished or hallucinated result shown to user | §3 — Verify/Correct |
 | Demo works, production fragile | Framing — no harness |
+| Agent can't handle user interruptions mid-task | §4 — async event handling |
+| Background tasks block the agent loop | §4 — async event handling |
 
 ---
 
@@ -218,6 +220,39 @@ layer mapping, tool risk-rating mechanics, and HITL trigger design.
 
 ---
 
+## §4 Async Event Handling
+
+**The question**: How does the agent handle events that arrive while it is
+already executing?
+
+Synchronous LLM APIs require the harness to manage concurrency explicitly.
+Three strategies cover the space:
+
+- **Cancellation-based** — urgent events (user interrupt, supervisor
+  instruction): cancel the in-flight operation, drain the queue, append all
+  events + the urgent event, re-invoke.
+- **Queue-based** — routine events (supplementary user input, timer): enqueue
+  without interrupting; append the batch when the current cycle completes.
+- **Parallel** — independent events (unrelated user question): spawn a
+  separate LLM call; result goes to the user without touching the main
+  trajectory.
+
+Hardcoded routing rules are insufficient — event semantics determine the
+strategy. Use a lightweight classification LLM as event router.
+
+**Trajectory integrity** across all three strategies requires five rules:
+write assistant messages immediately upon emission; append async tool results
+as new events; inject placeholder tool results on interruption; discard
+partial LLM thinking on interruption; hold non-interrupting events in queue
+until the current cycle completes.
+
+-> Read `references/async-event-handling.md` for the full event model
+(source/channel/content/context), detailed strategy steps, trajectory
+integrity rules, attention-dispersion mitigations, and the sync-to-async
+engineering pattern.
+
+---
+
 ## Routing Map
 
 These are companion skills in the ai-agents family. Load the relevant one
@@ -228,6 +263,7 @@ when building that layer.
 | Context depth & prompt design | context-engineering | Ch2 |
 | Memory & knowledge persistence | agent-memory-rag | Ch3 |
 | Tool taxonomy & interface design | agent-tool-design | Ch4 |
+| Async event handling | async-event-handling.md | When building agents that handle interruptions, background tasks, or multi-channel events |
 | Code generation & coding agents | coding-agent-design | Ch5 |
 | Evaluation & observability | agent-evaluation | Ch6 |
 | Multi-agent orchestration & collaboration | multi-agent-collaboration | Ch10 |
@@ -259,3 +295,4 @@ deterministic code, queues, or events is application-architecture.
 |---|---|
 | `references/orchestration-patterns.md` | Choosing workflow vs autonomous vs mixed; deeper trade-offs, mixing patterns, stopping-condition mechanics, framework pattern families |
 | `references/guardrails-and-safety.md` | Full input/execution/output guardrail taxonomy, C/V/C layer mapping, tool risk-rating mechanics, HITL trigger design, jailbreak vs injection in depth |
+| `references/async-event-handling.md` | Structured event modeling, cancellation/queue/parallel strategies, trajectory integrity rules, attention-dispersion mitigations, sync-to-async engineering pattern |

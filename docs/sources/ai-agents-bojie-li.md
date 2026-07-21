@@ -58,7 +58,7 @@ durable chapter→skill→reference map only.
 | Ch2 (§2.1–2.4, 2.6, 2.7) | context-engineering | prompt-design.md, kv-cache-context.md, compression-strategies.md |
 | Ch2 §2.5 | skill-creator (body weave) | SKILL.md body weave |
 | Ch3 | agent-memory-rag *(split decided in-session)* | TBD |
-| Ch4 | agent-tool-design | TBD |
+| Ch4 | agent-tool-design | tool-categories.md, tool-ecosystem.md |
 | Ch5 | coding-agent-design | TBD |
 | Ch6 | agent-evaluation | TBD |
 | Ch7 | agent-post-training *(fit decided in-session)* | TBD |

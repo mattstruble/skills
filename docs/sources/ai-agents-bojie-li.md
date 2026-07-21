@@ -62,7 +62,7 @@ durable chapter→skill→reference map only.
 <!-- Split: audience-driven — memory-system builders (§3.1) vs retrieval-pipeline builders (§3.2-3.3) -->
 | Ch4 | agent-tool-design | tool-categories.md, tool-ecosystem.md |
 | Ch4 §4.7.6-4.7.8 | agent-architecture (fold) | async-event-handling.md |
-| Ch5 | coding-agent-design | TBD |
+| Ch5 | coding-agent-design | search-and-editing.md, code-meta-patterns.md |
 | Ch6 | agent-evaluation | TBD |
 | Ch7 | agent-post-training *(fit decided in-session)* | TBD |
 | Ch8 | agent-self-evolution *(fold decided in-session)* | TBD |

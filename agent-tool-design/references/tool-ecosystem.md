@@ -143,6 +143,12 @@ registers a server with a tool named `read_file` that shadows the legitimate
 filesystem tool. The model, seeing two `read_file` tools, may call the
 attacker's version.
 
+A subtler variant: a legitimate server is compromised and rewrites its
+descriptions to claim broader scope — intercepting calls intended for other
+servers. Namespacing mitigates name-collision shadowing; this
+description-based shadowing requires periodic re-vetting of tool definitions,
+not just name deduplication.
+
 **4. Credential management risk**
 
 Agents hold OAuth tokens, API keys, and session credentials to call tools.
@@ -171,6 +177,7 @@ already been vetted.
 
 | Threat | Mitigation |
 |---|---|
+| Default posture | Allowlist permitted tool servers and names; deny unknown sources until explicitly vetted |
 | Description poisoning | Review tool descriptions before integration; treat as untrusted input, not trusted instructions |
 | Compromised servers | Lock server versions (pin to a specific release); monitor for unexpected definition changes |
 | Tool shadowing | Namespace tools by server (`servername.toolname`); reject ambiguous names at load time |

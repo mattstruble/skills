@@ -74,6 +74,9 @@ Validate at the tool boundary before any execution:
 - **Path traversal**: reject `../` sequences and symlinks outside the
   permitted root
 - **Injection**: sanitize shell metacharacters before passing to subprocesses
+- **SSRF**: for tools accepting URLs or hostnames, validate against an
+  allowlist of permitted hosts/schemes; reject private IP ranges
+  (10.x, 172.16–31.x, 192.168.x, 169.254.x) and loopback addresses
 - **Type correctness**: reject wrong types immediately with a clear error
 
 Fail fast — reject and return an error. Do not "smart correct" invalid input
@@ -101,6 +104,9 @@ tool-call data (name, parameters) — never the free-text reasoning chain.
 This blocks the rhetorical prompt-injection channel: an attacker cannot
 manipulate the sidecar by embedding instructions in prose the main model
 reasoned through. Sub-second latency; suitable for every execution call.
+The sidecar assesses behavioral risk (unexpected tool, anomalous call
+pattern) — it does not replace Layer 1 input validation, which must still
+sanitize parameter values at the tool boundary.
 
 ### Post-execution validation
 

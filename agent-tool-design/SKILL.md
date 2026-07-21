@@ -64,7 +64,7 @@ Five categories, each with distinct design constraints:
 
 ---
 
-## §1 Gate: Does This Need to Be a Tool?
+## §1 Dedicated Tool Gate
 
 **The question**: Should this capability be a dedicated tool, or a skill
 document executed by a general executor (bash, code-interpreter)?
@@ -116,7 +116,9 @@ which extractor to call; it just knows it wants document text.
 
 ## §3 Generality
 
-**The question**: Should this be a general tool or a dedicated one?
+**The question**: Given this IS a dedicated tool — should it accept
+free-form inputs and leverage the model's reasoning, or enforce a structured
+interface? (§1 asks whether to build a tool at all; §3 asks what kind.)
 
 Bojie Li argues general tools are preferable unless there is a specific
 reason for a dedicated tool. The LLM already reasons and generates code —
@@ -241,6 +243,10 @@ it passed exactly what it read.
 
 **Rule**: if normalization is necessary, document it in the description AND
 communicate it in the return value so the model can update its world model.
+
+**Security note**: normalization applied before validation creates bypass
+opportunities. A path sanitizer that checks for `../` after URL-decoding will
+miss `..%2F`. Validate on raw input first, then normalize for execution.
 
 ### Anti-pattern 2: Silent parameter injection
 

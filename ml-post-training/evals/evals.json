@@ -1,0 +1,213 @@
+{
+  "skill_name": "ml-post-training",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm training a Qwen2.5-7B model to output structured JSON tool calls. I've been applying LoRA only to the attention layers (q_proj, k_proj, v_proj, o_proj) but the model still produces malformed JSON about 30% of the time after 2000 training steps. What am I doing wrong and how do I fix it?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Guidance on applying LoRA to MLP layers (gate_proj, up_proj, down_proj), rank selection for SFT, and format stabilization target (<10% failure rate before RL)"
+    },
+    {
+      "id": 2,
+      "prompt": "We're starting RL training on a customer service agent using GRPO. After about 500 steps, training just stops improving — the reward is flat and the loss isn't moving. I checked and about 90% of our training groups are all-pass (the model solves most prompts correctly). How do I fix this?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Explanation of GRPO zero-variance deadlock in all-pass groups, dynamic sampling to filter them out, and adding harder prompts to the training distribution"
+    },
+    {
+      "id": 3,
+      "prompt": "I'm building a reward function for an RL agent that needs to call tools in the right order (search before summarize, verify identity before accessing account data). The outcome reward (task success/failure) isn't teaching the ordering constraint — the model just skips steps and gets lucky sometimes. What reward design should I use?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "RLVP pattern: verified penalty for constraint violations, milestone rewards for correct ordering, deterministic checks not learned scorers"
+    },
+    {
+      "id": 4,
+      "prompt": "Trying to decide between PPO and GRPO for training a multi-turn coding agent that needs to iteratively edit files, run tests, and fix errors. Trajectories are typically 15-25 turns. Which algorithm should I use and why?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "PPO recommendation for long-trajectory multi-turn tasks (value network provides per-step credit assignment); GRPO's coarse credit assignment degrades for long horizons"
+    },
+    {
+      "id": 5,
+      "prompt": "My RL training reward is climbing steadily but when I do human evals the model is getting worse — it's producing verbose, hedging responses that score well on the reward model but aren't actually helpful. How do I fix this?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Reward hacking diagnosis, KL penalty increase (kl_coef), early stopping based on human eval, reward model over-optimization explanation"
+    },
+    {
+      "id": 6,
+      "prompt": "I want to configure LoRA for RL training (GRPO) on a Llama-3.1-8B model. What rank should I use, what learning rate, and which modules should I target? I've been using rank=128 from my SFT run and it seems like overkill.",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "RL LoRA rank 8-32 (lower than SFT because per-step information is small), learning rate ~10x full fine-tuning LR, all major weight matrices including MLP layers"
+    },
+    {
+      "id": 7,
+      "prompt": "I'm building a simulation environment for training a web browsing agent. The agent needs to fill forms, click buttons, and navigate pages. What are the key requirements for the environment to be trainable with RL? I'm worried about state bleeding between episodes.",
+      "should_trigger": true,
+      "co_triggers": ["agent-architecture"],
+      "files": [],
+      "expected_output": "Reset semantics (snapshot/restore or ephemeral containers), throughput/parallelism requirements, fidelity to production environment, reward computability"
+    },
+    {
+      "id": 8,
+      "prompt": "We tried to run RL directly on a base Llama-3.2-11B model without any SFT first. The training completely failed — reward is always NaN and gradients are zero. Is this expected? Do we always need SFT first?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Yes, SFT must come first for smaller models with structured output requirements; base model produces unstructured output → reward function can't parse → NaN → zero gradients. Exception: very strong base models (DeepSeek-R1-Zero scale)"
+    },
+    {
+      "id": 9,
+      "prompt": "I'm designing a reward function for a math tutoring agent. The agent needs to guide students through multi-step problems. Binary reward (correct/incorrect final answer) isn't working well — the model just gives the answer directly instead of guiding. What reward design should I use?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Process rewards for pedagogical steps (explanation quality, question asking, scaffolding), milestone rewards for intermediate steps, vector rewards for multiple quality dimensions"
+    },
+    {
+      "id": 10,
+      "prompt": "I'm trying to distill DeepSeek-R1's reasoning capabilities into a 7B model using SFT. What's the right recipe? How do I collect the training data and what should I watch out for?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Prompt distillation recipe: collect trajectories from teacher, filter incorrect final answers with rule-based validator, SFT on problem→<think>reasoning</think>+answer format, watch for inherited systematic errors and verbose thinking"
+    },
+    {
+      "id": 11,
+      "prompt": "We have a tool-calling agent that works well in demos but I want to train it to be more reliable. I'm thinking of using RL with a code interpreter sandbox. What's the two-stage training recipe and what engineering tricks matter most?",
+      "should_trigger": true,
+      "co_triggers": ["agent-tool-design"],
+      "files": [],
+      "expected_output": "SFT warm-up to establish tool-call format, then RL with sandbox execution loop; token-level policy gradient loss, dynamic sampling, overlong reward shaping"
+    },
+    {
+      "id": 12,
+      "prompt": "I have a dataset of 50,000 preference pairs (preferred/rejected response pairs) from human annotators for my customer service model. Should I use DPO or PPO? I don't have a lot of GPU budget.",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "DPO recommendation when high-quality preference data already exists and budget is constrained; no online sampling needed, no reward model training, no PPO loop"
+    },
+    {
+      "id": 13,
+      "prompt": "How do I know when to stop SFT and start RL? My model is at about 15% JSON parse failure rate after 3000 training steps and I'm not sure if I should keep going or switch to RL.",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Target <10% parse failure rate before starting RL; at 15% RL will be unstable; continue SFT; check for template inconsistency or base model mismatch if not improving"
+    },
+    {
+      "id": 14,
+      "prompt": "I'm seeing that my GRPO training has zero gradient on about 60% of my training batches. The model is at about 5% success rate on the task. What's happening and how do I fix it?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "All-fail groups (early training, task too hard) → zero within-group variance → zero gradient. Add milestone/partial credit rewards, use easier warmup tasks, or add RLVP partial credit for reachable progress"
+    },
+    {
+      "id": 15,
+      "prompt": "Should I fine-tune a model for my RAG-based question answering system? The model needs to know a lot of domain-specific facts about our product catalog.",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "This is a decision question (whether to fine-tune) → agent-post-training skill, not ml-post-training. Also: factual knowledge → RAG, not SFT"
+    },
+    {
+      "id": 16,
+      "prompt": "I'm designing an agent that needs to remember user preferences across sessions. Should I use a memory system or fine-tune the model on user data?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Architecture/design decision → agent-architecture or agent-memory skill, not ml-post-training"
+    },
+    {
+      "id": 17,
+      "prompt": "How do I set up an evaluation harness to measure my model's performance on tool-calling tasks? I want to track accuracy, latency, and error rates.",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Eval system design → agent-evaluation skill, not ml-post-training"
+    },
+    {
+      "id": 18,
+      "prompt": "I'm trying to decide whether to use GPT-4o or Claude 3.5 Sonnet as the backbone for my customer service agent. Which one is better for tool calling?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Model selection for agent design → agent-architecture skill, not ml-post-training (no training involved)"
+    },
+    {
+      "id": 19,
+      "prompt": "We're deploying a fine-tuned model to production. How should I set up the inference server to handle multiple LoRA adapters for different customers?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Model serving/inference → not ml-post-training. (Though the skill mentions multi-tenant LoRA deployment in passing, the primary concern here is serving infrastructure)"
+    },
+    {
+      "id": 20,
+      "prompt": "My company wants to train a large language model from scratch on our proprietary data. We have 10TB of text. What pre-training setup do we need?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Pre-training from scratch → not ml-post-training (skill explicitly excludes this)"
+    },
+    {
+      "id": 21,
+      "prompt": "I want to add chain-of-thought reasoning to my model. Should I use SFT on CoT examples or RL? What are the tradeoffs?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "SFT vs RL comparison for CoT: SFT memorizes demonstrated reasoning patterns (fast, stable, ceiling = demonstration quality); RL generalizes reasoning strategy (slower, higher ceiling, can discover novel approaches). Recommend SFT first for format, then RL for generalization."
+    },
+    {
+      "id": 22,
+      "prompt": "We're running PPO training and the policy keeps collapsing — after a few hundred steps the model just outputs the same response for every input. KL penalty is set to 0.01. What's wrong?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "KL penalty too low (0.01 is very small); increase kl_coef; verify reference model is frozen; check for distribution collapse symptoms"
+    },
+    {
+      "id": 23,
+      "prompt": "I want to understand when it makes sense to use RL post-training vs just improving my prompts. My agent is doing okay but not great on complex multi-step tasks. Is RL worth the investment?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Decision question (whether/when to use RL) → agent-post-training skill, not ml-post-training which covers the HOW not the WHEN"
+    },
+    {
+      "id": 24,
+      "prompt": "We're building a multi-agent system where one agent plans and another executes. How should we structure the communication between them? Should we use a shared memory store or message passing?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Multi-agent architecture design → multi-agent-collaboration or agent-architecture skill, not ml-post-training"
+    },
+    {
+      "id": 25,
+      "prompt": "I need to benchmark my fine-tuned model against GPT-4 on a set of customer service tasks. What metrics should I track and how do I design a fair comparison?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Evaluation methodology → agent-evaluation skill, not ml-post-training"
+    },
+    {
+      "id": 26,
+      "prompt": "My team is debating whether to fine-tune an open-source model or use a closed-source API for our coding assistant. What factors should drive this decision?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Build-vs-buy / fine-tune decision → agent-post-training skill (deciding whether to fine-tune), not ml-post-training (HOW to fine-tune)"
+    }
+  ]
+}

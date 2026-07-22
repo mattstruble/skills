@@ -155,7 +155,8 @@ video. Not optional — a text-only model cannot handle these inputs.
 
 **Open vs closed.** Closed frontier models lead on capability. Open models
 enable privacy, cost control, and customization (fine-tuning, local
-deployment). Evaluate the trade on your actual task.
+deployment). Evaluate the trade on your actual task. For post-training
+decisions (when/whether to fine-tune, SFT vs RL), see `agent-post-training`.
 
 "Evaluate on your own tasks — benchmarks don't transfer."
 
@@ -266,10 +267,11 @@ when building that layer.
 | Async event handling | async-event-handling.md | When building agents that handle interruptions, background tasks, or multi-channel events |
 | Code generation & coding agents | coding-agent-design | Ch5 |
 | Evaluation & observability | agent-evaluation | Ch6 |
+| Post-training decisions (when/whether to fine-tune, SFT vs RL) | agent-post-training | Ch7 |
+| Post-training implementation (SFT/RL mechanics) | ml-post-training | Ch7 |
 | Multi-agent orchestration & collaboration | multi-agent-collaboration | Ch10 |
 
-Post-training (Ch7), self-evolution (Ch8), and multimodal agents (Ch9) are
-under evaluation for the ai-agents family — see epic mattstruble-skills-u9i.
+Self-evolution (Ch8) and multimodal agents (Ch9) are under evaluation for the ai-agents family — see epic mattstruble-skills-u9i.
 
 ---
 

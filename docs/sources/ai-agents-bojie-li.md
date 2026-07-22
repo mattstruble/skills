@@ -64,7 +64,9 @@ durable chapter→skill→reference map only.
 | Ch4 §4.7.6-4.7.8 | agent-architecture (fold) | async-event-handling.md |
 | Ch5 | coding-agent-design | search-and-editing.md, code-meta-patterns.md |
 | Ch6 | agent-evaluation | eval-methodology.md, eval-infrastructure.md |
-| Ch7 | agent-post-training *(fit decided in-session)* | TBD |
+| Ch7 (advisory) | agent-post-training | post-training-decisions.md, agent-reward-design.md |
+| Ch7 (implementation) | ml-post-training | sft-methodology.md, rl-training.md, training-data-environment.md |
+<!-- Split: audience-driven — advisory/decision layer (agent builders) vs implementation layer (ML practitioners) -->
 | Ch8 | agent-self-evolution *(fold decided in-session)* | TBD |
 | Ch9 | multimodal-agents *(fold/defer decided in-session)* | TBD |
 | Ch10 | multi-agent-collaboration | collaboration-patterns.md, multi-agent-infrastructure.md |

@@ -1,6 +1,6 @@
 ---
 name: agent-evaluation
-description: You MUST consult this skill when building evaluation systems for autonomous agents, designing rubrics for LLM-as-Judge, choosing evaluation paradigms (tool-calling verification vs user-simulator vs LLM-as-Judge), selecting metrics (Pass@k vs Pass^k), building eval datasets, or determining statistical significance of results. Also trigger when agent scores fluctuate between runs, a stronger model doesn't improve scores, or evaluation results don't match production behavior. NOT for testing code correctness (see test-design) or evaluating skill effectiveness specifically (see skill-creator).
+description: You MUST consult this skill when building evaluation systems for autonomous agents, designing rubrics for LLM-as-Judge, choosing evaluation paradigms (tool-calling verification vs user-simulator vs LLM-as-Judge), selecting metrics (Pass@k vs Pass^k), building eval datasets, or determining statistical significance of results. Also trigger when agent scores fluctuate between runs, a stronger model doesn't improve scores, or evaluation results don't match production behavior. NOT for testing code correctness (see test-design), evaluating skill effectiveness specifically (see skill-creator), or deciding whether/when to post-train based on eval results (→ agent-post-training; Ch6 §6.11 establishes that evaluation environments become training environments — the decision to cross that bridge lives in agent-post-training).
 ---
 
 # Agent Evaluation

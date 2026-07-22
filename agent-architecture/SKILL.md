@@ -163,6 +163,8 @@ decisions (when/whether to fine-tune, SFT vs RL), see `agent-post-training`.
 Durability caveat: these axes are stable; specific model versions are not.
 Revisit model choice when capability or cost changes materially.
 
+-> Read `references/real-time-thinking.md` for fast/slow thinking decomposition (when to decouple interaction from reasoning), cascade vs end-to-end tradeoffs, and the God's-eye-view labeling problem.
+
 ---
 
 ## §3 Guardrails & Safety
@@ -271,7 +273,7 @@ when building that layer.
 | Post-training implementation (SFT/RL mechanics) | ml-post-training | Ch7 |
 | Multi-agent orchestration & collaboration | multi-agent-collaboration | Ch10 |
 
-Self-evolution (Ch8) and multimodal agents (Ch9) are under evaluation for the ai-agents family — see epic mattstruble-skills-u9i.
+Self-evolution (Ch8) shipped as `agent-self-evolution`. Ch9 (multimodal & real-time interaction) is deferred as a standalone skill; its three transferable principles are folded here as `references/real-time-thinking.md`.
 
 ---
 
@@ -298,3 +300,4 @@ deterministic code, queues, or events is application-architecture.
 | `references/orchestration-patterns.md` | Choosing workflow vs autonomous vs mixed; deeper trade-offs, mixing patterns, stopping-condition mechanics, framework pattern families |
 | `references/guardrails-and-safety.md` | Full input/execution/output guardrail taxonomy, C/V/C layer mapping, tool risk-rating mechanics, HITL trigger design, jailbreak vs injection in depth |
 | `references/async-event-handling.md` | Structured event modeling, cancellation/queue/parallel strategies, trajectory integrity rules, attention-dispersion mitigations, sync-to-async engineering pattern |
+| `references/real-time-thinking.md` | Fast/slow thinking decomposition (decouple interaction from reasoning); cascade vs end-to-end tradeoff and the bottleneck-information principle; God's-eye-view labeling problem in online decision-making |

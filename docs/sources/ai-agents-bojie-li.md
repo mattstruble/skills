@@ -68,7 +68,7 @@ durable chapter→skill→reference map only.
 | Ch7 (implementation) | ml-post-training | sft-methodology.md, rl-training.md, training-data-environment.md |
 <!-- Split: audience-driven — advisory/decision layer (agent builders) vs implementation layer (ML practitioners) -->
 | Ch8 | agent-self-evolution | experience-distillation.md, autonomous-capability-growth.md, prompt-evolution.md |
-| Ch9 | multimodal-agents *(fold/defer decided in-session)* | TBD |
+| Ch9 | agent-architecture (fold — thin reference) | real-time-thinking.md |
 | Ch10 | multi-agent-collaboration | collaboration-patterns.md, multi-agent-infrastructure.md |
 
 Working skill names above are placeholders from the epic task graph

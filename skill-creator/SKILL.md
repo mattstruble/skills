@@ -106,6 +106,8 @@ Skills use a three-level loading system:
 2. **SKILL.md body** - In context whenever skill triggers (<500 lines ideal)
 3. **Bundled resources** - As needed (unlimited, scripts can execute without loading)
 
+A skill loaded via a dedicated tool call (e.g., `load_skill(name)`) receives stronger instruction-following from the model than the same content arriving via generic file reading — design loading mechanisms accordingly when building skill-aware frameworks.
+
 These word counts are approximate and you can feel free to go longer if needed. The SkillsBench data shows why this matters: compact, focused skills outperform sprawling documentation. Every token in the SKILL.md competes with the user's actual task for context window space.
 
 **Key patterns:**
@@ -390,6 +392,8 @@ Every description follows this structure:
 1. **Forceful opener** (~15 words): "You MUST consult/apply/use this skill when/before..."
 2. **Non-obvious triggers** (~30 words): 2-3 scenarios that wouldn't be intuited from the opener alone
 3. **Concise exclusions** (~25 words): "NOT for X, Y, or Z (see other-skill)"
+
+The exclusions are the routing mechanism, not optional polish. A description without explicit NOT-triggers is a feature blurb that fires too broadly; one with them is a routing condition that fires precisely. The description tells the model "load this skill when X" AND "do not load when Y" — without the second half, any query adjacent to the skill's domain will trigger it.
 
 Target: **~80 words total**. No keyword variant lists, no philosophy taglines, no workflow summaries.
 

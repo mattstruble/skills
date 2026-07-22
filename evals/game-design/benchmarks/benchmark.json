@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "skill_name": "game-design",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "opening-and-exhausted-mechanic",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Addresses first-impression friction (get to agency fast; don't wrest the camera; fast restart vs harsh death penalty)",
+          "passed": true,
+          "evidence": "All three sub-points present. Get to agency fast: 'get the player to real agency before they've decided to leave' and 'Time-to-agency. How many seconds from launch to the player doing the thing your game is actually about?' (lines 23, 27). Camera: 'Don't wrest the camera. The camera is the player's eyes... never take camera control during the opening' (lines 33-37). Restart vs death penalty: 'Restart speed vs. death penalty... Fast restart makes harsh difficulty tolerable... A long respawn, a reload... Measure your retry loop in seconds and compress it' (lines 39-46)."
+        },
+        {
+          "text": "Diagnoses the exhausted mechanic via idea density / mining a mechanic's depth / first-reveal novelty is not sustained value",
+          "passed": true,
+          "evidence": "All three lenses present. 'The key insight: first-reveal novelty is not sustained value' (line 84). 'it's almost certainly low idea density' and 'Idea density is the diagnostic: count the number of distinct ideas your mechanic surfaces per N levels' (lines 80, 90). 'the game is coasting on the first reveal instead of mining its own depth... you stopped exploring it' (lines 93, 97)."
+        },
+        {
+          "text": "Brings in at least one of: difficulty-is-not-quality, contrivance budget, or lifting the marginal parts",
+          "passed": true,
+          "evidence": "All three brought in. 'Difficulty != quality... the pinky-toe thought experiment makes it vivid' (lines 140-143). 'spends your contrivance budget -- every new rule adds cognitive weight the player has to carry, and must return more than it costs' (lines 126-129). 'Lift the marginal parts... concentrate effort on the weak parts first' (lines 149-153)."
+        },
+        {
+          "text": "Frames Jonathan Blow's contestable game takes as his stance",
+          "passed": true,
+          "evidence": "Explicit up-front framing: 'much of the sharpest guidance below comes from Jonathan Blow's stream commentary. Some of his specific judgments (which games earn their difficulty, that early access is no excuse, that crafting usually makes games worse) are his contestable, taste-driven takes, and I'll flag them as his stance rather than settled fact' (lines 7-13). Reinforced throughout: 'framed as Blow's contestable stance' (line 70); 'Blow argues (his stance, and a defensible one)' (line 128)."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "opening-and-exhausted-mechanic",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Addresses first-impression friction (get to agency fast; don't wrest the camera; fast restart vs harsh death penalty)",
+          "passed": true,
+          "evidence": "All three present. 'Get the player to agency fast. The game must be playable immediately' (line 11). 'Don't wrest control away early. Cutscenes, forced camera moves, and watch this moments at minute 1 spend investment' (line 15). 'Lower the cost of failure early... A fast retry keeps a struggling new player inside the band... a harsh penalty (long respawn, lost progress) at minute 1 spends investment the player hasn't earned' (line 19)."
+        },
+        {
+          "text": "Diagnoses the exhausted mechanic via idea density / mining a mechanic's depth / first-reveal novelty is not sustained value",
+          "passed": true,
+          "evidence": "Satisfies the OR. 'the novelty of a mechanic's first reveal is not the same as its sustained value' (line 29). 'Mine the mechanic for depth via interplay / counterpoint' (line 37). Uses the named 'Depth vs Complexity' diagnostic rather than 'idea density', but the first-reveal-novelty and mining-depth clauses are explicitly met."
+        },
+        {
+          "text": "Brings in at least one of: difficulty-is-not-quality, contrivance budget, or lifting the marginal parts",
+          "passed": true,
+          "evidence": "Difficulty-is-not-quality is genuinely brought in and applied: 'The fix for exhausted is rarely make it harder -- it's make it deeper (more meaningful decisions)' (line 46) and 'an exhausted mechanic is a depth problem, not a difficulty problem' (line 52). The answer names all three Blow framings in line 52 but explicitly declines to lean on contrivance-budget and lift-marginal-parts; difficulty-is-not-quality is the one actually used as a load-bearing concept."
+        },
+        {
+          "text": "Frames Jonathan Blow's contestable game takes as his stance",
+          "passed": false,
+          "evidence": "Does not name Jonathan Blow and does not present his takes as his stance. Line 52 refers only obliquely to 'one prominent designer's deliberately contestable positions' and states 'This snapshot of the skill doesn't carry those specific framings or attribute them, so I haven't leaned on them' -- it sets the takes aside rather than framing them as Blow's stance. Baseline transcript confirms the snapshot lacked the JB attribution."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.75,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.25"
+    }
+  },
+  "notes": [
+    "Assertions 1-3 (first-impression friction; idea-density diagnosis; difficulty!=quality/contrivance-budget/lift-marginal-parts) pass in BOTH configs - non-discriminating.",
+    "Sole discriminator: A4 'frame Jonathan Blow's takes as his stance' - baseline referenced 'one prominent designer' but declined to name/use the takes (attribution-only delta)."
+  ]
+}

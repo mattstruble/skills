@@ -1,0 +1,87 @@
+{
+  "skill_name": "brainstorm",
+  "evals": [
+    {
+      "id": 1,
+      "name": "greenfield-caching",
+      "prompt": "I want to add a caching layer to our API service. We're getting hammered on some endpoints and I think we need to cache responses.",
+      "expected_output": "Agent asks clarifying questions one at a time, leads with recommendations, does not jump to implementation",
+      "files": [],
+      "expectations": [
+        "Response asks exactly one question, not multiple questions or a bullet list of follow-ups",
+        "Response leads with an explicit recommendation and explains reasoning before or alongside the question",
+        "Response contains no code blocks or implementation details",
+        "Response challenges the premise — questions whether caching is the right solution rather than accepting it as given"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "simple-retry",
+      "prompt": "I need to add a retry mechanism to our HTTP client",
+      "expected_output": "Agent treats this as worthy of questioning despite simplicity, asks clarifying questions, does not skip to code",
+      "files": [],
+      "expectations": [
+        "Response asks exactly one question, not multiple questions or a bullet list of follow-ups",
+        "Response leads with an explicit recommendation and explains reasoning before or alongside the question",
+        "Response contains no code blocks or implementation details",
+        "Response treats the topic as worthy of brainstorming — does not dismiss as too simple or skip to implementation"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "large-scope-platform",
+      "prompt": "I want to build an internal developer platform with service catalogs, deployment pipelines, cost dashboards, and an incident management system",
+      "expected_output": "Agent flags scope immediately and helps decompose before drilling into details",
+      "files": [],
+      "expectations": [
+        "Response asks exactly one question, not multiple questions or a bullet list of follow-ups",
+        "Response leads with an explicit recommendation and explains reasoning before or alongside the question",
+        "Response contains no code blocks or implementation details",
+        "Response explicitly identifies this as multiple independent subsystems that should not be designed simultaneously",
+        "Response recommends tackling one piece at a time and suggests which to start with"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "80-20-notifications-mandated",
+      "prompt": "I need to build a notification system but my boss insists on email, SMS, and push notifications all at launch. I can't push back on this — it's already been promised to the client.",
+      "expected_output": "Agent accepts the constraint, does not re-litigate the decision, and pivots to finding the simplest version that satisfies all three channels",
+      "files": [],
+      "expectations": [
+        "Response does not re-challenge or re-litigate the 'all three channels' requirement after the user says it's non-negotiable",
+        "Response pivots toward simplification — asks about the minimal version of each channel rather than trying to eliminate channels",
+        "Response asks exactly one question, not multiple questions or a bullet list of follow-ups",
+        "Response leads with an explicit recommendation and explains reasoning before or alongside the question",
+        "Response contains no code blocks or implementation details"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "80-20-admin-dashboard",
+      "prompt": "The product manager wants a full admin dashboard with user management, billing history, audit logs, analytics charts, and a support ticket view. We have two weeks.",
+      "expected_output": "Agent challenges scope given the timeline, then helps find the 80/20 version — the subset that delivers the most value in two weeks",
+      "files": [],
+      "expectations": [
+        "Response flags the scope vs. timeline mismatch explicitly",
+        "Response asks exactly one question, not multiple questions or a bullet list of follow-ups",
+        "Response leads with an explicit recommendation and explains reasoning before or alongside the question",
+        "Response contains no code blocks or implementation details",
+        "Response either applies YAGNI (challenges whether all features are needed) or 80/20 (asks which subset delivers the most value) — not neither"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "80-20-yagni-first-then-simplify",
+      "prompt": "We want to add a real-time collaboration feature to our document editor — live cursors, presence indicators, conflict resolution, and operational transforms. The CTO says we need it to compete with Google Docs.",
+      "expected_output": "Agent first challenges whether full real-time collaboration is truly needed (YAGNI), and if the user confirms it is, pivots to finding the simplest version that satisfies the core need",
+      "files": [],
+      "expectations": [
+        "Response first challenges the premise — questions whether full real-time collaboration is actually needed to compete, or whether a simpler alternative would suffice",
+        "Response asks exactly one question, not multiple questions or a bullet list of follow-ups",
+        "Response leads with an explicit recommendation and explains reasoning before or alongside the question",
+        "Response contains no code blocks or implementation details",
+        "Response does not immediately accept the full feature list without questioning it"
+      ]
+    }
+  ]
+}

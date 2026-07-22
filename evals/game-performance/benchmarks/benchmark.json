@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "skill_name": "game-performance",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "flat-profile",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "expectations": [
+        {
+          "text": "Explicitly recognizes the flat-profile situation as the mature case",
+          "passed": true,
+          "evidence": "Title 'You Have a Flat Profile \u2014 That's the Mature Case'. Lines 5-7: 'This is the flat profile, and it's the mature case: it means you've already eliminated the obvious hotspots, and what's left is the long tail of many small contributors with no single dominant win.'"
+        },
+        {
+          "text": "Advises accepting it or making an architectural change rather than grinding many tiny items for a big win",
+          "passed": true,
+          "evidence": "'Your two real options': 'Option 1: Accept the profile' (line 24) and 'Option 2: Make an architectural change' (line 53). Lines 84-85: 'What you should not do is spend weeks grinding many tiny items hoping they sum to a big win \u2014 that's the worst-ROI path on a flat profile.'"
+        },
+        {
+          "text": "Mentions measuring work-per-unit-time rather than raw throughput",
+          "passed": true,
+          "evidence": "Section header line 89: 'Crucial: measure work per unit time, not raw throughput.' Lines 92-94: 'Don't evaluate performance as raw throughput (fps, draw-calls/sec) in isolation \u2014 measure work and features delivered per unit time.' Reinforced by the 120fps-rich-scene vs 2000fps-empty-room comparison (lines 96-102)."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "flat-profile",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "expectations": [
+        {
+          "text": "Explicitly recognizes the flat-profile situation as the mature case",
+          "passed": true,
+          "evidence": "Line 3 header 'First, recognize what this is: the mature case'. Line 5: 'A flat profile is not a failure to find the bottleneck \u2014 it's what a well-optimized program looks like... Treat this as the mature stage of optimization, not a fresh problem to grind.'"
+        },
+        {
+          "text": "Advises accepting it or making an architectural change rather than grinding many tiny items for a big win",
+          "passed": true,
+          "evidence": "Line 9 header 'Don't grind the tiny items hoping for a big win'. Line 13 'You have two legitimate responses: 1. Accept it (line 15) 2. Make an architectural change (line 21).' Line 11: 'Halving a 0.5% cost buys you 0.25%. Doing that fifty times is a massive, bug-prone effort... approximately zero.'"
+        },
+        {
+          "text": "Mentions measuring work-per-unit-time rather than raw throughput",
+          "passed": true,
+          "evidence": "Line 30 header 'Measure work-per-unit-time, not raw throughput'. Line 32: 'track the rate of useful work per unit time instead'. Line 36: 'Useful work per millisecond... An architectural change is validated when these improve... not when one function's raw number drops.'"
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.00"
+    }
+  },
+  "notes": [
+    "All 3 assertions pass in BOTH configs - non-discriminating. Baseline reproduced 'mature case', accept-or-architectural-change, and work-per-unit-time even though its snapshot lacked the exact terminology.",
+    "No discriminating assertion; the eval omits the JB-attribution check present in game-patterns/game-rendering. Grader recommends adding one."
+  ]
+}

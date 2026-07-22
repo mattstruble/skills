@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "skill_name": "game-patterns",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "serialization-and-events",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Explains that parsing is read+validate and to validate fully at load so there's no downstream uncertainty; gives custom-binary-vs-JSON tradeoffs",
+          "passed": true,
+          "evidence": "Part 1 states 'parsing is two distinct jobs: 1. Reading primitives... 2. Validating the contents' (lines 17-22) and 'validate everything at load time... Once that function returns successfully, there is zero downstream uncertainty' (lines 30-35). 'Custom binary vs JSON \u2014 the tradeoffs' section (lines 42-66) gives explicit 'Reach for a custom format when' vs 'Stick with JSON/TOML when' criteria (parse+validate in one pass, default diffing, versioned fields, hex floats vs human-edited config/tooling interop)."
+        },
+        {
+          "text": "Gives concrete asset/level-loading guidance (e.g. ship a packed binary, load whole file then parse, parallelize, profile before optimizing)",
+          "passed": true,
+          "evidence": "Part 2 (lines 79-114) is an ordered list: '1. Ship one packed binary per level', '2. Load the whole file, then parse', '3. Parallelize with a filename queue', '4. Profile before optimizing', '5. Validate at the packing step'. All four named examples are present and elaborated (page-cache rationale, read-only worker queue, mmap red-herring)."
+        },
+        {
+          "text": "Provides an event-system counterpoint: an event queue is often overrated; prefer sequential code / a thread / deliberate polling; reacting at an arbitrary time risks crashes",
+          "passed": true,
+          "evidence": "'The counterpoint (Jonathan Blow's stance)' (lines 136-153): 'An event queue is trivial to implement and frequently overrated.' Then 'plain sequential code is clearer... put it on a thread (or a coroutine)', 'Decide explicitly whether per-frame polling is acceptable', and 'Code that reacts at an arbitrary time will crash in ways that are hard to reproduce'. All four sub-claims present."
+        },
+        {
+          "text": "Frames JSON/event-system skepticism as Jonathan Blow's stance while keeping the durable kernels",
+          "passed": true,
+          "evidence": "Lines 7-11 framing note: 'the skeptical positions on JSON-for-game-data and on event queues come from Jonathan Blow's stream commentary. I'll flag them as his stance... but the mechanisms underneath (validate-at-load, sequential-code clarity) are durable'. Reinforced at line 37 ('Blow argues JSON/XML are overrated'), line 136 header, and line 155 ('The durable kernel underneath the skepticism')."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "serialization-and-events",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Explains that parsing is read+validate and to validate fully at load so there's no downstream uncertainty; gives custom-binary-vs-JSON tradeoffs",
+          "passed": true,
+          "evidence": "Line 11: 'Treat loading as read + validate in one step. By the time the load function returns, every field should be known-good... The reason is downstream certainty.' Lines 15-18 give the tradeoff: 'JSON is human-readable, trivially diffable, forgiving to version... Its costs are size and parse time' vs 'A custom/packed binary format is smaller and faster to parse, but opaque, harder to debug.' Content is present despite the author flagging it as outside the snapshot (line 18)."
+        },
+        {
+          "text": "Gives concrete asset/level-loading guidance (e.g. ship a packed binary, load whole file then parse, parallelize, profile before optimizing)",
+          "passed": true,
+          "evidence": "Line 34: 'Profile before you optimize the loader.' Line 36 parenthetical lists the rest: 'ship levels as a packed binary for release, read the whole file in one I/O then parse from memory, and parallelize independent loads across threads.' All four named examples appear, though thinner than with_skill and flagged as 'the snapshot doesn't spell out.'"
+        },
+        {
+          "text": "Provides an event-system counterpoint: an event queue is often overrated; prefer sequential code / a thread / deliberate polling; reacting at an arbitrary time risks crashes",
+          "passed": true,
+          "evidence": "Line 42: 'an event system is the most over-reached version of it.' Ordered preference (lines 66-68): '1. Sequential code... Default. 2. Observer... 3. A worker thread + Event Queue... pulled on a deliberate, once-per-frame cadence.' Line 53 'deliberate polling'. Line 58: 'the entity that posted an event may be dead by the time you react \u2014 dangling references and crashes.' All four sub-claims present."
+        },
+        {
+          "text": "Frames JSON/event-system skepticism as Jonathan Blow's stance while keeping the durable kernels",
+          "passed": false,
+          "evidence": "Durable kernels are kept, but the answer explicitly does NOT attribute the stance to Jonathan Blow. Lines 74-76: 'That skepticism is often delivered as one prominent practitioner's deliberately provocative stance... This snapshot of the skill doesn't attribute it or argue the polemic.' Blow is never named. The assertion's attribution requirement is unmet \u2014 consistent with the old snapshot lacking the JB material."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.75,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.25"
+    }
+  },
+  "notes": [
+    "Assertions 1-3 (parse=read+validate + binary/JSON tradeoffs; concrete asset-loading guidance; event-queue counterpoint) pass in BOTH configs - non-discriminating, satisfied from general game-dev knowledge.",
+    "Sole discriminator: A4 'frame JSON/event-system skepticism as Jonathan Blow's stance' - baseline kept the kernels but declined attribution (attribution-only delta)."
+  ]
+}

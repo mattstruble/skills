@@ -1,0 +1,48 @@
+{
+  "skill_name": "coding-agent-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a coding agent that will have access to our production source code and can execute commands. What security model should I use? I'm particularly worried about prompt injection via imported packages and accidental credential exposure.",
+      "expected_output": "A concrete security design covering: sandbox isolation (network egress controls, filesystem mounts), the lethal triad threat model (private data + untrusted content + external comms), semantic command parsing over keyword blacklists, principal loyalty definition, and trust-boundary enforcement below the application layer. Should address prompt injection via packages specifically and credential handling.",
+      "files": [],
+      "expectations": [
+        "Addresses sandbox isolation with specific controls (network egress, filesystem mounts)",
+        "Covers the threat model combining private data access + untrusted content + external communication",
+        "Addresses prompt injection via imported packages specifically",
+        "Recommends keeping credentials out of the sandbox (never mounted)",
+        "Mentions semantic parsing over keyword blacklists for shell command safety",
+        "Addresses principal loyalty — who the agent serves",
+        "Recommends trust enforcement below the application layer (DB constraints, etc.)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My coding agent keeps getting stuck — it tries the same fix over and over when something fails, and sometimes exhausts its budget without producing working code. How should I design the error handling and recovery system?",
+      "expected_output": "A structured failure recovery design covering: detection mechanisms (repeated-call fingerprinting, consecutive failure counters, idle watchdog), recovery escalation (silent retry -> degrade -> surface to user), circuit breakers and death-spiral defense, global caps (max turns, budget), and the principle that tool errors should feed back to the model rather than terminate the agent.",
+      "files": [],
+      "expectations": [
+        "Identifies repeated-call fingerprinting as the mechanism to detect stuck loops",
+        "Describes recovery escalation: silent retry first, then degrade, then surface to user",
+        "Recommends circuit breakers with max consecutive failure limits",
+        "Addresses budget exhaustion with global caps (max turns, budget cap)",
+        "States that tool errors should become model input, not stop signals",
+        "Mentions death-spiral defense (disabling model-invoking side effects on error paths)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm starting a new coding agent project. What's the minimum set of tools I need to give it, and should I include semantic code search or is grep enough? The codebase is about 500k lines of Python.",
+      "expected_output": "The 7-tool minimal toolset (Code Interpreter, Bash Shell, Read/Write/Edit File, Search File Name, Search File Content), with reasoning for each. For 500k lines Python: recommendation on grep vs semantic search with concrete guidance — grep is sufficient for known identifiers, semantic search adds value for concept-level queries but is an optimization not a requirement. Should reference the search strategy tradeoffs.",
+      "files": [],
+      "expectations": [
+        "Lists the 7-tool minimal toolset (Code Interpreter, Bash, Read, Write, Edit, Search File Name, Search File Content)",
+        "Explains why each tool earns its place (not just a list)",
+        "Addresses the grep vs semantic search question for a 500k line Python codebase",
+        "States that semantic search is an optimization, not a requirement",
+        "Explains when grep is sufficient (known identifiers, error messages, imports)",
+        "Mentions the file-system-as-hub philosophy"
+      ]
+    }
+  ]
+}

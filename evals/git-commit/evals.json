@@ -1,0 +1,144 @@
+{
+  "skill_name": "git-commit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a bunch of changes in my repo at /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/test-repo that I need to commit. Can you help me commit them? The changes include new profile feature files, an auth token revoke function, bulk email support, and updated README docs.",
+      "expected_output": "The agent should detect the repo's existing conventional commit style (feat/fix with scopes), group the changes into at least 3 separate commits (profile feature, auth revoke feature, email bulk feature, and docs), present the plan to the user before committing, and use correct conventional commit format matching the repo history.",
+      "files": [],
+      "expectations": [
+        "The agent runs 'git log' or 'git log --oneline' to detect existing commit conventions before writing any messages",
+        "The agent groups changes into multiple commits (at least 3), not a single commit",
+        "The profile feature files (src/models/profile.py, src/profile_api.py, tests/test_profile.py) are grouped together in one commit",
+        "The README.md docs change is in a separate 'docs:' commit, not bundled with the feature commits",
+        "The agent presents the grouping plan to the user and asks for confirmation before executing commits",
+        "All commit messages use conventional commit format matching the repo history (type(scope): description)",
+        "Commit messages are subject-line only with no body"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Please commit my staged changes in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/staged-repo. I've already staged what I want.",
+      "expected_output": "The agent should detect that only cache.py is staged (not config.py), work only with the staged file, and write a single commit for the TTL-enhanced cache implementation.",
+      "files": [],
+      "expectations": [
+        "The agent runs 'git status' to assess the working tree state",
+        "The agent works only with the staged file (cache.py) and does not include config.py",
+        "The agent writes a single commit (not multiple) since only one file is staged",
+        "The commit message describes the cache TTL enhancement (feat or refactor type)",
+        "The commit message uses conventional commit format",
+        "Commit messages are subject-line only with no body"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Help me commit my changes in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/custom-convention-repo. There's a change to main.py that adds logging.",
+      "expected_output": "The agent should detect the .commitlintrc.json file which defines custom types (feature, bugfix, etc.) and sentence-case subjects, then use 'feature:' (not 'feat:') with a sentence-case description like 'Add logging to main module'.",
+      "files": [],
+      "expectations": [
+        "The agent checks for .commitlintrc.json or similar convention files",
+        "The agent uses 'feature:' type (not 'feat:') matching the repo's commitlint config and history",
+        "The commit message description uses sentence-case (first word capitalized) matching the repo convention",
+        "The agent does NOT use standard conventional commit types like 'feat:' or 'fix:' which are not in this repo's config",
+        "Commit messages are subject-line only with no body"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I need to commit everything in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/test-repo. Just stage all the files and make one big commit called 'update stuff' - it's all related to the same sprint.",
+      "expected_output": "The agent should resist the user's request for a single vague commit and instead propose properly grouped commits with descriptive messages. It should explain why grouping is better but ultimately respect the user's final decision.",
+      "files": [],
+      "expectations": [
+        "The agent does NOT blindly follow the instruction to make one commit called 'update stuff'",
+        "The agent proposes grouping the changes into multiple logical commits",
+        "The agent explains why separate commits are better (reviewability, revertability)",
+        "The agent uses descriptive commit messages, not 'update stuff'",
+        "The agent still presents the plan and waits for user confirmation"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "commit the changes in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/test-repo",
+      "expected_output": "Even with a minimal/terse request, the agent should follow the full workflow: detect conventions, assess tree, analyze diffs, group logically, present plan, and execute. It should not shortcut to a single commit just because the request is brief.",
+      "files": [],
+      "expectations": [
+        "The agent runs 'git log' to detect conventions even though the user didn't ask for it",
+        "The agent runs 'git diff' or 'git diff --cached' to analyze the actual changes",
+        "The agent groups changes into multiple commits (not one catch-all commit)",
+        "The agent presents the grouping plan before committing",
+        "All commit messages follow the repo's conventional commit style",
+        "Commit messages are subject-line only with no body"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Please commit my changes in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/beads-active-repo. The repo has a .beads/ directory. I've staged src/api/profile.py with a new endpoint. When you run 'bd mine', it will return: bd-42 — Add user profile endpoint (claimed).",
+      "expected_output": "The agent commits the staged change, checks for .beads/, runs 'bd mine' to discover the claimed task bd-42, and asks the user whether this commit closes the task or is intermediate progress. It does NOT run 'bd close' in this turn.",
+      "files": [],
+      "expectations": [
+        "The agent commits the staged change with an appropriate conventional commit message",
+        "After committing, the agent checks for .beads/ directory existence before running any bd command",
+        "The agent runs 'bd mine' after confirming .beads/ exists",
+        "The agent asks the user whether the commit closes the claimed task or is intermediate progress",
+        "The question references the task id and title returned by 'bd mine'",
+        "The agent does NOT run 'bd close' in this scenario — it only asks the question and waits for user input"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Commit my staged changes in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/beads-no-tasks-repo. The repo has a .beads/ directory. I've staged a fix to src/utils/parser.py. When you run 'bd mine', it will return: (no claimed tasks).",
+      "expected_output": "The agent commits the staged change normally. It checks for .beads/, finds it exists, runs 'bd mine', finds no claimed tasks, and completes without any beads closure question or 'bd close'.",
+      "files": [],
+      "expectations": [
+        "The agent commits the staged change with an appropriate conventional commit message",
+        "The agent checks for .beads/ directory and finds it exists",
+        "The agent runs 'bd mine' and finds no claimed tasks",
+        "The agent does NOT skip beads interaction without first running 'bd mine'",
+        "The agent does NOT ask any question about task closure",
+        "The agent does NOT run 'bd close'",
+        "The commit workflow completes normally without beads follow-up"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Commit my changes in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/no-beads-repo. I've staged a refactor of src/core/engine.py.",
+      "expected_output": "The agent commits the staged change normally. It checks for .beads/ in the project root, finds it does not exist, and skips all beads interaction — no 'bd mine', no closure question, no 'bd close'.",
+      "files": [],
+      "expectations": [
+        "The agent commits the staged change with an appropriate conventional commit message",
+        "The agent checks for .beads/ directory in the project root and finds it does not exist",
+        "The agent does NOT run any 'bd' commands",
+        "The agent does NOT ask any question about task closure",
+        "The commit workflow completes without any beads interaction"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Commit my staged changes in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/beads-active-repo. The repo has a .beads/ directory. I've staged src/export/csv.py. When you run 'bd mine', it will return: bd-17 — Implement CSV export (claimed). After you ask about task closure, I'll confirm: yes, this closes the task.",
+      "expected_output": "The agent commits the staged change, runs 'bd mine' to discover the claimed task bd-17, asks the user whether the commit closes the task, receives confirmation, and runs 'bd close bd-17 --reason \"<reason>\"' with a quoted reason derived from the commit message. The question appears in the output before 'bd close' is run.",
+      "files": [],
+      "expectations": [
+        "The agent commits the staged change with an appropriate conventional commit message",
+        "The agent runs 'bd mine' to discover the claimed task",
+        "The agent asks the user whether the commit closes the claimed task before running 'bd close'",
+        "After the user confirms closure, the agent runs 'bd close bd-17 --reason \"<reason>\"' with the reason as a quoted string",
+        "The --reason value is a brief summary derived from the commit message",
+        "The agent's question about closure appears in the output before any 'bd close' command is issued"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Commit my staged changes in /Users/mstruble/Software/mattstruble-skills/git-commit-workspace/beads-active-repo. The repo has a .beads/ directory. I've staged a partial change to src/auth/oauth.py. When you run 'bd mine', it will return: bd-55 — Migrate auth to OAuth2 (claimed). After you ask about task closure, I'll say: this is just intermediate progress, the task isn't done yet.",
+      "expected_output": "The agent commits the staged change, runs 'bd mine' to discover the claimed task bd-55, asks whether the commit closes the task, receives the user's answer that it's intermediate progress, and completes without running 'bd close'.",
+      "files": [],
+      "expectations": [
+        "The agent commits the staged change with an appropriate conventional commit message",
+        "The agent runs 'bd mine' to discover the claimed task",
+        "The agent asks the user whether the commit closes the claimed task or is intermediate progress",
+        "After the user says it is intermediate progress, the agent does NOT run 'bd close'",
+        "The commit workflow completes normally after the user's answer",
+        "No 'bd close' command is executed at any point"
+      ]
+    }
+  ]
+}

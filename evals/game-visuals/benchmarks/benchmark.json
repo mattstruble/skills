@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "skill_name": "game-visuals",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "readability-and-brief",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "expectations": [
+        {
+          "text": "Uses the visual information-channels idea (color/shape/surface-contrast; removing channels like via monochrome or uniform roughness hurts playability, not just looks)",
+          "passed": true,
+          "evidence": "Three channels named explicitly: 'Color -- hue and saturation differences', 'Shape -- silhouette and form', 'Surface contrast -- value variation across a surface (roughness, light-to-dark gradients, texture detail)' (lines 13-18). Playability cost on channel removal: 'removing or flattening a channel costs legibility, and that's a playability cost, not just an aesthetic one. Monochrome deliberately subtracts the color channel... flattening surface contrast -- making everything the same roughness or the same mid-value -- subtracts the surface channel, and the result reads as uniform slop' (lines 22-27)."
+        },
+        {
+          "text": "Addresses composition: maximize actionable play-area, separate foreground from background, camera as a deliberate choice",
+          "passed": true,
+          "evidence": "All three present. Maximize actionable area: 'active-play-area ratio: the fraction of on-screen pixels that are actually actionable' and 'Maximize the actionable area. Tighten the camera so the play space dominates the frame' (lines 69-78). Separate fg/bg: 'Separate foreground from background vocabulary. Don't reuse the same visual objects in both layers -- it destroys depth cues' (lines 84-85). Camera deliberate: 'Treat camera angle and zoom as a deliberate, per-scene design choice, not a default you set once' (lines 79-81)."
+        },
+        {
+          "text": "Gives a reference-gathering + artist-briefing workflow (low-bar/breadth-first references, brief with concrete refs plus a rough programmer-art sketch)",
+          "passed": true,
+          "evidence": "Step 1: 'Gather references with a deliberately low bar (breadth first)... breadth beats taste' (lines 113-121). Step 2 briefing: 'Hand the artist concrete reference images, not adjectives' (line 131) and 'Pair them with your own rough sketch -- programmer-art quality is fine... Ugly-but-clear beats pretty-but-vague' (lines 133-136)."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "readability-and-brief",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.33,
+        "passed": 1,
+        "failed": 2,
+        "total": 3
+      },
+      "expectations": [
+        {
+          "text": "Uses the visual information-channels idea (color/shape/surface-contrast; removing channels like via monochrome or uniform roughness hurts playability, not just looks)",
+          "passed": true,
+          "evidence": "'In a game, color/value/shape are not decoration -- they're communication channels, and legibility is redundant encoding' (lines 26-27). Channel-removal as playability cost: 'A near-monochrome palette removes the hue channel; flattening everything to the same value removes the value channel; a uniform surface/saturation treatment removes the contrast that separates objects. Each removed channel is a playability cost, not just an aesthetic one' (line 29)."
+        },
+        {
+          "text": "Addresses composition: maximize actionable play-area, separate foreground from background, camera as a deliberate choice",
+          "passed": false,
+          "evidence": "Hits two of three. Separate fg/bg: 'Compose so the actionable layer is unmistakably separated from the decorative layer' (line 37). Camera deliberate: 'Treat the camera/framing as a deliberate focus-control decision... not a default' (line 37). But it does NOT address maximizing the actionable play-area (no active-play-area ratio, no tightening the camera so the play space dominates the frame); composition guidance is limited to contrast/density recession and focal-point clearing, not the play-area's share of the screen."
+        },
+        {
+          "text": "Gives a reference-gathering + artist-briefing workflow (low-bar/breadth-first references, brief with concrete refs plus a rough programmer-art sketch)",
+          "passed": false,
+          "evidence": "Provides the programmer-art mock ('Build a quick programmer-art mock of a real gameplay frame at the intended hierarchy and density', line 82) but explicitly lacks the reference half. Scope note (lines 86-87): 'It does not include a dedicated breadth-first reference-gathering workflow (casting a wide low-bar net of references, then narrowing to concrete refs).' No briefing with concrete reference images; the workflow is vocabulary/palette/per-asset-job based instead."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.33,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.67"
+    }
+  },
+  "notes": [
+    "A1 (visual information-channels) passes in BOTH configs - non-discriminating.",
+    "Discriminating: A2 (maximize actionable play-area) and A3 (breadth-first reference-gathering + briefing workflow) - both absent from the baseline snapshot. Genuine capability add (+0.67)."
+  ]
+}

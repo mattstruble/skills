@@ -1,0 +1,58 @@
+{
+  "skill_name": "nix",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I need to set up a Nix dev shell for a Python project that uses poetry. I also want direnv to auto-activate the environment when I cd into the project directory. Can you write the flake.nix and .envrc for me?",
+      "expected_output": "A flake.nix with a devShell using poetry2nix or a venv-based mkShell, plus a .envrc with 'use flake'. Should reference dev-environments.md for detailed patterns.",
+      "files": [],
+      "expectations": [
+        "Output includes a flake.nix with a devShell definition",
+        "Output includes a .envrc file containing 'use flake'",
+        "Agent consulted references/dev-environments.md",
+        "flake.nix includes inputs.nixpkgs.follows pattern to avoid duplicate downloads",
+        "Response addresses the pip/sandbox limitation (gotcha about Python in Nix)"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "I'm setting up nix-darwin on my new M4 MacBook Pro. I want to: configure dark mode and autohide dock, manage my shell config (zsh with starship prompt) via Home Manager, and install Firefox and VS Code via Homebrew. Write me the flake.nix, darwin.nix, and home.nix.",
+      "expected_output": "A complete nix-darwin + Home Manager setup with system.primaryUser, system.defaults for dock/dark mode, homebrew casks, and home-manager zsh+starship config. Should reference nix-darwin.md and home-manager.md.",
+      "files": [],
+      "expectations": [
+        "Output includes flake.nix, darwin.nix, and home.nix files",
+        "darwin.nix includes system.primaryUser (required in 25.11)",
+        "darwin.nix configures dark mode (AppleInterfaceStyle) and dock autohide",
+        "flake.nix targets aarch64-darwin for M4 Apple Silicon",
+        "Homebrew section includes casks for firefox and visual-studio-code",
+        "home.nix configures zsh and starship prompt",
+        "Agent consulted references/nix-darwin.md and references/home-manager.md"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "On my NixOS machine I want to: (1) override vim to use python311 instead of the default python, (2) create a custom package for a CLI tool hosted on GitHub at github:myorg/mytool, and (3) make both available system-wide via an overlay. Show me how to structure this in my flake.nix and explain the tradeoffs.",
+      "expected_output": "Overlay using override for vim, callPackage for custom package, with explanation of cache invalidation tradeoff. Should reference nixpkgs-advanced.md for details.",
+      "files": [],
+      "expectations": [
+        "Output uses override (not overrideAttrs) for vim with python311",
+        "Output uses callPackage for the custom mytool package",
+        "Overlay uses correct final/prev parameter naming",
+        "Response explains binary cache invalidation tradeoff from overlays",
+        "Agent consulted references/nixpkgs-advanced.md"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "My nixos-rebuild keeps failing. First it said it couldn't find a new module file I just created (modules/vpn.nix), and after I fixed that, now I'm getting 'infinite recursion encountered' errors that seem to come from my overlay. How do I debug this?",
+      "expected_output": "Identifies git add as fix for missing file, explains final vs prev confusion in overlays as cause of infinite recursion, suggests debugging tools. Should reference best-practices.md.",
+      "files": [],
+      "expectations": [
+        "Response identifies git add as the fix for the missing file issue",
+        "Response explains final vs prev confusion as the cause of infinite recursion in overlays",
+        "Response suggests --show-trace or nix repl as debugging tools",
+        "Agent consulted references/best-practices.md"
+      ]
+    }
+  ]
+}

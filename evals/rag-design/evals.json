@@ -1,0 +1,44 @@
+{
+  "skill_name": "rag-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a corpus of 10,000 legal contracts (PDFs, avg 20 pages each) that I need to make searchable for a legal research assistant. How should I chunk these documents for retrieval?",
+      "expected_output": "A concrete chunking strategy recommendation covering: (1) which chunking approach to use for legal documents (structure-aware/recursive preferred), (2) recommended chunk size and overlap, (3) how to handle the context-loss problem (contextual retrieval), (4) why fixed-size chunking is insufficient for legal text, and (5) consideration of document structure (sections, clauses, definitions).",
+      "files": [],
+      "expectations": [
+        "Recommends structure-aware or recursive chunking over fixed-size for legal documents",
+        "Provides specific chunk size guidance (token range) with overlap percentage",
+        "Addresses the context-loss problem and recommends contextual retrieval or similar enrichment",
+        "Explains why isolated chunks from legal contracts are ambiguous without document context",
+        "Mentions the retrieval stack framing (chunk layer is first design decision)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My RAG system returns results but they're often irrelevant — the chunks look topically related but don't actually answer the question. What's wrong with my retrieval and how do I fix it?",
+      "expected_output": "A diagnostic walkthrough using the retrieval stack: (1) identify the likely layer failure (retrieval strategy — dense-only missing keywords, or reranking absent), (2) recommend hybrid retrieval (dense + sparse + rerank), (3) explain why semantic similarity alone is insufficient for precision, (4) introduce the neural reranker as the precision fix, and (5) mention retrieval quality metrics (recall@k, MRR, nDCG) for measurement.",
+      "files": [],
+      "expectations": [
+        "Uses the retrieval stack as a diagnostic framework to identify the failure layer",
+        "Identifies dense-only retrieval as a likely cause of topically-related-but-irrelevant results",
+        "Recommends hybrid retrieval (dense + sparse) as the fix",
+        "Recommends adding a neural reranker (cross-encoder) for precision improvement",
+        "Mentions at least one retrieval quality metric (recall@k, MRR, or nDCG) for measuring improvement"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm building a Q&A system over our company's internal documentation (wiki, Confluence, Slack archives). Simple questions work fine, but complex questions that span multiple docs fail. Should I add structured indexing, and if so, which kind?",
+      "expected_output": "A structured indexing recommendation covering: (1) confirm that flat retrieval is insufficient for multi-doc spanning queries, (2) compare the three structured indexing options (RAPTOR, GraphRAG, filesystem paradigm), (3) recommend the filesystem paradigm (L0/L1/L2) as the best fit for wiki/Confluence/Slack, (4) explain why GraphRAG is overkill for this use case, and (5) note the critical cross-reference requirement.",
+      "files": [],
+      "expectations": [
+        "Confirms that flat retrieval fails on multi-hop/cross-document queries and structured indexing is warranted",
+        "Explains at least two of the three structured indexing options (RAPTOR, GraphRAG, filesystem paradigm)",
+        "Recommends the filesystem paradigm (L0/L1/L2) as the best fit for wiki/Confluence/Slack-style corpora",
+        "Notes the critical cross-reference requirement for the filesystem paradigm",
+        "Explains why GraphRAG is not the best fit (entity-relationship focus vs document navigation)"
+      ]
+    }
+  ]
+}

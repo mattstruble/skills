@@ -1,0 +1,47 @@
+{
+  "skill_name": "code-reviewer",
+  "evals": [
+    {
+      "id": 1,
+      "name": "remove-legacy-error-handling",
+      "prompt": "Review this PR. The change removes a try/except block that was wrapping a database call. The author says it's dead code because 'we never actually hit that error path in production logs'. The diff:\n\n```diff\n-try:\n-    result = db.execute(query, params)\n-except DatabaseConnectionError as e:\n-    logger.warning(\"DB connection failed, retrying\", exc_info=e)\n-    time.sleep(1)\n-    result = db.execute(query, params)\n+result = db.execute(query, params)\n```",
+      "expected_output": "Reviewer applies Chesterton's Fence: does not simply approve the removal because 'it's never triggered in logs'. Instead raises a concern that the retry logic may be there for transient failures that are rare but real, and asks the author to confirm the error path is truly unreachable before removing.",
+      "files": [],
+      "expectations": [
+        "Reviewer does not simply approve the removal because 'it's never triggered in logs'",
+        "Reviewer raises a concern about removing the retry/error handling without understanding why it was added",
+        "Reviewer asks the author to explain or confirm the error path is truly unreachable before removal",
+        "Reviewer does not mark this as a blocking critical finding without evidence — appropriate severity is important or suggestion",
+        "Reviewer references or applies the principle that 'not seen in logs' is not the same as 'cannot happen'"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "confusing-state-machine",
+      "prompt": "Review this PR that refactors a payment processing module. The core logic was rewritten. Here's the new state transition code:\n\n```python\ndef _advance(self, ev):\n    nxt = self._T.get((self._s, ev))\n    if nxt is None:\n        nxt = self._T.get((None, ev))\n    if nxt:\n        self._s = nxt[0]\n        nxt[1](ev) if nxt[1] else None\n    else:\n        self._fallback(ev)\n```\n\nThe PR description says 'simplified the state machine logic for better performance'.",
+      "expected_output": "Reviewer applies FOLD: raises a readability finding that the code is difficult to understand — single-letter variables, opaque tuple indexing, and no comments make this hard to reason about. Does not stay silent because they can't articulate exactly what's wrong.",
+      "files": [],
+      "expectations": [
+        "Reviewer raises a readability finding about the code being hard to understand",
+        "Reviewer specifically calls out single-letter variable names (_s, _T, nxt) as obscuring intent",
+        "Reviewer does not stay silent simply because the code may be technically correct",
+        "Reviewer notes that payment processing logic requires clarity for safety/auditability",
+        "Reviewer does not dismiss the concern as 'just style' — raises it as at least an important finding given the domain"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "delete-commented-out-code",
+      "prompt": "Review this PR. The change deletes a block of commented-out code. The PR description says 'cleaning up dead code'. The diff:\n\n```diff\n-# Legacy S3 path — kept for rollback if new CDN integration fails\n-# def _upload_legacy(self, key, data):\n-#     bucket = self._get_legacy_bucket()\n-#     bucket.put_object(Key=key, Body=data)\n-#     return f\"s3://{bucket.name}/{key}\"\n-#\n-# TODO: remove after CDN migration validated (target: Q2 2024)\n```",
+      "expected_output": "Reviewer applies Chesterton's Fence: the comment explicitly says it was kept for rollback purposes. Reviewer flags that deleting this before confirming the CDN migration is validated may remove a safety net. Does not approve simply because it's 'commented out'.",
+      "files": [],
+      "expectations": [
+        "Reviewer does not simply approve because the code is commented out",
+        "Reviewer reads the comment and notes it explicitly says 'kept for rollback if new CDN integration fails'",
+        "Reviewer asks whether the CDN migration has been validated before approving deletion",
+        "Reviewer notes the TODO had a target date of Q2 2024 and asks if that milestone was confirmed",
+        "Reviewer raises this as at least a suggestion — does not silently approve"
+      ]
+    }
+  ]
+}

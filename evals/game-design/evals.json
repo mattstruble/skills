@@ -1,0 +1,61 @@
+{
+  "skill_name": "game-design",
+  "focus": "choice-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm making a roguelike deckbuilder and right now after each fight the player gets to pick from 5 cards. Playtesters say they feel stressed about the picks and don't feel great about what they chose. What's going wrong and how do I fix it?",
+      "expected_output": "Should identify that 5 options is above the comfortable evaluation threshold for a time-pressured post-combat reward, recommend reducing to 3, explain the decoy effect and contextual decoys, and discuss how archetype commitment naturally creates contextual decoys.",
+      "assertions": [
+        {"text": "Identifies 5 as above the comfortable threshold for fast decisions", "type": "presence"},
+        {"text": "Recommends reducing to 3 options (or explains why 3 is the standard)", "type": "presence"},
+        {"text": "Explains the decoy effect or contextual decoy concept", "type": "presence"},
+        {"text": "Mentions subitizing or working memory limits as the cognitive basis", "type": "presence"},
+        {"text": "Does not recommend reducing to 2 (which would eliminate meaningful choice)", "type": "absence"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I'm designing a character class selection screen for an RPG. We have 12 classes and I want players to feel excited by the variety but not overwhelmed. The game is single-player, no time pressure at this point. Any advice on how to present these?",
+      "expected_output": "Should explain the 8+ threshold for creating a sense of 'boundless' options, confirm that 12 is above working memory so it will feel large (which is the goal here), and suggest compression techniques like categorical grouping, visual clustering, or progressive disclosure to prevent paralysis while maintaining the feeling of abundance.",
+      "assertions": [
+        {"text": "Explains that 8+ exceeds working memory and creates the 'boundless' feeling", "type": "presence"},
+        {"text": "Confirms 12 is appropriate for the goal of exciting variety", "type": "presence"},
+        {"text": "Suggests grouping or categorization to manage cognitive load", "type": "presence"},
+        {"text": "Mentions heuristic support (class archetypes, visual identity, role labels)", "type": "presence"},
+        {"text": "Does not recommend reducing to 3-5 classes (since the goal is perceived variety)", "type": "absence"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "In my card game draft mode, players pick from packs of 10 cards. New players seem lost and take forever on each pick, but experienced players love it. Is the problem just that new players need to 'git gud' or is there a design issue?",
+      "expected_output": "Should identify analysis paralysis as the issue for new players, explain that 10 exceeds comfortable evaluation without structural support, discuss how experienced players develop heuristics (color commitment, archetype signals, BREAD-like priority lists) that new players lack, and suggest design interventions that support heuristic development for newcomers (rarity signals, archetype labels, recommended picks).",
+      "assertions": [
+        {"text": "Identifies analysis paralysis as the core issue for new players", "type": "presence"},
+        {"text": "Explains that experienced players cope via heuristics that new players haven't developed yet", "type": "presence"},
+        {"text": "Suggests structural support for heuristic development (rarity, archetypes, signals)", "type": "presence"},
+        {"text": "Does NOT just say 'reduce the pack size' as the only solution", "type": "quality"},
+        {"text": "References or applies the MTG draft analogy (large packs requiring player-developed filters)", "type": "presence"}
+      ],
+      "files": []
+    }
+  ],
+  "trigger_evals": [
+    {"query": "I'm making a roguelike and after each fight the player picks from 5 cards but playtesters say they feel stressed and don't feel great about their choices", "should_trigger": true},
+    {"query": "working on a talent tree for my RPG — should I offer 3 choices per tier or 5? players seem to like both but I can't decide which feels better", "should_trigger": true},
+    {"query": "my card game draft has 15-card packs and new players take forever to pick while veterans breeze through it. is there a design pattern for this?", "should_trigger": true},
+    {"query": "designing a shop screen for my roguelite. right now there are 7 items but it feels like too much. would 4 be better? I want players to feel like the shop is worth visiting", "should_trigger": true},
+    {"query": "in my game players choose between 3 boons after each boss but they always say all 3 options feel equally good and they don't feel satisfied with what they picked", "should_trigger": true},
+    {"query": "I have a character select screen with 20 fighters. I want it to feel like there's a huge roster but players are saying they can't find a main. some kind of grouping?", "should_trigger": true},
+    {"query": "players in my 4X game keep turtling instead of expanding. they build up huge armies but never attack. how do I make them want to be aggressive?", "should_trigger": false},
+    {"query": "my platformer has 20 enemy types but combat feels repetitive, every enemy just walks toward you", "should_trigger": false},
+    {"query": "I'm writing a shader for a dissolve effect on enemy death in Godot 4", "should_trigger": false},
+    {"query": "how do I implement the observer pattern for my event system in Love2D", "should_trigger": false},
+    {"query": "my game's story doesn't match the gameplay — the narrative says you're a pacifist but the mechanics reward killing everything", "should_trigger": false},
+    {"query": "need help balancing a fighting game matchup where one character dominates another", "should_trigger": false},
+    {"query": "I want to add procedural level generation to my dungeon crawler but generated rooms feel samey", "should_trigger": false},
+    {"query": "my game is a deckbuilder and I need to decide how many cards should be in the starting deck — 7 or 10?", "should_trigger": false}
+  ]
+}

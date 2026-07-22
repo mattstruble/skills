@@ -1,0 +1,129 @@
+{
+  "skill_name": "logging",
+  "evals": [
+    {
+      "id": 1,
+      "name": "write-service",
+      "prompt": "Write a background job processor in Python that pulls tasks from a Redis queue, calls an external API for each task, and stores results in a database. Include error handling.",
+      "expected_output": "Production-quality job processor with logging as a first-class concern throughout the normal flow, not just error paths.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Logs the happy path: successful job completion produces at least one INFO-level log line",
+          "type": "behavioral"
+        },
+        {
+          "text": "Logs entry AND exit of the external API call with duration/timing",
+          "type": "behavioral"
+        },
+        {
+          "text": "Uses structured logging consistently (key=value or extra={} dict, not mixed formats)",
+          "type": "behavioral"
+        },
+        {
+          "text": "Includes a correlation ID or job ID that threads through all log lines for a single job",
+          "type": "behavioral"
+        },
+        {
+          "text": "Logs all major branches (success, transient failure, fatal failure, retry, exhaustion)",
+          "type": "behavioral"
+        },
+        {
+          "text": "Does not log sensitive data (no raw payloads with potential PII, no tokens)",
+          "type": "behavioral"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "add-error-handling",
+      "prompt": "I have a payment processing function in Python that validates the payment method, charges the customer through a payment gateway, updates the order status in the database, and sends a confirmation email. Add proper error handling to make this production-ready.",
+      "expected_output": "Payment processor with error handling AND logging throughout, including success paths and external call timing.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Logs the happy path: successful payment completion produces at least one INFO-level log line",
+          "type": "behavioral"
+        },
+        {
+          "text": "Logs entry or exit of the payment gateway call with duration/timing",
+          "type": "behavioral"
+        },
+        {
+          "text": "Uses structured logging consistently (one format throughout, not mixed)",
+          "type": "behavioral"
+        },
+        {
+          "text": "Includes a correlation ID or request ID that threads through log lines",
+          "type": "behavioral"
+        },
+        {
+          "text": "Error logs include the state/context that led to the error, not just the exception message",
+          "type": "behavioral"
+        },
+        {
+          "text": "Does not log sensitive payment data (no card numbers, tokens, raw PII)",
+          "type": "behavioral"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "code-review",
+      "prompt": "Review this Python service for production readiness: it's an HTTP endpoint that accepts a webhook from a third-party provider, validates the signature, parses the payload, updates the relevant records in the database, and enqueues follow-up tasks. It works in staging but we're about to go live.",
+      "expected_output": "Review that flags logging gaps as a significant production-readiness concern, not a low-priority afterthought.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Flags missing or inadequate logging as a production-readiness issue (not ranked last or treated as a nice-to-have)",
+          "type": "behavioral"
+        },
+        {
+          "text": "Specifically mentions logging the success path, not just errors",
+          "type": "behavioral"
+        },
+        {
+          "text": "Mentions correlation IDs or request tracing as something that should be added",
+          "type": "behavioral"
+        },
+        {
+          "text": "Mentions structured logging (key=value or JSON) rather than string interpolation",
+          "type": "behavioral"
+        },
+        {
+          "text": "Mentions logging entry/exit of external calls or timing of operations",
+          "type": "behavioral"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "debug-issue",
+      "prompt": "Users are intermittently getting 500 errors from our order status endpoint. It fetches the order from the database, checks if the user is authorized to view it, enriches it with shipping data from an external API, and returns the response. It works most of the time. Help me figure out what's going wrong and fix it.",
+      "expected_output": "Diagnosis and fix that treats logging as a core part of the solution, not an afterthought addition at the end.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Fixed version logs the happy path (successful order retrieval produces a log line)",
+          "type": "behavioral"
+        },
+        {
+          "text": "Fixed version logs entry or exit of the external shipping API call with timing",
+          "type": "behavioral"
+        },
+        {
+          "text": "Uses structured logging consistently in the fix",
+          "type": "behavioral"
+        },
+        {
+          "text": "Includes a correlation ID or request ID in the fixed version",
+          "type": "behavioral"
+        },
+        {
+          "text": "Logging is presented as part of the fix strategy, not listed last or as an afterthought",
+          "type": "behavioral"
+        }
+      ]
+    }
+  ]
+}

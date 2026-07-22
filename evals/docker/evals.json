@@ -1,0 +1,43 @@
+{
+  "skill_name": "docker",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a production-ready Dockerfile for a Go REST API. The API is a simple HTTP server in cmd/server/main.go. It needs to be secure, minimal, and ready for deployment.",
+      "expected_output": "A multi-stage Dockerfile using a Go builder stage and gcr.io/distroless/static (or similar minimal) runtime stage, with CGO_ENABLED=0, USER 65534:65534, exec-form ENTRYPOINT, and BuildKit cache mounts for go modules.",
+      "files": [],
+      "expectations": [
+        "Dockerfile uses multi-stage build with a separate builder and runtime stage",
+        "CGO_ENABLED=0 is set in the build command to produce a static binary",
+        "Runtime stage uses gcr.io/distroless/static or scratch (not a full OS image)",
+        "USER directive sets a non-root user (UID 65534 or similar) in the runtime stage",
+        "ENTRYPOINT uses exec form (JSON array), not shell form",
+        "BuildKit cache mounts are used for Go module cache (/go/pkg/mod)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm running qbittorrent using the linuxserver/qbittorrent image in Docker Compose. Here's my current compose file:\n\n```yaml\nservices:\n  qbittorrent:\n    image: lscr.io/linuxserver/qbittorrent:latest\n    environment:\n      - PUID=1000\n      - PGID=1000\n      - TZ=America/New_York\n    volumes:\n      - ./config:/config\n      - ./downloads:/downloads\n    ports:\n      - 8080:8080\n      - 6881:6881\n      - 6881:6881/udp\n    restart: unless-stopped\n```\n\nWhat security improvements should I make to this compose file?",
+      "expected_output": "Recommendations covering: pinning the image tag away from 'latest', adding no-new-privileges security_opt, explaining the PUID/PGID root-start caveat, and optionally adding healthcheck and network isolation.",
+      "files": [],
+      "expectations": [
+        "Recommends pinning the image tag away from 'latest' to a specific version",
+        "Recommends adding security_opt with no-new-privileges=true",
+        "Explains that PUID/PGID images (LinuxServer.io) still start as root before dropping privileges",
+        "Provides a concrete updated compose.yaml snippet or diff showing the improvements"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I want to set up a Docker Compose file for a self-hosted Nextcloud instance. The data should be stored on an NFS share at 192.168.1.50:/volume1/nextcloud. I also want the container to run securely.",
+      "expected_output": "A compose.yaml with an NFS named volume using driver_opts (type: nfs, addr, device), a non-root user directive or security_opt, and proper network isolation.",
+      "files": [],
+      "expectations": [
+        "Compose file defines a named volume with driver: local and driver_opts for NFS (type: nfs, addr pointing to 192.168.1.50, device with the share path)",
+        "The NFS volume uses driver_opts with 'o' field containing addr=192.168.1.50",
+        "Compose file includes security hardening (user directive, security_opt no-new-privileges, or equivalent)",
+        "Services use depends_on or healthcheck for startup ordering if a database is included"
+      ]
+    }
+  ]
+}

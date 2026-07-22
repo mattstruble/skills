@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "skill_name": "code-reviewer",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "copy-paste-defects",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "expectations": [
+        {
+          "text": "Calls out scanning copy-pasted/edited-but-similar regions for the one spot that wasn't updated \u2014 code that still compiles but does the wrong thing",
+          "passed": true,
+          "evidence": "Opening: 'someone copies a nearby working block, edits it *almost* completely, and ships. It still compiles, passes type checks ... but one spot that should have changed didn't, so it silently does the wrong thing.' '**The compiler can't catch it because the code is valid; it's just wrong.**' Plus '## Core technique: diff the siblings, find the one that didn't change' and an 8-class token checklist (vars, indices, fields, operators, constants, enums, calls, keys, stale strings)."
+        },
+        {
+          "text": "Keeps review-cost/proportionality framing (if present) as Jonathan Blow's stance and subordinate to blocking correctness/security findings",
+          "passed": true,
+          "evidence": "Review-cost framing present and attributed to Blow: 'Jonathan Blow argues that mandatory review layers add latency and can hurt morale, and that you shouldn't pile heavy process onto low-risk changes \u2014 trust the people you hired...' Kept subordinate: 'it is explicitly subordinate to blocking correctness and security findings: it governs *how much process to layer on a change that is already clearly safe*, not whether to scrutinize one that isn't. A PR full of copy-pasted blocks is not in the \"clearly safe\" bucket.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "copy-paste-defects",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "expectations": [
+        {
+          "text": "Calls out scanning copy-pasted/edited-but-similar regions for the one spot that wasn't updated \u2014 code that still compiles but does the wrong thing",
+          "passed": true,
+          "evidence": "Correctness section: 'a block is duplicated and *mostly* adapted to its new context, but one spot wasn't updated. It still compiles and runs \u2014 it just does the wrong thing (wrong variable, wrong index, stale bound or literal, off-by-one...).' And 'Scan the near-identical regions **side by side** and hunt specifically for the line that *should* have changed when pasted but didn't. That diff-the-clones pass is the single most productive thing to do on a copy-paste-heavy PR.'"
+        },
+        {
+          "text": "Keeps review-cost/proportionality framing (if present) as Jonathan Blow's stance and subordinate to blocking correctness/security findings",
+          "passed": true,
+          "evidence": "Blow's review-cost stance is not present (the older snapshot lacked it; transcript confirms 'no ... Jonathan Blow review-cost framing, so neither was fabricated'), so the '(if present)' condition for Blow attribution is not triggered. The proportionality framing the answer DOES use is the skill's own 'Continuous Improvement, Not Perfection,' and it is kept correctly subordinate: 'that lens is explicitly *subordinate*... never trumps a blocking correctness or security finding; fix those first.' Nothing is misattributed or elevated above blocking findings."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.00"
+    }
+  },
+  "notes": [
+    "Both assertions pass in BOTH configs - non-discriminating. A1 (scan copy-paste regions for the un-updated spot) is general knowledge the baseline nails.",
+    "A2's '(if present)' hedge lets the baseline pass vacuously by never invoking the Blow review-cost stance. No discriminating assertion."
+  ]
+}

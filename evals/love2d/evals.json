@@ -1,0 +1,23 @@
+{
+  "skill_name": "love2d",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm making a pixel art love2d game (11.4) and I want animated water tiles. The water should shimmer using a displacement shader, but the land parts of the tile should stay still. I have a 64x64 tile spritesheet and a simplex noise texture. Write me the shader code and the Lua code to load and apply it, including a mask so only the water pixels move.",
+      "expected_output": "A working Love2D shader pipeline with GLSL code, Lua loading/applying code, uniform passing, displacement using simplex noise, and a mask image to restrict the effect to water pixels. Should use Love2D GLSL flavor (Image, Texel).",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I'm building a bullet hell in love2d and there are gonna be hundreds of projectiles on screen. Right now I'm calling love.graphics.newImage every time I spawn a bullet and it's lagging. How should I structure the projectile system? Show me the code for an efficient approach.",
+      "expected_output": "An Object Pool pattern implementation for bullet management. Should share a single image (Flyweight), pre-allocate bullet tables, and use active/inactive flags. Should include update and draw loops over the pool, and a spawn function that reuses inactive bullets.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I need a main menu for my love2d game with Start Game, Options, and Quit buttons. They should highlight when hovered and play a sound when clicked. Can you write the full main.lua for this?",
+      "expected_output": "A complete main.lua with button rendering using love.graphics.rectangle and printf, hover detection using mouse position and AABB check, click handling via love.mousereleased, highlight color on hover, and sound playback. Should use push/pop for each button's transforms.",
+      "files": []
+    }
+  ]
+}

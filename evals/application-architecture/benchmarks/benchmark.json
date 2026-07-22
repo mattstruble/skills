@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "skill_name": "application-architecture",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "concurrency-load-infra",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Distinguishes concurrency from parallelism (thread count should track CPU cores, not task count)",
+          "passed": true,
+          "evidence": "Section header line 18 '## 1. Concurrency is not parallelism'. Lines 19-24 'Parallelism is using the hardware to finish work faster, so **thread count should track CPU core count, not task count.** ... thread-per-request is exactly the design that thrashes.' Exact match to the assertion."
+        },
+        {
+          "text": "Recommends explicit task-state / a job system / threads over coroutines-or-async-as-a-language-feature, framed as a tradeoff",
+          "passed": true,
+          "evidence": "Lines 31-47 enumerate three options (thread pool, job system, explicit task-state + small scheduler), prefaced 'they're a tradeoff, not a one-true-answer'. Lines 49-66 '**On async / coroutines as the default.** Jonathan Blow argues against baking coroutines ... as a language-level architectural feature \u2014 and I'd present this as a deliberate tradeoff, not gospel ... prefer explicit task-state or threads, and keep any async **at the user level**.' Recommendation + explicit tradeoff framing present."
+        },
+        {
+          "text": "Applies queueing/load realism: high utilization makes wait time blow up; model load realistically; over-provision for launch",
+          "passed": true,
+          "evidence": "Lines 86-99: '**as utilization approaches capacity, wait time blows up far faster than intuition expects** ... A system at 90% utilization does not have 10% headroom'; '**Model the load realistically.** \"N registered users\" is not \"N concurrent DB requests\"'; '**Over-provision for launch.**' All three sub-elements present."
+        },
+        {
+          "text": "Cautions against importing Docker/Kubernetes/microservices complexity the problem does not actually require",
+          "passed": true,
+          "evidence": "Section line 110 '## 5. Infrastructure: resist the web stack'. Lines 112-116 'Docker, Kubernetes, microservices, load balancers, and message queues are solutions to problems that web-scale services actually have \u2014 they are not required by every networked system.' Lines 124-140 give per-tool guidance: 'Microservices: No', 'Kubernetes: Only if you genuinely need fleet orchestration', queue 'Justify it.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "concurrency-load-infra",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Distinguishes concurrency from parallelism (thread count should track CPU cores, not task count)",
+          "passed": false,
+          "evidence": "The answer explicitly declines this. Lines 84-89: 'The deeper questions you're really asking \u2014 concurrency vs. parallelism, how many threads to run (and whether thread count should track CPU cores or task count) ... are concurrency/runtime concerns. This guidance is explicitly not an infrastructure/concurrency skill, so I won't invent thread-count or queueing-theory rules it doesn't contain.' It names the question but makes no distinction and gives no cores-vs-task-count guidance."
+        },
+        {
+          "text": "Recommends explicit task-state / a job system / threads over coroutines-or-async-as-a-language-feature, framed as a tradeoff",
+          "passed": false,
+          "evidence": "No concurrency model is recommended. Lines 86-89 explicitly punt on 'threads vs. async/coroutines', stating the guidance 'is explicitly not an infrastructure/concurrency skill, so I won't invent thread-count ... rules.' No task-state/job-system/threads recommendation appears."
+        },
+        {
+          "text": "Applies queueing/load realism: high utilization makes wait time blow up; model load realistically; over-provision for launch",
+          "passed": false,
+          "evidence": "The central queueing-theory insight is explicitly declined (lines 87-89 'I won't invent ... queueing-theory rules it doesn't contain'). 'High utilization makes wait time blow up' is absent; 'model load realistically' is absent. Only 'over-provisioning for launch' appears once (lines 41-43) as incidental horizontal-scaling advice, not as an application of load realism. One of three sub-elements, not framed as queueing/load realism -> does not demonstrate the expectation."
+        },
+        {
+          "text": "Cautions against importing Docker/Kubernetes/microservices complexity the problem does not actually require",
+          "passed": true,
+          "evidence": "Section line 22 'Docker / Kubernetes / microservices \u2014 don't import them yet'. Lines 39-48 'Ship **one deployable** (a monolith) ... Reach for Kubernetes/microservices only for a concrete need the single deployable can't meet ... Until then it's complexity tax.' Substantive YAGNI-grounded caution. PASS."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.25,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.75"
+    }
+  },
+  "notes": [
+    "Only A4 (caution against unneeded Docker/K8s/microservices) passes in BOTH configs.",
+    "Discriminating: A1-A3 (concurrency vs parallelism; task-state/threads-over-async tradeoff; queueing/load realism) - baseline explicitly declined this content as out of scope. Largest delta in the set (+0.75)."
+  ]
+}

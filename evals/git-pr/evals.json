@@ -1,0 +1,26 @@
+{
+  "skill_name": "git-pr",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just committed a fix for the token parser crash on empty input. Create a PR for it.",
+      "expected_output": "Single-line PR title matching the commit subject, no body, presented for confirmation before creation",
+      "files": [],
+      "context": "Branch has exactly one commit ahead of main: 'fix(parser): handle empty input without panic'. No PR template in repo."
+    },
+    {
+      "id": 2,
+      "prompt": "Open a PR for this branch. I've been working on adding OAuth support.",
+      "expected_output": "Conventional commit title summarizing the overall change, 2-4 sentence motivation paragraph in body, Closes #312 footer, presented for confirmation",
+      "files": [],
+      "context": "Branch 'feat/312-oauth-support' has 4 commits: 'feat(auth): add OAuth provider config', 'feat(auth): implement token exchange middleware', 'feat(auth): add refresh token rotation', 'test(auth): add OAuth flow integration tests'. No PR template."
+    },
+    {
+      "id": 3,
+      "prompt": "Create a PR for my changes.",
+      "expected_output": "Conventional commit title, template used as skeleton with empty sections removed (Screenshots removed for backend-only change), minimal content in remaining sections, presented for confirmation",
+      "files": [],
+      "context": "Branch has 2 commits: 'refactor(api): extract validation into middleware' and 'feat(api): add rate limiting to public endpoints'. Repo has .github/PULL_REQUEST_TEMPLATE.md with sections: ## Description, ## Testing, ## Screenshots, ## Breaking Changes."
+    }
+  ]
+}

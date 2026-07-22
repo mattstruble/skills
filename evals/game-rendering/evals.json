@@ -1,0 +1,38 @@
+{
+  "skill_name": "game-rendering",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a CPU-side 3D renderer (rasterizing triangles, doing my own UV mapping). My textured cube renders fine when it's facing the camera, but as I rotate it the texture appears to slide and stretch unevenly across each face — almost like the texture is sticking to the silhouette instead of the surface. The texture coordinates are correct (verified by drawing them directly as colors). What's happening, why does it happen specifically with perspective projection, and what's the fix?",
+      "expected_output": "Identifies this as the classic affine-vs-perspective-correct UV interpolation bug. Explains why it specifically appears under perspective projection (the inverse depth term varies non-linearly across the screen-space triangle). Gives the fix: store 1/w per projected vertex, interpolate U/w, V/w, and 1/w linearly across the triangle, then divide back at each pixel. Mentions barycentric weights as the per-pixel interpolation mechanism. May reference PS1-era games as the classic example of the bug.",
+      "files": [],
+      "assertions": [
+        {"id": "identifies-affine-uv-bug", "text": "Correctly identifies the bug as affine UV interpolation (vs perspective-correct), or names the technique that's missing", "type": "semantic"},
+        {"id": "explains-perspective-cause", "text": "Explains why this specifically happens under perspective projection (e.g., w varies across the triangle in screen space, inverse depth is non-linear, screen-space linear interpolation is invalid for view-space-linear quantities)", "type": "semantic"},
+        {"id": "fix-stores-inverse-w", "text": "The fix involves storing 1/w (or inverse-depth equivalent) per projected vertex", "type": "semantic"},
+        {"id": "fix-interpolates-uv-over-w", "text": "The fix interpolates U/w and V/w (along with 1/w) linearly across the triangle in screen space, not raw U and V", "type": "semantic"},
+        {"id": "fix-divides-back-at-pixel", "text": "The fix divides back at each pixel (multiplies by inverse of the interpolated 1/w to recover U and V)", "type": "semantic"},
+        {"id": "uses-barycentric-or-screen-linear", "text": "Mentions barycentric weights or screen-space linear interpolation as the per-pixel mechanism", "type": "semantic"},
+        {"id": "no-incorrect-fix", "text": "Does NOT recommend an incorrect fix (more texture resolution, changing wrap mode, mip-mapping, or subdividing triangles as the primary remedy)", "type": "semantic"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Walk me through constructing a perspective projection matrix for a 3D renderer from these inputs: vertical field-of-view in degrees, screen width in pixels, screen height in pixels, near plane, and far plane. Include (a) what the view frustum is and what each parameter controls about it, (b) how the focal length / aspect ratio enter the matrix, (c) the actual 4x4 matrix entries, (d) what perspective division is and where it happens in the pipeline.",
+      "expected_output": "Defines view frustum as the truncated pyramid of visible space. Explains FOV controls the width of the cone, aspect ratio (= width/height) compensates for non-square viewports, near/far define the depth range. Derives the focal length term f = 1/tan(fov/2) (with conversion from degrees to radians). Shows the standard 4x4 matrix with f/aspect on [0,0], f on [1,1], the depth-mapping terms on [2,2] and [2,3] (near/far), and the -1 in [3,2] that produces the perspective divide. Explains perspective division: after multiplying a point by this matrix, divide x/y/z by w (the resulting homogeneous coordinate) to get NDC. Mentions that w stores depth information that's needed later for perspective-correct interpolation.",
+      "files": [],
+      "assertions": [
+        {"id": "view-frustum-defined", "text": "Defines view frustum as the truncated pyramid of visible space (or equivalent 6-plane volume)", "type": "semantic"},
+        {"id": "fov-controls-cone", "text": "Explains FOV controls the angular width of the viewing cone", "type": "semantic"},
+        {"id": "aspect-ratio-derivation", "text": "Defines aspect ratio as width/height and explains it compensates for non-square viewports", "type": "semantic"},
+        {"id": "focal-length-derivation", "text": "Derives f = 1/tan(fov/2) (or cotangent equivalent) for the focal length term", "type": "semantic"},
+        {"id": "fov-degrees-to-radians", "text": "Notes FOV must be converted from degrees to radians for trig functions", "type": "semantic"},
+        {"id": "matrix-entries-shown", "text": "Shows the full 4x4 matrix entries explicitly", "type": "semantic"},
+        {"id": "aspect-on-x-axis", "text": "Aspect correction enters as f/aspect on the x-axis entry (or equivalent column), not the y", "type": "semantic"},
+        {"id": "depth-mapping-near-far", "text": "Explains the [2,2] and [2,3] entries map z based on near and far planes (specific signs depend on convention)", "type": "semantic"},
+        {"id": "perspective-divide-row", "text": "Explains the -1 (or +1, by convention) in the bottom row that triggers perspective division", "type": "semantic"},
+        {"id": "perspective-division-explained", "text": "Explains perspective division is dividing x, y, z by w after multiplying by the matrix to get NDC", "type": "semantic"}
+      ]
+    }
+  ]
+}

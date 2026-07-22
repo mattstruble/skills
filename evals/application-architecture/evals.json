@@ -1,0 +1,50 @@
+{
+  "skill_name": "application-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a new order management service. It needs to handle order placement, payment processing, inventory reservation, and send confirmation emails. Multiple teams will consume it via REST API and also via a message queue. We expect complex pricing rules that change quarterly. How should I structure the application?",
+      "expected_output": "Should recommend Domain Model + Service Layer, discuss Hexagonal Architecture as a possibility, recommend DTOs for the API boundary, and suggest Domain Events for the email/inventory side effects. Should reference the relevant decision points and explain the progression.",
+      "files": [],
+      "expectations": [
+        "Recommends Domain Model for the business logic given complex pricing rules",
+        "Recommends Service Layer given multiple interfaces (REST + queue)",
+        "Discusses Domain Events for side effects (email, inventory)",
+        "Mentions DTOs or boundary objects for the REST API",
+        "Does NOT recommend Transaction Script for this level of complexity",
+        "References the YAGNI gate or progression path",
+        "Discusses data access strategy (Repository or similar given domain complexity)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a Flask app where all the business logic is in the route handlers. Validation, database queries, price calculations, email sending -- all in 200-line handler functions. There are about 15 endpoints and the logic is getting duplicated between the REST API and a CLI tool we added last month. How should I restructure this?",
+      "expected_output": "Should identify the smell (business logic in controllers), recommend extracting a Domain Model or at minimum a Service Layer to share logic between REST and CLI, and provide a progression path. Should NOT recommend jumping straight to Hexagonal Architecture or Event Sourcing.",
+      "files": [],
+      "expectations": [
+        "Identifies the architectural smell (business logic in route handlers / controllers)",
+        "Recommends extracting business logic out of the handlers",
+        "Suggests Service Layer as a solution for the REST+CLI duplication problem",
+        "Discusses whether a Domain Model is warranted given the complexity",
+        "Does NOT recommend Event Sourcing or CQRS for this scenario",
+        "Provides incremental advice rather than a full rewrite",
+        "Addresses the data access concern (queries mixed into business logic)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm building an internal tool for my team of 3 people to track experiment results. It's basically CRUD -- create experiments, log results, view reports. Postgres database, maybe 5 tables. Should I implement a Repository pattern with Domain Events and CQRS to keep things clean from the start?",
+      "expected_output": "Should firmly push back via the YAGNI gates. For a 3-person CRUD tool with 5 tables, Transaction Script with direct ORM access is the right answer. Repository, Domain Events, and CQRS are all overkill. Should explain why without being dismissive.",
+      "files": [],
+      "expectations": [
+        "Recommends against Repository pattern for this use case",
+        "Recommends against Domain Events for this use case",
+        "Recommends against CQRS for this use case",
+        "Suggests Transaction Script or direct ORM as the appropriate approach",
+        "Explains WHY these patterns are overkill (not just says they are)",
+        "References the YAGNI gate concept",
+        "Does not recommend adding patterns 'for future growth' or 'just in case'"
+      ]
+    }
+  ]
+}

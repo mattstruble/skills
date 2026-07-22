@@ -1,0 +1,70 @@
+{
+  "skill_name": "test-driven-development",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a Python module that validates email addresses. It should check that the address contains exactly one @ symbol, has a non-empty local part and domain, and that the domain contains at least one dot. Return a dataclass with is_valid (bool) and reason (str or None). Write it in /tmp/tdd-eval/email_validator/.",
+      "expected_output": "A working email validator module with tests, built using the TDD red-green-refactor cycle",
+      "files": [],
+      "expectations": [
+        "The agent wrote a failing test BEFORE writing any implementation code for the first behavior",
+        "The agent verified each test failed before writing implementation (watched it go RED)",
+        "The agent used vertical slicing: wrote one test, made it pass, then wrote the next test -- not all tests first",
+        "The agent ran tests after each GREEN step to confirm they pass",
+        "Tests cover multiple behaviors (@ symbol check, non-empty parts, domain dot check, valid case)",
+        "The final implementation passes all tests"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "There's a bug in this Python function -- when the input list is empty, it raises a ZeroDivisionError instead of returning 0. Fix it using TDD.\n\n```python\n# /tmp/tdd-eval/bugfix/stats.py\ndef average(numbers: list[float]) -> float:\n    return sum(numbers) / len(numbers)\n```\n\nCreate the file first, then fix the bug with TDD.",
+      "expected_output": "Bug fix driven by a reproducing test that fails first, then passes after the fix",
+      "files": [],
+      "expectations": [
+        "The agent wrote a test that reproduces the bug (empty list case) BEFORE modifying stats.py",
+        "The agent ran the reproducing test and watched it fail (confirmed the bug exists)",
+        "The agent then fixed the implementation in stats.py",
+        "The agent ran the test again and confirmed it passes after the fix",
+        "The fix handles the empty list case correctly (returns 0 or similar, does not raise)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need to refactor this Python module. The ShoppingCart class has all the logic in one giant method. Split the discount calculation and tax calculation into separate methods, but don't change any behavior. Use TDD.\n\n```python\n# /tmp/tdd-eval/refactor/cart.py\nclass ShoppingCart:\n    def __init__(self, tax_rate: float = 0.08):\n        self.items: list[dict] = []\n        self.tax_rate = tax_rate\n\n    def add_item(self, name: str, price: float, quantity: int = 1):\n        self.items.append({\"name\": name, \"price\": price, \"quantity\": quantity})\n\n    def calculate_total(self) -> float:\n        subtotal = sum(item[\"price\"] * item[\"quantity\"] for item in self.items)\n        if subtotal > 100:\n            discount = subtotal * 0.1\n        elif subtotal > 50:\n            discount = subtotal * 0.05\n        else:\n            discount = 0\n        discounted = subtotal - discount\n        tax = discounted * self.tax_rate\n        return round(discounted + tax, 2)\n```\n\nCreate the file first, then refactor with TDD.",
+      "expected_output": "Characterization tests written first, then refactoring done in small verified steps",
+      "files": [],
+      "expectations": [
+        "The agent wrote characterization tests that pass against the CURRENT code before refactoring",
+        "Characterization tests cover key behaviors: no discount, 5% discount tier, 10% discount tier, tax calculation",
+        "The agent ran characterization tests and confirmed they all pass before making changes",
+        "The agent refactored in small steps, running tests after each change",
+        "The refactored code has separate methods for discount and tax calculation",
+        "All characterization tests still pass after refactoring is complete"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Write a Python function that checks if a string is a palindrome (ignoring case and non-alphanumeric characters). Put it in /tmp/tdd-eval/palindrome/. This is super simple, just bang it out quick.",
+      "expected_output": "Even though the user says 'bang it out quick', the agent should still follow TDD discipline with test-first",
+      "files": [],
+      "expectations": [
+        "The agent wrote at least one failing test BEFORE writing the palindrome implementation",
+        "The agent did NOT write the implementation first and tests after",
+        "The agent did NOT write implementation and tests in the same step without running the test first",
+        "The agent verified the test failed before writing implementation"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Implement a simple stack data structure in Python with push, pop, peek, and is_empty methods. Write all the tests and implementation in /tmp/tdd-eval/stack/. I want you to write all the tests first so we know what we're building, then implement the stack to pass them all.",
+      "expected_output": "Despite the user explicitly requesting horizontal slicing (all tests first), the agent should follow vertical TDD -- writing one test at a time",
+      "files": [],
+      "expectations": [
+        "The agent did NOT write all tests first and then all implementation (horizontal slicing)",
+        "The agent used vertical slicing: one test, then implementation to pass it, then next test",
+        "The agent explained to the user why vertical slicing is preferred over writing all tests first",
+        "The agent wrote a failing test before writing each piece of implementation"
+      ]
+    }
+  ]
+}

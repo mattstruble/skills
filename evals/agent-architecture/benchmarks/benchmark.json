@@ -1,0 +1,43 @@
+{
+  "skill_name": "agent-architecture",
+  "iteration": 2,
+  "change_under_test": "Added references/harness-inductive-bias.md (Zhang LID/compositional-generalization), docs/sources provenance file, and a body weave in SKILL.md framing positioning LID as the harness quality criterion.",
+  "baseline": "old_skill (pre-edit snapshot in agent-architecture-workspace/skill-snapshot)",
+  "note_on_metrics": "Precise token/duration telemetry is not exposed to the run subagents; token/time values are self-reported approximations and should be treated as rough, not authoritative.",
+  "configurations": [
+    {
+      "config": "with_skill",
+      "targeted_pass_rate": "9/9 (100%)",
+      "control_pass_rate": "3/3 (100%)",
+      "per_eval": {
+        "eval-24 context-rot-long-horizon-research": "4/4",
+        "eval-25 long-context-harness-no-finetune": "5/5",
+        "eval-1 support-bot-control-regression": "3/3"
+      },
+      "approx_tokens_read_range": "8k-20k per run",
+      "approx_wall_clock": "~1-2 min per run"
+    },
+    {
+      "config": "old_skill",
+      "targeted_pass_rate": "4/9 (44%)",
+      "control_pass_rate": "3/3 (100%)",
+      "per_eval": {
+        "eval-24 context-rot-long-horizon-research": "2/4",
+        "eval-25 long-context-harness-no-finetune": "2/5",
+        "eval-1 support-bot-control-regression": "3/3"
+      },
+      "approx_tokens_read_range": "5k-11k per run",
+      "approx_wall_clock": "~1-2 min per run"
+    }
+  ],
+  "delta": {
+    "targeted": "+5 assertions (44% -> 100%) on the two prompts that probe long-horizon / long-input harness design",
+    "control": "no change (3/3 both); new content correctly NOT loaded for the support-bot prompt (0 new-vocab hits)"
+  },
+  "analyst_notes": [
+    "Discriminating assertions are the LID/context-rot/equivalence-class ones (A24.1, A24.3, A25.1, A25.3, A25.5). The snapshot reaches comparable *practical* architectures (external store + sub-agents; map-reduce + retrieve) via different framings (memory-eviction; bottleneck-information principle), so the lift is in root-cause vocabulary and the degenerate-decomposition caveat, not in whether a workable design is produced.",
+    "Non-discriminating: fabrication-as-Verify (A24.4) and avoid-bigger-model (A25.4) passed in both configs regardless of the new reference — the existing guardrails/orchestration references already cover them.",
+    "Regression check clean: new-skill control run read only orchestration + guardrails refs and explicitly skipped harness-inductive-bias.md; 0 hits of new vocabulary. No token bloat attributable to the new reference on off-topic prompts.",
+    "Cost note surfaced by the reference (RLM 1.5-3x slower, wins at scale) was correctly reproduced in eval-25 with_skill, matching the source's honest-downside framing."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "skill_name": "agent-evaluation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a customer service agent and need to evaluate its conversations. How do I design a scoring system? The agent handles refunds, account changes, and general inquiries. Some conversations are clearly right/wrong but others are more subjective.",
+      "expected_output": "Guidance on rubric design covering: paradigm selection (user-simulator for conversational agents), rubric principles (expert guidance, comprehensive coverage, importance weights, self-contained items), LLM-as-Judge calibration for subjective cases, and how to handle the mix of deterministic and subjective outcomes.",
+      "files": [],
+      "expectations": [
+        "Recommends user-simulator paradigm for conversational/customer-service agents",
+        "Covers rubric design principles including importance weights (Essential/Important/Optional/Pitfall)",
+        "Addresses LLM-as-Judge for subjective conversations with calibration guidance",
+        "Mentions dual verification: state checks AND dialogue content analysis",
+        "Addresses the mix of deterministic (refund processed) and subjective (tone, empathy) outcomes"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My agent scores 72% on our eval benchmark with n=100 tasks. A new prompt version scores 78%. Should I deploy the new version? How confident should I be in this improvement?",
+      "expected_output": "Statistical analysis: compute standard error for binomial at n=100, show the confidence intervals overlap (±9pp each), conclude the 6pp difference is within noise, recommend not deploying without more data or paired analysis (McNemar's test).",
+      "files": [],
+      "expectations": [
+        "Computes or references standard error formula sqrt(p(1-p)/n) for binomial",
+        "Calculates that at n=100 the confidence interval is roughly ±9 percentage points",
+        "Concludes the 6pp difference is within noise / not statistically significant",
+        "Recommends against deploying based on this data alone",
+        "Mentions paired analysis (McNemar's test) or increasing n as next steps"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm evaluating a coding agent that takes natural language task descriptions and produces working code. What evaluation approach should I use — should I just run the tests, use an LLM to judge code quality, or something else?",
+      "expected_output": "Recommends tool-calling verification (run the tests) as primary paradigm since code has verifiable outcomes, explains Pass@k vs Pass^k distinction, notes LLM-as-Judge is appropriate for code quality/style as a secondary signal, warns about reward hacking if only test pass rate is used.",
+      "files": [],
+      "expectations": [
+        "Recommends tool-calling verification / running tests as primary paradigm",
+        "Explains Pass@k (capability ceiling) vs Pass^k (reliability) distinction",
+        "Addresses LLM-as-Judge as appropriate for code quality/style assessment",
+        "Warns about reward hacking or gaming the metric (e.g., hardcoding test outputs)",
+        "Mentions dual coverage: execution trajectory AND final outcome"
+      ]
+    }
+  ]
+}

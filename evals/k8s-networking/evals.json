@@ -1,0 +1,46 @@
+{
+  "skill_name": "k8s-networking",
+  "evals": [
+    {
+      "id": 1,
+      "name": "tls-setup",
+      "prompt": "I have a k3s cluster running on a Hetzner VPS. My app is already deployed and accessible at http://mysite.com through an NGINX ingress. I need to set up HTTPS with a real SSL certificate. Walk me through it.",
+      "expected_output": "Step-by-step guide to install cert-manager, create ClusterIssuer for Let's Encrypt, and update Ingress with TLS",
+      "assertions": [
+        {"text": "Installs cert-manager with a pinned version (not latest)", "type": "boolean"},
+        {"text": "Creates a ClusterIssuer (not namespace-scoped Issuer) with ACME/Let's Encrypt", "type": "boolean"},
+        {"text": "Recommends staging issuer for testing before production", "type": "boolean"},
+        {"text": "Updates Ingress with tls: block and cert-manager.io/cluster-issuer annotation", "type": "boolean"},
+        {"text": "Sets nginx.ingress.kubernetes.io/ssl-redirect to true", "type": "boolean"},
+        {"text": "Shows how to verify certificate issuance", "type": "boolean"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "wireguard",
+      "prompt": "I have a k3s cluster and I want to access internal services (like my database on ClusterIP) from my laptop without exposing them publicly. Set up a WireGuard VPN for this.",
+      "expected_output": "WireGuard server and client configuration with proper security practices",
+      "assertions": [
+        {"text": "Generates private keys on the client machine (not on server then transferred)", "type": "boolean"},
+        {"text": "Server config includes both PostUp and PostDown iptables rules", "type": "boolean"},
+        {"text": "Client config includes PersistentKeepalive", "type": "boolean"},
+        {"text": "Enables IP forwarding (sysctl) as a prerequisite", "type": "boolean"},
+        {"text": "Opens UDP port 51820 in firewall", "type": "boolean"},
+        {"text": "Uses /32 addresses in AllowedIPs for peers", "type": "boolean"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "network-policies",
+      "prompt": "I want to lock down my production namespace so that only the ingress controller can reach my web pods, and my web pods can only talk to the database namespace and external HTTPS. How do I set up network policies for this?",
+      "expected_output": "NetworkPolicy manifests with deny-all default and specific allow rules",
+      "assertions": [
+        {"text": "Creates a deny-all default NetworkPolicy", "type": "boolean"},
+        {"text": "Ingress rule uses namespaceSelector matching ingress-nginx", "type": "boolean"},
+        {"text": "Egress allows DNS (UDP 53 to kube-system)", "type": "boolean"},
+        {"text": "Egress allows traffic to database namespace", "type": "boolean"},
+        {"text": "Warns that Flannel alone does not enforce NetworkPolicies", "type": "boolean"}
+      ]
+    }
+  ]
+}

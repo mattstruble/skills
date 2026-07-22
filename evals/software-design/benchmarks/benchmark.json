@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "skill_name": "software-design",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "scary-fn-and-flat-profile",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Treats feeling 'scared' of code as a signal of complexity worth simplifying (judging code by runtime behavior/dynamics, not line count)",
+          "passed": true,
+          "evidence": "Line 8: '**Stop judging it by line count. Judge it by its dynamics.**' Line 16-19: 'So your fear is data. Jonathan Blow argues ... that feeling *scared* of a section is a reliable signal that it's too complex ... The fear is your own pattern-matcher telling you the dynamics don't fit in your working memory.' Both halves present: fear-as-complexity-signal and judge-by-dynamics-not-line-count."
+        },
+        {
+          "text": "For the flat profile, advises accepting it or making an architectural change rather than grinding many tiny contributors for a big win",
+          "passed": true,
+          "evidence": "Lines 91-106 list options in order: '1. **Accept it and stop.**' and '2. **Make an architectural / algorithmic change** ... they come from removing whole categories of work: a better algorithm, a data structure ...'. Lines 84-89 and 113-117 warn against grinding 0.5% items ('Micro-grinding a flat profile is high-effort, low-yield')."
+        },
+        {
+          "text": "Advises understanding the code's invariants / not papering over behavior before changing it",
+          "passed": true,
+          "evidence": "Line 22 '**Understand it before you touch it.**'; lines 32-40 'make those invariants explicit ... What must be true on entry and on exit'; line 47 '**Don't paper over behavior you don't understand.**' plus pin-the-behavior-with-a-characterization-test guidance (lines 50-52)."
+        },
+        {
+          "text": "Presents Jonathan Blow's contestable claims as his stance, not as absolute rules",
+          "passed": true,
+          "evidence": "Line 16-17 'Jonathan Blow argues \u2014 and I'd treat this as a useful heuristic rather than a law'; line 76 'Blow's framing (again, his stance, but it matches reality)'; lines 119-121 '*(The Blow positions above ... are his opinions, offered because they're useful, not as universal law. Your context can override any of them.)*' Explicit attribution AND explicit contestability."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "scary-fn-and-flat-profile",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Treats feeling 'scared' of code as a signal of complexity worth simplifying (judging code by runtime behavior/dynamics, not line count)",
+          "passed": true,
+          "evidence": "Lines 8-9 'Size is the wrong metric ... Judge code by its **dynamics \u2014 what it actually does at runtime \u2014** not by its line count.' Lines 10-13 'Your fear is real information: it's telling you that this small function has complexity you can't simulate in your head. That's the thing worth fixing, not the line count.' Both halves present."
+        },
+        {
+          "text": "For the flat profile, advises accepting it or making an architectural change rather than grinding many tiny contributors for a big win",
+          "passed": true,
+          "evidence": "Lines 69-83 give ordered options '1. **Decide the speed is good enough and stop.**' and '2. **If it genuinely isn't fast enough, change the architecture, not the functions.**' Lines 85-86 'Treat \"grind the long tail of tiny contributors\" as the option of last resort, not the default.'"
+        },
+        {
+          "text": "Advises understanding the code's invariants / not papering over behavior before changing it",
+          "passed": true,
+          "evidence": "Lines 25-30 '**An invariant you don't understand (Chesterton's Fence).** That lone `if` almost certainly guards *something* ... **Before you change anything, find out what it protects.** Don't paper over the behavior.' Lines 32-37 establish 'understand -> then decide' and 'Pin down the invariant.'"
+        },
+        {
+          "text": "Presents Jonathan Blow's contestable claims as his stance, not as absolute rules",
+          "passed": false,
+          "evidence": "Jonathan Blow is never mentioned anywhere in the answer (searched full text). The claims are framed as the assistant's own generic 'opinionated judgment calls, not absolute rules' and 'lenses to reason with, not laws to obey' (lines 90-96). The contestability half is present, but the attribution to Blow as 'his stance' \u2014 required by the assertion \u2014 is entirely absent, so the expectation is not demonstrated."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.75,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.25"
+    }
+  },
+  "notes": [
+    "Assertions 1-3 (fear-as-complexity signal; flat-profile architectural change; understand-invariants-before-changing) pass in BOTH configs - non-discriminating.",
+    "Sole discriminator: A4 'present Jonathan Blow's claims as his stance' - baseline framed claims as contestable but never attributed them to Blow (attribution-only delta)."
+  ]
+}

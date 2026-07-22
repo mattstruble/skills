@@ -1,7 +1,6 @@
 *-workspace/
 *-eval/
 .opencode/
-**/evals/
 
 # Beads / Dolt files (added by bd init)
 .dolt/

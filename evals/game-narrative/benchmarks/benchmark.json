@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "skill_name": "game-narrative",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "reactive-dialogue-and-coherence",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "expectations": [
+        {
+          "text": "States the reactive-dialogue rule: a reaction line must reveal something new about world/character or be cut; cut out-of-character lines; keep lines short",
+          "passed": true,
+          "evidence": "Rule stated as a hard gate: 'A line triggered by a recent event... must reveal something new about the character, the situation, or the world, or it must be cut' (lines 17-20). Cut out-of-character: 'Cut out-of-character lines. A reaction that's tonally inconsistent with a character's established voice is worse than silence' (lines 40-42). Keep short: 'Keep lines short. Reactive dialogue is not the place for exposition... A short, sharp reaction lands harder than a paragraph' (lines 47-49)."
+        },
+        {
+          "text": "Connects world coherence / concrete detail to earning audience investment",
+          "passed": true,
+          "evidence": "'A thin-feeling setup is rarely a quantity problem... It's a coherence problem. The player's willingness to believe in your fiction is a budget' (lines 75-77); section 'Coherence is the buy-in mechanism' (line 81); 'Earn investment with specific, consistent, purposeful detail' (line 104); 'the ceiling of your story's emotional and intellectual impact is set by the coherence of its details' (lines 122-124)."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "reactive-dialogue-and-coherence",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "expectations": [
+        {
+          "text": "States the reactive-dialogue rule: a reaction line must reveal something new about world/character or be cut; cut out-of-character lines; keep lines short",
+          "passed": true,
+          "evidence": "Rule stated: 'A reaction line must reveal something new about the world or the character -- or it gets cut' (line 13). Cut out-of-character: 'out-of-character lines are exactly what makes scripted reactivity feel like scaffolding showing through. Cut them' (line 23). Keep short: 'Keep lines short and implication-heavy... keep it short and let implication do the work' (lines 26-27). The practical loop (lines 30-32) restates all three."
+        },
+        {
+          "text": "Connects world coherence / concrete detail to earning audience investment",
+          "passed": true,
+          "evidence": "'Audience investment isn't bought with more lore -- it's earned by concrete detail, coherence, and a world that has its own life the player co-authors' (line 38); 'Earn investment with concrete, coherent detail (not more lore)' (line 41); 'keep them coherent -- consistent voice, motivation, and imagery across everything -- because coherence is what makes the detail feel like a real place rather than a stage set' (line 42)."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.00"
+    }
+  },
+  "notes": [
+    "Both assertions pass in BOTH configs - non-discriminating. Reactive-dialogue rule and coherence-to-investment are reconstructable from the baseline's character-out / iceberg material.",
+    "No discriminating assertion. Grader suggests keying on the named 'Reactive-Dialogue Rule', the 'confirmation line' anti-pattern, or 'disbelief-as-a-budget'."
+  ]
+}

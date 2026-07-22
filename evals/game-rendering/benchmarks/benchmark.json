@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "skill_name": "game-rendering",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "how-to-learn-graphics",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "expectations": [
+        {
+          "text": "Advises against starting on OpenGL or Vulkan; suggests a higher-level layer (raylib/SDL3/three.js) or writing a software renderer",
+          "passed": true,
+          "evidence": "Title 'Neither OpenGL Nor Vulkan First'; line 4 'don't start with either OpenGL or Vulkan'. Dedicated 'Why not Vulkan (yet)' and 'Why not OpenGL either' sections. 'Option A \u2014 Start on a higher-level layer' names 'raylib, SDL3, or three.js' (line 49); 'Option B \u2014 Write your own software renderer (the recommended path)' (line 56)."
+        },
+        {
+          "text": "States the math you need is linear algebra (matrices/transforms) with almost no calculus",
+          "passed": true,
+          "evidence": "Line 4: 'the math you actually need is linear algebra, with almost no calculus.' Lines 89-103: 'You need linear algebra. Vectors, matrices, matrix multiplication, transforms (translation, rotation, scale)...' and 'You need almost no calculus.' Also untangles the 'vectors = linear algebra, not vector calculus' confusion (lines 99-103)."
+        },
+        {
+          "text": "Keeps the durable point that the math/algorithms matter more than any specific API; frames the API opinions as Jonathan Blow's view",
+          "passed": true,
+          "evidence": "Lines 7-11: 'the API opinions here (especially \"don't learn on OpenGL\") are Jonathan Blow's view... the durable point underneath... the math and algorithms matter far more than any specific API.' Section header line 26 'Why not OpenGL either (Blow's stance...)'. Durable point restated line 112: 'APIs change; the math and algorithms don't.' Both clauses satisfied."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "how-to-learn-graphics",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 2,
+        "failed": 1,
+        "total": 3
+      },
+      "expectations": [
+        {
+          "text": "Advises against starting on OpenGL or Vulkan; suggests a higher-level layer (raylib/SDL3/three.js) or writing a software renderer",
+          "passed": true,
+          "evidence": "Line 3 header 'Don't start with Vulkan \u2014 and arguably not with raw OpenGL either'; line 5 'learning Vulkan first is the wrong move, and starting on raw OpenGL isn't much better.' Line 9 '1. Write a software renderer from scratch.' Line 11 '2. Or start on a higher-level layer... raylib or SDL3 for desktop, three.js for the web.'"
+        },
+        {
+          "text": "States the math you need is linear algebra (matrices/transforms) with almost no calculus",
+          "passed": true,
+          "evidence": "Line 19 header 'The math you actually need: linear algebra, with almost no calculus.' Line 21 'It's overwhelmingly linear algebra, plus a little trigonometry.' Enumerates vectors, 4x4 matrices/MVP, homogeneous coords (lines 23-27). Line 29 'What you do not need to start: essentially no calculus.'"
+        },
+        {
+          "text": "Keeps the durable point that the math/algorithms matter more than any specific API; frames the API opinions as Jonathan Blow's view",
+          "passed": false,
+          "evidence": "Durable point IS kept (line 17: 'the rendering math and algorithms matter far more than any particular API'), but the answer explicitly does NOT frame the API opinions as Jonathan Blow's view. Lines 39-40: 'The \"don't start with Vulkan...\" position is often voiced as one prominent practitioner's pointed view. This snapshot of the skill doesn't attribute it as such.' Blow is never named. The attribution clause is unmet \u2014 consistent with the old snapshot lacking JB material."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.67,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.33"
+    }
+  },
+  "notes": [
+    "Assertions 1-2 (avoid OpenGL/Vulkan first, use higher-level/software renderer; linear algebra not calculus) pass in BOTH configs - non-discriminating.",
+    "Sole discriminator: A3's Blow-attribution clause - baseline kept the durable 'math > API' point but never named Blow (attribution-only delta)."
+  ]
+}

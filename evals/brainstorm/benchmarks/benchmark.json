@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "skill_name": "brainstorm",
+    "timestamp": "2026-06-30",
+    "evals_run": [
+      "eval-0"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "excited-idea-and-prototype",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "expectations": [
+        {
+          "text": "Stress-tests the idea instead of greenlighting it; invokes calling-your-own-bluff / honest prototype self-evaluation",
+          "passed": true,
+          "evidence": "'I'm not going to greenlight the idea. I'm also not going to tell you to drop it. I'm going to grill it...' Dedicated section '## The discipline you're missing: call your own bluff' \u2014 'saying \"this part kind of sucks\" about your own work without flinching' and 'the prototype's job is to reveal what the real game should be, not to prove your first idea was right.' Five concrete self-evaluation tests (stranger test, 10th-minute test, name-and-audit assumptions)."
+        },
+        {
+          "text": "Uses judgment/taste-as-the-engine and/or novelty-is-not-sustained-value",
+          "passed": true,
+          "evidence": "Both are present. '## Taste is the engine \u2014 so what's your standard?': 'You can't measure a prototype without an explicit opinion of what good looks like... anything good you make is good by accident' (matches idea-judgment.md taste kernel). '## The trap: novelty is not sustained value': 'The \"wow\" of a striking idea on first reveal ... is **not** the same thing as sustained engagement ... A lot of attachment is novelty addiction.'"
+        },
+        {
+          "text": "Stays within brainstorm's ideation/stress-test scope \u2014 does NOT drift into generic life/career advice",
+          "passed": true,
+          "evidence": "Entire answer is about the game idea, prototype evaluation, and core-loop design. Closes with '## Then we build' and a single brainstorming question: 'what is the single thing the player does over and over, and which of the tests above has that loop actually passed so far?' No life or career advice."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "excited-idea-and-prototype",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 2,
+        "failed": 1,
+        "total": 3
+      },
+      "expectations": [
+        {
+          "text": "Stress-tests the idea instead of greenlighting it; invokes calling-your-own-bluff / honest prototype self-evaluation",
+          "passed": true,
+          "evidence": "Refuses to greenlight: 'Hold on \u2014 ... excitement is exactly the state in which we skip the questions that matter most.' Honest prototype self-evaluation present: 'stress-test the prototype against your own conclusions', 'What assumption did building it let me avoid examining? The prototype existing is not evidence the assumption underneath it is true', and the stranger test ('watch where they get bored or confused, without explaining it'). Satisfies the 'honest prototype self-evaluation' branch of the '/' assertion."
+        },
+        {
+          "text": "Uses judgment/taste-as-the-engine and/or novelty-is-not-sustained-value",
+          "passed": false,
+          "evidence": "Neither concept is genuinely invoked. 'Novelty is not sustained value' is entirely absent \u2014 no mention of novelty, first-reveal wow, or chasing shinier ideas (the closest line, 'features that are fun to have, not clearly needed,' is YAGNI, not novelty). 'Taste-as-the-engine' (holding your own opinion of what's good as the engine of quality; without it you make good things only by accident) is not present either; the answer instead uses a generic 'define independent success criteria' move ('what would \"it's fun\" look like if you weren't the one who made it?'), which maps to honest self-evaluation (assertion 1), not taste-as-the-engine."
+        },
+        {
+          "text": "Stays within brainstorm's ideation/stress-test scope \u2014 does NOT drift into generic life/career advice",
+          "passed": true,
+          "evidence": "Stays entirely on the game idea: success criteria, prototype attachment, core loop. Section 2 ('I just want to start building it') opens the interview with one core-loop question and hands off to building. No life or career advice."
+        }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.67,
+        "stddev": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.33"
+    }
+  },
+  "notes": [
+    "Assertions 1 and 3 (stress-test / call-your-own-bluff; stay in ideation scope) pass in BOTH configs - non-discriminating.",
+    "Discriminator: A2 (taste-as-the-engine and/or novelty-is-not-sustained-value) - baseline reached neither idea-judgment concept. Genuine capability add, not just attribution."
+  ]
+}

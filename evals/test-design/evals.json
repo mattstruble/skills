@@ -1,0 +1,101 @@
+{
+  "skill_name": "test-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to write pytest tests for this NotificationService class. It sends email reminders for upcoming tasks, marks overdue tasks, and escalates high-priority overdue tasks to a manager. The code is in files/notification_service.py. Write the tests to a file called test_notification_service.py in the outputs directory.",
+      "expected_output": "A well-structured test file with behavioral tests using fakes, factory functions, and focused assertions on outcomes rather than internal method calls.",
+      "files": [
+        "files/notification_service.py"
+      ],
+      "expectations": [
+        "Tests use fake implementations (not MagicMock/mock) for task_repo and email_sender",
+        "A factory function (e.g., make_task or similar) is used to create test Task objects with sensible defaults",
+        "A fixed clock/datetime is used instead of relying on real time (deterministic)",
+        "Test names describe behaviors, not method names (e.g., 'test_reminder_sent_for_task_due_within_24h' not 'test_send_due_reminders_1')",
+        "Assertions verify outcomes (emails sent, task status changed, return values) not mock call counts",
+        "At least one boundary test exists (e.g., task due at exactly 24h, priority exactly at threshold)",
+        "Tests cover all three public methods: send_due_reminders, notify_overdue, escalate_high_priority",
+        "No assert_called_once_with or assert_called patterns in the test file"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "These tests for our DiscountEngine keep breaking every time we refactor anything. We recently added a caching layer and had to rewrite half the tests even though the behavior didn't change. Can you review these tests and tell me what's wrong and how to fix them? The tests are in files/fragile_tests.py. Write your improved version to test_discount_engine.py in the outputs directory.",
+      "expected_output": "Review identifying over-mocking as the root cause, with rewritten tests using fakes for stateful collaborators and assertions on outcomes.",
+      "files": [
+        "files/fragile_tests.py"
+      ],
+      "expectations": [
+        "Review identifies mock-call verification (assert_called_once_with etc.) as the primary cause of fragility",
+        "Review explains WHY mock-call verification causes breakage on refactor (tests mirror implementation, not behavior)",
+        "Improved tests replace MagicMock with fake implementations for stateful collaborators (repo, cache)",
+        "Improved tests use a factory function to wire up the engine with fakes",
+        "Improved tests remove or drastically reduce assert_called patterns",
+        "Improved tests still verify the core discount calculation outcomes (percentage, fixed, cap)",
+        "Improved tests still verify error cases (below minimum, inactive, not found)",
+        "Review mentions the structure-insensitive or behavioral property from the desiderata"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm building an inventory management system for a warehouse. Products have a quantity, reorder point, and supplier lead time. When quantity drops below the reorder point, the system should automatically create a purchase order. There's also a bulk import feature that reads a CSV and updates quantities, skipping rows with invalid SKUs. I haven't written any tests yet. What should I test, and at what level? Write your recommendations to a file called test_plan.md in the outputs directory.",
+      "expected_output": "A test plan that prioritizes behavioral tests at the right levels, focuses on edge cases and boundary conditions, and avoids recommending tests for defaults or echo-back values.",
+      "files": [],
+      "expectations": [
+        "Plan distinguishes between unit and integration test levels with appropriate recommendations for each",
+        "Plan recommends testing the reorder threshold boundary (quantity at, above, and below reorder point)",
+        "Plan recommends testing CSV edge cases (invalid SKUs, malformed data, mixed valid/invalid rows)",
+        "Plan does NOT recommend testing default constructor values or echo-back assertions",
+        "Plan recommends using factory functions or similar patterns for test setup",
+        "Plan recommends using fakes for repositories/storage rather than mocks",
+        "Plan addresses the 'skip invalid rows, don't abort' behavior for bulk import"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I'm adding tests to a new OrderService that takes orders from an HTTP endpoint, validates them, saves them to a Postgres database, and publishes an event to a message queue. Should I write unit tests or integration tests? I've been writing unit tests with mocks for the database and queue but they keep breaking when I refactor. What's the right approach here?",
+      "expected_output": "Guidance recommending integration tests as the primary investment for this service, explaining why unit tests with mocks are fragile for this use case, and describing what the integration tests should look like.",
+      "files": [],
+      "expectations": [
+        "Response recommends integration tests as the primary investment for this service (not unit tests with mocks)",
+        "Response explains WHY unit tests with mocks break on refactor (they test call sequences, not behavior)",
+        "Response recommends using real or in-memory equivalents for the database (not mocks)",
+        "Response recommends using real or fake equivalents for the message queue (not mocks)",
+        "Response acknowledges where unit tests would still be appropriate (e.g., validation logic, pure business rules)",
+        "Response does NOT recommend mocking the database or queue as the primary approach",
+        "Response explains the integration test middle ground: high enough for real correctness, low enough to debug"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Should I mock the database call in this test? I have a UserRepository that wraps SQLAlchemy and I want to test my UserService which calls repo.find_by_email(). My colleague says I should mock the repo so the test is a 'true unit test'. What do you think?",
+      "expected_output": "Guidance recommending a fake repository over a mock, explaining why mock-call verification is fragile, and describing what a fake implementation looks like.",
+      "files": [],
+      "expectations": [
+        "Response recommends against mocking the repository for this use case",
+        "Response recommends a fake repository (in-memory implementation) instead of a mock",
+        "Response explains WHY mocking is problematic (tests mirror implementation, break on refactor)",
+        "Response explains what a fake repository looks like (in-memory dict or list, implements the same interface)",
+        "Response does NOT recommend using MagicMock or patch for the repository",
+        "Response explains that verifying outcomes (what data was stored/retrieved) is better than verifying mock calls",
+        "Response acknowledges that mocks are appropriate at true external boundaries (third-party APIs, payment processors)"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "My unit tests keep breaking whenever I refactor. I just extracted a helper method from a service class and now 12 tests fail even though the behavior is exactly the same. How do I write tests that survive refactoring?",
+      "expected_output": "Diagnosis identifying structure-sensitivity as the root cause, with guidance on writing behavioral tests that test through the public API and survive internal restructuring.",
+      "files": [],
+      "expectations": [
+        "Response identifies the root cause: tests are testing structure (internal call sequences) not behavior",
+        "Response explains the structure-insensitive property from the desiderata",
+        "Response recommends testing through the public API rather than internal methods",
+        "Response recommends replacing mock-call verification with outcome verification",
+        "Response mentions that integration tests are often more resilient to refactoring than unit tests with mocks",
+        "Response does NOT recommend just updating the mocks to match the new structure",
+        "Response explains the difference between testing 'how' vs testing 'what'"
+      ]
+    }
+  ]
+}

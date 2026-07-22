@@ -1,0 +1,44 @@
+{
+  "skill_name": "multi-agent-collaboration",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building an AI system that needs to research a topic, write a report, and then review it for accuracy. Should I use one agent with multiple stages, or separate agents? If separate, what collaboration pattern — peer review, a manager agent, or something else?",
+      "expected_output": "Recommends single agent with role switching OR Proposer-Reviewer peer pattern with the reviewer having access to external verification tools (not just re-reading). Explains the new-information criterion: a reviewer re-reading the same text adds no signal. Identifies that a manager is overkill for 3 sequential stages. Recommends shared context (trajectory inheritance) if stages are tightly coupled.",
+      "files": [],
+      "expectations": [
+        "Applies the new-information criterion to evaluate whether a reviewer agent adds value",
+        "Identifies that a reviewer re-reading the same text without external tools adds no new signal",
+        "Recommends a specific topology (peer Proposer-Reviewer or single-agent with role switching) with justification",
+        "Explains when shared vs non-shared context is appropriate for this pipeline",
+        "Addresses the YAGNI gate — whether multi-agent is justified at all for this task"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a Proposer-Reviewer setup for generating marketing copy, but the reviewer just says 'looks good' every time and doesn't actually improve anything. What's wrong with my multi-agent design?",
+      "expected_output": "Diagnoses the root cause: the reviewer has no new information — it's re-reading the same text the proposer generated, so it has no signal to improve on. Recommends giving the reviewer access to external verification (e.g., brand guidelines check, A/B test data, audience persona tool). May also identify cognitive surrender as a loop failure mode. Recommends a verifier grounded in real observations rather than model self-assessment.",
+      "files": [],
+      "expectations": [
+        "Correctly diagnoses the root cause as the reviewer lacking new information (not just 'bad prompting')",
+        "Explains the new-information criterion specifically in the context of the Proposer-Reviewer pattern",
+        "Recommends concrete ways to give the reviewer access to new information (external tools, metrics, brand guidelines, etc.)",
+        "Mentions cognitive surrender or lazy fake-done as a related failure mode",
+        "Does NOT recommend just 'improving the reviewer prompt' as the primary fix"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Our multi-agent coding system has 4 agents working on different files simultaneously. They keep overwriting each other's changes and sometimes one agent's bug gets propagated and 'confirmed' by the others. How do we fix this?",
+      "expected_output": "Addresses two distinct failure modes: (1) concurrency conflicts — recommends working copy isolation (Git branches/worktrees per agent, merge after completion) or optimistic locking; (2) cascading amplification — recommends cross-validation from an independent agent that hasn't seen prior output, plus external validation (tests, compilers) as chain breakers. Should not conflate the two problems.",
+      "files": [],
+      "expectations": [
+        "Identifies concurrency conflicts and cascading amplification as two distinct failure modes",
+        "Recommends working copy isolation (Git branches or worktrees per agent) for the concurrency problem",
+        "Recommends external validation (tests, compilers) as chain breakers for the cascading amplification problem",
+        "Recommends cross-validation from an independent agent that hasn't seen prior output",
+        "Addresses both problems rather than only one"
+      ]
+    }
+  ]
+}

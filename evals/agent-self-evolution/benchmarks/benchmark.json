@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "skill_name": "agent-self-evolution",
+    "skill_path": "/Users/mstruble/Software/skills/mattstruble-skills/agent-self-evolution",
+    "iteration": 2,
+    "timestamp": "2026-07-22",
+    "evals_run": [1, 4, 5, 8, 20],
+    "runs_per_configuration": 1,
+    "note": "Iteration 2 after a targeted SKILL.md revision (added a code-generation boundary cue to the Tool Creation section). Revision touched only the body, not the description, so trigger accuracy is unchanged (100%) and was not re-run. Baseline is reused from iteration-1 (no-skill baseline is independent of skill edits, per skill-creator convention)."
+  },
+  "runs": [
+    {"eval_id": 1, "eval_name": "telecom-experience-reuse", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4}},
+    {"eval_id": 1, "eval_name": "telecom-experience-reuse", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4}},
+    {"eval_id": 4, "eval_name": "research-learning-loop", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4}},
+    {"eval_id": 4, "eval_name": "research-learning-loop", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4}},
+    {"eval_id": 5, "eval_name": "system-prompt-optimization", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4}},
+    {"eval_id": 5, "eval_name": "system-prompt-optimization", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.75, "passed": 3, "failed": 1, "total": 4}},
+    {"eval_id": 8, "eval_name": "voyager-enterprise-safety", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4}},
+    {"eval_id": 8, "eval_name": "voyager-enterprise-safety", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.5, "passed": 2, "failed": 2, "total": 4}},
+    {"eval_id": 20, "eval_name": "self-evolution-vs-codegen-boundary", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4}},
+    {"eval_id": 20, "eval_name": "self-evolution-vs-codegen-boundary", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.5, "passed": 2, "failed": 2, "total": 4}}
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.75, "stddev": 0.22, "min": 0.5, "max": 1.0}
+    },
+    "delta": {
+      "pass_rate": "+0.25"
+    }
+  },
+  "trigger_accuracy": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "note": "Unchanged from iteration 1 — description was not modified.",
+    "total": 20
+  },
+  "iteration_delta": {
+    "with_skill_iter1_mean": 0.95,
+    "with_skill_iter2_mean": 1.0,
+    "improvement": "+0.05",
+    "driver": "eval-20 improved 0.75 -> 1.0 (the code-generation boundary cue caused the answer to route code-gen mechanics to coding-agent-design). All other evals held at 1.0 — no regression."
+  },
+  "notes": [
+    "Final skill lift: +25pp (with_skill 1.0 vs baseline 0.75).",
+    "Iteration-2 revision closed the only with-skill gap (eval-20 assertion 4) without regressing any other eval — no-regression confirmed.",
+    "Convergence: with_skill reached ceiling (1.0) on this eval subset; further iteration would require harder assertions. Stopping at 2 iterations per plan (floor met, clear improvement)."
+  ]
+}

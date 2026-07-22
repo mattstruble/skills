@@ -1,0 +1,17 @@
+{
+  "skill_name": "game-visuals",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "readability-and-brief",
+      "prompt": "My game looks technically fine but plays badly — players keep missing enemies and important objects, and the screen feels busy. Separately, I have only a vague art idea and need to brief an artist. Help with both.",
+      "expected_output": "Applies the visual information-channels idea (color/shape/surface-contrast; removing channels hurts playability), addresses composition (maximize actionable play-area, separate foreground from background, deliberate camera), and gives a breadth-first reference-gathering plus artist-briefing workflow with concrete refs and rough programmer-art.",
+      "files": [],
+      "expectations": [
+        "Uses the visual information-channels idea (color/shape/surface-contrast; removing channels like via monochrome or uniform roughness hurts playability, not just looks)",
+        "Addresses composition: maximize actionable play-area, separate foreground from background, camera as a deliberate choice",
+        "Gives a reference-gathering + artist-briefing workflow (low-bar/breadth-first references, brief with concrete refs plus a rough programmer-art sketch)"
+      ]
+    }
+  ]
+}

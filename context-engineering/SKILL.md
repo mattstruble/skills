@@ -161,8 +161,14 @@ drives up cost. Three tactics, in order of preference:
    the fact. Compression is a lossy post-hoc remedy; isolation insulates
    the main context from noise from the start. The cost: the sub-agent
    doesn't see the full main context, so the task description must be
-   self-contained. Cross-ref sub-agent mechanics → `agent-tool-design`;
-   multi-agent context architecture → `multi-agent-collaboration`.
+   self-contained. The deeper reason isolation beats compression: it keeps
+   each LM call *locally in-distribution* — offloading task-specific tokens
+   behind references so the main context stays familiar and structurally
+   similar tasks look the same to the model. Cross-ref sub-agent mechanics →
+   `agent-tool-design`; multi-agent context architecture →
+   `multi-agent-collaboration`; the LID rationale and context-offloading /
+   programmatic-sub-call mechanisms → `agent-architecture`
+   `references/harness-inductive-bias.md`.
 
 3. **Agent status bar.** Convert implicit state — step count, tool budget
    remaining, task progress, time elapsed — into explicit structured

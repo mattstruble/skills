@@ -1,5 +1,12 @@
 Skills in this repository are under active development. Create and modify skills in the repository root, not in `~/.config/opencode/skills/`.
 
+## Maintenance
+
+After adding a new skill or landing updated benchmarks, regenerate the README files:
+
+```
+make readme
+```
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:full hash:f2c52d34 -->
 ## Issue Tracking with bd (beads)

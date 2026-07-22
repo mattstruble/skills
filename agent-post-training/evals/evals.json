@@ -1,0 +1,165 @@
+{
+  "skill_name": "agent-post-training",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We've been iterating on our customer support agent for 3 months. It handles returns, billing questions, and escalations. We've refined the system prompt a dozen times and we're stuck at about 78% on our eval set. My team is pushing to fine-tune the model. Is that the right call, or are we missing something in the harness?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": ["agent-architecture"],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "should we use SFT or RL to train our coding agent? it needs to handle novel codebases it's never seen before. we have about 2000 labeled examples of good code edits",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I'm trying to figure out the ROI of fine-tuning vs just using a better prompt for our document classification agent. The task is: given a legal contract, classify it into one of 12 categories. We're at 82% accuracy with GPT-4 and a detailed prompt. What would fine-tuning actually buy us here?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "We're building an agent that calls our internal APIs to fulfill customer orders. The API has a very specific call sequence — you have to authenticate, then query inventory, then reserve, then confirm. The model keeps getting the order wrong or skipping steps. Would SFT fix this or do we need RL?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": ["agent-tool-design"],
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "our agent works great in our test environment but degrades significantly when we deploy to production. the production data has different distributions — different user phrasings, different edge cases. we've tried adding more test examples but it doesn't help. what's the right training approach here",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "I need to design a reward function for training our phone-calling agent. It needs to collect specific information from the customer service rep (account number, billing address, plan name) and successfully change the plan. What reward signal should I use — binary success/failure or something more granular?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "We want to teach our agent to use a new internal search API we built. It has 5 endpoints with different query formats. The agent currently uses the wrong endpoint about 30% of the time and formats queries incorrectly. Is this a fine-tuning problem or a prompt engineering problem?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": ["agent-tool-design"],
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "My team is debating whether to invest in RL training for our multi-step research agent. The agent does 15-20 tool calls per task (web search, document parsing, summarization). We have a working version with prompt engineering but it makes suboptimal tool selection decisions. What's the decision framework for whether RL is worth the investment?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "We're designing reward signals for a multi-turn customer service agent. The task involves 8-12 turns of dialogue. Should we give rewards at each turn or only at the end when the customer's issue is resolved? What are the tradeoffs?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Our agent keeps taking shortcuts that technically complete the task but violate our business rules — it skips identity verification when it's faster, edits test files to make CI pass instead of fixing the actual bug. We're using RL with a binary success reward. How do we fix this?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 11,
+      "prompt": "We have a well-performing SFT model for our agent. Performance on in-distribution tasks is great but we want to push further. What's the right sequence — do we go straight to RL or is there more we can squeeze out of SFT first?",
+      "expected_output": "",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 12,
+      "prompt": "how do i set up a PPO training loop for my language model? i need to configure the value network, the KL penalty coefficient, and the clipping epsilon. what are the recommended hyperparameter ranges?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 13,
+      "prompt": "I want to run SFT on a 7B model using LoRA. What rank should I use, what learning rate, and how many epochs? I have 5000 training examples.",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 14,
+      "prompt": "we're building an eval harness for our agent. we need to measure task completion rate, tool call accuracy, and response quality. how do we design the evaluation pipeline and what metrics should we track?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": ["agent-evaluation"],
+      "files": []
+    },
+    {
+      "id": 15,
+      "prompt": "I'm designing the orchestration layer for a multi-agent system. One orchestrator agent breaks down tasks and spawns worker agents. How should I handle communication between agents and what happens when a worker fails?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": ["agent-architecture"],
+      "files": []
+    },
+    {
+      "id": 16,
+      "prompt": "how do i implement GRPO from scratch? i need to understand the advantage calculation, the group sampling, and how to handle the KL regularization term in the loss function",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 17,
+      "prompt": "We're setting up a training infrastructure for RL. We need to configure veRL, set up the sandbox environment for code execution, and handle parallelization across 8 GPUs. What's the recommended setup?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    },
+    {
+      "id": 18,
+      "prompt": "our agent's context window is filling up on long tasks. we're at 128k tokens and hitting the limit on complex research tasks. should we use summarization, sliding window, or a different memory architecture?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": ["agent-architecture", "context-engineering"],
+      "files": []
+    },
+    {
+      "id": 19,
+      "prompt": "I need to design the tool interface for our agent's database access. Should the agent get raw SQL access, a query builder API, or a natural language interface that translates to SQL? What are the security and reliability tradeoffs?",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": ["agent-tool-design"],
+      "files": []
+    },
+    {
+      "id": 20,
+      "prompt": "We're evaluating whether to use DPO or PPO for preference alignment on our conversational agent. We have 50k preference pairs from human annotators. Walk me through the implementation differences and which one to use.",
+      "expected_output": "",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": []
+    }
+  ]
+}

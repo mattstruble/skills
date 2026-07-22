@@ -43,6 +43,24 @@ Bojie Li argues the harness — not the model — is the durable competitive
 advantage, as model capability commoditizes and competitive differentiation
 shifts to the engineering outside the model.
 
+Zhang argues the harness's deeper contribution is carrying the inductive bias
+for compositional generalization — reducing unfamiliar, complex problems to
+compositions of familiar, simple ones. The five functions above are the
+operational machinery; the criterion that judges their quality is whether each
+LM call sees a *locally in-distribution* (LID) observation — one that resembles
+training data even when the overall task is novel. A harness that appends every
+observation to a growing context (the ReAct/Claude Code/Codex pattern) drifts
+out-of-distribution over long horizons — "context rot" — while a harness that
+offloads task-specific tokens keeps each call in-distribution and lets
+structurally similar tasks look identical to the model, so it generalizes
+across task length and domain.
+
+-> Read `references/harness-inductive-bias.md` when an agent works on short
+tasks but degrades on long ones, transfers poorly to a new domain, or when
+designing a harness for long-horizon or variable-length tasks: the LID
+criterion, context offloading and programmatic sub-agent calling, and the
+context-rot failure mode.
+
 ---
 
 ## Framing — Effective Agent Principles
@@ -301,3 +319,4 @@ deterministic code, queues, or events is application-architecture.
 | `references/guardrails-and-safety.md` | Full input/execution/output guardrail taxonomy, C/V/C layer mapping, tool risk-rating mechanics, HITL trigger design, jailbreak vs injection in depth |
 | `references/async-event-handling.md` | Structured event modeling, cancellation/queue/parallel strategies, trajectory integrity rules, attention-dispersion mitigations, sync-to-async engineering pattern |
 | `references/real-time-thinking.md` | Fast/slow thinking decomposition (decouple interaction from reasoning); cascade vs end-to-end tradeoff and the bottleneck-information principle; God's-eye-view labeling problem in online decision-making |
+| `references/harness-inductive-bias.md` | What makes a harness *good*: the Locally In-Distribution (LID) quality criterion; context offloading and programmatic sub-agent calling as mechanisms; equivalence classes over task trajectories; context rot failure mode; length/domain generalization evidence |

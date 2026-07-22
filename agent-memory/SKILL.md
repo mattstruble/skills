@@ -264,6 +264,7 @@ when building that layer.
 | Memory tool interface design | agent-tool-design | Ch4 |
 | Orchestration & autonomy | agent-architecture | Ch1 |
 | Operating a personal wiki | knowledge-base | — |
+| Sleep consolidation / experience distillation lifecycle | agent-self-evolution | Ch8 |
 
 ---
 

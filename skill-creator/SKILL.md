@@ -489,6 +489,15 @@ The user might be asking you to update an existing skill, not create a new one. 
 
 ---
 
+## Routing Map
+
+| Concern | Companion Skill | Source |
+|---|---|---|
+| Automated skill generation pipelines (agent generates skills from experience) | agent-self-evolution | Ch8 |
+| System prompt optimization from failures (automated description/prompt evolution) | agent-self-evolution | Ch8 |
+
+---
+
 ## Reference files
 
 The agents/ directory contains instructions for specialized subagents. Read them when you need to spawn the relevant subagent.

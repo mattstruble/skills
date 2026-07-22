@@ -186,6 +186,21 @@ strategies, and status-bar composition patterns.
 
 ---
 
+## Routing Map
+
+These are companion skills in the ai-agents family. Load the relevant one
+when building that layer.
+
+| Concern | Companion Skill | Source |
+|---|---|---|
+| Cross-session memory (what to persist) | agent-memory | Ch3 |
+| Retrieval pipeline for knowledge bases | rag-design *(planned)* | Ch3 §3.2–3.3 |
+| Tool interface design (schema, descriptions) | agent-tool-design | Ch4 |
+| Agent orchestration & guardrails | agent-architecture | Ch1 |
+| System prompt optimization from experience | agent-self-evolution | Ch8 |
+
+---
+
 ## NOT For
 
 **Primary litmus**: Information living in the context window this session

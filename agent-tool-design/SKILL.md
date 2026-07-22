@@ -275,6 +275,7 @@ when building that layer.
 | Coding agents & code generation | coding-agent-design *(planned)* | Ch5 |
 | Multi-agent topology | multi-agent-collaboration *(planned)* | Ch10 |
 | HTTP API surface for human callers | api-design | — |
+| Autonomous tool creation / Voyager cycle | agent-self-evolution | Ch8 |
 
 ---
 

@@ -311,6 +311,7 @@ that uses an LLM to write and execute code."
 | Code review | code-reviewer |
 | Test design | test-design |
 | Context window management | context-engineering |
+| Cross-session capability growth / skill generation | agent-self-evolution |
 
 ---
 

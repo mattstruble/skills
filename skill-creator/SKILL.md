@@ -222,7 +222,7 @@ Flowcharts (graphviz dot, Mermaid, etc.) help in specific situations and hurt in
 
 After writing the skill draft, come up with 2-3 realistic test prompts — the kind of thing a real user would actually say. Share them with the user: [you don't have to use this exact language] "Here are a few test cases I'd like to try. Do these look right, or do you want to add more?" Then run them.
 
-Save test cases to `evals/evals.json`. Don't write assertions yet — just the prompts. You'll draft assertions in the next step while the runs are in progress.
+Save test cases to `evals/<skill-name>/evals.json` at the repo root. Don't write assertions yet — just the prompts. You'll draft assertions in the next step while the runs are in progress.
 
 ```json
 {
@@ -278,11 +278,11 @@ Write an `eval_metadata.json` for each test case (assertions can be empty for no
 
 ### Step 2: While runs are in progress, draft assertions
 
-Don't just wait for the runs to finish — you can use this time productively. Draft quantitative assertions for each test case and explain them to the user. If assertions already exist in `evals/evals.json`, review them and explain what they check.
+Don't just wait for the runs to finish — you can use this time productively. Draft quantitative assertions for each test case and explain them to the user. If assertions already exist in `evals/<skill-name>/evals.json`, review them and explain what they check.
 
 Good assertions are objectively verifiable and have descriptive names — they should read clearly so someone glancing at the results immediately understands what each one checks. Subjective skills (writing style, design quality) are better evaluated qualitatively — don't force assertions onto things that need human judgment.
 
-Update the `eval_metadata.json` files and `evals/evals.json` with the assertions once drafted.
+Update the `eval_metadata.json` files and `evals/<skill-name>/evals.json` with the assertions once drafted.
 
 ### Step 3: As runs complete, capture timing data
 
@@ -304,9 +304,16 @@ Once all runs are done:
 
 2. **Aggregate into benchmark** — collect grading results across all runs into a `benchmark.json`. See `references/schemas.md` for the exact schema. Include pass_rate, time, and tokens for each configuration, with mean ± stddev and the delta. Put each with_skill version before its baseline counterpart.
 
-3. **Do an analyst pass** — read the benchmark data and surface patterns the aggregate stats might hide. See `agents/analyzer.md` (the "Analyzing Benchmark Results" section) for what to look for — things like assertions that always pass regardless of skill (non-discriminating), high-variance evals (possibly flaky), and time/token tradeoffs.
+3. **Auto-promote the benchmark** — once the benchmark.json is finalized, copy it to the tracked location:
+   ```
+   mkdir -p evals/<skill-name>/benchmarks/
+   cp <workspace>/iteration-<N>/benchmark.json evals/<skill-name>/benchmarks/benchmark.json
+   ```
+   This overwrites the prior benchmark — git history preserves the progression. The `evals/` directory is committed; the workspace is not.
 
-4. **Present results to the user** — show the qualitative outputs and quantitative benchmark data. The user needs to see both the actual outputs and the aggregate metrics to make informed decisions. Tell them something like: "Here are the results. Take a look at the outputs for each test case and let me know what you think."
+4. **Do an analyst pass** — read the benchmark data and surface patterns the aggregate stats might hide. See `agents/analyzer.md` (the "Analyzing Benchmark Results" section) for what to look for — things like assertions that always pass regardless of skill (non-discriminating), high-variance evals (possibly flaky), and time/token tradeoffs.
+
+5. **Present results to the user** — show the qualitative outputs and quantitative benchmark data. The user needs to see both the actual outputs and the aggregate metrics to make informed decisions. Tell them something like: "Here are the results. Take a look at the outputs for each test case and let me know what you think."
 
 ### Step 5: Read the feedback
 

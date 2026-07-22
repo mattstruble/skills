@@ -1,7 +1,7 @@
 {
   "metadata": {
     "skill_name": "agent-self-evolution",
-    "skill_path": "/Users/mstruble/Software/skills/mattstruble-skills/agent-self-evolution",
+    "skill_path": "./agent-self-evolution",
     "iteration": 2,
     "timestamp": "2026-07-22",
     "evals_run": [1, 4, 5, 8, 20],

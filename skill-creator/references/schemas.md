@@ -6,7 +6,7 @@ This document defines the JSON schemas used by skill-creator.
 
 ## evals.json
 
-Defines the evals for a skill. Located at `evals/<skill>/evals.json` at the repo root.
+Defines the evals for a skill. Located at `evals/<skill-name>/evals.json` at the repo root.
 
 ```json
 {
@@ -31,7 +31,7 @@ Defines the evals for a skill. Located at `evals/<skill>/evals.json` at the repo
 - `evals[].id`: Unique integer identifier
 - `evals[].prompt`: The task to execute
 - `evals[].expected_output`: Human-readable description of success
-- `evals[].files`: Optional list of input file paths (relative to `evals/<skill>/`)
+- `evals[].files`: Optional list of input file paths (relative to `evals/<skill-name>/`)
 - `evals[].expectations`: List of verifiable statements
 
 ---
@@ -218,7 +218,7 @@ Wall clock timing for a run. Located at `<run-dir>/timing.json`.
 
 ## benchmark.json
 
-Output from Benchmark mode. Located at `evals/<skill>/benchmarks/benchmark.json` (latest overwrites prior; git history preserves progression). Scratch copies live at `<skill>-workspace/iteration-<N>/benchmark.json`.
+Output from Benchmark mode. Located at `evals/<skill-name>/benchmarks/benchmark.json` (latest overwrites prior; git history preserves progression). Scratch copies live at `<skill-name>-workspace/iteration-<N>/benchmark.json`.
 
 ```json
 {

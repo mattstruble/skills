@@ -115,6 +115,8 @@ Key design constraints: the consolidation sub-agent's permissions are confined t
 
 The cycle: explore → iterate on failure → verify task completion → store → reuse. The agent identifies a capability gap, searches for or writes code to fill it, iterates on failures using environmental feedback, verifies the task actually succeeded, then stores the tool for future reuse. Tools are hierarchical and composable — a "portfolio analysis" tool can build on a "get stock price" tool.
 
+**Boundary with code generation**: writing or editing the code of a tool is a coding-agent concern (see `coding-agent-design`). What makes it *self-evolution* is the persistence-and-reuse loop — verifying the tool, storing it, and calling it on future tasks instead of regenerating it each time. Code generated once and discarded is plain code generation, not evolution. The disambiguating test: does the capability persist and get reused across sessions?
+
 **Safety first**: run tool creation in a sandbox; security-scan newly created tools; maintain a whitelist of permitted tool types; set limits on library growth; schedule periodic human review.
 
 → Read `references/autonomous-capability-growth.md` for the Voyager cycle and safety boundaries.

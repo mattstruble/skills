@@ -63,7 +63,7 @@ durable chapter→skill→reference map only.
 | Ch4 | agent-tool-design | tool-categories.md, tool-ecosystem.md |
 | Ch4 §4.7.6-4.7.8 | agent-architecture (fold) | async-event-handling.md |
 | Ch5 | coding-agent-design | search-and-editing.md, code-meta-patterns.md |
-| Ch6 | agent-evaluation | TBD |
+| Ch6 | agent-evaluation | eval-methodology.md, eval-infrastructure.md |
 | Ch7 | agent-post-training *(fit decided in-session)* | TBD |
 | Ch8 | agent-self-evolution *(fold decided in-session)* | TBD |
 | Ch9 | multimodal-agents *(fold/defer decided in-session)* | TBD |

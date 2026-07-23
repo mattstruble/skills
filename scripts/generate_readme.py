@@ -67,25 +67,68 @@ def fmt_pct(val: float) -> str:
     return f"{round(val * 100)}%"
 
 
-def _scoreboard_row(skill: dict, bm: dict) -> str | None:
-    """Return a scoreboard table row string, or None if data is missing."""
-    try:
-        rs = bm["run_summary"]
-        with_mean = rs["with_skill"]["pass_rate"]["mean"]
-        base_mean = rs["without_skill"]["pass_rate"]["mean"]
-        with_pct = fmt_pct(with_mean)
-        base_pct = fmt_pct(base_mean)
-        # Recompute delta from means — robust against both "+0.33" and "+0%" formats
-        delta_val = with_mean - base_mean
-        sign = "+" if delta_val >= 0 else ""
-        delta = f"{sign}{round(delta_val * 100)}%"
-        date = bm["metadata"]["timestamp"]
-    except KeyError:
-        return None
-    return f"| {skill['name']} | {with_pct} | {base_pct} | {delta} | {date} |"
+_SECTION_META = {
+    "process": (
+        "Process Skills",
+        "Skills that enforce a specific way of working — a multi-step procedure or discipline the model follows once the skill loads.",
+    ),
+    "design": (
+        "Design Skills",
+        "Skills that supply frameworks and judgment for architectural or creative decisions.",
+    ),
+    "reference": (
+        "Reference Skills",
+        "Skills that provide domain facts and syntax the model already knows; they exist for consistent routing and conventions.",
+    ),
+    # Legacy alias: treat behavioral as process until frontmatter is relabeled
+    "behavioral": (
+        "Process Skills",
+        "Skills that enforce a specific way of working — a multi-step procedure or discipline the model follows once the skill loads.",
+    ),
+}
+
+_SECTION_ORDER = ["process", "design", "reference"]
+
+
+def _unified_table_row(skill: dict, benchmarks: dict[str, dict]) -> str:
+    name = skill["name"]
+    summary = (skill.get("summary") or name).replace("|", "\\|")
+    bm = benchmarks.get(name)
+    if bm and "run_summary" in bm:
+        try:
+            rs = bm["run_summary"]
+            with_mean = rs["with_skill"]["pass_rate"]["mean"]
+            base_mean = rs["without_skill"]["pass_rate"]["mean"]
+            delta_val = with_mean - base_mean
+            sign = "+" if delta_val >= 0 else ""
+            date = bm["metadata"]["timestamp"]
+            return (
+                f"| {name} | {summary} | {fmt_pct(with_mean)} | {fmt_pct(base_mean)}"
+                f" | {sign}{round(delta_val * 100)}% | {date} |"
+            )
+        except KeyError:
+            pass
+    return f"| {name} | {summary} | — | — | — | — |"
 
 
 def generate_root_readme(skills: list[dict], benchmarks: dict[str, dict]) -> str:
+    # Bucket skills by canonical section key; behavioral maps to "process"
+    _alias = {"behavioral": "process"}
+    sections: dict[str, list[dict]] = {k: [] for k in _SECTION_ORDER}
+    other: list[dict] = []
+    for s in skills:
+        raw_type = s.get("type", "")
+        key = _alias.get(raw_type, raw_type)
+        if key in sections:
+            sections[key].append(s)
+        else:
+            other.append(s)
+
+    table_header = [
+        "| Skill | Summary | With Skill | Baseline | Δ | Last Run |",
+        "|-------|---------|-----------|----------|---|----------|",
+    ]
+
     lines = [
         "# mattstruble-skills",
         "",
@@ -93,54 +136,30 @@ def generate_root_readme(skills: list[dict], benchmarks: dict[str, dict]) -> str
         "",
         "## Skills",
         "",
-        "| Skill | Description |",
-        "|-------|-------------|",
     ]
-    for s in skills:
-        # Use summary if present, fall back to name (not description)
-        display = s.get("summary") or s["name"]
-        display = display.replace("|", "\\|")
-        lines.append(f"| {s['name']} | {display} |")
 
-    # Group skills by type for scoreboard
-    behavioral: list[dict] = []
-    reference: list[dict] = []
-    other: list[dict] = []
-    for s in skills:
-        if s["name"] not in benchmarks:
+    for key in _SECTION_ORDER:
+        section_skills = sections[key]
+        if not section_skills:
             continue
-        skill_type = s.get("type", "")
-        if skill_type == "behavioral":
-            behavioral.append(s)
-        elif skill_type == "reference":
-            reference.append(s)
-        else:
-            other.append(s)
-
-    scoreboard_header = [
-        "| Skill | With Skill | Baseline | Delta | Last Run |",
-        "|-------|-----------|----------|-------|----------|",
-    ]
-
-    lines += ["", "## Eval Scoreboard", ""]
-
-    def _append_section(section_skills: list[dict], heading: str) -> None:
-        rows = []
+        heading, description = _SECTION_META[key]
+        lines += [f"### {heading}", "", description, ""]
+        lines.extend(table_header)
         for s in section_skills:
-            row = _scoreboard_row(s, benchmarks[s["name"]])
-            if row:
-                rows.append(row)
-        if not rows:
-            return
-        lines.append(f"### {heading}")
-        lines.append("")
-        lines.extend(scoreboard_header)
-        lines.extend(rows)
+            lines.append(_unified_table_row(s, benchmarks))
         lines.append("")
 
-    _append_section(behavioral, "Behavioral Skills")
-    _append_section(reference, "Reference Skills")
-    _append_section(other, "Other Skills")
+    if other:
+        lines += [
+            "### Other Skills",
+            "",
+            "Skills not yet assigned to a section.",
+            "",
+        ]
+        lines.extend(table_header)
+        for s in other:
+            lines.append(_unified_table_row(s, benchmarks))
+        lines.append("")
 
     lines += [
         "[Detailed per-eval results →](evals/README.md)",

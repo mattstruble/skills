@@ -1,7 +1,7 @@
 ---
 name: logging
 summary: Production logging discipline: structured logs, happy-path coverage, correlation IDs
-type: behavioral
+type: process
 description: You MUST apply this skill proactively when writing any code that will run in production — services, workers, queue consumers, schedulers, API servers (FastAPI, Flask, Django, gRPC), or any server-side code. Also trigger when adding error handling, implementing observability, adding try/catch blocks, mentioning correlation IDs or request tracing, or debugging a production issue where more context would help. Apply even when the user doesn't explicitly ask about logging — logging is massively undervalued. NOT for log aggregation infrastructure (see grafana-loki for cloud/k8s, homelab-monitoring for homelab), query syntax (see logql), or reviewing existing logging code in PRs (see code-reviewer).
 ---
 

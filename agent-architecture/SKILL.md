@@ -1,7 +1,7 @@
 ---
 name: agent-architecture
 summary: Framework for deciding when and how to build LLM-driven agent systems
-type: behavioral
+type: design
 description: You MUST consult this skill when designing or reviewing any system where an LLM drives execution. Trigger when deciding whether to build an agent at all, choosing workflow vs autonomous orchestration, selecting a model, or adding guardrails. Also trigger when an agent loops forever, fires irreversible actions without confirmation, or works in demos but fails in production. NOT for code-level design (see software-design), tool interface depth (see agent-tool-design), or structuring application code regardless of whether an LLM is involved (see application-architecture).
 ---
 

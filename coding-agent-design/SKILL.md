@@ -1,7 +1,7 @@
 ---
 name: coding-agent-design
 summary: Building coding agents: toolset design, security model, workflow, and failure handling
-type: behavioral
+type: design
 description: You MUST consult this skill when building or improving a coding agent or copilot, choosing its toolset, designing its security model, defining its engineering workflow, handling failures and retries, or deciding whether code generation is the right approach for a problem. Also trigger when a coding agent loops without progress, executes dangerous commands, or can't find files in large codebases. NOT for code-level design patterns (see software-design), code review (see code-reviewer), or agent orchestration decisions unrelated to code execution (see agent-architecture).
 ---
 

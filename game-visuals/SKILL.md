@@ -1,7 +1,7 @@
 ---
 name: game-visuals
 summary: Visual design principles for legibility, color hierarchy, and art direction in games
-type: behavioral
+type: design
 description: "You MUST consult this skill when reasoning about visual design decisions that serve gameplay — art direction for legibility, color and contrast for communication, palette design, making simulation systems visually readable, or diagnosing why a game looks muddy, unreadable, or tonally wrong. Also trigger on visual hierarchy, player visibility, colorblind accessibility, or art that needs to communicate game state. NOT for shader/VFX implementation (see godot-shader) or engine-specific rendering (see godot, love2d). NOT for UI/UX layout."
 ---
 

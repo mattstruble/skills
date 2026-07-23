@@ -1,7 +1,7 @@
 ---
 name: game-design
 summary: Frameworks for analyzing mechanics, game feel, player motivation, and systemic design
-type: behavioral
+type: design
 description: "You MUST consult this skill when reasoning about or evaluating game design decisions — analyzing mechanics, diagnosing why a design feels wrong or shallow, evaluating whether a mechanic is interesting, or discussing game feel, player motivation, balance, or systemic design. Also trigger when a game feels one-note, shallow, or like every other game in its genre. NOT for engine-specific implementation (see godot, love2d) or shader/VFX work (see godot-shader)."
 ---
 

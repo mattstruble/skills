@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 summary: Four-reviewer parallel code review pipeline with fix cycle and aggregated findings
-type: behavioral
+type: process
 description: "Use when reviewing PRs, examining code changes, running `gh pr diff`, or when asked for code review. Also trigger after completing a feature implementation when review is needed before merging. NOT for test quality (see test-design)."
 author: mattstruble
 ---

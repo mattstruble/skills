@@ -1,7 +1,7 @@
 ---
 name: game-audio
 summary: Audio design principles for games: music, sound effects, and adaptive systems
-type: behavioral
+type: design
 description: "You MUST consult this skill when reasoning about game audio design — how music serves gameplay, designing sound that reinforces game feel, adaptive/reactive audio systems, tonal integration between music and sound effects, or creative process for game composers. Also trigger when audio feels generic, when a brief demands something unprecedented, or when discussing constraints as creative tools. NOT for Wwise/FMOD node graph configuration or middleware setup. NOT for general music composition theory outside a game context."
 ---
 

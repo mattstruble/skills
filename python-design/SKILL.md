@@ -1,7 +1,7 @@
 ---
 name: python-design
 summary: Python-specific design patterns, idioms, type choices, and anti-patterns
-type: behavioral
+type: design
 description: You MUST consult this skill when writing, reviewing, or generating Python code. Also trigger on Python-specific design choices (Protocol vs ABC, TypedDict vs dataclass, Pydantic boundaries), code style anti-patterns (broad exceptions, sentinel defaults, redundant docstrings, unnecessary future imports), or advanced patterns (functools, generator pipelines, typing). NOT for debugging Python errors, framework-specific setup (Django, Flask, FastAPI config), package management, or writing tests (see test-design).
 ---
 

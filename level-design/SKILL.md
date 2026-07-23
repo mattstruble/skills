@@ -1,7 +1,7 @@
 ---
 name: level-design
 summary: Combat arena and action game level design: spatial choice, legibility, encounter flow
-type: behavioral
+type: design
 description: "You MUST consult this skill when reasoning about combat arena design, encounter composition, spatial choice in action/shooter levels, player guidance through combat spaces, push-forward layout, or level flow in action games. Also trigger when a level feels like a corridor with decoration, when players camp or disengage, when combat encounters feel static, or when spatial choices feel cosmetic. NOT for puzzle, exploration, or platformer level design. NOT for game mechanics theory or depth analysis (see game-design). NOT for engine-specific implementation (see godot, love2d)."
 ---
 

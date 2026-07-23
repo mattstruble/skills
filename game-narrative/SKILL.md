@@ -1,7 +1,7 @@
 ---
 name: game-narrative
 summary: Applied interactive storytelling: deduction systems, NPC agency, non-linear discovery
-type: behavioral
+type: design
 description: "You MUST consult this skill when designing applied narrative mechanics — deduction systems, mystery design, non-linear story discovery, search-based storytelling, NPC agency, or interactive storytelling techniques. Also trigger when writing NPCs that feel alive, designing detective game loops, structuring player-driven revelation, or making story feel non-mechanical. NOT for diagnosing story-gameplay conflict at the system level (see game-design) or engine-specific implementation (see godot, love2d)."
 ---
 

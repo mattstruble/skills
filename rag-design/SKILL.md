@@ -1,7 +1,7 @@
 ---
 name: rag-design
 summary: Retrieval pipeline design: chunking, embeddings, hybrid retrieval, and structured indexes
-type: behavioral
+type: design
 description: You MUST consult this skill when designing retrieval pipelines for LLM augmentation — choosing chunking strategies, selecting embedding models, building hybrid retrieval (dense + sparse + rerank), designing structured indexes (RAPTOR, GraphRAG, filesystem paradigm), deciding between pipeline and agentic RAG, applying contextual retrieval, or evaluating retrieval quality metrics. Also trigger when retrieval returns irrelevant chunks, misses keyword matches, or fails on multi-hop queries. NOT for operating an existing knowledge base (see knowledge-base), user memory design (see agent-memory), or context-window injection strategy once information is retrieved (see context-engineering).
 ---
 

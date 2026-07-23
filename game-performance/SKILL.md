@@ -1,7 +1,7 @@
 ---
 name: game-performance
 summary: Systematic GPU/CPU/memory profiling and optimization methodology for games
-type: behavioral
+type: design
 description: "You MUST consult this skill when diagnosing or fixing game performance problems — profiling GPU/CPU/memory bottlenecks, improving frame rate, reducing battery consumption, fixing hitches or frame drops, or optimizing for constrained hardware (handheld, mobile, integrated graphics). Also trigger when a game runs at target FPS but utilization is dangerously high, or when frame pacing is inconsistent. NOT for network performance (latency, tick rate, bandwidth), loading time optimization, architectural patterns that prevent performance problems (see game-patterns), shader authoring (see godot-shader), or engine-specific profiling tool configuration."
 ---
 

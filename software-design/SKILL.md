@@ -1,7 +1,7 @@
 ---
 name: software-design
 summary: Core software design principles: composition, minimal interfaces, and clean boundaries
-type: behavioral
+type: design
 description: You MUST consult this skill when writing, reviewing, or designing code. Also trigger when code seems verbose or over-documented (unnecessary wrappers, comments restating the code), when design behavior is ambiguous (what should happen on empty input, which error to propagate), or when conventions are silently violated without explanation. NOT for debugging existing errors, language syntax questions, framework setup (CI/CD, database migrations), performance benchmarking, test quality criteria (see test-design), API surface conventions (see api-design), or abstract pattern theory discussions.
 ---
 

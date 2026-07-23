@@ -1,7 +1,7 @@
 ---
 name: application-architecture
 summary: Layering, domain modeling, and data access patterns for application-level structure
-type: behavioral
+type: design
 description: Application-level structural patterns -- layering, business logic organization, data access strategy, domain modeling, and cross-boundary communication. Use when designing a new service, choosing how to structure an application, or reviewing code for architectural smells (logic in controllers, no domain boundary, tangled data access). NOT for code-level design (see software-design), API surface conventions (see api-design), or infrastructure/deployment architecture.
 ---
 

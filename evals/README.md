@@ -2,308 +2,266 @@
 
 ## agent-self-evolution
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| telecom-experience-reuse | with_skill | 100% | 4 | 0 | 4 |
-| telecom-experience-reuse | without_skill | 100% | 4 | 0 | 4 |
-| research-learning-loop | with_skill | 100% | 4 | 0 | 4 |
-| research-learning-loop | without_skill | 100% | 4 | 0 | 4 |
-| system-prompt-optimization | with_skill | 100% | 4 | 0 | 4 |
-| system-prompt-optimization | without_skill | 75% | 3 | 1 | 4 |
-| voyager-enterprise-safety | with_skill | 100% | 4 | 0 | 4 |
-| voyager-enterprise-safety | without_skill | 50% | 2 | 2 | 4 |
-| self-evolution-vs-codegen-boundary | with_skill | 100% | 4 | 0 | 4 |
-| self-evolution-vs-codegen-boundary | without_skill | 50% | 2 | 2 | 4 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| telecom-experience-reuse | 4/4 | 4/4 | +0 |
+| research-learning-loop | 4/4 | 4/4 | +0 |
+| system-prompt-optimization | 3/4 | 4/4 | +1 |
+| voyager-enterprise-safety | 2/4 | 4/4 | +2 |
+| self-evolution-vs-codegen-boundary | 2/4 | 4/4 | +2 |
+| **Total** | **15/20 (75%)** | **20/20 (100%)** | **+25%** |
 
 ## api-design
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| networking-api-sockets | with_skill | 100% | 3 | 0 | 3 |
-| networking-api-sockets | without_skill | 100% | 3 | 0 | 3 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| networking-api-sockets | 3/3 | 3/3 | +0 |
+| **Total** | **3/3 (100%)** | **3/3 (100%)** | **+0%** |
 
 ## application-architecture
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| concurrency-load-infra | with_skill | 100% | 4 | 0 | 4 |
-| concurrency-load-infra | without_skill | 25% | 1 | 3 | 4 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| concurrency-load-infra | 1/4 | 4/4 | +3 |
+| **Total** | **1/4 (25%)** | **4/4 (100%)** | **+75%** |
 
 ## brainstorm
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| excited-idea-and-prototype | with_skill | 100% | 3 | 0 | 3 |
-| excited-idea-and-prototype | without_skill | 67% | 2 | 1 | 3 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| excited-idea-and-prototype | 2/3 | 3/3 | +1 |
+| **Total** | **2/3 (67%)** | **3/3 (100%)** | **+33%** |
 
 ## code-reviewer
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| copy-paste-defects | with_skill | 100% | 2 | 0 | 2 |
-| copy-paste-defects | without_skill | 100% | 2 | 0 | 2 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| copy-paste-defects | 2/2 | 2/2 | +0 |
+| **Total** | **2/2 (100%)** | **2/2 (100%)** | **+0%** |
 
 ## concurrency-design
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| game-server-actor-fault-isolation | with_skill | 100% | 5 | 0 | 5 |
-| game-server-actor-fault-isolation | without_skill | 60% | 3 | 2 | 5 |
-| kafka-pipeline-backpressure | with_skill | 100% | 5 | 0 | 5 |
-| kafka-pipeline-backpressure | without_skill | 100% | 5 | 0 | 5 |
-| http2-state-machine-vs-coroutines | with_skill | 80% | 4 | 1 | 5 |
-| http2-state-machine-vs-coroutines | without_skill | 40% | 2 | 3 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| game-server-actor-fault-isolation | 3/5 | 5/5 | +2 |
+| kafka-pipeline-backpressure | 5/5 | 5/5 | +0 |
+| http2-state-machine-vs-coroutines | 2/5 | 4/5 | +2 |
+| **Total** | **10/15 (67%)** | **14/15 (93%)** | **+27%** |
 
 ## game-audio
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| constraint-driven-composition | with_skill | 100% | 5 | 0 | 5 |
-| constraint-driven-composition | without_skill | 100% | 5 | 0 | 5 |
-| tonal-integration-crossbow | with_skill | 100% | 5 | 0 | 5 |
-| tonal-integration-crossbow | without_skill | 40% | 2 | 3 | 5 |
-| reactive-audio-overkill | with_skill | 100% | 5 | 0 | 5 |
-| reactive-audio-overkill | without_skill | 80% | 4 | 1 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| constraint-driven-composition | 5/5 | 5/5 | +0 |
+| tonal-integration-crossbow | 2/5 | 5/5 | +3 |
+| reactive-audio-overkill | 4/5 | 5/5 | +1 |
+| **Total** | **11/15 (73%)** | **15/15 (100%)** | **+27%** |
 
 ## game-design
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| opening-and-exhausted-mechanic | with_skill | 100% | 4 | 0 | 4 |
-| opening-and-exhausted-mechanic | without_skill | 75% | 3 | 1 | 4 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| opening-and-exhausted-mechanic | 3/4 | 4/4 | +1 |
+| **Total** | **3/4 (75%)** | **4/4 (100%)** | **+25%** |
 
 ## game-narrative
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| reactive-dialogue-and-coherence | with_skill | 100% | 2 | 0 | 2 |
-| reactive-dialogue-and-coherence | without_skill | 100% | 2 | 0 | 2 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| reactive-dialogue-and-coherence | 2/2 | 2/2 | +0 |
+| **Total** | **2/2 (100%)** | **2/2 (100%)** | **+0%** |
 
 ## game-patterns
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| serialization-and-events | with_skill | 100% | 4 | 0 | 4 |
-| serialization-and-events | without_skill | 75% | 3 | 1 | 4 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| serialization-and-events | 3/4 | 4/4 | +1 |
+| **Total** | **3/4 (75%)** | **4/4 (100%)** | **+25%** |
 
 ## game-performance
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| flat-profile | with_skill | 100% | 3 | 0 | 3 |
-| flat-profile | without_skill | 100% | 3 | 0 | 3 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| flat-profile | 3/3 | 3/3 | +0 |
+| **Total** | **3/3 (100%)** | **3/3 (100%)** | **+0%** |
 
 ## game-rendering
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| how-to-learn-graphics | with_skill | 100% | 3 | 0 | 3 |
-| how-to-learn-graphics | without_skill | 67% | 2 | 1 | 3 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| how-to-learn-graphics | 2/3 | 3/3 | +1 |
+| **Total** | **2/3 (67%)** | **3/3 (100%)** | **+33%** |
 
 ## game-visuals
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| readability-and-brief | with_skill | 100% | 3 | 0 | 3 |
-| readability-and-brief | without_skill | 33% | 1 | 2 | 3 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| readability-and-brief | 1/3 | 3/3 | +2 |
+| **Total** | **1/3 (33%)** | **3/3 (100%)** | **+67%** |
 
 ## godot
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| player-scene-component-state-machine | with_skill | 80% | 4 | 1 | 5 |
-| player-scene-component-state-machine | without_skill | 40% | 2 | 3 | 5 |
-| bullet-hell-pool-flyweight | with_skill | 100% | 5 | 0 | 5 |
-| bullet-hell-pool-flyweight | without_skill | 80% | 4 | 1 | 5 |
-| coroutine-safety-timeout | with_skill | 100% | 5 | 0 | 5 |
-| coroutine-safety-timeout | without_skill | 60% | 3 | 2 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| player-scene-component-state-machine | 2/5 | 4/5 | +2 |
+| bullet-hell-pool-flyweight | 4/5 | 5/5 | +1 |
+| coroutine-safety-timeout | 3/5 | 5/5 | +2 |
+| **Total** | **9/15 (60%)** | **14/15 (93%)** | **+33%** |
 
 ## godot-shader
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| custom-lighting-rim-fresnel | with_skill | 100% | 5 | 0 | 5 |
-| custom-lighting-rim-fresnel | without_skill | 100% | 5 | 0 | 5 |
-| shadertoy-postprocess-port | with_skill | 100% | 5 | 0 | 5 |
-| shadertoy-postprocess-port | without_skill | 100% | 5 | 0 | 5 |
-| vertex-displacement-normals | with_skill | 100% | 5 | 0 | 5 |
-| vertex-displacement-normals | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| custom-lighting-rim-fresnel | 5/5 | 5/5 | +0 |
+| shadertoy-postprocess-port | 5/5 | 5/5 | +0 |
+| vertex-displacement-normals | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## gpu-rendering-architecture
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| gpu-driven-culling-indirect-count | with_skill | 100% | 5 | 0 | 5 |
-| gpu-driven-culling-indirect-count | without_skill | 100% | 5 | 0 | 5 |
-| deferred-bindless-nonuniform-index | with_skill | 100% | 5 | 0 | 5 |
-| deferred-bindless-nonuniform-index | without_skill | 100% | 5 | 0 | 5 |
-| tbdr-mobile-port-render-state | with_skill | 100% | 5 | 0 | 5 |
-| tbdr-mobile-port-render-state | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| gpu-driven-culling-indirect-count | 5/5 | 5/5 | +0 |
+| deferred-bindless-nonuniform-index | 5/5 | 5/5 | +0 |
+| tbdr-mobile-port-render-state | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## grafana
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| instanceselector-mismatch-silent-skip | with_skill | 100% | 5 | 0 | 5 |
-| instanceselector-mismatch-silent-skip | without_skill | 100% | 5 | 0 | 5 |
-| container-template-variable-prometheus-loki | with_skill | 100% | 5 | 0 | 5 |
-| container-template-variable-prometheus-loki | without_skill | 100% | 5 | 0 | 5 |
-| sonarr-discord-alert-operator-crd | with_skill | 100% | 5 | 0 | 5 |
-| sonarr-discord-alert-operator-crd | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| instanceselector-mismatch-silent-skip | 5/5 | 5/5 | +0 |
+| container-template-variable-prometheus-loki | 5/5 | 5/5 | +0 |
+| sonarr-discord-alert-operator-crd | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## helm
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| bitnami-postgres-upgrade-password | with_skill | 100% | 5 | 0 | 5 |
-| bitnami-postgres-upgrade-password | without_skill | 100% | 5 | 0 | 5 |
-| atomic-failed-install-retry | with_skill | 100% | 4 | 0 | 4 |
-| atomic-failed-install-retry | without_skill | 100% | 4 | 0 | 4 |
-| custom-pgvector-image-values | with_skill | 100% | 5 | 0 | 5 |
-| custom-pgvector-image-values | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| bitnami-postgres-upgrade-password | 5/5 | 5/5 | +0 |
+| atomic-failed-install-retry | 4/4 | 4/4 | +0 |
+| custom-pgvector-image-values | 5/5 | 5/5 | +0 |
+| **Total** | **14/14 (100%)** | **14/14 (100%)** | **+0%** |
 
 ## homelab-monitoring
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| docker-log-collection-alloy | with_skill | 100% | 5 | 0 | 5 |
-| docker-log-collection-alloy | without_skill | 100% | 5 | 0 | 5 |
-| kube-prometheus-stack-servicemonitor | with_skill | 100% | 5 | 0 | 5 |
-| kube-prometheus-stack-servicemonitor | without_skill | 80% | 4 | 1 | 5 |
-| alertmanager-discord-email-routing | with_skill | 100% | 5 | 0 | 5 |
-| alertmanager-discord-email-routing | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| docker-log-collection-alloy | 5/5 | 5/5 | +0 |
+| kube-prometheus-stack-servicemonitor | 4/5 | 5/5 | +1 |
+| alertmanager-discord-email-routing | 5/5 | 5/5 | +0 |
+| **Total** | **14/15 (93%)** | **15/15 (100%)** | **+7%** |
 
 ## k8s-operations
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| readiness-probe-rolling-update | with_skill | 100% | 5 | 0 | 5 |
-| readiness-probe-rolling-update | without_skill | 100% | 5 | 0 | 5 |
-| safe-node-reboot-drain | with_skill | 100% | 5 | 0 | 5 |
-| safe-node-reboot-drain | without_skill | 100% | 5 | 0 | 5 |
-| resourceversion-apply-conflict | with_skill | 100% | 5 | 0 | 5 |
-| resourceversion-apply-conflict | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| readiness-probe-rolling-update | 5/5 | 5/5 | +0 |
+| safe-node-reboot-drain | 5/5 | 5/5 | +0 |
+| resourceversion-apply-conflict | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## k8s-storage
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| hetzner-rwo-shared-volume-podaffinity | with_skill | 100% | 5 | 0 | 5 |
-| hetzner-rwo-shared-volume-podaffinity | without_skill | 100% | 5 | 0 | 5 |
-| postgres-statefulset-volumeclaimtemplates-pvc-cleanup | with_skill | 100% | 5 | 0 | 5 |
-| postgres-statefulset-volumeclaimtemplates-pvc-cleanup | without_skill | 100% | 5 | 0 | 5 |
-| configmap-to-secret-volume-mount-rotation | with_skill | 100% | 5 | 0 | 5 |
-| configmap-to-secret-volume-mount-rotation | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| hetzner-rwo-shared-volume-podaffinity | 5/5 | 5/5 | +0 |
+| postgres-statefulset-volumeclaimtemplates-pvc-cleanup | 5/5 | 5/5 | +0 |
+| configmap-to-secret-volume-mount-rotation | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## k8s-workloads
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| zero-downtime-rolling-update-deployment | with_skill | 100% | 5 | 0 | 5 |
-| zero-downtime-rolling-update-deployment | without_skill | 100% | 5 | 0 | 5 |
-| one-time-migration-job | with_skill | 100% | 5 | 0 | 5 |
-| one-time-migration-job | without_skill | 100% | 5 | 0 | 5 |
-| cronjob-concurrency-backup | with_skill | 100% | 5 | 0 | 5 |
-| cronjob-concurrency-backup | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| zero-downtime-rolling-update-deployment | 5/5 | 5/5 | +0 |
+| one-time-migration-job | 5/5 | 5/5 | +0 |
+| cronjob-concurrency-backup | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## knowledge-base
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| log-postgres-job-queue-decision | with_skill | 100% | 5 | 0 | 5 |
-| log-postgres-job-queue-decision | without_skill | 60% | 3 | 2 | 5 |
-| supersede-reversed-decision-note | with_skill | 100% | 5 | 0 | 5 |
-| supersede-reversed-decision-note | without_skill | 100% | 5 | 0 | 5 |
-| add-collaborator-person-note | with_skill | 100% | 5 | 0 | 5 |
-| add-collaborator-person-note | without_skill | 80% | 4 | 1 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| log-postgres-job-queue-decision | 3/5 | 5/5 | +2 |
+| supersede-reversed-decision-note | 5/5 | 5/5 | +0 |
+| add-collaborator-person-note | 4/5 | 5/5 | +1 |
+| **Total** | **12/15 (80%)** | **15/15 (100%)** | **+20%** |
 
 ## level-design
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| arena-pressure-doorway-camping | with_skill | 100% | 5 | 0 | 5 |
-| arena-pressure-doorway-camping | without_skill | 80% | 4 | 1 | 5 |
-| checkpoint-test-scripted-encounters | with_skill | 100% | 5 | 0 | 5 |
-| checkpoint-test-scripted-encounters | without_skill | 80% | 4 | 1 | 5 |
-| boss-arena-oversized-symmetric | with_skill | 100% | 5 | 0 | 5 |
-| boss-arena-oversized-symmetric | without_skill | 80% | 4 | 1 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| arena-pressure-doorway-camping | 4/5 | 5/5 | +1 |
+| checkpoint-test-scripted-encounters | 4/5 | 5/5 | +1 |
+| boss-arena-oversized-symmetric | 4/5 | 5/5 | +1 |
+| **Total** | **12/15 (80%)** | **15/15 (100%)** | **+20%** |
 
 ## logql
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| json-parser-error-empty-results | with_skill | 100% | 5 | 0 | 5 |
-| json-parser-error-empty-results | without_skill | 100% | 5 | 0 | 5 |
-| topk-error-rate-dashboard | with_skill | 100% | 5 | 0 | 5 |
-| topk-error-rate-dashboard | without_skill | 100% | 5 | 0 | 5 |
-| cross-service-correlation-no-tracing | with_skill | 100% | 5 | 0 | 5 |
-| cross-service-correlation-no-tracing | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| json-parser-error-empty-results | 5/5 | 5/5 | +0 |
+| topk-error-rate-dashboard | 5/5 | 5/5 | +0 |
+| cross-service-correlation-no-tracing | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## nix-packaging
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| buildgomodule-vendorhash-fakehash-bootstrap | with_skill | 100% | 5 | 0 | 5 |
-| buildgomodule-vendorhash-fakehash-bootstrap | without_skill | 100% | 5 | 0 | 5 |
-| substituteinplace-buildphase-runhook | with_skill | 100% | 5 | 0 | 5 |
-| substituteinplace-buildphase-runhook | without_skill | 100% | 5 | 0 | 5 |
-| wrapprogram-runtime-path-closure | with_skill | 100% | 5 | 0 | 5 |
-| wrapprogram-runtime-path-closure | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| buildgomodule-vendorhash-fakehash-bootstrap | 5/5 | 5/5 | +0 |
+| substituteinplace-buildphase-runhook | 5/5 | 5/5 | +0 |
+| wrapprogram-runtime-path-closure | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## pr-reviewer
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| auth-endpoint-review | with_skill | 100% | 5 | 0 | 5 |
-| auth-endpoint-review | without_skill | 80% | 4 | 1 | 5 |
-| hardcoded-credential-review | with_skill | 100% | 5 | 0 | 5 |
-| hardcoded-credential-review | without_skill | 80% | 4 | 1 | 5 |
-| clean-pr-lgtm | with_skill | 100% | 5 | 0 | 5 |
-| clean-pr-lgtm | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| auth-endpoint-review | 4/5 | 5/5 | +1 |
+| hardcoded-credential-review | 4/5 | 5/5 | +1 |
+| clean-pr-lgtm | 5/5 | 5/5 | +0 |
+| **Total** | **13/15 (87%)** | **15/15 (100%)** | **+13%** |
 
 ## prd-writing
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| one-question-at-a-time | with_skill | 100% | 5 | 0 | 5 |
-| one-question-at-a-time | without_skill | 40% | 2 | 3 | 5 |
-| behavioral-not-implementation | with_skill | 100% | 5 | 0 | 5 |
-| behavioral-not-implementation | without_skill | 80% | 4 | 1 | 5 |
-| write-prd-with-coverage-check | with_skill | 100% | 5 | 0 | 5 |
-| write-prd-with-coverage-check | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| one-question-at-a-time | 2/5 | 5/5 | +3 |
+| behavioral-not-implementation | 4/5 | 5/5 | +1 |
+| write-prd-with-coverage-check | 5/5 | 5/5 | +0 |
+| **Total** | **11/15 (73%)** | **15/15 (100%)** | **+27%** |
 
 ## promql
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| predict-linear-disk-fill | with_skill | 100% | 5 | 0 | 5 |
-| predict-linear-disk-fill | without_skill | 100% | 5 | 0 | 5 |
-| histogram-quantile-per-container | with_skill | 100% | 5 | 0 | 5 |
-| histogram-quantile-per-container | without_skill | 100% | 5 | 0 | 5 |
-| absent-vs-up-zero | with_skill | 100% | 4 | 0 | 4 |
-| absent-vs-up-zero | without_skill | 100% | 4 | 0 | 4 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| predict-linear-disk-fill | 5/5 | 5/5 | +0 |
+| histogram-quantile-per-container | 5/5 | 5/5 | +0 |
+| absent-vs-up-zero | 4/4 | 4/4 | +0 |
+| **Total** | **14/14 (100%)** | **14/14 (100%)** | **+0%** |
 
 ## skill-creator
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| create-conventional-commit-skill | with_skill | 100% | 5 | 0 | 5 |
-| create-conventional-commit-skill | without_skill | 100% | 5 | 0 | 5 |
-| analyze-python-design-benchmark | with_skill | 100% | 5 | 0 | 5 |
-| analyze-python-design-benchmark | without_skill | 100% | 5 | 0 | 5 |
-| fix-logging-description-triggering | with_skill | 100% | 5 | 0 | 5 |
-| fix-logging-description-triggering | without_skill | 100% | 5 | 0 | 5 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| create-conventional-commit-skill | 5/5 | 5/5 | +0 |
+| analyze-python-design-benchmark | 5/5 | 5/5 | +0 |
+| fix-logging-description-triggering | 5/5 | 5/5 | +0 |
+| **Total** | **15/15 (100%)** | **15/15 (100%)** | **+0%** |
 
 ## software-design
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| scary-fn-and-flat-profile | with_skill | 100% | 4 | 0 | 4 |
-| scary-fn-and-flat-profile | without_skill | 75% | 3 | 1 | 4 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| scary-fn-and-flat-profile | 3/4 | 4/4 | +1 |
+| **Total** | **3/4 (75%)** | **4/4 (100%)** | **+25%** |
 
 ## test-design
 
-| Eval | Config | Pass Rate | Passed | Failed | Total |
-|------|--------|-----------|--------|--------|-------|
-| where-to-test-and-infra-cost | with_skill | 100% | 3 | 0 | 3 |
-| where-to-test-and-infra-cost | without_skill | 67% | 2 | 1 | 3 |
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| where-to-test-and-infra-cost | 2/3 | 3/3 | +1 |
+| **Total** | **2/3 (67%)** | **3/3 (100%)** | **+33%** |

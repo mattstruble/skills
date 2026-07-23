@@ -15,7 +15,7 @@ Skills that enforce a specific way of working — a multi-step procedure or disc
 | git-commit | Conventional commit authoring: grouping changes by intent and writing commit messages | 76% | 96% | +20% | 2026-07-23 |
 | git-pr | Pull request creation: sizing, title conventions, and description writing | 7% | 53% | +47% | 2026-07-23 |
 | knowledge-base | Maintaining and writing to a persistent Obsidian-style cross-session knowledge graph | 47% | 100% | +53% | 2026-07-23 |
-| logging | Production logging discipline: structured logs, happy-path coverage, correlation IDs | 100% | 91% | -9% | 2026-07-23 |
+| logging | Production logging discipline: structured logs, happy-path coverage, correlation IDs | 100% | 92% | -8% | 2026-07-23 |
 | pr-reviewer | Peer PR review pipeline producing tiered, courteous draft comments for GitHub | 40% | 100% | +60% | 2026-07-23 |
 | prd-to-stories | Decomposing behavioral PRDs into deliverable stories with specific acceptance criteria | 88% | 94% | +6% | 2026-07-23 |
 | prd-writing | Co-authoring behavioral product requirements documents through structured interview | 60% | 87% | +27% | 2026-07-23 |
@@ -48,11 +48,11 @@ Skills that supply frameworks and judgment for architectural or creative decisio
 | level-design | Combat arena and action game level design: spatial choice, legibility, encounter flow | 20% | 100% | +80% | 2026-07-23 |
 | love2d-fennel | Fennel + Love2D interactive development: REPL workflow, hot-reloading, mode architecture | 20% | 87% | +67% | 2026-07-23 |
 | ml-post-training | SFT and RL post-training mechanics: data pipelines, reward design, LoRA, debugging | 64% | 84% | +20% | 2026-07-23 |
-| multi-agent-collaboration | Designing multi-agent topologies, context sharing, handoff protocols, and failure modes | 47% | 93% | +46% | 2026-07-23 |
+| multi-agent-collaboration | Designing multi-agent topologies, context sharing, handoff protocols, and failure modes | 47% | 93% | +47% | 2026-07-23 |
 | nix | NixOS, Home Manager, nix-darwin, flakes, devShells, and declarative system configuration | 62% | 70% | +9% | 2026-07-23 |
 | nix-dendritic | Aspect-oriented flake-parts Nix configuration for multi-host, multi-platform setups | 49% | 90% | +41% | 2026-07-23 |
 | odin-design | Idiomatic Odin patterns, allocators, package structure, and LLM knowledge-gap corrections | 67% | 86% | +19% | 2026-07-23 |
-| odin-gamedev | Odin game architecture with Raylib/Sokol: entity management, hot reloading, game state | 70% | 89% | +19% | 2026-07-23 |
+| odin-gamedev | Odin game architecture with Raylib/Sokol: entity management, hot reloading, game state | 71% | 89% | +18% | 2026-07-23 |
 | python-design | Python-specific design patterns, idioms, type choices, and anti-patterns | 80% | 100% | +20% | 2026-07-23 |
 | rag-design | Retrieval pipeline design: chunking, embeddings, hybrid retrieval, and structured indexes | 40% | 93% | +53% | 2026-07-23 |
 | software-design | Core software design principles: composition, minimal interfaces, and clean boundaries | 75% | 100% | +25% | 2026-06-30 |

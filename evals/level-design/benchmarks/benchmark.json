@@ -1,65 +1,29 @@
 {
-  "metadata": { "skill_name": "level-design", "timestamp": "2026-07-22", "evals_run": ["arena-pressure-doorway-camping", "checkpoint-test-scripted-encounters", "boss-arena-oversized-symmetric"], "runs_per_configuration": 1 },
-  "runs": [
-    { "eval_id": 1, "eval_name": "arena-pressure-doorway-camping", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Identifies static health pickups as root cause enabling ignore-and-recover", "passed": true, "evidence": "'The static corner health pickup. This is the primary offender'"},
-        {"text": "Recommends kill-drop / glory-kill health model rather than removing pickups", "passed": true, "evidence": "'Tie health to kills ... move recovery onto a kill-drop / glory-kill model'"},
-        {"text": "Names Arena Pressure or Push-Forward Design as the governing concept", "passed": true, "evidence": "'The governing concept is Arena Pressure / Push-Forward Design, not difficulty.'"},
-        {"text": "Recommends half-walls over full-wall cover (full walls reward camping)", "passed": true, "evidence": "'Full walls stop movement ... reward camping'; 'Replace full walls with half-walls'"},
-        {"text": "Avoids adding more enemies / enemy health as the primary fix", "passed": true, "evidence": "'Avoid: adding more enemies or inflating enemy health as the primary fix'"}
-      ] },
-    { "eval_id": 1, "eval_name": "arena-pressure-doorway-camping", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5},
-      "expectations": [
-        {"text": "Identifies static health pickups as root cause enabling ignore-and-recover", "passed": true, "evidence": "'The health pickup is the core problem ... lets players disengage, heal, and re-engage'"},
-        {"text": "Recommends kill-drop / glory-kill health model rather than removing pickups", "passed": true, "evidence": "'change the health pickup to a kill-based drop'"},
-        {"text": "Names Arena Pressure or Push-Forward Design as the governing concept", "passed": false, "evidence": "describes 'reward forward motion' but never names Arena Pressure / Push-Forward Design"},
-        {"text": "Recommends half-walls over full-wall cover (full walls reward camping)", "passed": true, "evidence": "'Full-wall cover encourages camping ... Swap most of them for half-walls'"},
-        {"text": "Avoids adding more enemies / enemy health as the primary fix", "passed": true, "evidence": "'I would not start by just adding more enemies or bumping enemy health'"}
-      ] },
-    { "eval_id": 2, "eval_name": "checkpoint-test-scripted-encounters", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Names the Checkpoint Test and applies it as the diagnostic", "passed": true, "evidence": "'fails the Checkpoint Test ... play it repeatedly as if you died and restarted'"},
-        {"text": "Identifies authoritative scripting / fixed-wave spawning as anti-pattern", "passed": true, "evidence": "'Root cause: authoritative scripting / fixed-wave spawning'"},
-        {"text": "Recommends encounter composition with orthogonally differentiated archetypes", "passed": true, "evidence": "'Encounter Composition with orthogonally differentiated archetypes'"},
-        {"text": "Explains Prioritization Choice as the goal (no dominant answer)", "passed": true, "evidence": "'a real Prioritization Choice ... no obviously dominant answer'"},
-        {"text": "Avoids randomizing positions as the sole fix", "passed": true, "evidence": "'Position jitter on an undifferentiated roster still yields one dominant script'"}
-      ] },
-    { "eval_id": 2, "eval_name": "checkpoint-test-scripted-encounters", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5},
-      "expectations": [
-        {"text": "Names the Checkpoint Test and applies it as the diagnostic", "passed": false, "evidence": "applies replay-from-checkpoint but uses 'checkpoint' as a common noun; never names the Checkpoint Test"},
-        {"text": "Identifies authoritative scripting / fixed-wave spawning as anti-pattern", "passed": true, "evidence": "'rigid, authored wave scripting: enemies spawn in the same place, same order'"},
-        {"text": "Recommends encounter composition with orthogonally differentiated archetypes", "passed": true, "evidence": "'mix archetypes with orthogonal threats: ranged hitscan, slow heavy, fast flanker'"},
-        {"text": "Explains Prioritization Choice as the goal (no dominant answer)", "passed": true, "evidence": "'a real prioritization decision ... no single answer dominates in every replay'"},
-        {"text": "Avoids randomizing positions as the sole fix", "passed": true, "evidence": "'random placement only reshuffles a solved problem'"}
-      ] },
-    { "eval_id": 3, "eval_name": "boss-arena-oversized-symmetric", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Identifies the circular symmetric shape as a specific anti-pattern, not just too big", "passed": true, "evidence": "'two stacked anti-patterns — oversized and symmetric'"},
-        {"text": "Explains Right-Sized Arena by name (weaving through traffic, not crossing a field)", "passed": true, "evidence": "'apply Right-Sized Arena ... traversal feels like weaving through traffic, not crossing a field'"},
-        {"text": "Recommends Asymmetric Layout with landmarks for binary routing choices", "passed": true, "evidence": "'Break the symmetry with distinct navigation landmarks ... clear binary routing choices'"},
-        {"text": "Recommends half-walls for line-of-sight breaks without stopping movement", "passed": true, "evidence": "'Add half-walls ... a single (or double) jump clears without stopping movement'"},
-        {"text": "Explains large arenas feel slower/disconnected, not more epic", "passed": true, "evidence": "'large arenas make combat feel slower and less connected, not more epic'"}
-      ] },
-    { "eval_id": 3, "eval_name": "boss-arena-oversized-symmetric", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5},
-      "expectations": [
-        {"text": "Identifies the circular symmetric shape as a specific anti-pattern, not just too big", "passed": true, "evidence": "'The arena is too symmetric. A perfect circle has no landmarks'"},
-        {"text": "Explains Right-Sized Arena by name (weaving through traffic, not crossing a field)", "passed": false, "evidence": "gives the insight ('threading through traffic, not jogging across a parking lot') but never names Right-Sized Arena"},
-        {"text": "Recommends Asymmetric Layout with landmarks for binary routing choices", "passed": true, "evidence": "'redesign it asymmetrically around two or three distinct landmarks ... binary routing choices'"},
-        {"text": "Recommends half-walls for line-of-sight breaks without stopping movement", "passed": true, "evidence": "'half-walls and low obstacles that break the boss's sightline ... clear in a single jump'"},
-        {"text": "Explains large arenas feel slower/disconnected, not more epic", "passed": true, "evidence": "'making a boss arena bigger usually makes it feel slower and more disconnected, not more epic'"}
-      ] }
-  ],
-  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 0.8, "stddev": 0.0}}, "delta": {"pass_rate": "+20%"} },
+  "metadata": {
+    "skill_name": "level-design",
+    "timestamp": "2026-07-23",
+    "evals_run": 3,
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.2,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+80%"
+    }
+  },
   "notes": [
-    "All 3 evals discriminated by exactly one expectation each: baseline reaches the correct mechanical substance (kill-drops, half-walls, orthogonal archetypes, prioritization, asymmetric landmarks, counter-intuitive large-arena failure) but never names the skill's proper-noun diagnostics — Arena Pressure/Push-Forward Design, the Checkpoint Test, Right-Sized Arena.",
-    "The skill's measured value here is a shared reusable vocabulary for these diagnostics rather than better underlying advice.",
-    "runs_per_configuration=1; single-run benchmark."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
   ]
 }

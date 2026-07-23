@@ -1,64 +1,29 @@
 {
-  "metadata": { "skill_name": "pr-reviewer", "timestamp": "2026-07-22", "evals_run": ["auth-endpoint-review", "hardcoded-credential-review", "clean-pr-lgtm"], "runs_per_configuration": 1 },
-  "runs": [
-    { "eval_id": 1, "eval_name": "auth-endpoint-review", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Recommendation line states count of blocking and should-fix comments", "passed": true, "evidence": "'Post the 2 blocking + 0 should-fix comments'"},
-        {"text": "KeyError and info-leak under Blocking, no prefix", "passed": true, "evidence": "'Blocking (2)' holds both, no prefix"},
-        {"text": "rename under Should-fix/Nits with Optional:/Nit: prefix", "passed": true, "evidence": "'Nit: do_auth -> authenticate_request'"},
-        {"text": "About the code, not the person", "passed": true, "evidence": "'a token that omits that claim will raise KeyError' — no 'you'"},
-        {"text": "Highlights present, specific positive", "passed": true, "evidence": "'inline comments walking through the HMAC verification'"}
-      ] },
-    { "eval_id": 1, "eval_name": "auth-endpoint-review", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5},
-      "expectations": [
-        {"text": "Recommendation line states count of blocking and should-fix comments", "passed": true, "evidence": "'Post 2 blocking comments ... and 1 nit'"},
-        {"text": "KeyError and info-leak under Blocking, no prefix", "passed": true, "evidence": "'## Blocking' with both, no prefix"},
-        {"text": "rename under Should-fix/Nits with Optional:/Nit: prefix", "passed": false, "evidence": "'**Rename do_auth** ... Minor, take it or leave it.' — no Optional:/Nit: label"},
-        {"text": "About the code, not the person", "passed": true, "evidence": "findings phrased about the code"},
-        {"text": "Highlights present, specific positive", "passed": true, "evidence": "'## Highlights - Token parsing wrapped in try/except that logs the raw exception'"}
-      ] },
-    { "eval_id": 2, "eval_name": "hardcoded-credential-review", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Credential in Blocking, no prefix, references file+line", "passed": true, "evidence": "'Blocking (1) [config.py:2] commits a live cloud credential'"},
-        {"text": "Comment does NOT reproduce the secret value", "passed": true, "evidence": "uses os.environ[\"DB_PASSWORD\"]; no secret shown"},
-        {"text": "Misleading name with Optional:/Nit: prefix in Should-fix/Nits", "passed": true, "evidence": "'Should-fix (1) ... Optional: CLOUD_SECRET is passed as the database password'"},
-        {"text": "Recommendation at top, states blocking count", "passed": true, "evidence": "top 'Recommendation Post the 1 blocking + 1 should-fix comment'"},
-        {"text": "Highlights present, specific positive", "passed": true, "evidence": "'get_connection is short and does exactly one thing'"}
-      ] },
-    { "eval_id": 2, "eval_name": "hardcoded-credential-review", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5},
-      "expectations": [
-        {"text": "Credential in Blocking, no prefix, references file+line", "passed": true, "evidence": "'## Blocking ... config.py line 2', no prefix"},
-        {"text": "Comment does NOT reproduce the secret value", "passed": true, "evidence": "'by location only — not reproducing the value here'"},
-        {"text": "Misleading name with Optional:/Nit: prefix in Should-fix/Nits", "passed": true, "evidence": "'## Should-fix / Nits **Optional: rename CLOUD_SECRET**'"},
-        {"text": "Recommendation at top, states blocking count", "passed": false, "evidence": "Recommendation appears last, not at top"},
-        {"text": "Highlights present, specific positive", "passed": true, "evidence": "'get_connection() is short, simple, and easy to audit'"}
-      ] },
-    { "eval_id": 3, "eval_name": "clean-pr-lgtm", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Recommendation states PR clean, no counts", "passed": true, "evidence": "'This PR is clean — no findings from any reviewer'"},
-        {"text": "No tier sections", "passed": true, "evidence": "only Recommendation + Highlights"},
-        {"text": "Highlights with specific sub-reviewer observations", "passed": true, "evidence": "'pagination cursor handles empty results and last-page edge case ... exponential backoff with a cap'"},
-        {"text": "Highlights specific/concrete, not generic", "passed": true, "evidence": "references pagination edge cases and backoff cap"},
-        {"text": "Does not invent findings or hedge", "passed": true, "evidence": "clean positive-only output"}
-      ] },
-    { "eval_id": 3, "eval_name": "clean-pr-lgtm", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Recommendation states PR clean, no counts", "passed": true, "evidence": "'LGTM — clean PR, no findings ... Approve.'"},
-        {"text": "No tier sections", "passed": true, "evidence": "'No blocking, should-fix, or nit comments to post'"},
-        {"text": "Highlights with specific sub-reviewer observations", "passed": true, "evidence": "'Pagination cursor boundary conditions ... backoff and a cap'"},
-        {"text": "Highlights specific/concrete, not generic", "passed": true, "evidence": "cites pagination boundary conditions + backoff cap"},
-        {"text": "Does not invent findings or hedge", "passed": true, "evidence": "no invented findings"}
-      ] }
-  ],
-  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 0.867, "stddev": 0.094}}, "delta": {"pass_rate": "+13%"} },
+  "metadata": {
+    "skill_name": "pr-reviewer",
+    "timestamp": "2026-07-23",
+    "evals_run": 3,
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.4,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+60%"
+    }
+  },
   "notes": [
-    "Discriminates on the skill's specific comment format: baseline missed the labeled Optional:/Nit: prefix on nits (eval 1) and placed the Recommendation line at the bottom rather than the top (eval 2). Clean-PR variant (eval 3) was non-discriminating — baseline organically produced LGTM + no empty tiers + specific highlights + no invented findings.",
-    "runs_per_configuration=1; single-run benchmark."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
   ]
 }

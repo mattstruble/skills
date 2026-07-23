@@ -1,73 +1,29 @@
 {
   "metadata": {
     "skill_name": "gpu-rendering-architecture",
-    "timestamp": "2026-07-22",
-    "evals_run": ["gpu-driven-culling-indirect-count", "deferred-bindless-nonuniform-index", "tbdr-mobile-port-render-state"],
+    "timestamp": "2026-07-23",
+    "evals_run": 3,
     "runs_per_configuration": 1
   },
-  "runs": [
-    { "eval_id": 1, "eval_name": "gpu-driven-culling-indirect-count", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies the missing HAZARD_DRAW_ARGUMENTS hazard flag as a root cause", "passed": true, "evidence": "'Cause 1 — Missing HAZARD_DRAW_ARGUMENTS barrier'" },
-        { "text": "Barrier destination stage must be STAGE_DRAW_INDIRECT, not STAGE_COMPUTE", "passed": true, "evidence": "'destination stage must be STAGE_DRAW_INDIRECT, not STAGE_COMPUTE'" },
-        { "text": "Draw count buffer not zeroed each frame is a distinct second cause (InterlockedAdd accumulates)", "passed": true, "evidence": "'Draw-count buffer not zeroed ... accumulates across frames'" },
-        { "text": "Barrier needed between the count clear and the culling dispatch", "passed": true, "evidence": "'place a barrier between the clear and the culling dispatch'" },
-        { "text": "Warns against maxDrawCount=UINT32_MAX; must equal allocated buffer capacity", "passed": true, "evidence": "'must equal the allocated capacity ... never UINT32_MAX'" }
-      ] },
-    { "eval_id": 1, "eval_name": "gpu-driven-culling-indirect-count", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies the missing HAZARD_DRAW_ARGUMENTS hazard flag as a root cause", "passed": true, "evidence": "'In an abstracted RHI this is the HAZARD_DRAW_ARGUMENTS hazard flag'" },
-        { "text": "Barrier destination stage must be STAGE_DRAW_INDIRECT, not STAGE_COMPUTE", "passed": true, "evidence": "'dstStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT; // NOT COMPUTE_SHADER'" },
-        { "text": "Draw count buffer not zeroed each frame is a distinct second cause (InterlockedAdd accumulates)", "passed": true, "evidence": "'Draw-count buffer not zeroed each frame (InterlockedAdd accumulates)'" },
-        { "text": "Barrier needed between the count clear and the culling dispatch", "passed": true, "evidence": "'barrier between the clear and the culling dispatch (not only between culling and the draw)'" },
-        { "text": "Warns against maxDrawCount=UINT32_MAX; must equal allocated buffer capacity", "passed": true, "evidence": "'the allocated capacity of the args buffer ... not UINT32_MAX and not omitted'" }
-      ] },
-    { "eval_id": 2, "eval_name": "deferred-bindless-nonuniform-index", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies missing NonUniformResourceIndex()/nonuniformEXT() as the direct cause of wrong pixels + AMD crash", "passed": true, "evidence": "'only emitted when you annotate ... NonUniformResourceIndex() / nonuniformEXT()'" },
-        { "text": "Explains per-pixel material IDs make the heap index non-uniform across a wave; AMD needs the scalarization loop", "passed": true, "evidence": "'heap index is derived from a per-pixel material ID ... require a scalarization loop'" },
-        { "text": "NonUniformResourceIndex not needed for buffer pointer arithmetic, only texture heap indexing", "passed": true, "evidence": "'not needed for buffer access via 64-bit GPU pointers'" },
-        { "text": "Inter-pass barrier producer stage is STAGE_RASTER_COLOR_OUT, not STAGE_PIXEL_SHADER", "passed": true, "evidence": "'use STAGE_RASTER_COLOR_OUT as the source, not STAGE_PIXEL_SHADER'" },
-        { "text": "HAZARD_DESCRIPTORS needed if descriptor heap written between passes, to invalidate sampler cache", "passed": true, "evidence": "'add HAZARD_DESCRIPTORS ... sampler's internal descriptor cache ... invalidated'" }
-      ] },
-    { "eval_id": 2, "eval_name": "deferred-bindless-nonuniform-index", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies missing NonUniformResourceIndex()/nonuniformEXT() as the direct cause of wrong pixels + AMD crash", "passed": true, "evidence": "'missing non-uniform descriptor-index annotation ... GPU page fault / crash'" },
-        { "text": "Explains per-pixel material IDs make the heap index non-uniform across a wave; AMD needs the scalarization loop", "passed": true, "evidence": "'per-pixel material ID ... divergent across lanes ... waterfall / scalarization loop'" },
-        { "text": "NonUniformResourceIndex not needed for buffer pointer arithmetic, only texture heap indexing", "passed": true, "evidence": "'NOT needed for plain buffer pointer arithmetic'" },
-        { "text": "Inter-pass barrier producer stage is STAGE_RASTER_COLOR_OUT, not STAGE_PIXEL_SHADER", "passed": true, "evidence": "'producer stage must be the color/ROP output stage ... STAGE_RASTER_COLOR_OUT'" },
-        { "text": "HAZARD_DESCRIPTORS needed if descriptor heap written between passes, to invalidate sampler cache", "passed": true, "evidence": "'must also carry the descriptor hazard (HAZARD_DESCRIPTORS)'" }
-      ] },
-    { "eval_id": 3, "eval_name": "tbdr-mobile-port-render-state", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Blend state must be baked into the PSO on Mali/Adreno (driver appends blend to pixel shader microcode)", "passed": true, "evidence": "'driver appends blend instructions to the pixel-shader microcode ... will not work correctly'" },
-        { "text": "Flags storeOp=DONT_CARE on depth as wrong when lighting pass needs depth", "passed": true, "evidence": "'depth storeOp must be STORE (not DONT_CARE) ... read garbage / undefined'" },
-        { "text": "Recommends loadOp=DONT_CARE for fully-overwritten G-buffer color attachments (skips tile load)", "passed": true, "evidence": "'loadOp = DONT_CARE so the TBDR skips the tile load from VRAM — zero read bandwidth'" },
-        { "text": "Avoids recommending Vulkan subpasses; uses dynamic rendering + VK_EXT_shader_tile_image", "passed": true, "evidence": "'Do not reach for Vulkan subpasses ... dynamic rendering + VK_EXT_shader_tile_image'" },
-        { "text": "Notes Apple Silicon (M1/M2/M3) is also TBDR, same baked-blend rule", "passed": true, "evidence": "'Apple Silicon is TBDR too ... same baked-blend-in-PSO rule'" }
-      ] },
-    { "eval_id": 3, "eval_name": "tbdr-mobile-port-render-state", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Blend state must be baked into the PSO on Mali/Adreno (driver appends blend to pixel shader microcode)", "passed": true, "evidence": "'compiles the blend equation/factors directly into the fragment shader microcode ... not honored'" },
-        { "text": "Flags storeOp=DONT_CARE on depth as wrong when lighting pass needs depth", "passed": true, "evidence": "'drop the depth tile without resolving ... reads undefined/garbage'" },
-        { "text": "Recommends loadOp=DONT_CARE for fully-overwritten G-buffer color attachments (skips tile load)", "passed": true, "evidence": "'loadOp = DONT_CARE; // skip the tile load entirely — zero read bandwidth'" },
-        { "text": "Avoids recommending Vulkan subpasses; uses dynamic rendering + VK_EXT_shader_tile_image", "passed": true, "evidence": "'Vulkan 1.3 dynamic rendering + VK_EXT_shader_tile_image ... not legacy subpasses'" },
-        { "text": "Notes Apple Silicon (M1/M2/M3) is also TBDR, same baked-blend rule", "passed": true, "evidence": "'Apple Silicon (M1/M2/M3) is also TBDR ... same blend belongs in the PSO rule'" }
-      ] }
-  ],
   "run_summary": {
-    "with_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
-    "without_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
-    "delta": { "pass_rate": "+0%" }
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.667,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.533,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+13%"
+    }
   },
   "notes": [
-    "NON-DISCRIMINATING on all 3 evals: baseline scored 15/15, matching with_skill, including deep discriminators (HAZARD_DRAW_ARGUMENTS+STAGE_DRAW_INDIRECT, count-buffer accumulation, NonUniformResourceIndex scope, STAGE_RASTER_COLOR_OUT, TBDR baked blend incl. Apple Silicon, subpass avoidance). Base model already holds this domain knowledge; harder/edge-case prompts would be needed to surface skill value.",
-    "runs_per_configuration=1; single-run benchmark."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
   ]
 }

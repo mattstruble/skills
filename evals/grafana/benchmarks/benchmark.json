@@ -1,73 +1,29 @@
 {
   "metadata": {
     "skill_name": "grafana",
-    "timestamp": "2026-07-22",
-    "evals_run": ["instanceselector-mismatch-silent-skip", "container-template-variable-prometheus-loki", "sonarr-discord-alert-operator-crd"],
+    "timestamp": "2026-07-23",
+    "evals_run": 3,
     "runs_per_configuration": 1
   },
-  "runs": [
-    { "eval_id": 1, "eval_name": "instanceselector-mismatch-silent-skip", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies instanceSelector mismatch as the cause, not generic 'check your YAML'", "passed": true, "evidence": "'Root cause: instanceSelector mismatch ... not a check your YAML syntax problem'" },
-        { "text": "Cites the specific label dashboards: grafana as the homelab standard", "passed": true, "evidence": "'Confirm the homelab standard label dashboards: grafana'" },
-        { "text": "Provides kubectl get grafana -n monitoring --show-labels", "passed": true, "evidence": "'kubectl get grafana -n monitoring --show-labels'" },
-        { "text": "Explains the operator silently skips non-matching CRDs with no status error", "passed": true, "evidence": "'silently skips ... emits no error to the resource status'" },
-        { "text": "Avoids suggesting Grafana UI edits or pod restart as the primary fix", "passed": true, "evidence": "'Do not fix this by editing the dashboard in the Grafana UI or restarting the pod'" }
-      ] },
-    { "eval_id": 1, "eval_name": "instanceselector-mismatch-silent-skip", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies instanceSelector mismatch as the cause, not generic 'check your YAML'", "passed": true, "evidence": "'In almost every case this is an instanceSelector mismatch'" },
-        { "text": "Cites the specific label dashboards: grafana as the homelab standard", "passed": true, "evidence": "'The convention in this homelab is the label dashboards: grafana'" },
-        { "text": "Provides kubectl get grafana -n monitoring --show-labels", "passed": true, "evidence": "'kubectl get grafana -n monitoring --show-labels'" },
-        { "text": "Explains the operator silently skips non-matching CRDs with no status error", "passed": true, "evidence": "'the resource status stays empty ... a silent skip, not a failure'" },
-        { "text": "Avoids suggesting Grafana UI edits or pod restart as the primary fix", "passed": true, "evidence": "'Do not fix this by editing the dashboard in the Grafana UI or restarting the pod'" }
-      ] },
-    { "eval_id": 2, "eval_name": "container-template-variable-prometheus-loki", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Uses label_values() for Prometheus var, explicitly rejects it for Loki", "passed": true, "evidence": "'label_values(up, container) ... Do not use label_values() for the Loki variable — Prometheus-only'" },
-        { "text": "Loki variable query as object form {\"label\":\"container\",\"stream\":\"{}\"}", "passed": true, "evidence": "'\"query\": { \"label\": \"container\", \"stream\": \"{}\" }'" },
-        { "text": "Uses ${DS_PROMETHEUS} and ${DS_LOKI} uid references (portable)", "passed": true, "evidence": "'uid: ${DS_PROMETHEUS} ... uid: ${DS_LOKI}'" },
-        { "text": "Sets refresh: 2 so variables re-query on time range change", "passed": true, "evidence": "'refresh: 2 on both'" },
-        { "text": "Notes every panel must include {container=\"$container\"}", "passed": true, "evidence": "'Use the variable in every panel query'" }
-      ] },
-    { "eval_id": 2, "eval_name": "container-template-variable-prometheus-loki", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Uses label_values() for Prometheus var, explicitly rejects it for Loki", "passed": true, "evidence": "'label_values(up, container) ... that syntax is Prometheus-only'" },
-        { "text": "Loki variable query as object form {\"label\":\"container\",\"stream\":\"{}\"}", "passed": true, "evidence": "'\"query\": { \"label\": \"container\", \"stream\": \"{}\", \"type\": 1 }'" },
-        { "text": "Uses ${DS_PROMETHEUS} and ${DS_LOKI} uid references (portable)", "passed": true, "evidence": "'uid: ${DS_PROMETHEUS} ... uid: ${DS_LOKI}'" },
-        { "text": "Sets refresh: 2 so variables re-query on time range change", "passed": true, "evidence": "'\"refresh\": 2 — refresh on time range change'" },
-        { "text": "Notes every panel must include {container=\"$container\"}", "passed": true, "evidence": "'If you leave {container=\"$container\"} off a panel ... a confusing mismatch'" }
-      ] },
-    { "eval_id": 3, "eval_name": "sonarr-discord-alert-operator-crd", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Requires GrafanaFolder CRD before GrafanaAlertRuleGroup", "passed": true, "evidence": "'Create the folder (required prerequisite) ... cannot be applied unless its folder already exists'" },
-        { "text": "Two-refId structure: A raw PromQL, C with datasourceUid __expr__ threshold", "passed": true, "evidence": "'refId A ... refId: C datasourceUid: __expr__ type: threshold'" },
-        { "text": "datasourceUid must match explicit uid in GrafanaDatasource spec", "passed": true, "evidence": "'set an explicit uid ... datasourceUid: prometheus must match'" },
-        { "text": "Store Discord webhook in a Secret via secureSettings, not plain YAML", "passed": true, "evidence": "'never commit it in plain YAML. Store it in a Kubernetes Secret ... secureSettings'" },
-        { "text": "Default notification policy contact point must be set or alerts go nowhere", "passed": true, "evidence": "'Fired alerts go nowhere until the default policy points at a real contact point'" }
-      ] },
-    { "eval_id": 3, "eval_name": "sonarr-discord-alert-operator-crd", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Requires GrafanaFolder CRD before GrafanaAlertRuleGroup", "passed": true, "evidence": "'create the folder FIRST ... Apply the folder before the rule group'" },
-        { "text": "Two-refId structure: A raw PromQL, C with datasourceUid __expr__ threshold", "passed": true, "evidence": "'refId A is the raw PromQL query ... refId C is a threshold expression (datasourceUid: __expr__)'" },
-        { "text": "datasourceUid must match explicit uid in GrafanaDatasource spec", "passed": true, "evidence": "'must equal the uid you set explicitly ... If you let Grafana auto-assign'" },
-        { "text": "Store Discord webhook in a Secret via secureSettings, not plain YAML", "passed": true, "evidence": "'Never commit it in plain YAML — put it in a Kubernetes Secret ... secureSettings / valuesFrom'" },
-        { "text": "Default notification policy contact point must be set or alerts go nowhere", "passed": true, "evidence": "'An alert can fire perfectly and go nowhere if the notification policy default receiver isn't set'" }
-      ] }
-  ],
   "run_summary": {
-    "with_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
-    "without_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
-    "delta": { "pass_rate": "+0%" }
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.867,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.467,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+40%"
+    }
   },
   "notes": [
-    "NON-DISCRIMINATING on all 3 evals: baseline scored 15/15, matching with_skill on every discriminating detail (instanceSelector silent-skip + dashboards: grafana label + --show-labels; Prometheus label_values vs Loki object-form + ${DS_*} + refresh:2; folder-first ordering + A/C __expr__ refIds + explicit datasourceUid + Secret/secureSettings + default notification policy). The homelab-specific conventions were reproduced by the baseline.",
-    "runs_per_configuration=1; single-run benchmark."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
   ]
 }

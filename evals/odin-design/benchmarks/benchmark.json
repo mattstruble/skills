@@ -1,45 +1,29 @@
 {
-  "skill_name": "odin-design",
-  "iteration": 3,
-  "note": "Iteration 3 covers only the new content added in this session (matrix-builtin, profiling). Existing evals 1-3 (game-skeleton, cyclic-deps, tilemap) were already covered in iterations 1-2 and are unchanged.",
-  "summary": {
-    "total_evals": 2,
+  "metadata": {
+    "skill_name": "odin-design",
+    "timestamp": "2026-07-23",
+    "evals_run": 5,
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
     "with_skill": {
-      "total_assertions": 14,
-      "passed": 14,
-      "pass_rate": 1.0
+      "pass_rate": {
+        "mean": 0.86,
+        "stddev": 0.0
+      }
     },
     "without_skill": {
-      "total_assertions": 14,
-      "passed": 9,
-      "pass_rate": 0.643
+      "pass_rate": {
+        "mean": 0.672,
+        "stddev": 0.0
+      }
     },
-    "delta": 5,
-    "delta_pp": 35.7
-  },
-  "evals": [
-    {
-      "id": 4,
-      "name": "matrix-vs-handrolled",
-      "with_skill": {"passed": 6, "total": 6, "pass_rate": 1.0},
-      "without_skill": {"passed": 6, "total": 6, "pass_rate": 1.0},
-      "delta": 0,
-      "notes": "Both variants correctly recommend matrix[R,C]T, the Vector3 array alias, core:math/linalg, and discourage hand-rolling. The LLM has solid knowledge of Odin's built-in matrix type from training data."
-    },
-    {
-      "id": 5,
-      "name": "profiling-slow-frame",
-      "with_skill": {"passed": 8, "total": 8, "pass_rate": 1.0},
-      "without_skill": {"passed": 3, "total": 8, "pass_rate": 0.375},
-      "delta": 5,
-      "missed_by_baseline": [
-        "auto-instrumentation-mentioned: did not mention @(instrumentation_enter) / @(instrumentation_exit) attribute-based auto-instrumentation",
-        "spall-web-viewer: linked to gravitymoth.com/spall but did not name the Spall-Web browser viewer specifically",
-        "hot-vs-cold-code: did not draw the per-frame vs init/shutdown distinction explicitly",
-        "self-time-vs-total: discussed phase times and min/max/avg but never recommended self/exclusive time over total",
-        "trace-size-warning: did not warn that .spall traces grow fast or recommend capturing only 1-2 seconds"
-      ]
+    "delta": {
+      "pass_rate": "+19%"
     }
-  ],
-  "analysis": "Eval 5 (profiling) shows clear skill value: 5 out of 8 assertions miss in baseline. The misses cluster on Odin-specific Spall API details (instrumentation attributes, Spall-Web viewer naming) and the optimization-mindset content (hot/cold mental model, self time vs total, trace-size discipline) that the skill's references/profiling.md was specifically written to teach. Baseline produced a workflow-correct but generic profiling answer. Eval 4 (matrix) shows no lift — Odin's matrix[R,C]T is well-represented in training data."
+  },
+  "notes": [
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+  ]
 }

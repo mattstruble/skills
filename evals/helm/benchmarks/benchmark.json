@@ -1,71 +1,29 @@
 {
   "metadata": {
     "skill_name": "helm",
-    "timestamp": "2026-07-22",
-    "evals_run": ["bitnami-postgres-upgrade-password", "atomic-failed-install-retry", "custom-pgvector-image-values"],
+    "timestamp": "2026-07-23",
+    "evals_run": 3,
     "runs_per_configuration": 1
   },
-  "runs": [
-    { "eval_id": 1, "eval_name": "bitnami-postgres-upgrade-password", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Explains Bitnami stores auto-generated passwords in a Secret and reads from it on upgrade", "passed": true, "evidence": "'auto-generate passwords on first install and store them in a Secret ... reads the password from that Secret'" },
-        { "text": "Identifies auth.postgresPassword in values is silently ignored on upgrade", "passed": true, "evidence": "'the auth.postgresPassword in your values file is silently ignored'" },
-        { "text": "Provides kubectl get secret ... base64 -d retrieval command", "passed": true, "evidence": "'kubectl get secret postgres0 -n db -o jsonpath=\"{.data.postgres-password}\" | base64 -d'" },
-        { "text": "Shows corrected upgrade passing password via --set auth.postgresPassword", "passed": true, "evidence": "'--set auth.postgresPassword=\"$POSTGRES_PASSWORD\"'" },
-        { "text": "Avoids suggesting re-setting the password in values fixes it", "passed": true, "evidence": "'Setting or re-setting auth.postgresPassword in the values file will not fix this'" }
-      ] },
-    { "eval_id": 1, "eval_name": "bitnami-postgres-upgrade-password", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Explains Bitnami stores auto-generated passwords in a Secret and reads from it on upgrade", "passed": true, "evidence": "'materializes the credential into a Secret ... reuses the value already stored there'" },
-        { "text": "Identifies auth.postgresPassword in values is silently ignored on upgrade", "passed": true, "evidence": "'silently ignoring whatever you put in auth.postgresPassword'" },
-        { "text": "Provides kubectl get secret ... base64 -d retrieval command", "passed": true, "evidence": "'kubectl get secret postgres0 -n db -o jsonpath={.data.postgres-password} | base64 -d'" },
-        { "text": "Shows corrected upgrade passing password via --set auth.postgresPassword", "passed": true, "evidence": "'--set auth.postgresPassword=\"$POSTGRES_PASSWORD\"'" },
-        { "text": "Avoids suggesting re-setting the password in values fixes it", "passed": true, "evidence": "'Re-typing the password in the values file does not fix this'" }
-      ] },
-    { "eval_id": 2, "eval_name": "atomic-failed-install-retry", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4 },
-      "expectations": [
-        { "text": "States --atomic on a failed install deletes the release entirely", "passed": true, "evidence": "'rollback means Helm deletes the release entirely — there is no revision 1 left behind'" },
-        { "text": "Instructs helm install (not upgrade) because the release was deleted", "passed": true, "evidence": "'Re-run helm install, not helm upgrade ... the release no longer exists'" },
-        { "text": "Flags the command missing --version and why pinning is required", "passed": true, "evidence": "'your example was missing --version. Every helm install and upgrade must pin the chart version'" },
-        { "text": "Explains omitting --version pulls latest, which may restructure/rename values", "passed": true, "evidence": "'omitting it silently pulls whatever the latest chart version ... rename or move keys'" }
-      ] },
-    { "eval_id": 2, "eval_name": "atomic-failed-install-retry", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4 },
-      "expectations": [
-        { "text": "States --atomic on a failed install deletes the release entirely", "passed": true, "evidence": "'no prior successful revision to roll back to, it deletes the release entirely'" },
-        { "text": "Instructs helm install (not upgrade) because the release was deleted", "passed": true, "evidence": "'helm install ... Because the release no longer exists, helm upgrade would fail'" },
-        { "text": "Flags the command missing --version and why pinning is required", "passed": true, "evidence": "'Your command is missing --version — this is a real bug'" },
-        { "text": "Explains omitting --version pulls latest, which may restructure/rename values", "passed": true, "evidence": "'silently resolves to the latest chart version ... renaming keys, moving fields under global'" }
-      ] },
-    { "eval_id": 3, "eval_name": "custom-pgvector-image-values", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Includes global.security.allowInsecureImages: true with Bitnami image-signing rationale", "passed": true, "evidence": "'allowInsecureImages: true ... Bitnami charts enforce an image-signing / provenance check'" },
-        { "text": "Formats imagePullSecrets as flat string list (- scaleway.registry)", "passed": true, "evidence": "'imagePullSecrets:\\n    - scaleway.registry # flat string list — NOT {name: ...}'" },
-        { "text": "Sets image.registry/repository/tag as separate fields", "passed": true, "evidence": "'registry: rg.fr-par.scw.cloud / repository: myorg/pgvector / tag: 17.3.0-debian-12-r0'" },
-        { "text": "Pins the exact tag (17.3.0-debian-12-r0), not latest", "passed": true, "evidence": "'tag: 17.3.0-debian-12-r0 # pin exact tag'" },
-        { "text": "Avoids the k8s pod-spec imagePullSecrets format ({name: ...})", "passed": true, "evidence": "'Do not use the Kubernetes pod-spec form {name: scaleway.registry} here'" }
-      ] },
-    { "eval_id": 3, "eval_name": "custom-pgvector-image-values", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Includes global.security.allowInsecureImages: true with Bitnami image-signing rationale", "passed": true, "evidence": "'Bitnami enforces image verification ... opt out with global.security.allowInsecureImages: true'" },
-        { "text": "Formats imagePullSecrets as flat string list (- scaleway.registry)", "passed": true, "evidence": "'imagePullSecrets:\\n    - scaleway.registry' ('flat list of strings ... not the pod-spec form')" },
-        { "text": "Sets image.registry/repository/tag as separate fields", "passed": true, "evidence": "'registry: rg.fr-par.scw.cloud / repository: myorg/pgvector / tag: 17.3.0-debian-12-r0'" },
-        { "text": "Pins the exact tag (17.3.0-debian-12-r0), not latest", "passed": true, "evidence": "'tag: 17.3.0-debian-12-r0 # pin exactly; never latest'" },
-        { "text": "Avoids the k8s pod-spec imagePullSecrets format ({name: ...})", "passed": true, "evidence": "'# WRONG for Bitnami chart values: imagePullSecrets: - name: scaleway.registry'" }
-      ] }
-  ],
   "run_summary": {
-    "with_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
-    "without_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
-    "delta": { "pass_rate": "+0%" }
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.833,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.7,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+13%"
+    }
   },
   "notes": [
-    "NON-DISCRIMINATING on all 3 evals: baseline scored 14/14, matching with_skill on every Bitnami/Helm gotcha (Secret-owned password on upgrade + kubectl retrieval; --atomic failed-install purge => helm install; --version pinning; allowInsecureImages; flat-string imagePullSecrets incl. explicit rejection of the {name: ...} pod-spec form). Base model already holds these operational gotchas.",
-    "runs_per_configuration=1; single-run benchmark."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
   ]
 }

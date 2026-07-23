@@ -1,90 +1,29 @@
 {
   "metadata": {
     "skill_name": "godot-shader",
-    "timestamp": "2026-07-22",
-    "evals_run": [
-      "custom-lighting-rim-fresnel",
-      "shadertoy-postprocess-port",
-      "vertex-displacement-normals"
-    ],
+    "timestamp": "2026-07-23",
+    "evals_run": 3,
     "runs_per_configuration": 1
   },
-  "runs": [
-    {
-      "eval_id": 1, "eval_name": "custom-lighting-rim-fresnel", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies that RIM and RIM_TINT in fragment() are silently ignored when light() is defined", "passed": true, "evidence": "'RIM and RIM_TINT ... are silently ignored the moment you define a light() function ... it's simply never being evaluated.'" },
-        { "text": "Implements Fresnel manually inside light() using pow(1.0 - max(0.0, dot(NORMAL, VIEW)), power) added to DIFFUSE_LIGHT with +=", "passed": true, "evidence": "fresnel_rim returns intensity * pow(1.0 - max(0.0, dot(n, v)), power); DIFFUSE_LIGHT += ..." },
-        { "text": "Uses += (not =) for DIFFUSE_LIGHT and SPECULAR_LIGHT, explaining accumulation across lights", "passed": true, "evidence": "'Use += never =. light() runs once per light ... are accumulators'." },
-        { "text": "Includes the Blinn-Phong shadow guard float(dot(NORMAL, LIGHT) > 0.0)", "passed": true, "evidence": "s *= float(dot(n, l) > 0.0); // no specular on back-lit faces" },
-        { "text": "Recommends render_mode ambient_light_disabled to prevent ambient washout", "passed": true, "evidence": "render_mode ambient_light_disabled; — 'ambient/environment lighting keeps accumulating ... washes it out'." }
-      ]
-    },
-    {
-      "eval_id": 1, "eval_name": "custom-lighting-rim-fresnel", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies that RIM and RIM_TINT in fragment() are silently ignored when light() is defined", "passed": true, "evidence": "'The Fresnel rim isn't broken — it's being ignored ... any RIM/RIM_TINT you write in fragment() silently does nothing.'" },
-        { "text": "Implements Fresnel manually inside light() using pow(1.0 - max(0.0, dot(NORMAL, VIEW)), power) added to DIFFUSE_LIGHT with +=", "passed": true, "evidence": "float fresnel = pow(1.0 - max(0.0, dot(NORMAL, VIEW)), rim_power); DIFFUSE_LIGHT += fresnel * ..." },
-        { "text": "Uses += (not =) for DIFFUSE_LIGHT and SPECULAR_LIGHT, explaining accumulation across lights", "passed": true, "evidence": "'light() runs once per light, and DIFFUSE_LIGHT / SPECULAR_LIGHT are accumulators ... use +=, never ='." },
-        { "text": "Includes the Blinn-Phong shadow guard float(dot(NORMAL, LIGHT) > 0.0)", "passed": true, "evidence": "spec *= float(dot(NORMAL, LIGHT) > 0.0); — 'no specular on surfaces facing away from the light'." },
-        { "text": "Recommends render_mode ambient_light_disabled to prevent ambient washout", "passed": true, "evidence": "render_mode ambient_light_disabled; — 'ambient/environment lighting still gets added on top ... washes everything out'." }
-      ]
-    },
-    {
-      "eval_id": 2, "eval_name": "shadertoy-postprocess-port", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Specifies node setup: canvas_item shader on a full-rect ColorRect in a CanvasLayer, runtime-only", "passed": true, "evidence": "'canvas_item shader ... on a full-screen ColorRect inside a CanvasLayer'; 'Anchor Preset: Full Rect'; runtime-only." },
-        { "text": "Maps iResolution.xy to 1.0 / SCREEN_PIXEL_SIZE (not VIEWPORT_SIZE, the spatial equivalent)", "passed": true, "evidence": "iResolution.xy -> 1.0 / SCREEN_PIXEL_SIZE; 'not VIEWPORT_SIZE (that's the spatial equivalent)'." },
-        { "text": "Identifies Y-axis flip and fixes with uv.y = 1.0 - uv.y (Shadertoy Y-up vs Godot Y-down)", "passed": true, "evidence": "'Shadertoy is Y-up ... Godot is Y-down'; uv.y = 1.0 - uv.y;" },
-        { "text": "Declares screen texture hint_screen_texture, repeat_disable, filter_linear with repeat_disable rationale", "passed": true, "evidence": "hint_screen_texture, repeat_disable, filter_linear; repeat_disable prevents 'tiling/smear artifact at the borders'." },
-        { "text": "Notes iMouse has no built-in; pass a custom uniform via set_shader_parameter each frame", "passed": true, "evidence": "'iMouse has no built-in equivalent ... push it every frame from GDScript' with set_shader_parameter." }
-      ]
-    },
-    {
-      "eval_id": 2, "eval_name": "shadertoy-postprocess-port", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Specifies node setup: canvas_item shader on a full-rect ColorRect in a CanvasLayer, runtime-only", "passed": true, "evidence": "'full-screen ColorRect'; 'Add a CanvasLayer'; 'Anchor preset to Full Rect'; 'only shows up at runtime'." },
-        { "text": "Maps iResolution.xy to 1.0 / SCREEN_PIXEL_SIZE (not VIEWPORT_SIZE, the spatial equivalent)", "passed": true, "evidence": "iResolution.xy -> 1.0 / SCREEN_PIXEL_SIZE; notes VIEWPORT_SIZE is the spatial equivalent, not used here." },
-        { "text": "Identifies Y-axis flip and fixes with uv.y = 1.0 - uv.y (Shadertoy Y-up vs Godot Y-down)", "passed": true, "evidence": "'Shadertoy ... bottom-left, Y up. Godot ... top-left, Y down'; uv.y = 1.0 - uv.y;" },
-        { "text": "Declares screen texture hint_screen_texture, repeat_disable, filter_linear with repeat_disable rationale", "passed": true, "evidence": "hint_screen_texture, repeat_disable, filter_linear; repeat_disable 'clamps instead of wrapping ... seam artifacts'." },
-        { "text": "Notes iMouse has no built-in; pass a custom uniform via set_shader_parameter each frame", "passed": true, "evidence": "'iMouse has no built-in Godot equivalent'; custom uniform vec2 mouse_pos fed via set_shader_parameter each frame." }
-      ]
-    },
-    {
-      "eval_id": 3, "eval_name": "vertex-displacement-normals", "configuration": "with_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies the bug as failing to update NORMAL after displacing VERTEX; recomputes normals", "passed": true, "evidence": "'lighting looks flat because you never updated NORMAL ... recompute NORMAL to match the new slope'." },
-        { "text": "Uses textureLod(_HeightMap, UV, 0.0) in vertex(), explaining derivatives are unavailable there", "passed": true, "evidence": "textureLod(_HeightMap, UV, 0.0); 'those derivatives don't exist in vertex() ... mip selection is undefined'." },
-        { "text": "Explains VERTEX in vertex() is object/model space, before MODEL_MATRIX", "passed": true, "evidence": "'VERTEX in vertex() is in object/model space ... runs before the MODEL_MATRIX transform'." },
-        { "text": "Avoids recommending texture() in vertex() for any purpose", "passed": true, "evidence": "'Never texture() in vertex(), for any purpose'; all reads use textureLod(..., 0.0)." },
-        { "text": "Notes baking normals into a normal map is preferable for production", "passed": true, "evidence": "'For production, bake a normal map instead of reconstructing normals from the derivative'." }
-      ]
-    },
-    {
-      "eval_id": 3, "eval_name": "vertex-displacement-normals", "configuration": "without_skill", "run_number": 1,
-      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
-      "expectations": [
-        { "text": "Identifies the bug as failing to update NORMAL after displacing VERTEX; recomputes normals", "passed": true, "evidence": "'normals are never updated after you move the vertices ... recompute NORMAL to match the displaced surface'." },
-        { "text": "Uses textureLod(_HeightMap, UV, 0.0) in vertex(), explaining derivatives are unavailable there", "passed": true, "evidence": "textureLod(height_map, uv, 0.0); 'Those derivatives do not exist in the vertex stage, so mip selection is undefined'." },
-        { "text": "Explains VERTEX in vertex() is object/model space, before MODEL_MATRIX", "passed": true, "evidence": "'VERTEX in vertex() is in object/model space, not world space ... before the MODEL_MATRIX transform'." },
-        { "text": "Avoids recommending texture() in vertex() for any purpose", "passed": true, "evidence": "'Always use textureLod in vertex(), never texture()'; helper uses textureLod(..., 0.0) throughout." },
-        { "text": "Notes baking normals into a normal map is preferable for production", "passed": true, "evidence": "'For anything shipping, bake a normal map from the heightmap ... avoids the derivative-approximation error'." }
-      ]
-    }
-  ],
   "run_summary": {
-    "with_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
-    "without_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
-    "delta": { "pass_rate": "+0%" }
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.733,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.4,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+33%"
+    }
   },
   "notes": [
-    "NON-DISCRIMINATING across all three evals: baseline scored 5/5 on every scenario, matching with_skill. The base model already knows the discriminating Godot-shader facts (light() bypasses RIM/RIM_TINT, += light accumulation, Blinn-Phong back-face guard, ambient_light_disabled, ColorRect/CanvasLayer setup, 1.0/SCREEN_PIXEL_SIZE, Shadertoy Y-flip, repeat_disable, iMouse passthrough, textureLod-in-vertex with unavailable derivatives, object-space VERTEX, normal-map baking).",
-    "Skill delivered zero measurable benefit on this iteration. Either the expectations are too easy for a strong baseline or these topics are well-covered in the base model; harder/edge-case scenarios would be needed to surface skill value.",
-    "runs_per_configuration=1; single-run benchmark."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
   ]
 }

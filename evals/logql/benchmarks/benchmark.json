@@ -1,64 +1,29 @@
 {
-  "metadata": { "skill_name": "logql", "timestamp": "2026-07-22", "evals_run": ["json-parser-error-empty-results", "topk-error-rate-dashboard", "cross-service-correlation-no-tracing"], "runs_per_configuration": 1 },
-  "runs": [
-    { "eval_id": 1, "eval_name": "json-parser-error-empty-results", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Identifies __error__ labels as the signal parser failures drop lines", "passed": true, "evidence": "'the tell-tale signal that parser failures are silently dropping lines'"},
-        {"text": "Recommends | __error__ != \"\" as the diagnostic", "passed": true, "evidence": "'{container=\"sonarr\"} | json | __error__ != \"\"'"},
-        {"text": "Recommends |= \"{\" line filter before | json", "passed": true, "evidence": "'|= \"{\" ... drops any line without a brace'"},
-        {"text": "Recommends | json response_time (partial extraction)", "passed": true, "evidence": "'Use | json response_time rather than a bare | json'"},
-        {"text": "Places line filter before parser (pipeline ordering rule)", "passed": true, "evidence": "'line filters before parsers'"}
-      ] },
-    { "eval_id": 1, "eval_name": "json-parser-error-empty-results", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Identifies __error__ labels as the signal parser failures drop lines", "passed": true, "evidence": "'attaches an __error__ ... downstream label filter can't match it and it falls out'"},
-        {"text": "Recommends | __error__ != \"\" as the diagnostic", "passed": true, "evidence": "'{container=\"sonarr\"} | json | __error__ != \"\"'"},
-        {"text": "Recommends |= \"{\" line filter before | json", "passed": true, "evidence": "'|= \"{\" runs as a cheap distributed grep before | json'"},
-        {"text": "Recommends | json response_time (partial extraction)", "passed": true, "evidence": "'| json response_time extracts only the one field'"},
-        {"text": "Places line filter before parser (pipeline ordering rule)", "passed": true, "evidence": "'the line filter goes before the parser, the label filter after'"}
-      ] },
-    { "eval_id": 2, "eval_name": "topk-error-rate-dashboard", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Places |= \"error\" line filter before any parser (cheapest grep)", "passed": true, "evidence": "'|= \"error\" is a line filter placed before any parser ... cheapest stage'"},
-        {"text": "Uses topk(5, sum by (container) (...)) matching the skill pattern", "passed": true, "evidence": "'topk(5, sum by (container) (rate({host=\"homelab\"} |= \"error\" [1m])))'"},
-        {"text": "Includes an exact-match label as the primary index lookup", "passed": true, "evidence": "'{host=\"homelab\"} is the primary index lookup'"},
-        {"text": "Warns against grouping by high-cardinality labels (timeout cause)", "passed": true, "evidence": "'Do not group by() a high-cardinality label — IPs, user IDs, request IDs'"},
-        {"text": "Mentions recording rules for frequently-loaded panels", "passed": true, "evidence": "'Use a recording rule for a frequently-loaded dashboard panel'"}
-      ] },
-    { "eval_id": 2, "eval_name": "topk-error-rate-dashboard", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Places |= \"error\" line filter before any parser (cheapest grep)", "passed": true, "evidence": "'|= \"error\" ... runs first, before any parsing, as a distributed grep'"},
-        {"text": "Uses topk(5, sum by (container) (...)) matching the skill pattern", "passed": true, "evidence": "'topk(5, sum by (container) (rate({host=\"homelab\"} |= \"error\" [1m])))'"},
-        {"text": "Includes an exact-match label as the primary index lookup", "passed": true, "evidence": "'{host=\"homelab\"} is the primary index lookup ... Exact matches (=) use the index'"},
-        {"text": "Warns against grouping by high-cardinality labels (timeout cause)", "passed": true, "evidence": "'Never by (request_id), by (ip), or by (user_id) ... classic timeout/OOM cause'"},
-        {"text": "Mentions recording rules for frequently-loaded panels", "passed": true, "evidence": "'Use a recording rule for a dashboard'"}
-      ] },
-    { "eval_id": 3, "eval_name": "cross-service-correlation-no-tracing", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Names lack of OTel instrumentation as why distributed tracing is unavailable", "passed": true, "evidence": "'off-the-shelf containers with no OpenTelemetry instrumentation'"},
-        {"text": "Recommends correlating by shared domain IDs (TMDB ID, download hash, NZB ID)", "passed": true, "evidence": "'correlate by shared domain identifiers ... TMDB ID, download hash, NZB ID'"},
-        {"text": "Uses container=~\"...\" regex selector to span multiple services", "passed": true, "evidence": "'{container=~\"radarr|prowlarr|qbittorrent\"} |= \"tmdbId=12345\"'"},
-        {"text": "Prefers |= over |~ for ID match, explaining |~ is slower", "passed": true, "evidence": "'Prefer an exact |= match on an ID over a |~ regex ... |~ is slower'"},
-        {"text": "Avoids recommending OTel instrumentation for these containers", "passed": true, "evidence": "'adding OTel/trace injection to these apps isn't an option. Don't go down that road'"}
-      ] },
-    { "eval_id": 3, "eval_name": "cross-service-correlation-no-tracing", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Names lack of OTel instrumentation as why distributed tracing is unavailable", "passed": true, "evidence": "'ship no OpenTelemetry instrumentation ... real distributed tracing isn't available'"},
-        {"text": "Recommends correlating by shared domain IDs (TMDB ID, download hash, NZB ID)", "passed": true, "evidence": "'correlate on a shared domain identifier ... TMDB ID ... Download hash / NZB ID'"},
-        {"text": "Uses container=~\"...\" regex selector to span multiple services", "passed": true, "evidence": "'{container=~\"radarr|prowlarr|qbittorrent\"} |= \"tmdbId=12345\"'"},
-        {"text": "Prefers |= over |~ for ID match, explaining |~ is slower", "passed": true, "evidence": "'Prefer |= over |~ ... |~ regex matching is slower'"},
-        {"text": "Avoids recommending OTel instrumentation for these containers", "passed": true, "evidence": "'you can't just inject one' — recommends shared-ID correlation"}
-      ] }
-  ],
-  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "delta": {"pass_rate": "+0%"} },
+  "metadata": {
+    "skill_name": "logql",
+    "timestamp": "2026-07-23",
+    "evals_run": 3,
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.93,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.33,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+60%"
+    }
+  },
   "notes": [
-    "NON-DISCRIMINATING on all 3 evals (15/15 both configs). Baseline matched exact query shapes (|= \"{\" before | json, topk(5, sum by (container)...), container=~ regex), pipeline ordering, high-cardinality warning, recording rules, and no-OTel rationale. Base model knows LogQL well.",
-    "runs_per_configuration=1; single-run benchmark."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
   ]
 }

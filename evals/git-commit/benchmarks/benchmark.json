@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_name": "git-commit",
+    "timestamp": "2026-07-23",
+    "evals_run": 10,
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.96,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.758,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+20%"
+    }
+  },
+  "notes": [
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+  ]
+}

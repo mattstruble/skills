@@ -103,7 +103,7 @@ def _unified_table_row(skill: dict, benchmarks: dict[str, dict]) -> str:
             sign = "+" if delta_val >= 0 else ""
             date = bm["metadata"]["timestamp"]
             return (
-                f"| {name} | {summary} | {fmt_pct(with_mean)} | {fmt_pct(base_mean)}"
+                f"| {name} | {summary} | {fmt_pct(base_mean)} | {fmt_pct(with_mean)}"
                 f" | {sign}{round(delta_val * 100)}% | {date} |"
             )
         except KeyError:
@@ -125,8 +125,8 @@ def generate_root_readme(skills: list[dict], benchmarks: dict[str, dict]) -> str
             other.append(s)
 
     table_header = [
-        "| Skill | Summary | With Skill | Baseline | Δ | Last Run |",
-        "|-------|---------|-----------|----------|---|----------|",
+        "| Skill | Summary | Baseline | With Skill | Δ | Last Run |",
+        "|-------|---------|----------|-----------|---|----------|",
     ]
 
     lines = [

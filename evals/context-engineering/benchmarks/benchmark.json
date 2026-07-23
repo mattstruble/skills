@@ -1,46 +1,29 @@
 {
-  "skill_name": "context-engineering",
-  "iteration": 1,
-  "note_on_metrics": "Token/duration telemetry is not exposed to run subagents; token values are word_count * 1.3 approximations and should be treated as rough, not authoritative.",
-  "provenance": "Trigger phase reconstructed from the verified u9i.3.5 sweep (21/21) against the unchanged committed description. Qualitative eval-22/eval-23 from the original sweep; eval-24 baseline recovered via a single state-independent no-skill re-run (original froze under the watchdog).",
-  "trigger_accuracy": {
-    "total": 21,
-    "correct": 21,
-    "accuracy": "100%",
-    "true_positives": 13,
-    "true_negatives": 8,
-    "false_positives": 0,
-    "false_negatives": 0,
-    "bar": "PASS (0 FP on near-miss negatives; >=90% recall)"
+  "metadata": {
+    "skill_name": "context-engineering",
+    "timestamp": "2026-07-23",
+    "evals_run": 16,
+    "runs_per_configuration": 1
   },
-  "qualitative": {
-    "baseline": "no skill loaded",
-    "with_skill": "context-engineering/SKILL.md loaded",
-    "per_eval": [
-      {
-        "eval": "22 — coding agent forgetting decisions across multi-file refactor",
-        "baseline_tokens_approx": 714,
-        "with_skill_tokens_approx": 1050,
-        "delta": "+47%",
-        "verdict": "with-skill better: volatile-data-last (status bar at END), sub-agent isolation for file reads, process-driven prompt; baseline puts decision log at prompt START (busts cache). CONDITIONAL PASS (longer, substantive)."
-      },
-      {
-        "eval": "23 — customer support agent, inconsistent domain handling",
-        "baseline_tokens_approx": 937,
-        "with_skill_tokens_approx": 1543,
-        "delta": "+65%",
-        "verdict": "with-skill better: audit -> process restructure -> domain isolation -> volatile-last cache placement; baseline good intuition but no framework, no cache-awareness. CONDITIONAL PASS (longer, substantive)."
-      },
-      {
-        "eval": "24 — autonomous research agent, design from scratch",
-        "baseline_tokens_approx": 2292,
-        "with_skill_tokens_approx": 2085,
-        "delta": "-9%",
-        "verdict": "with-skill better AND shorter: leads with isolation-over-compression, names long-run failure modes with explicit mitigations. PASS (strict invisibility)."
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.875,
+        "stddev": 0.0
       }
-    ],
-    "token_delta_range": "-9% to +65%",
-    "invisibility_verdict": "PASS on substance-not-ceremony across all three; eval-24 passes the strict same-or-fewer-tokens test outright."
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.588,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+29%"
+    }
   },
-  "overall": "SHIP — 100% trigger accuracy (0 FP), qualitative lift on all three prompts. Extra tokens (where present) are substantive domain guidance, not ceremony."
+  "notes": [
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+  ]
 }

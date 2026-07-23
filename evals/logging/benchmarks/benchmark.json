@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_name": "logging",
+    "timestamp": "2026-07-23",
+    "evals_run": 4,
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.91,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "-9%"
+    }
+  },
+  "notes": [
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak. NEGATIVE delta \u2014 likely an eval-quality issue (expectations too easy for baseline or misaligned); flag for eval rework.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+  ]
+}

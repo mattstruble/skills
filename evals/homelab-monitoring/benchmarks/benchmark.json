@@ -1,64 +1,29 @@
 {
-  "metadata": { "skill_name": "homelab-monitoring", "timestamp": "2026-07-22", "evals_run": ["docker-log-collection-alloy", "kube-prometheus-stack-servicemonitor", "alertmanager-discord-email-routing"], "runs_per_configuration": 1 },
-  "runs": [
-    { "eval_id": 1, "eval_name": "docker-log-collection-alloy", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Recommends Alloy, not the Docker Loki log driver", "passed": true, "evidence": "'Use Alloy as a separate container — not the Docker Loki log driver.'"},
-        {"text": "Explains the Docker Loki log driver blocks container stdout when Loki is unreachable", "passed": true, "evidence": "'Docker blocks the container's stdout write. That can hang Plex/Sonarr/Radarr indefinitely'"},
-        {"text": "Shows discovery.docker with host = unix:///var/run/docker.sock in .alloy syntax", "passed": true, "evidence": "discovery.docker \"containers\" { host = \"unix:///var/run/docker.sock\" }"},
-        {"text": "Shows loki.source.docker forwarding to loki.write.default.receiver", "passed": true, "evidence": "forward_to = [loki.write.default.receiver]"},
-        {"text": "Mounts docker.sock and /var/lib/docker/containers read-only", "passed": true, "evidence": "docker.sock:ro and /var/lib/docker/containers:ro"}
-      ] },
-    { "eval_id": 1, "eval_name": "docker-log-collection-alloy", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Recommends Alloy, not the Docker Loki log driver", "passed": true, "evidence": "'run Grafana Alloy as a dedicated container'; 'Do not use the Docker Loki logging driver.'"},
-        {"text": "Explains the Docker Loki log driver blocks container stdout when Loki is unreachable", "passed": true, "evidence": "'blocks the container's writes to stdout, which can hang or freeze Plex/Sonarr/Radarr'"},
-        {"text": "Shows discovery.docker with host = unix:///var/run/docker.sock in .alloy syntax", "passed": true, "evidence": "discovery.docker \"containers\" { host = \"unix:///var/run/docker.sock\" }"},
-        {"text": "Shows loki.source.docker forwarding to loki.write.default.receiver", "passed": true, "evidence": "forward_to = [loki.write.default.receiver]"},
-        {"text": "Mounts docker.sock and /var/lib/docker/containers read-only", "passed": true, "evidence": "docker.sock:ro and /var/lib/docker/containers:ro"}
-      ] },
-    { "eval_id": 2, "eval_name": "kube-prometheus-stack-servicemonitor", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Identifies serviceMonitorSelectorNilUsesHelmValues as root cause, not networking/RBAC", "passed": true, "evidence": "'Root cause: serviceMonitorSelectorNilUsesHelmValues ... not a networking, DNS, or RBAC problem'"},
-        {"text": "Specifies all three selector flags set to false", "passed": true, "evidence": "serviceMonitor/podMonitor/rule SelectorNilUsesHelmValues all false"},
-        {"text": "Places the fix under prometheus.prometheusSpec", "passed": true, "evidence": "'They must sit under prometheus.prometheusSpec — not at the top level'"},
-        {"text": "Notes Prometheus silently ignores ServiceMonitors even though kubectl shows them", "passed": true, "evidence": "'kubectl get servicemonitor shows it exists, but Prometheus never selects it'"},
-        {"text": "Avoids recommending manual label matching or recreating the ServiceMonitor", "passed": true, "evidence": "'Do not fix this by copying the Helm release labels ... and do not delete and recreate'"}
-      ] },
-    { "eval_id": 2, "eval_name": "kube-prometheus-stack-servicemonitor", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5},
-      "expectations": [
-        {"text": "Identifies serviceMonitorSelectorNilUsesHelmValues as root cause, not networking/RBAC", "passed": true, "evidence": "'not a networking, RBAC, or endpoint problem'; names the flag"},
-        {"text": "Specifies all three selector flags set to false", "passed": true, "evidence": "all three false (plus optional probeSelector...)"},
-        {"text": "Places the fix under prometheus.prometheusSpec", "passed": true, "evidence": "'under prometheus.prometheusSpec in your Helm values'"},
-        {"text": "Notes Prometheus silently ignores ServiceMonitors even though kubectl shows them", "passed": true, "evidence": "'kubectl get servicemonitor will happily show your object, but Prometheus never adds it as a target'"},
-        {"text": "Avoids recommending manual label matching or recreating the ServiceMonitor", "passed": false, "evidence": "Added an 'Alternative (label matching)' section recommending adding the release label to the ServiceMonitor — the anti-fix the skill warns against."}
-      ] },
-    { "eval_id": 3, "eval_name": "alertmanager-discord-email-routing", "configuration": "with_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Sets repeat_interval: 4h", "passed": true, "evidence": "repeat_interval: 4h"},
-        {"text": "Uses discord_configs (not generic webhook_configs)", "passed": true, "evidence": "- name: 'discord' discord_configs:"},
-        {"text": "Routes critical->discord, warning->email as separate child routes", "passed": true, "evidence": "match severity critical → discord, warning → email"},
-        {"text": "Keeps webhook URL/SMTP password out of config (env or webhook_url_file)", "passed": true, "evidence": "webhook_url: '$DISCORD_WEBHOOK_URL'; k3s webhook_url_file/auth_password_file"},
-        {"text": "Includes group_by: ['alertname', 'job']", "passed": true, "evidence": "group_by: ['alertname', 'job']"}
-      ] },
-    { "eval_id": 3, "eval_name": "alertmanager-discord-email-routing", "configuration": "without_skill", "run_number": 1,
-      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
-      "expectations": [
-        {"text": "Sets repeat_interval: 4h", "passed": true, "evidence": "repeat_interval: 4h"},
-        {"text": "Uses discord_configs (not generic webhook_configs)", "passed": true, "evidence": "- name: discord discord_configs:"},
-        {"text": "Routes critical->discord, warning->email as separate child routes", "passed": true, "evidence": "two child routes on severity critical/warning"},
-        {"text": "Keeps webhook URL/SMTP password out of config (env or webhook_url_file)", "passed": true, "evidence": "webhook_url: ${DISCORD_WEBHOOK_URL}; k3s webhook_url_file/auth_password_file"},
-        {"text": "Includes group_by: ['alertname', 'job']", "passed": true, "evidence": "group_by: ['alertname', 'job']"}
-      ] }
-  ],
-  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 0.933, "stddev": 0.094}}, "delta": {"pass_rate": "+6.7%"} },
+  "metadata": {
+    "skill_name": "homelab-monitoring",
+    "timestamp": "2026-07-23",
+    "evals_run": 3,
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.867,
+        "stddev": 0.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.467,
+        "stddev": 0.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+40%"
+    }
+  },
   "notes": [
-    "Only discriminating point: kube-prometheus-stack ServiceMonitor eval — baseline added a label-matching 'alternative' fix, which the skill explicitly warns against; with_skill avoided it. The other two evals (Alloy log collection, Alertmanager routing) were non-discriminating — baseline matched all details including homelab-specific values.",
-    "runs_per_configuration=1; single-run benchmark."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
   ]
 }

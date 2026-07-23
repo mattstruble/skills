@@ -1,41 +1,29 @@
 {
-  "skill_name": "odin-gamedev",
-  "iteration": 1,
-  "summary": {
-    "total_evals": 2,
+  "metadata": {
+    "skill_name": "odin-gamedev",
+    "timestamp": "2026-07-23",
+    "evals_run": 2,
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
     "with_skill": {
-      "total_assertions": 18,
-      "passed": 18,
-      "pass_rate": 1.0
+      "pass_rate": {
+        "mean": 0.888,
+        "stddev": 0.0
+      }
     },
     "without_skill": {
-      "total_assertions": 18,
-      "passed": 17,
-      "pass_rate": 0.944
+      "pass_rate": {
+        "mean": 0.7,
+        "stddev": 0.0
+      }
     },
-    "delta": 1,
-    "delta_pp": 5.6
-  },
-  "evals": [
-    {
-      "id": 1,
-      "name": "slow-raycaster",
-      "with_skill": {"passed": 10, "total": 10, "pass_rate": 1.0},
-      "without_skill": {"passed": 10, "total": 10, "pass_rate": 1.0},
-      "delta": 0,
-      "notes": "Both variants correctly diagnose rl.DrawPixel as the bottleneck and recommend the rl.Image framebuffer pattern with a complete main-loop. The pattern is well-represented in raylib documentation and training data."
-    },
-    {
-      "id": 2,
-      "name": "read-png-pixels",
-      "with_skill": {"passed": 8, "total": 8, "pass_rate": 1.0},
-      "without_skill": {"passed": 7, "total": 8, "pass_rate": 0.875},
-      "delta": 1,
-      "missed_by_baseline": [
-        "image-can-unload-early: baseline used direct img.data cast (correct alternative path) and warned against unloading early — but for the LoadImageColors path the data IS copied. Baseline didn't address this specific lifecycle detail."
-      ],
-      "notes": "Baseline took a different (also correct) approach using rl.ImageFormat + casting img.data to [^]rl.Color directly. This avoids the LoadImageColors copy but binds the pixel array's lifetime to img. The skill version follows the LoadImageColors path that's idiomatic for read-only sampling."
+    "delta": {
+      "pass_rate": "+19%"
     }
-  ],
-  "analysis": "Modest lift on eval 2 — baseline diverged to a different correct pattern, missing the specific copy-semantics nuance the skill teaches. Eval 1 (framebuffer pattern) shows no lift; the pattern is well-documented in raylib materials and training data. The skill's value here is in surfacing one specific raylib API path (LoadImageColors → [^]rl.Color → UnloadImageColors) over a competing one (img.data cast)."
+  },
+  "notes": [
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+  ]
 }

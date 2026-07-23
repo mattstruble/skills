@@ -10,6 +10,24 @@ Skills that enforce a specific way of working — a multi-step procedure or disc
 
 | Skill | Summary | With Skill | Baseline | Δ | Last Run |
 |-------|---------|-----------|----------|---|----------|
+| brainstorm | Interview-driven design through relentless questioning before implementation | 100% | 67% | +33% | 2026-06-30 |
+| code-reviewer | Four-reviewer parallel code review pipeline with fix cycle and aggregated findings | 100% | 100% | +0% | 2026-06-30 |
+| git-commit | Conventional commit authoring: grouping changes by intent and writing commit messages | — | — | — | — |
+| git-pr | Pull request creation: sizing, title conventions, and description writing | — | — | — | — |
+| knowledge-base | Maintaining and writing to a persistent Obsidian-style cross-session knowledge graph | 100% | 80% | +20% | 2026-07-22 |
+| logging | Production logging discipline: structured logs, happy-path coverage, correlation IDs | — | — | — | — |
+| pr-reviewer | Peer PR review pipeline producing tiered, courteous draft comments for GitHub | 100% | 87% | +13% | 2026-07-22 |
+| prd-to-stories | Decomposing behavioral PRDs into deliverable stories with specific acceptance criteria | — | — | — | — |
+| prd-writing | Co-authoring behavioral product requirements documents through structured interview | 100% | 73% | +27% | 2026-07-22 |
+| skill-creator | Creating, iterating, and benchmarking skills through eval-driven refinement | 100% | 100% | +0% | 2026-07-22 |
+| test-driven-development | Red-green-refactor TDD workflow: writing tests before implementation | — | — | — | — |
+
+### Design Skills
+
+Skills that supply frameworks and judgment for architectural or creative decisions.
+
+| Skill | Summary | With Skill | Baseline | Δ | Last Run |
+|-------|---------|-----------|----------|---|----------|
 | agent-architecture | Framework for deciding when and how to build LLM-driven agent systems | — | — | — | — |
 | agent-evaluation | Designing evaluation systems, rubrics, and metrics for autonomous agents | — | — | — | — |
 | agent-memory | Cross-session memory design for personalized agents: storage, consolidation, retrieval | — | — | — | — |
@@ -18,8 +36,6 @@ Skills that enforce a specific way of working — a multi-step procedure or disc
 | agent-tool-design | Designing tool interfaces that LLMs can reliably discover, select, and invoke | — | — | — | — |
 | api-design | REST and gRPC API conventions: resource modeling, naming, versioning, error handling | 100% | 100% | +0% | 2026-06-30 |
 | application-architecture | Layering, domain modeling, and data access patterns for application-level structure | 100% | 25% | +75% | 2026-06-30 |
-| brainstorm | Interview-driven design through relentless questioning before implementation | 100% | 67% | +33% | 2026-06-30 |
-| code-reviewer | Four-reviewer parallel code review pipeline with fix cycle and aggregated findings | 100% | 100% | +0% | 2026-06-30 |
 | coding-agent-design | Building coding agents: toolset design, security model, workflow, and failure handling | — | — | — | — |
 | concurrency-design | Choosing thread topology, concurrency units, and inter-component communication models | 93% | 67% | +27% | 2026-07-22 |
 | context-engineering | Structuring LLM context windows for cache efficiency and instruction persistence | — | — | — | — |
@@ -29,11 +45,7 @@ Skills that enforce a specific way of working — a multi-step procedure or disc
 | game-patterns | Engine-agnostic game programming patterns: ECS, state machines, event systems, pooling | 100% | 75% | +25% | 2026-06-30 |
 | game-performance | Systematic GPU/CPU/memory profiling and optimization methodology for games | 100% | 100% | +0% | 2026-06-30 |
 | game-visuals | Visual design principles for legibility, color hierarchy, and art direction in games | 100% | 33% | +67% | 2026-06-30 |
-| git-commit | Conventional commit authoring: grouping changes by intent and writing commit messages | — | — | — | — |
-| git-pr | Pull request creation: sizing, title conventions, and description writing | — | — | — | — |
-| knowledge-base | Maintaining and writing to a persistent Obsidian-style cross-session knowledge graph | 100% | 80% | +20% | 2026-07-22 |
 | level-design | Combat arena and action game level design: spatial choice, legibility, encounter flow | 100% | 80% | +20% | 2026-07-22 |
-| logging | Production logging discipline: structured logs, happy-path coverage, correlation IDs | — | — | — | — |
 | love2d-fennel | Fennel + Love2D interactive development: REPL workflow, hot-reloading, mode architecture | — | — | — | — |
 | ml-post-training | SFT and RL post-training mechanics: data pipelines, reward design, LoRA, debugging | — | — | — | — |
 | multi-agent-collaboration | Designing multi-agent topologies, context sharing, handoff protocols, and failure modes | — | — | — | — |
@@ -41,15 +53,10 @@ Skills that enforce a specific way of working — a multi-step procedure or disc
 | nix-dendritic | Aspect-oriented flake-parts Nix configuration for multi-host, multi-platform setups | — | — | — | — |
 | odin-design | Idiomatic Odin patterns, allocators, package structure, and LLM knowledge-gap corrections | — | — | — | — |
 | odin-gamedev | Odin game architecture with Raylib/Sokol: entity management, hot reloading, game state | — | — | — | — |
-| pr-reviewer | Peer PR review pipeline producing tiered, courteous draft comments for GitHub | 100% | 87% | +13% | 2026-07-22 |
-| prd-to-stories | Decomposing behavioral PRDs into deliverable stories with specific acceptance criteria | — | — | — | — |
-| prd-writing | Co-authoring behavioral product requirements documents through structured interview | 100% | 73% | +27% | 2026-07-22 |
 | python-design | Python-specific design patterns, idioms, type choices, and anti-patterns | — | — | — | — |
 | rag-design | Retrieval pipeline design: chunking, embeddings, hybrid retrieval, and structured indexes | — | — | — | — |
-| skill-creator | Creating, iterating, and benchmarking skills through eval-driven refinement | 100% | 100% | +0% | 2026-07-22 |
 | software-design | Core software design principles: composition, minimal interfaces, and clean boundaries | 100% | 75% | +25% | 2026-06-30 |
 | test-design | Test quality tradeoffs using Kent Beck's Test Desiderata: behavior over structure | 100% | 67% | +33% | 2026-06-30 |
-| test-driven-development | Red-green-refactor TDD workflow: writing tests before implementation | — | — | — | — |
 
 ### Reference Skills
 

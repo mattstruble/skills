@@ -2,6 +2,9 @@
 *-eval/
 .opencode/
 
+# Preserved eval run answers (inputs for detail-table backfill; not committed)
+evals/*/runs/
+
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db

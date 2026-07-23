@@ -250,6 +250,16 @@ Put results in `<skill-name>-workspace/` as a sibling to the skill directory. Wi
 
 ### Step 1: Spawn all runs (with-skill AND baseline) in the same turn
 
+> **⚠️ CRITICAL: Prompt isolation.** Run-agents must receive ONLY the eval prompt — never `expected_output` or `expectations`. These fields are the grading rubric; showing them to the test-taker invalidates results (the agent will produce the expected answer by reading the rubric, not by applying the skill).
+>
+> Before spawning runs, extract prompts using:
+> ```
+> make extract-prompts SKILL=<skill-name> OUTPUT=<workspace>/iteration-<N>/prompts.json
+> ```
+> Then point run-agents at `prompts.json`, NOT at `evals/<skill-name>/evals.json`.
+>
+> **Anti-pattern:** Do NOT tell run-agents to "read evals.json" directly — this leaks the grading rubric and produces artificial +0% results where the baseline matches the skill because both agents saw the answer key.
+
 For each test case, spawn two subagents in the same turn — one with the skill, one without. This is important: don't spawn the with-skill runs first and then come back for baselines later. Launch everything at once so it all finishes around the same time.
 
 **With-skill run:**
@@ -302,7 +312,7 @@ When each subagent task completes, capture any available timing and token data i
 
 Once all runs are done:
 
-1. **Grade each run** — spawn a grader subagent (or grade inline) that reads `agents/grader.md` and evaluates each assertion against the outputs. Save results to `grading.json` in each run directory. The grading.json expectations array must use the fields `text`, `passed`, and `evidence` (not `name`/`met`/`details` or other variants). For assertions that can be checked programmatically, write and run a script rather than eyeballing it — scripts are faster, more reliable, and can be reused across iterations.
+1. **Grade each run** — spawn a grader subagent (or grade inline) that reads `agents/grader.md` and evaluates each assertion against the outputs. Save results to `grading.json` in each run directory. The grader IS the component that reads `evals/<skill-name>/evals.json` including expectations — it needs them to evaluate the outputs. The run-agents never see this file. The grading.json expectations array must use the fields `text`, `passed`, and `evidence` (not `name`/`met`/`details` or other variants). For assertions that can be checked programmatically, write and run a script rather than eyeballing it — scripts are faster, more reliable, and can be reused across iterations.
 
 2. **Aggregate into benchmark** — collect grading results across all runs into a `benchmark.json`. See `references/schemas.md` for the exact schema. Include pass_rate, time, and tokens for each configuration, with mean ± stddev and the delta. Put each with_skill version before its baseline counterpart.
 

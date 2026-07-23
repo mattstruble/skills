@@ -6,13 +6,13 @@
       "name": "initial-setup",
       "prompt": "I just provisioned a fresh Ubuntu 24.04 VPS on Hetzner (public IP: 203.0.113.50). I want to install k3s and be able to manage it from my MacBook. Walk me through the setup.",
       "expected_output": "Step-by-step k3s installation with remote access configuration",
-      "assertions": [
-        {"text": "Uses curl install script with specific version pin (INSTALL_K3S_VERSION)", "type": "boolean"},
-        {"text": "Includes --tls-san with the public IP", "type": "boolean"},
-        {"text": "Includes --disable=traefik", "type": "boolean"},
-        {"text": "Includes --cluster-init for future HA capability", "type": "boolean"},
-        {"text": "Copies kubeconfig to local machine and updates server address from 127.0.0.1 to public IP", "type": "boolean"},
-        {"text": "Verifies with kubectl get nodes", "type": "boolean"}
+      "expectations": [
+        "Uses curl install script with specific version pin (INSTALL_K3S_VERSION)",
+        "Includes --tls-san with the public IP",
+        "Includes --disable=traefik",
+        "Includes --cluster-init for future HA capability",
+        "Copies kubeconfig to local machine and updates server address from 127.0.0.1 to public IP",
+        "Verifies with kubectl get nodes"
       ]
     },
     {
@@ -20,13 +20,13 @@
       "name": "add-nodes",
       "prompt": "I have a single-node k3s cluster on node0 (Ubuntu 24.04, x86-64). I want to add node1 as a second control plane node and node2 as a worker-only node. node2 is ARM64. How do I do this?",
       "expected_output": "Procedures for adding both server and agent nodes to existing k3s cluster",
-      "assertions": [
-        {"text": "Retrieves join token from the correct location", "type": "boolean"},
-        {"text": "Joins server node with server subcommand and --server flag pointing to node0", "type": "boolean"},
-        {"text": "Matches original install flags (--disable=traefik, --cluster-domain if set)", "type": "boolean"},
-        {"text": "Joins agent node with agent subcommand (distinct from server join)", "type": "boolean"},
-        {"text": "Pins INSTALL_K3S_VERSION to match existing cluster", "type": "boolean"},
-        {"text": "Confirms mixed architecture (ARM64 + x86-64) works without special config", "type": "boolean"}
+      "expectations": [
+        "Retrieves join token from the correct location",
+        "Joins server node with server subcommand and --server flag pointing to node0",
+        "Matches original install flags (--disable=traefik, --cluster-domain if set)",
+        "Joins agent node with agent subcommand (distinct from server join)",
+        "Pins INSTALL_K3S_VERSION to match existing cluster",
+        "Confirms mixed architecture (ARM64 + x86-64) works without special config"
       ]
     },
     {
@@ -34,13 +34,13 @@
       "name": "kubectl-essentials",
       "prompt": "I'm new to kubectl. I have k3s running and my app is deployed. Show me the essential commands I need for daily management -- checking status, viewing logs, debugging pods, and basic operations.",
       "expected_output": "kubectl command reference covering daily operations",
-      "assertions": [
-        {"text": "Shows kubectl get for pods, deployments, services", "type": "boolean"},
-        {"text": "Shows kubectl describe for debugging", "type": "boolean"},
-        {"text": "Shows kubectl logs with -f and/or --previous", "type": "boolean"},
-        {"text": "Shows kubectl exec for interactive shell access", "type": "boolean"},
-        {"text": "Shows kubectl port-forward", "type": "boolean"},
-        {"text": "Explains namespace flag (-n / --all-namespaces)", "type": "boolean"}
+      "expectations": [
+        "Shows kubectl get for pods, deployments, services",
+        "Shows kubectl describe for debugging",
+        "Shows kubectl logs with -f and/or --previous",
+        "Shows kubectl exec for interactive shell access",
+        "Shows kubectl port-forward",
+        "Explains namespace flag (-n / --all-namespaces)"
       ]
     }
   ]

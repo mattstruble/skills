@@ -5,123 +5,47 @@
       "id": 1,
       "prompt": "I'm designing a REST API for a user management system. Users can belong to multiple organizations, and each organization has roles. I need endpoints for managing users, organizations, and role assignments. Can you help me design the resource hierarchy and endpoints following best practices?",
       "expected_output": "A resource-oriented API design with: proper path structure (e.g., /v1/users, /v1/organizations, /v1/organizations/{org_id}/members or similar), standard CRUD methods using correct HTTP verbs (GET/POST/PATCH/DELETE), paginated List responses with 'results' array, user-specified IDs as query params on Create, PATCH for updates (not PUT), and a checklist or notes covering standard fields (create_time, update_time, etag).",
-      "assertions": [
-        {
-          "name": "uses-resource-oriented-paths",
-          "description": "API paths use nouns (resources), not verbs like /createUser or /getOrganization",
-          "type": "qualitative"
-        },
-        {
-          "name": "list-uses-results-array",
-          "description": "List endpoint responses use 'results' as the array field name, not 'users' or 'organizations'",
-          "type": "qualitative"
-        },
-        {
-          "name": "create-uses-post",
-          "description": "Create operations use POST, not PUT",
-          "type": "qualitative"
-        },
-        {
-          "name": "update-uses-patch",
-          "description": "Update operations use PATCH with merge-patch semantics, not PUT",
-          "type": "qualitative"
-        },
-        {
-          "name": "pagination-mentioned",
-          "description": "Pagination is mentioned for List endpoints (max_page_size, page_token, or similar)",
-          "type": "qualitative"
-        },
-        {
-          "name": "standard-fields-mentioned",
-          "description": "Standard fields like create_time, update_time are mentioned",
-          "type": "qualitative"
-        }
+      "expectations": [
+        "API paths use nouns (resources), not verbs like /createUser or /getOrganization",
+        "List endpoint responses use 'results' as the array field name, not 'users' or 'organizations'",
+        "Create operations use POST, not PUT",
+        "Update operations use PATCH with merge-patch semantics, not PUT",
+        "Pagination is mentioned for List endpoints (max_page_size, page_token, or similar)",
+        "Standard fields like create_time, update_time are mentioned"
       ]
     },
     {
       "id": 2,
       "prompt": "Review this API design for consistency problems:\n\n```\nGET  /api/getBooks\nPOST /api/createBook\nPUT  /api/updateBook/{bookId}\nDEL  /api/deleteBook/{id}\nGET  /api/book/{book_id}/getChapters\nPOST /api/books/{bookId}/chapters/create\n\nList response: { \"bookList\": [...], \"count\": 50 }\nCreate request body: { \"id\": \"my-book\", \"title\": \"...\", \"author\": \"...\" }\nTimestamp fields: createdAt, updatedAt\n```\n\nWhat's wrong with this design?",
       "expected_output": "A review identifying: (1) verb-oriented paths instead of resource-oriented, (2) PUT instead of PATCH for updates, (3) inconsistent ID parameter naming (bookId vs book_id vs id), (4) List response uses 'bookList' instead of 'results', (5) 'id' should be a query param not body field on Create, (6) timestamp fields use wrong suffix (createdAt/updatedAt instead of create_time/update_time with _time suffix), (7) path naming inconsistencies.",
-      "assertions": [
-        {
-          "name": "identifies-verb-paths",
-          "description": "Review identifies that paths use verbs (getBooks, createBook) instead of resource-oriented nouns",
-          "type": "qualitative"
-        },
-        {
-          "name": "identifies-put-problem",
-          "description": "Review identifies PUT as problematic and recommends PATCH with merge-patch",
-          "type": "qualitative"
-        },
-        {
-          "name": "identifies-results-naming",
-          "description": "Review identifies 'bookList' should be 'results'",
-          "type": "qualitative"
-        },
-        {
-          "name": "identifies-id-in-body",
-          "description": "Review identifies that 'id' should be a query parameter, not in the request body",
-          "type": "qualitative"
-        },
-        {
-          "name": "identifies-timestamp-naming",
-          "description": "Review identifies createdAt/updatedAt should use _time suffix (create_time/update_time)",
-          "type": "qualitative"
-        }
+      "expectations": [
+        "Review identifies that paths use verbs (getBooks, createBook) instead of resource-oriented nouns",
+        "Review identifies PUT as problematic and recommends PATCH with merge-patch",
+        "Review identifies 'bookList' should be 'results'",
+        "Review identifies that 'id' should be a query parameter, not in the request body",
+        "Review identifies createdAt/updatedAt should use _time suffix (create_time/update_time)"
       ]
     },
     {
       "id": 3,
       "prompt": "I have a video processing service. When a user uploads a video, it needs to be transcoded into multiple formats (720p, 1080p, 4K). This can take 5-30 minutes. Should I use a standard Create endpoint that returns the video resource, or something else? How should I design this so clients can track progress?",
       "expected_output": "Recommendation to use Long-running Operations (LROs): POST to create the video resource returns 202 Accepted with an Operation resource containing path, done, metadata, response, error fields. Expose GET /v1/operations/{operation_id} for polling. The video resource should appear in List/Get immediately with a state field (e.g., PROCESSING, READY, FAILED). Mention state enum conventions (UPPER_SNAKE_CASE, STATE_UNSPECIFIED as value 0).",
-      "assertions": [
-        {
-          "name": "recommends-lro",
-          "description": "Response recommends Long-running Operations (LROs) for the async transcoding work",
-          "type": "qualitative"
-        },
-        {
-          "name": "mentions-202-accepted",
-          "description": "Response mentions returning 202 Accepted (not 200/201) for the async operation",
-          "type": "qualitative"
-        },
-        {
-          "name": "mentions-operation-resource",
-          "description": "Response mentions an Operation resource with done/status tracking",
-          "type": "qualitative"
-        },
-        {
-          "name": "mentions-state-field",
-          "description": "Response mentions a state field on the video resource for tracking readiness",
-          "type": "qualitative"
-        }
+      "expectations": [
+        "Response recommends Long-running Operations (LROs) for the async transcoding work",
+        "Response mentions returning 202 Accepted (not 200/201) for the async operation",
+        "Response mentions an Operation resource with done/status tracking",
+        "Response mentions a state field on the video resource for tracking readiness"
       ]
     },
     {
       "id": 4,
       "prompt": "I need to add an 'archive' action to my documents API. Archived documents are hidden from normal List results but can be retrieved with a flag. I also need a way to 'publish' a document (which sends notifications and changes its visibility). Should these be standard CRUD operations or something else? How should I model the document states?",
       "expected_output": "Recommendation to use custom methods for archive and publish (POST /v1/documents/{doc_id}:archive, POST /v1/documents/{doc_id}:publish) since they're state transitions that can't be expressed as field updates. State should be an output-only enum (DRAFT, PUBLISHED, ARCHIVED) not directly writable via Update. List should support bool show_deleted or bool show_archived. Soft-delete pattern for archive (with delete_time field and Undelete method). State enum should use UPPER_SNAKE_CASE with STATE_UNSPECIFIED.",
-      "assertions": [
-        {
-          "name": "recommends-custom-methods",
-          "description": "Response recommends custom methods (:archive, :publish) for state transitions",
-          "type": "qualitative"
-        },
-        {
-          "name": "state-not-via-update",
-          "description": "Response explains that state should not be directly writable via Update/PATCH",
-          "type": "qualitative"
-        },
-        {
-          "name": "mentions-show-archived-flag",
-          "description": "Response mentions a flag on List to show archived/deleted documents",
-          "type": "qualitative"
-        },
-        {
-          "name": "state-enum-conventions",
-          "description": "Response mentions state enum conventions (output-only, UPPER_SNAKE_CASE, or STATE_UNSPECIFIED)",
-          "type": "qualitative"
-        }
+      "expectations": [
+        "Response recommends custom methods (:archive, :publish) for state transitions",
+        "Response explains that state should not be directly writable via Update/PATCH",
+        "Response mentions a flag on List to show archived/deleted documents",
+        "Response mentions state enum conventions (output-only, UPPER_SNAKE_CASE, or STATE_UNSPECIFIED)"
       ]
     }
   ]

@@ -6,17 +6,17 @@
       "prompt": "I'm writing a software raycaster in Odin using raylib. It's correct but slow — at 800x600 I get about 30 FPS even with simple scenes, and most of that time is spent in my per-pixel rendering. I'm using rl.DrawPixel inside the inner loop. What's the idiomatic raylib pattern for fast per-pixel rendering, and how would I rewrite the rendering setup? Show the full main-loop structure including buffer creation, per-pixel writes, the per-frame upload, and cleanup.",
       "expected_output": "Identifies that rl.DrawPixel issues a GPU draw call per pixel and is the bottleneck. Recommends the rl.Image software-framebuffer pattern: build the frame in CPU memory with rl.ImageDrawPixel, upload once per frame with rl.UpdateTexture, blit with rl.DrawTexture, clear with rl.ImageClearBackground. Shows full main-loop structure with rl.GenImageColor for the framebuffer, rl.LoadTextureFromImage for the GPU texture, the per-frame UpdateTexture+DrawTexture+ImageClearBackground sequence, and matching defer rl.UnloadImage / rl.UnloadTexture for cleanup. Roughly 2x FPS improvement is realistic.",
       "files": [],
-      "assertions": [
-        {"id": "diagnoses-drawpixel-bottleneck", "text": "Identifies rl.DrawPixel as the bottleneck because each call goes through the GPU draw pipeline", "type": "semantic"},
-        {"id": "framebuffer-pattern-recommended", "text": "Recommends the rl.Image (CPU framebuffer) pattern: write to image, upload once, blit", "type": "semantic"},
-        {"id": "rl-genimagecolor-or-equivalent", "text": "Uses rl.GenImageColor (or similar rl.Image-creating function) for the backing framebuffer", "type": "semantic"},
-        {"id": "rl-loadtexturefromimage", "text": "Uses rl.LoadTextureFromImage to create the GPU texture that mirrors the framebuffer", "type": "semantic"},
-        {"id": "rl-imagedrawpixel", "text": "Uses rl.ImageDrawPixel (or equivalent direct image-data writes) for per-pixel writes, NOT rl.DrawPixel", "type": "semantic"},
-        {"id": "rl-updatetexture-per-frame", "text": "Uses rl.UpdateTexture once per frame to upload the framebuffer to the GPU texture", "type": "semantic"},
-        {"id": "rl-drawtexture-blit", "text": "Uses rl.DrawTexture to blit the texture to the screen each frame", "type": "semantic"},
-        {"id": "frame-clear", "text": "Mentions clearing the framebuffer each frame (rl.ImageClearBackground or equivalent)", "type": "semantic"},
-        {"id": "complete-main-loop", "text": "Shows a complete main-loop structure from window init through cleanup", "type": "semantic"},
-        {"id": "defer-cleanup", "text": "Pairs allocations with defer for cleanup (rl.UnloadImage, rl.UnloadTexture, rl.CloseWindow)", "type": "semantic"}
+      "expectations": [
+        "Identifies rl.DrawPixel as the bottleneck because each call goes through the GPU draw pipeline",
+        "Recommends the rl.Image (CPU framebuffer) pattern: write to image, upload once, blit",
+        "Uses rl.GenImageColor (or similar rl.Image-creating function) for the backing framebuffer",
+        "Uses rl.LoadTextureFromImage to create the GPU texture that mirrors the framebuffer",
+        "Uses rl.ImageDrawPixel (or equivalent direct image-data writes) for per-pixel writes, NOT rl.DrawPixel",
+        "Uses rl.UpdateTexture once per frame to upload the framebuffer to the GPU texture",
+        "Uses rl.DrawTexture to blit the texture to the screen each frame",
+        "Mentions clearing the framebuffer each frame (rl.ImageClearBackground or equivalent)",
+        "Shows a complete main-loop structure from window init through cleanup",
+        "Pairs allocations with defer for cleanup (rl.UnloadImage, rl.UnloadTexture, rl.CloseWindow)"
       ]
     },
     {
@@ -24,15 +24,15 @@
       "prompt": "Show me how to load a PNG texture in Odin using raylib's bindings and read individual pixel colors from it for custom CPU-side rendering (texture sampling, blitting, processing — I don't want raylib to draw it for me, I just want the pixel array). Cover: loading the file, getting at the pixel data, sampling a specific pixel by (x, y), and freeing the resources at shutdown. What's the type of the pixel array and what should I know about it?",
       "expected_output": "Uses rl.LoadImage to read the file. Uses rl.LoadImageColors to get a flat array of pixels. Notes the return type is [^]rl.Color — Odin's multi-pointer (typed C-style pointer to many) — and explains that it has no length tag, just the pointer. Notes rl.Color is [4]u8 (or distinct [4]u8) so .r/.g/.b/.a accessors work. Shows row-major indexing: pixels[y * width + x] for sampling. Mentions raylib copies the pixel data, so rl.UnloadImage is safe immediately after LoadImageColors. For shutdown: rl.UnloadImageColors (matches rl.LoadImageColors). May also note bounds-checking caveat for multi-pointers.",
       "files": [],
-      "assertions": [
-        {"id": "rl-loadimage-used", "text": "Uses rl.LoadImage to load the PNG into a CPU-side rl.Image", "type": "semantic"},
-        {"id": "loadimagecolors-or-image-data", "text": "Uses rl.LoadImageColors (or a documented direct cast of img.data) to get an addressable pixel array", "type": "semantic"},
-        {"id": "multi-pointer-type-named", "text": "Identifies the pixel array type as `[^]rl.Color` — Odin's multi-pointer", "type": "semantic"},
-        {"id": "multi-pointer-no-length", "text": "Notes that multi-pointers have no length tag and behave like C-style pointers (caller must track bounds)", "type": "semantic"},
-        {"id": "rl-color-rgba8", "text": "Notes rl.Color is [4]u8 (or distinct [4]u8) — RGBA 8-bit per channel — and that .r/.g/.b/.a accessors work", "type": "semantic"},
-        {"id": "row-major-indexing", "text": "Shows row-major indexing: pixels[y * width + x]", "type": "semantic"},
-        {"id": "image-can-unload-early", "text": "Notes raylib copies pixel data (or equivalent), so rl.UnloadImage is safe to call immediately after LoadImageColors", "type": "semantic"},
-        {"id": "rl-unloadimagecolors", "text": "Uses rl.UnloadImageColors at shutdown to free the pixel array", "type": "semantic"}
+      "expectations": [
+        "Uses rl.LoadImage to load the PNG into a CPU-side rl.Image",
+        "Uses rl.LoadImageColors (or a documented direct cast of img.data) to get an addressable pixel array",
+        "Identifies the pixel array type as `[^]rl.Color` — Odin's multi-pointer",
+        "Notes that multi-pointers have no length tag and behave like C-style pointers (caller must track bounds)",
+        "Notes rl.Color is [4]u8 (or distinct [4]u8) — RGBA 8-bit per channel — and that .r/.g/.b/.a accessors work",
+        "Shows row-major indexing: pixels[y * width + x]",
+        "Notes raylib copies pixel data (or equivalent), so rl.UnloadImage is safe to call immediately after LoadImageColors",
+        "Uses rl.UnloadImageColors at shutdown to free the pixel array"
       ]
     }
   ]

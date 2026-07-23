@@ -1,0 +1,44 @@
+{
+  "skill_name": "skill-creator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to create a skill for writing conventional git commits. It should help the model write good commit messages following the conventional commits spec. I already know roughly what I want — can you help me write the skill and set up some test cases?",
+      "expected_output": "The agent interviews the user to capture intent (what the skill enables, when it triggers, expected output format), writes a SKILL.md with a description following the MUST-language forceful-opener + non-obvious-triggers + concise-exclusions template (~80 words), saves 2-3 test prompts to evals/git-commit/evals.json at the repo root, and proposes running with-skill and baseline subagents in the same turn.",
+      "files": [],
+      "expectations": [
+        "The generated description uses MUST language ('You MUST use this skill when...' or 'You MUST consult this skill when...') rather than soft 'Use when' phrasing",
+        "The description includes explicit NOT-for exclusions that name adjacent skills or contexts where the skill should not trigger",
+        "Test prompts are saved to evals/git-commit/evals.json (repo-root evals/ directory), not inside the skill directory or a workspace folder",
+        "The agent proposes spawning both a with-skill run and a baseline (without-skill) run in the same turn, not sequentially",
+        "The description does not summarize the skill's workflow steps (e.g., does not say 'parses staged diff, formats message, validates spec') — it describes only triggering conditions"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a skill called `python-design` that I've been iterating on. I just finished iteration 2 and the benchmark results are in. Can you help me analyze whether the new version is actually better and figure out what to improve next? The benchmark.json is at python-design-workspace/iteration-2/benchmark.json.",
+      "expected_output": "The agent reads the benchmark.json, runs an analyst pass looking for non-discriminating assertions (pass 100% in both configs), high-variance evals, and time/token tradeoffs, then auto-promotes the finalized benchmark by copying it to evals/python-design/benchmarks/benchmark.json. It presents both qualitative patterns and the aggregate delta to the user before proposing skill edits.",
+      "files": [],
+      "expectations": [
+        "The agent copies the finalized benchmark to evals/python-design/benchmarks/benchmark.json (not to python-design/benchmarks/ or any path inside the skill directory)",
+        "The analyst pass explicitly checks for assertions that pass at 100% in both with-skill and without-skill configurations and flags them as potentially non-discriminating",
+        "The agent checks for high-variance evals (large stddev relative to mean pass_rate) and surfaces them as potentially flaky",
+        "The agent presents both the aggregate pass_rate delta and qualitative patterns from the runs — not just the summary numbers — before asking the user what to change",
+        "Iteration artifacts (grading.json, run directories) remain in python-design-workspace/, not in the tracked evals/ directory"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The description for my `logging` skill keeps failing to trigger when users are writing FastAPI services or background workers — they don't mention 'logging' at all, they just ask me to add error handling or set up a new service. Can you help me fix the description so it triggers proactively on those activities?",
+      "expected_output": "The agent diagnoses the failure as a proactive-skill triggering problem — the description relies on topic vocabulary ('logging') rather than activity vocabulary. It rewrites the description to match the activity (writing FastAPI services, background workers, queue consumers) rather than the topic, generates 20 trigger eval queries (mix of should-trigger and should-not-trigger, with realistic detail and near-miss negatives), and presents them for user review before testing.",
+      "files": [],
+      "expectations": [
+        "The agent identifies the root cause as topic-vocabulary vs activity-vocabulary mismatch and rewrites the description to trigger on activity patterns ('when writing FastAPI services, background workers, queue consumers') rather than on the word 'logging'",
+        "The rewritten description follows the ~80-word template: forceful opener (~15 words) + non-obvious triggers (~30 words) + concise exclusions (~25 words)",
+        "The agent generates 20 trigger eval queries with a mix of should-trigger and should-not-trigger entries, where the should-not-trigger cases are near-misses (adjacent domain or ambiguous phrasing) rather than obviously irrelevant queries",
+        "The eval queries are concrete and specific — include realistic detail like file paths, framework names, or user context — not abstract requests like 'add error handling'",
+        "The agent does not list keyword variants in the description (e.g., does not enumerate 'logging', 'log this', 'add logs', 'set up logging') and instead uses a broad opener that catches those naturally"
+      ]
+    }
+  ]
+}

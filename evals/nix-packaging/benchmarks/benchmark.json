@@ -1,0 +1,64 @@
+{
+  "metadata": { "skill_name": "nix-packaging", "timestamp": "2026-07-22", "evals_run": ["buildgomodule-vendorhash-fakehash-bootstrap", "substituteinplace-buildphase-runhook", "wrapprogram-runtime-path-closure"], "runs_per_configuration": 1 },
+  "runs": [
+    { "eval_id": 1, "eval_name": "buildgomodule-vendorhash-fakehash-bootstrap", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Explains lib.fakeHash as a bootstrap sentinel that fails to reveal the hash", "passed": true, "evidence": "'a bootstrap sentinel that intentionally fails ... a sentinel, not a value you leave in place'"},
+        {"text": "Warns committing fakeHash or vendorHash=\"\" always fails", "passed": true, "evidence": "'Never commit vendorHash = lib.fakeHash or vendorHash = \"\" ... Both always fail'"},
+        {"text": "Shows subPackages = [ \"cmd/mytool\" ]", "passed": true, "evidence": "'subPackages = [ \"cmd/mytool\" ];'"},
+        {"text": "vendorHash = null only when no external deps", "passed": true, "evidence": "'vendorHash = null ... only when the module has no external dependencies'"},
+        {"text": "Avoids manual hash computation (fakeHash error-output is the workflow)", "passed": true, "evidence": "'the failing build is the workflow'"}
+      ] },
+    { "eval_id": 1, "eval_name": "buildgomodule-vendorhash-fakehash-bootstrap", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Explains lib.fakeHash as a bootstrap sentinel that fails to reveal the hash", "passed": true, "evidence": "'a throwaway sentinel ... aborts with a mismatch that prints the got: value'"},
+        {"text": "Warns committing fakeHash or vendorHash=\"\" always fails", "passed": true, "evidence": "'Never commit lib.fakeHash and never use vendorHash = \"\" ... guaranteed to fail'"},
+        {"text": "Shows subPackages = [ \"cmd/mytool\" ]", "passed": true, "evidence": "'subPackages = [ \"cmd/mytool\" ];'"},
+        {"text": "vendorHash = null only when no external deps", "passed": true, "evidence": "'vendorHash = null is the correct value when the module has no external dependencies'"},
+        {"text": "Avoids manual hash computation (fakeHash error-output is the workflow)", "passed": true, "evidence": "'do not try to compute the hash by hand ... the error-output bootstrap is the intended path'"}
+      ] },
+    { "eval_id": 2, "eval_name": "substituteinplace-buildphase-runhook", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Uses --replace-fail; explains --replace silently succeeds on missing pattern", "passed": true, "evidence": "'--replace ... silently succeeds when the pattern is absent ... you ship a binary that still contains /usr/bin/curl'"},
+        {"text": "Distinguishes ${curl} (Nix interpolation) from $out (shell var)", "passed": true, "evidence": "'${curl} is Nix interpolation ... $out, $CC ... are shell variables available only at build time'"},
+        {"text": "Shows runHook preBuild and runHook postBuild in overridden buildPhase", "passed": true, "evidence": "'runHook preBuild ... runHook postBuild'"},
+        {"text": "Explains omitting runHook silently breaks dependency setup hooks", "passed": true, "evidence": "'most common cause of mysterious build failures that appear after adding a dependency'"},
+        {"text": "Prefers postPatch over patchPhase override to compose with other patches", "passed": true, "evidence": "'postPatch is chosen over overriding patchPhase precisely so it stacks with patches'"}
+      ] },
+    { "eval_id": 2, "eval_name": "substituteinplace-buildphase-runhook", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Uses --replace-fail; explains --replace silently succeeds on missing pattern", "passed": true, "evidence": "'Plain --replace succeeds silently even when the search string is absent ... baked into your binary'"},
+        {"text": "Distinguishes ${curl} (Nix interpolation) from $out (shell var)", "passed": true, "evidence": "'${curl} is Nix string interpolation ... $out ... expanded at build time'"},
+        {"text": "Shows runHook preBuild and runHook postBuild in overridden buildPhase", "passed": true, "evidence": "'runHook preBuild ... runHook postBuild'"},
+        {"text": "Explains omitting runHook silently breaks dependency setup hooks", "passed": true, "evidence": "'classic it built fine until I added dependency X, now it fails mysteriously bug'"},
+        {"text": "Prefers postPatch over patchPhase override to compose with other patches", "passed": true, "evidence": "'Prefer postPatch over overriding patchPhase ... compose with declarative patches'"}
+      ] },
+    { "eval_id": 3, "eval_name": "wrapprogram-runtime-path-closure", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Places makeWrapper in nativeBuildInputs, not buildInputs", "passed": true, "evidence": "'makeWrapper goes in nativeBuildInputs ... not a library linked into anything'"},
+        {"text": "Uses lib.makeBinPath rather than manual store-path concatenation", "passed": true, "evidence": "'lib.makeBinPath [ curl jq ] ... Hand-concatenating store paths is error-prone'"},
+        {"text": "Explains wrapProgram embeds store paths; each PATH tool becomes a closure entry", "passed": true, "evidence": "'hardcodes the store path of every tool ... becomes a runtime closure entry. This is the most common source of unexpected closure size'"},
+        {"text": "Shows diagnostic sequence: file, strings | grep /nix/store/, nix why-depends", "passed": true, "evidence": "'file /nix/store/... ; strings ... | grep /nix/store/ ; nix why-depends'"},
+        {"text": "Avoids propagatedBuildInputs/buildInputs for shelled-out runtime tools", "passed": true, "evidence": "'Do NOT use buildInputs or propagatedBuildInputs for tools you only shell out to'"}
+      ] },
+    { "eval_id": 3, "eval_name": "wrapprogram-runtime-path-closure", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Places makeWrapper in nativeBuildInputs, not buildInputs", "passed": true, "evidence": "'makeWrapper goes in nativeBuildInputs, not buildInputs ... not a library linked into the output'"},
+        {"text": "Uses lib.makeBinPath rather than manual store-path concatenation", "passed": true, "evidence": "'Use lib.makeBinPath [ curl jq ] ... Do not hand-concatenate store paths'"},
+        {"text": "Explains wrapProgram embeds store paths; each PATH tool becomes a closure entry", "passed": true, "evidence": "'embeds those store paths literally ... single most common source of unexpectedly large closure'"},
+        {"text": "Shows diagnostic sequence: file, strings | grep /nix/store/, nix why-depends", "passed": true, "evidence": "'file ...; strings ... | grep /nix/store/; nix why-depends'"},
+        {"text": "Avoids propagatedBuildInputs/buildInputs for shelled-out runtime tools", "passed": true, "evidence": "'Do not use propagatedBuildInputs or buildInputs for tools the script only shells out to'"}
+      ] }
+  ],
+  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "delta": {"pass_rate": "+0%"} },
+  "notes": [
+    "NON-DISCRIMINATING on all 3 evals (15/15 both configs). Baseline independently produced fakeHash-bootstrap semantics, vendorHash=null vs \"\", --replace-fail rationale, ${curl}-vs-$out split, runHook guards, makeWrapper-in-nativeBuildInputs, lib.makeBinPath, closure-growth explanation, and the file/strings/why-depends diagnostic sequence. Base model knows Nix packaging deeply.",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

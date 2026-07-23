@@ -1,0 +1,44 @@
+{
+  "skill_name": "godot-shader",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm writing a spatial shader in Godot 4.6 that implements custom Lambert diffuse and Blinn-Phong specular using a light() function. I also want a Fresnel rim effect. The rim shows up fine in isolation but disappears completely when I add the light() function. What's wrong, and how do I implement all three effects correctly together?",
+      "expected_output": "The rim disappears because RIM and RIM_TINT in fragment() are silently ignored when light() is defined — Godot's built-in rim pipeline is bypassed entirely. You must implement Fresnel manually inside light() using the formula `intensity * pow(1.0 - max(0.0, dot(NORMAL, VIEW)), power)` and add it to DIFFUSE_LIGHT with +=. Lambert uses `max(0.0, dot(NORMAL, LIGHT)) * ATTENUATION` accumulated into DIFFUSE_LIGHT, and Blinn-Phong uses the halfway vector `normalize(LIGHT + VIEW)` with a shadow guard `float(dot(NORMAL, LIGHT) > 0.0)` accumulated into SPECULAR_LIGHT. Add `render_mode ambient_light_disabled` to isolate custom lighting.",
+      "files": [],
+      "expectations": [
+        "Identifies that RIM and RIM_TINT in fragment() are silently ignored when light() is defined, not a bug in the Fresnel formula itself",
+        "Implements Fresnel manually inside light() using `pow(1.0 - max(0.0, dot(NORMAL, VIEW)), power)` added to DIFFUSE_LIGHT with +=",
+        "Uses += (not =) for both DIFFUSE_LIGHT and SPECULAR_LIGHT, explaining that light() runs once per light and these variables accumulate across lights",
+        "Includes the Blinn-Phong shadow guard `float(dot(NORMAL, LIGHT) > 0.0)` to prevent specular highlights on back-lit surfaces",
+        "Recommends render_mode ambient_light_disabled to prevent Godot's ambient from accumulating on top of the custom lighting result"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm porting a Shadertoy water ripple effect to Godot 4.6 as a full-screen post-processing shader. The effect uses iTime, iResolution, and fragCoord. My port compiles but the effect appears upside-down and the ripples are in the wrong position. Walk me through the correct setup and coordinate mapping.",
+      "expected_output": "Post-processing in Godot requires a canvas_item shader on a ColorRect (Anchor: Full Rect) inside a CanvasLayer — effects only appear at runtime, not in the editor viewport. Map iTime to TIME, iResolution.xy to `1.0 / SCREEN_PIXEL_SIZE`, and fragCoord to FRAGCOORD.xy. The upside-down appearance is because Shadertoy uses Y-up (origin at bottom-left) while Godot uses Y-down (origin at top-left) — fix with `uv.y = 1.0 - uv.y`. The screen texture must be declared as `uniform sampler2D _ScreenTexture : hint_screen_texture, repeat_disable, filter_linear` and sampled with SCREEN_UV.",
+      "files": [],
+      "expectations": [
+        "Specifies the node setup as a canvas_item shader on a ColorRect with Anchor set to Full Rect inside a CanvasLayer, and notes the effect only appears at runtime",
+        "Maps iResolution.xy to `1.0 / SCREEN_PIXEL_SIZE` (not a custom uniform or VIEWPORT_SIZE, which is the spatial equivalent)",
+        "Identifies the Y-axis flip as the cause of the upside-down appearance and fixes it with `uv.y = 1.0 - uv.y`, explaining Shadertoy is Y-up while Godot is Y-down",
+        "Declares the screen texture with `hint_screen_texture, repeat_disable, filter_linear` and explains repeat_disable prevents tiling artifacts at screen edges",
+        "Notes that iMouse has no built-in equivalent and must be passed as a custom `uniform vec2 _Mouse` updated each frame from GDScript via set_shader_parameter"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm writing a spatial shader in Godot 4.6 that displaces terrain vertices using a heightmap texture. The displacement works but the lighting looks completely wrong — normals seem to be pointing in the original flat directions. I'm also getting visual artifacts that look like random bright pixels. What are the two bugs and how do I fix them?",
+      "expected_output": "The lighting bug is caused by not updating NORMAL after displacing VERTEX — the normal still points straight up from the original flat mesh. For a wave-based displacement, approximate the corrected normal from the derivative: `NORMAL = normalize(vec3(-dx, 1.0, 0.0))` where dx is the cosine derivative of the displacement function. The bright pixel artifacts come from using `texture()` in vertex() — implicit mip-level derivatives are unavailable in vertex(), so mip selection is undefined. Always use `textureLod(tex, uv, 0.0)` for deterministic heightmap sampling in vertex().",
+      "files": [],
+      "expectations": [
+        "Identifies the lighting bug as failing to update NORMAL after displacing VERTEX, and shows the corrected normal must be recalculated to match the displaced geometry",
+        "Uses `textureLod(_HeightMap, UV, 0.0)` instead of `texture(_HeightMap, UV)` in vertex(), explaining that implicit derivatives are unavailable in vertex() making texture() produce undefined results",
+        "Explains that VERTEX in vertex() is in object/model space, not world space, so displacement is applied before the MODEL_MATRIX transform",
+        "Avoids recommending texture() in vertex() for any purpose — consistently uses textureLod with explicit LOD 0",
+        "Notes that for production quality, baking normals into a normal map is preferable to approximating them from the displacement derivative"
+      ]
+    }
+  ]
+}

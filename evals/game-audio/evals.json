@@ -1,0 +1,44 @@
+{
+  "skill_name": "game-audio",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We're making a fast-paced arena shooter. The brief from the creative director says 'no synthesizers — everything must be organic instruments only.' Our composer keeps treating this as a temporary restriction and keeps sneaking in synth pads under acoustic layers. The music sounds fine but generic. How should we be thinking about this constraint?",
+      "expected_output": "Should identify the composer's behavior as the anti-pattern of treating a constraint as a problem to solve rather than a creative direction. Should apply Constraint-Driven Composition: the 'no synthesizers' restriction is a forcing function that, taken seriously, produces a sonic identity unique to this game. The music sounds generic precisely because the constraint was bypassed rather than explored. The answer should redirect toward building the sound under the constraint.",
+      "files": [],
+      "expectations": [
+        "Identifies the composer's workaround behavior as the anti-pattern — treating the constraint as a problem to solve rather than a creative direction",
+        "Names or applies Constraint-Driven Composition — the constraint is a forcing function that pushes away from genre defaults",
+        "Explains that the generic sound is a direct consequence of bypassing the constraint, not a coincidence",
+        "Recommends exploring the constraint seriously before adding the restricted element back, rather than finding a better workaround",
+        "Does not recommend relaxing or removing the constraint to fix the generic sound"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm the audio lead on a third-person action RPG. We have a rapid-fire crossbow weapon that fires bolts at roughly 8 per second. In playtesting, the crossbow sounds great in isolation but when the player fires it during combat music, the whole mix sounds dissonant and muddy. Our sound designer wants to EQ the crossbow differently and our composer wants to add a low-cut to the music during crossbow fire. Who's right, and what's the actual fix?",
+      "expected_output": "Should identify this as a Tonal Integration problem — the crossbow firing at 8 bolts/second produces a pitched tone (rhythm fast enough to register as pitch), and that tone clashes with the music's key. Neither EQ nor dynamic ducking is the fix because tonal integration cannot be fixed in post-processing. The correct approach is to identify the pitch the crossbow rhythm produces, then tune the crossbow to the music's root note or write the music in the key the crossbow dictates. This must be designed in from the start.",
+      "files": [],
+      "expectations": [
+        "Identifies that the crossbow's 8/second firing rate produces a pitched tone that clashes with the music's key — not just a mixing/EQ problem",
+        "Names or applies Tonal Integration — tonal SFX must be tuned to the music's root note (or vice versa)",
+        "States that EQ and dynamic ducking cannot fix tonal integration in post-processing",
+        "Recommends tuning the crossbow SFX to the music's key or writing the music around the SFX's pitch",
+        "Does not endorse the EQ or low-cut approach as the correct solution"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Our indie studio is building a linear dungeon crawler — one path, room-by-room combat, no branching objectives. Our audio programmer has spec'd out a full adaptive music system: 8 stems that layer in/out based on enemy count, player health, and combo multiplier. The composer loves it. I'm worried it's overkill. How do I evaluate whether we actually need this system?",
+      "expected_output": "Should apply the Reactive Audio framework: the first question is whether the gameplay structure actually needs dynamic music. Linear dungeon crawlers with room-by-room combat are exactly the structure where continuous driving music outperforms a complex adaptive system — the gameplay is predictable enough that layer changes interrupt the groove more than they enhance it. The correct diagnostic is to map the gameplay structure first, then ask whether the emotional context actually changes in ways that need musical response. For this structure, the answer is likely to simplify.",
+      "files": [],
+      "expectations": [
+        "Names or applies the Reactive Audio principle: match system complexity to gameplay complexity, not technical capability",
+        "Identifies linear room-by-room combat as the structure where continuous driving music outperforms a layered adaptive system",
+        "Frames the diagnostic as mapping gameplay structure first, then deciding how much reactivity it needs",
+        "Warns that complexity that interrupts the groove is worse than simplicity that sustains it",
+        "Does not endorse the 8-stem adaptive system as appropriate for this structure without qualification"
+      ]
+    }
+  ]
+}

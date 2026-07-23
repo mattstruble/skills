@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "skill_name": "godot",
+    "timestamp": "2026-07-22",
+    "evals_run": [
+      "player-scene-component-state-machine",
+      "bullet-hell-pool-flyweight",
+      "coroutine-safety-timeout"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "player-scene-component-state-machine",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5 },
+      "expectations": [
+        { "text": "HealthComponent as a separate Node child emitting typed signals health_changed(new_health: int, max_health: int) and died", "passed": true, "evidence": "HealthComponent extends Node with 'signal health_changed(new_health: int, max_health: int)' and 'signal died'." },
+        { "text": "StateMachine node owning State child nodes wired via @export, warning against a match block in _process", "passed": true, "evidence": "StateMachine owns Idle/Run/Air/Dash State children; 'each state @exports the player... Wire in the editor — no hardcoded state names'; explicitly 'not a match block in _process'." },
+        { "text": "Abilities as child Nodes extending a base Ability class with a _execute() hook and cooldown ticking in _process", "passed": false, "evidence": "FireballAbility extends Node directly with _cast() and a child Cooldown Timer — no base Ability class, no _execute() hook, cooldown via Timer not _process." },
+        { "text": "Signals connected in _ready using Callable syntax, not in _process", "passed": true, "evidence": "_ready: 'health_component.died.connect(_on_health_died)' and 'health_component.health_changed.connect(...)'." },
+        { "text": "Avoids get_node path strings; uses @export references or signals", "passed": true, "evidence": "'Every cross-node reference is an editor-wired @export or a signal, never a get_node(\"../..\") path.'" }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "player-scene-component-state-machine",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.4, "passed": 2, "failed": 3, "total": 5 },
+      "expectations": [
+        { "text": "HealthComponent as a separate Node child emitting typed signals health_changed and died", "passed": true, "evidence": "HealthComponent with 'signal health_changed(current: int, maximum: int)' and 'signal died'." },
+        { "text": "StateMachine node owning State child nodes wired via @export, warning against a match block in _process", "passed": false, "evidence": "States auto-collected from get_children() into a Dictionary and switched via string keys (transition_to(&\"Air\")); not @export-wired, and no warning against match in _process." },
+        { "text": "Abilities as child Nodes extending a base Ability class with a _execute() hook and cooldown ticking in _process", "passed": false, "evidence": "Uses a base Ability class but with _perform() (not _execute()) and a Timer-based cooldown (not _process ticking)." },
+        { "text": "Signals connected in _ready using Callable syntax, not in _process", "passed": true, "evidence": "_ready: 'health.died.connect(_on_died)'." },
+        { "text": "Avoids get_node path strings; uses @export references or signals", "passed": false, "evidence": "HUD uses 'get_tree().get_first_node_in_group(\"player\").get_node(\"HealthComponent\")' — runtime path/group lookup rather than @export injection." }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "bullet-hell-pool-flyweight",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Object Pool as pre-instantiated nodes toggled with visible=false and process_mode=PROCESS_MODE_DISABLED", "passed": true, "evidence": "deactivate(): hide() + 'process_mode = Node.PROCESS_MODE_DISABLED'; activate() re-enables. Pre-instantiated in _ready." },
+        { "text": "Flyweight as a custom Resource subclass with @export fields, same .tres shared across bullets", "passed": true, "evidence": "'BulletType extends Resource' with @export damage/speed/texture; 'assign the same .tres file to all bullets of that type.'" },
+        { "text": "Warns modifying a shared Resource changes all holders; duplicate() for per-instance", "passed": true, "evidence": "'never mutate a shared resource at runtime... If you genuinely need a mutated copy, stats.duplicate().'" },
+        { "text": "Pool resets bullet state when retrieving from the pool", "passed": true, "evidence": "'Reset every field in activate(). The #1 pool bug is a recycled bullet keeping the previous shot's position/velocity/lifetime.'" },
+        { "text": "Uses a typed Resource subclass, not a Dictionary or plain class for shared stats", "passed": true, "evidence": "BulletType Resource used throughout; no Dictionary. Also upgraded to an O(1) free-list over the skill's O(n) scan." }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "bullet-hell-pool-flyweight",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5 },
+      "expectations": [
+        { "text": "Object Pool as pre-instantiated nodes toggled with visible=false and process_mode=PROCESS_MODE_DISABLED", "passed": false, "evidence": "Toggles with hide() + set_physics_process(false) + set_deferred(\"monitoring\", false); does not use process_mode = PROCESS_MODE_DISABLED (different mechanism)." },
+        { "text": "Flyweight as a custom Resource subclass with @export fields, same .tres shared across bullets", "passed": true, "evidence": "'BulletType extends Resource' with @export; 'hand the same reference to every bullet of that type.'" },
+        { "text": "Warns modifying a shared Resource changes all holders; duplicate() for per-instance", "passed": true, "evidence": "'Never mutate a shared resource at runtime... duplicate() the resource... Don't set resource_local_to_scene = true.'" },
+        { "text": "Pool resets bullet state when retrieving from the pool", "passed": true, "evidence": "activate(pos, dir, stats) resets position, velocity, texture on retrieval." },
+        { "text": "Uses a typed Resource subclass, not a Dictionary or plain class for shared stats", "passed": true, "evidence": "BulletType Resource with preload'd .tres; no Dictionary." }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "coroutine-safety-timeout",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Requires an is_instance_valid(self) guard after every await", "passed": true, "evidence": "Guards after animation_finished and after the timer await: 'the node can be freed externally (scene change, level reset) while the coroutine is suspended.'" },
+        { "text": "Uses await get_tree().create_timer(0.5).timeout for the wait", "passed": true, "evidence": "'await get_tree().create_timer(0.5).timeout before queue_free().'" },
+        { "text": "Timeout pattern uses a responded flag set by CONNECT_ONE_SHOT on both signals, polled with await get_tree().process_frame", "passed": true, "evidence": "pressed/timed_out flags via CONNECT_ONE_SHOT on confirmed and the timer; 'while not pressed and not timed_out: await get_tree().process_frame'." },
+        { "text": "Notes Godot has no Promise.race equivalent", "passed": true, "evidence": "'Godot has no Promise.race, so you can't await two awaitables and take whichever fires first.'" },
+        { "text": "Includes is_instance_valid(self) inside the polling loop", "passed": true, "evidence": "Inside the while loop: 'if not is_instance_valid(self): return false'." }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "coroutine-safety-timeout",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5 },
+      "expectations": [
+        { "text": "Requires an is_instance_valid(self) guard after every await", "passed": false, "evidence": "Death-sequence code omits per-await self guards; explicitly argues 'Your final queue_free() is last, so it's safe here' and only guards references to other nodes." },
+        { "text": "Uses await get_tree().create_timer(0.5).timeout for the wait", "passed": true, "evidence": "'await get_tree().create_timer(0.5).timeout' then queue_free()." },
+        { "text": "Timeout pattern uses a responded flag set by CONNECT_ONE_SHOT on both signals, polled with await get_tree().process_frame", "passed": true, "evidence": "Button variant: state.done flag with CONNECT_ONE_SHOT on button.pressed and timer.timeout; 'while not state.done: await get_tree().process_frame'." },
+        { "text": "Notes Godot has no Promise.race equivalent", "passed": true, "evidence": "'There is no built-in await first of N signals, so you either poll a frame signal or race two real signals.'" },
+        { "text": "Includes is_instance_valid(self) inside the polling loop", "passed": false, "evidence": "Neither timeout variant checks is_instance_valid inside the while loop." }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": { "pass_rate": { "mean": 0.933, "stddev": 0.094 } },
+    "without_skill": { "pass_rate": { "mean": 0.6, "stddev": 0.163 } },
+    "delta": { "pass_rate": "+0.33" }
+  },
+  "notes": [
+    "Baseline answers were high quality (correct, idiomatic Godot) but consistently missed the skill's specific idioms: @export-wired state nodes vs string-keyed transitions, process_mode=PROCESS_MODE_DISABLED pooling, and is_instance_valid(self) after every await + inside poll loops.",
+    "Most discriminating: coroutine safety (S3) and the player-scene wiring conventions (S1). Bullet pool (S2) least discriminating — baseline knows pooling + Resource flyweight well.",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

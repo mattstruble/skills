@@ -1,0 +1,44 @@
+{
+  "skill_name": "knowledge-base",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We just decided to use Postgres for the job queue instead of Redis — we benchmarked both and Postgres handles our volume fine and removes a dependency. Log this decision.",
+      "expected_output": "The agent greps decisions/ for existing redis or job-queue notes, finds none, creates decisions/YYYY-MM-DD-postgres-for-job-queue.md with full YAML frontmatter (type: decision, tags including type/decision and status/active, decision_date, status: active), writes a body with Context/Decided/Why/Open sections, updates the relevant MOC to link the new note, and confirms briefly with the filename.",
+      "files": [],
+      "expectations": [
+        "The agent greps decisions/ before creating any file to check for an existing node on this topic",
+        "The created file is placed in decisions/ with a YYYY-MM-DD- prefix in the filename (e.g. decisions/2026-07-22-postgres-for-job-queue.md)",
+        "The frontmatter includes type: decision, status: active, decision_date, and tags containing type/decision",
+        "The note body uses the Context/Decided/Why/Open structure, not free-form prose",
+        "The agent updates a relevant MOC to link the new decision note and confirms with the exact filename"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a decision note at decisions/2024-11-03-use-redis-for-job-queue.md that we're now reversing — we're moving to Postgres. How should I handle the old decision note, and what do I need to update?",
+      "expected_output": "The agent explains the supersession pattern: set status: superseded on the old note, create the new decision note with supersedes: pointing to the old note's wikilink, and update any MOC entries. It does not recommend deleting the old note.",
+      "files": [],
+      "expectations": [
+        "The agent instructs setting status: superseded on the old note (decisions/2024-11-03-use-redis-for-job-queue.md), not deleting it",
+        "The agent specifies adding a supersedes: field to the new decision note containing the full-path wikilink [[decisions/2024-11-03-use-redis-for-job-queue.md]]",
+        "The agent mentions bumping updated: on the old note when its status field is changed",
+        "The agent instructs updating the relevant MOC to point to the new decision, not the superseded one",
+        "The agent avoids recommending deletion of the old decision note"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I want to add a note about my new collaborator Dana Chen — she's the ML infra lead at a partner org we're working with on the data pipeline project. What should the note look like and where does it go?",
+      "expected_output": "The agent describes creating people/dana-chen.md with YAML frontmatter (type: person, title, aliases, tags including type/person and role/collaborator, created, updated, related linking to the relevant org and topic notes), a brief prose body, and updating the people MOC. It uses full-path wikilinks for all cross-references.",
+      "files": [],
+      "expectations": [
+        "The agent places the note at people/dana-chen.md (kebab-case filename in the people/ folder)",
+        "The frontmatter includes type: person and tags containing type/person and role/collaborator",
+        "The related field uses full-path wikilinks (e.g. [[orgs/partner-org]], [[topics/data-pipeline]]) not bare [[dana-chen]] or markdown links",
+        "The agent specifies updating the people MOC (or a domain MOC) to include [[people/dana-chen|Dana Chen]] with a one-line context description",
+        "The agent avoids recommending markdown-style links ([Dana](./people/dana-chen.md)) for inter-wiki references"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{ "skill_name": "prd-writing", "evals": [
+  {
+    "id": 1,
+    "prompt": "I want to write a PRD for a new feature. The feature is a CSV export for a data dashboard. Just ask me all your questions at once so we can get through this quickly.",
+    "expected_output": "The skill refuses to batch questions and explains why, then begins the interview by asking exactly one question — the first Phase 1 question about primary users — with a recommended answer pre-populated from any available context. It does not emit a list of questions.",
+    "files": [],
+    "expectations": [
+      "Asks exactly one question, not a list of multiple questions",
+      "Provides a recommended answer alongside the question rather than leaving it blank or using a literal placeholder like [X]",
+      "Explicitly declines to batch questions and explains that one-at-a-time produces a better document",
+      "The first question targets problem/actors (Phase 1), not implementation details like technology choice or data format",
+      "Does not ask about class names, file layout, or internal architecture"
+    ]
+  },
+  {
+    "id": 2,
+    "prompt": "Here is a draft PRD section a colleague wrote. Review it and tell me what's wrong with it.\n\n---\n\n## Expected Behaviors\n\n### CSV Export\n- The ExportController class will call ExportService.generate() with a list of row IDs\n- ExportService will use Apache POI to write rows to a ByteArrayOutputStream\n- The frontend React component will POST to /api/export and receive a blob response\n- The export button will be disabled while the request is in-flight using a useState(false) hook\n\n---",
+    "expected_output": "The skill identifies that every bullet describes internal structure or mechanism rather than observable behavior. It flags class names (ExportController, ExportService), library choices (Apache POI), internal data types (ByteArrayOutputStream), and framework implementation details (useState hook) as PRD anti-patterns, and rewrites or suggests rewrites as plain behavioral statements from the user's perspective.",
+    "files": [],
+    "expectations": [
+      "Identifies that the bullets describe implementation structure (class names, library, internal types) rather than observable behavior",
+      "Flags at least one specific example — ExportController, ExportService, Apache POI, ByteArrayOutputStream, or useState — as a PRD anti-pattern",
+      "Explains the principle: a PRD should specify what the system does from the outside, not how it is built",
+      "Offers at least one rewritten behavioral statement in plain language (e.g., 'User can download filtered rows as a CSV file')",
+      "Avoids recommending that implementation details be moved to a design doc rather than simply removed from the PRD"
+    ]
+  },
+  {
+    "id": 3,
+    "prompt": "We've finished the interview. Here are the behaviors I captured:\n\n**File Upload**\n- User can upload a CSV file up to 50 MB\n- System rejects files that are not valid CSV format with an error message\n- Upload progress is shown while the file is being processed\n\n**Data Preview**\n- User can see the first 10 rows of the uploaded file before confirming import\n- User can map uploaded columns to system fields\n\nNow write the PRD.\n\n---\n\nDo NOT write any files to disk. Instead, show the exact markdown content you would write to docs/prd.md.",
+    "expected_output": "The skill first presents the captured behaviors grouped by capability area and asks 'What's missing?' before writing. Once confirmed, it produces a docs/prd.md using the exact template: Problem Statement, User Stories (3–8 entries), Expected Behaviors grouped by capability, Open Questions, and Out of Scope. Behaviors are flat plain-language statements with no implementation detail. The skill explicitly states it will not commit the file.",
+    "files": [],
+    "expectations": [
+      "Presents the captured behaviors and asks 'What's missing?' (the behavior coverage check) before writing the PRD",
+      "Output follows the exact template structure: Problem Statement, User Stories, Expected Behaviors, Open Questions, Out of Scope — in that order",
+      "Expected Behaviors are flat plain-language statements grouped under named capability headings, not nested sub-bullets or implementation steps",
+      "Explicitly states the file will be written to docs/prd.md and that committing is the user's responsibility — does not offer to commit",
+      "User Stories section contains 3–8 'As a [actor], I want [feature], so that [benefit]' entries, not a full specification"
+    ]
+  }
+] }

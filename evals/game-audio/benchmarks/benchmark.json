@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "skill_name": "game-audio",
+    "timestamp": "2026-07-22",
+    "evals_run": [
+      "constraint-driven-composition",
+      "tonal-integration-crossbow",
+      "reactive-audio-overkill"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "constraint-driven-composition",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Identifies the composer's workaround behavior as the anti-pattern", "passed": true, "evidence": "'treating no synths as a problem to solve instead of a creative direction to explore — which is the exact anti-pattern that produces genre-typical results.'" },
+        { "text": "Names or applies Constraint-Driven Composition — constraint as forcing function", "passed": true, "evidence": "'it's a forcing function... Constraints push you off the genre default, and the genre default is where generic lives.' Cites DOOM no-guitars." },
+        { "text": "Explains generic sound is a direct consequence of bypassing the constraint", "passed": true, "evidence": "'The generic sound you're hearing is the sound of that constraint being dodged, not the sound of the constraint being too tight.'" },
+        { "text": "Recommends exploring the constraint before adding the restricted element back", "passed": true, "evidence": "'build the entire foundation organic-only first; if a synth ever earns its way in later, it enters morphed with a game asset.'" },
+        { "text": "Does not recommend relaxing or removing the constraint", "passed": true, "evidence": "'stop treating no synths as something to endure until it gets lifted. It won't get lifted, and it's the best thing in the brief.'" }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "constraint-driven-composition",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Identifies the composer's workaround behavior as the anti-pattern", "passed": true, "evidence": "'it's generic because the composer keeps undermining it... The pad is the sound of not making a decision.'" },
+        { "text": "Names or applies Constraint-Driven Composition — constraint as forcing function", "passed": true, "evidence": "'Strip it out and commit, and the workarounds he's forced to invent become the score's fingerprint.' Frames constraint as differentiation bet." },
+        { "text": "Explains generic sound is a direct consequence of bypassing the constraint", "passed": true, "evidence": "'Sounds fine but generic is the exact signature of a half-honored constraint.'" },
+        { "text": "Recommends exploring the constraint before adding the restricted element back", "passed": true, "evidence": "'Give it one committed sprint of real organic problem-solving first' before considering any exception." },
+        { "text": "Does not recommend relaxing or removing the constraint", "passed": true, "evidence": "'commit to constraints... The right time to question no synths is after a genuine, full-hearted exploration' — commit-first, not relax." }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "tonal-integration-crossbow",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Identifies a pitched-tone clash with the music's key, not just a mixing/EQ problem", "passed": true, "evidence": "Identifies dissonance as a pitch clash (per-shot transient's dominant pitch landing off-key) and even corrects the premise: 8Hz repetition is below pitch perception, so it's the transient pitch, not fire-rate drone." },
+        { "text": "Names or applies Tonal Integration", "passed": true, "evidence": "'a Tonal Integration failure, and the governing principle is blunt: it cannot be fixed in the mix.'" },
+        { "text": "States EQ and dynamic ducking cannot fix tonal integration in post-processing", "passed": true, "evidence": "Quotes the principle: 'you're fixing a problem that shouldn't be there in the first place'; 'EQ does nothing for dissonance — you cannot equalize a pitch into the right key.'" },
+        { "text": "Recommends tuning the crossbow SFX to the music's key or writing music around the SFX", "passed": true, "evidence": "'pitch-shift the asset so that pitch sits on the root, fifth, or octave' or 'let the SFX constraint dictate the music.'" },
+        { "text": "Does not endorse the EQ or low-cut approach as the correct solution", "passed": true, "evidence": "'put down the mix tools. The composer's low-cut is aimed at the wrong track, and the sound designer's EQ can't touch pitch.'" }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "tonal-integration-crossbow",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.4, "passed": 2, "failed": 3, "total": 5 },
+      "expectations": [
+        { "text": "Identifies a pitched-tone clash with the music's key, not just a mixing/EQ problem", "passed": true, "evidence": "'dissonant = a pitch clash... comb-filters into a buzzy, tonal artifact, and the bolt's metallic ring adds a resonant pitch.'" },
+        { "text": "Names or applies Tonal Integration", "passed": false, "evidence": "Frames the root cause as periodicity/comb-filter ('machine-gun effect') and leads with 'de-tonalize'; tuning to root/fifth appears only as a secondary 'if the key is stable' option, not the Tonal Integration principle." },
+        { "text": "States EQ and dynamic ducking cannot fix tonal integration in post-processing", "passed": false, "evidence": "Opposite: recommends 'frequency-targeted sidechain ducking / dynamic EQ' as step 3 of the fix and calls EQ 'necessary.'" },
+        { "text": "Recommends tuning the crossbow SFX to the music's key or writing music around the SFX", "passed": true, "evidence": "'tune the crossbow's dominant tone to the root or fifth of that key' (offered as the stable-key alternative)." },
+        { "text": "Does not endorse the EQ or low-cut approach as the correct solution", "passed": false, "evidence": "Endorses the sound designer's EQ ('good for the mud... necessary') and dynamic ducking as part of the correct fix, contra the skill's design-it-in stance." }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "reactive-audio-overkill",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Names or applies the Reactive Audio principle: match system complexity to gameplay complexity", "passed": true, "evidence": "'the textbook Reactive Audio anti-pattern... The governing principle is match system complexity to gameplay complexity.'" },
+        { "text": "Identifies linear room-by-room combat as the structure where continuous driving music wins", "passed": true, "evidence": "'That's the DOOM (2016) structure exactly... Linear combat wants music that drives continuously, like hitting play on an album.'" },
+        { "text": "Frames the diagnostic as mapping gameplay structure first", "passed": true, "evidence": "Runs each proposed input (enemy count, combo, health) through the emotional-context test and maps the transitions that matter." },
+        { "text": "Warns complexity that interrupts the groove is worse than simplicity that sustains it", "passed": true, "evidence": "Verbatim: 'complexity that interrupts the groove is worse than simplicity that sustains it.'" },
+        { "text": "Does not endorse the 8-stem system without qualification", "passed": true, "evidence": "'two of the three proposed drivers are continuous variables that will actively hurt the groove'; recommends prototyping the simple version and A/B testing." }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "reactive-audio-overkill",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5 },
+      "expectations": [
+        { "text": "Names or applies the Reactive Audio principle: match system complexity to gameplay complexity", "passed": true, "evidence": "'Count perceptible states, not stems'; adaptive music earns its cost only when states map to something the player cares about." },
+        { "text": "Identifies linear room-by-room combat as the structure where continuous driving music wins", "passed": true, "evidence": "'A linear crawler is the textbook case for horizontal re-sequencing, not deep vertical layering... you don't need continuous 8-layer response when the game itself is discrete.'" },
+        { "text": "Frames the diagnostic as mapping gameplay structure first", "passed": true, "evidence": "'Enumerate the state combinations the spec produces... list every state the system can emit' before judging the system." },
+        { "text": "Warns complexity that interrupts the groove is worse than simplicity that sustains it", "passed": false, "evidence": "Argues from perceptibility and production cost; does not articulate that mid-combat layer churn interrupts the groove — the specific principle is absent." },
+        { "text": "Does not endorse the 8-stem system without qualification", "passed": true, "evidence": "'Build the 3-4 state crossfade version first... Don't commit the composer to 8 interlocking stems.'" }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": { "pass_rate": { "mean": 1.0, "stddev": 0.0 } },
+    "without_skill": { "pass_rate": { "mean": 0.733, "stddev": 0.249 } },
+    "delta": { "pass_rate": "+0.27" }
+  },
+  "notes": [
+    "Discriminator: Tonal Integration (S2) is the strongest — baseline diagnoses periodicity/comb-filter and endorses dynamic EQ/ducking, missing the skill's 'cannot be fixed in post' principle. Reactive Audio (S3) moderately discriminating on the groove-interruption principle.",
+    "constraint-driven-composition (S1) is NON-discriminating (both 1.0): the model independently reaches 'commit to the constraint, the workaround is why it sounds generic' without the skill.",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

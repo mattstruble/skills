@@ -1,0 +1,41 @@
+{ "skill_name": "logql", "evals": [
+  {
+    "id": 1,
+    "prompt": "I'm querying Sonarr JSON logs in Loki to find all lines where the HTTP response time exceeds 2 seconds. My current query is: {container=\"sonarr\"} | json | response_time > 2s — but I'm getting empty results and I see __error__ labels appearing. What's wrong and how do I fix it?",
+    "expected_output": "The empty results are caused by parser failures: lines that fail `| json` parsing produce `__error__` labels and are excluded from downstream label filters, so the `response_time > 2s` filter sees nothing. Debug by adding `| __error__ != \"\"` after the parser to inspect failing lines — common causes are startup banners or non-JSON lines mixed into the stream. Fix by adding `|= \"{\"` as a line filter before `| json` to pre-filter to JSON-only lines, then extract only the needed field with `| json response_time` rather than parsing all fields.",
+    "files": [],
+    "expectations": [
+      "Identifies __error__ labels as the signal that parser failures are silently dropping lines from downstream filters",
+      "Recommends `| __error__ != \"\"` as the diagnostic step to inspect failing lines",
+      "Recommends adding `|= \"{\"` as a line filter before `| json` to exclude non-JSON lines (startup banners, mixed formats)",
+      "Recommends extracting only the needed field with `| json response_time` rather than bare `| json`",
+      "Places the line filter (`|= \"{\"`) before the parser, not after, consistent with the skill's pipeline ordering rule"
+    ]
+  },
+  {
+    "id": 2,
+    "prompt": "I want a LogQL metric query for a Grafana dashboard panel showing the per-minute error rate for each container on my homelab host, with the top 5 containers highlighted. The query is timing out. How should I write this correctly and efficiently?",
+    "expected_output": "Use `topk(5, sum by (container) (rate({host=\"homelab\"} |= \"error\" [1m])))` — the `|= \"error\"` line filter runs as a distributed grep before any parsing, which is the cheapest filter and dramatically reduces data volume before aggregation. Avoid grouping `by(container)` on a high-cardinality label like request IDs or IPs; `container` is acceptable here. If the query still times out, add a more specific exact-match label to the stream selector (e.g., `compose_service`) to narrow the index lookup, and consider a recording rule for a frequently-loaded dashboard panel.",
+    "files": [],
+    "expectations": [
+      "Places `|= \"error\"` as a line filter before any parser stage, not after, citing that line filters are the cheapest distributed grep",
+      "Uses `topk(5, ...)` wrapping `sum by (container)` matching the skill's example pattern exactly",
+      "Includes at least one exact-match label in the stream selector and explains this is the primary index lookup",
+      "Warns against grouping by high-cardinality labels (IPs, user IDs, request IDs) as a timeout/performance cause",
+      "Mentions recording rules as the fix for frequently-loaded dashboard panels"
+    ]
+  },
+  {
+    "id": 3,
+    "prompt": "Radarr added a movie but I can't tell if Prowlarr actually searched for it or if the download got stuck in qBittorrent. I don't have distributed tracing set up. How do I correlate activity across these three services in Loki?",
+    "expected_output": "Since off-the-shelf containers like Radarr, Prowlarr, and qBittorrent have no OpenTelemetry instrumentation, use shared domain identifiers as the homelab substitute for distributed tracing. Query `{container=~\"radarr|prowlarr|qbittorrent\"} |= \"<tmdb-or-download-hash>\"` to pull all log lines across services that reference the same movie or download. Use the TMDB ID if you know it (`|= \"tmdbId=12345\"`), or the download hash once Radarr hands off to qBittorrent. The `|~` operator can do a case-insensitive title search (`|~ \"(?i)inception\"`) but is slower — prefer an exact `|=` match on an ID when available.",
+    "files": [],
+    "expectations": [
+      "Explicitly names the lack of OpenTelemetry instrumentation in off-the-shelf containers as the reason standard distributed tracing is unavailable",
+      "Recommends correlating by shared domain identifiers (TMDB ID, download hash, NZB ID) as the homelab substitute for distributed traces",
+      "Uses `container=~\"radarr|prowlarr|qbittorrent\"` with a regex stream selector to span multiple services in one query",
+      "Prefers `|=` exact-match line filter on an ID over `|~` regex for performance, explaining `|~` is slower",
+      "Avoids recommending OpenTelemetry instrumentation or trace injection as a solution for these containers"
+    ]
+  }
+] }

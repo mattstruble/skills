@@ -1,0 +1,40 @@
+{ "skill_name": "promql", "evals": [
+  {
+    "id": 1,
+    "prompt": "I want to alert when my homelab's root filesystem will fill up within 24 hours. I wrote this rule: `alert: DiskFillingSoon` with `expr: node_filesystem_avail_bytes{mountpoint=\"/\"} < 10737418240` and `for: 1h`. It fires too late — by the time it fires I only have a few hours left. How should I rewrite this to give me a full day of lead time?",
+    "expected_output": "Replace the threshold expression with `predict_linear(node_filesystem_avail_bytes{mountpoint=\"/\"}[6h], 24*3600) < 0`, which fits a linear regression over the last 6 hours and extrapolates 24 hours forward — the result going negative means the disk is projected to be full within 24h. Use a 6h–24h regression window for disk (slow trends); too short a window produces noisy predictions. Also shorten `for:` to `15m` — a 1h `for:` with a 24h prediction horizon means the alert only fires after the condition has been true for an hour, consuming your lead time.",
+    "files": [],
+    "expectations": [
+      "Replaces the static threshold with `predict_linear(...[6h], 24*3600) < 0` and explains the `< 0` means projected full within 24h",
+      "Recommends a 6h–24h regression window for disk trends and explains why too-short windows produce noisy results",
+      "Identifies the `for: 1h` duration as the cause of late firing and recommends shortening it (e.g., `for: 15m`)",
+      "Explains that a long `for:` consumes the prediction lead time, leaving less than the intended horizon when the alert fires",
+      "Avoids recommending a simple byte-threshold approach as the primary fix"
+    ]
+  },
+  {
+    "id": 2,
+    "prompt": "I'm building a Grafana panel for 95th-percentile HTTP request latency across all my homelab app containers. I wrote: `histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))`. The panel shows a single flat line instead of per-container percentiles. What's wrong and how do I fix it?",
+    "expected_output": "The query aggregates all bucket series into one before computing the quantile, losing the per-container dimension. Fix by adding `sum by (le, job)` around the `rate(...)` call: `histogram_quantile(0.95, sum by (le, job) (rate(http_request_duration_seconds_bucket[5m])))`. The `le` label is mandatory — it defines the histogram bucket boundaries and must be preserved in the aggregation; dropping it produces a meaningless or errored result. Including `job` (or `container`) in the `by` clause gives you one quantile series per container.",
+    "files": [],
+    "expectations": [
+      "Identifies the missing `by (le)` in the aggregation as the root cause — `le` must be preserved for histogram_quantile to work correctly",
+      "Adds `sum by (le, job)` (or `le, container`) around the `rate()` call, not outside `histogram_quantile`",
+      "Applies `rate()` to the `_bucket` counter before aggregating, not to the already-aggregated series",
+      "Explains that omitting `le` from the `by` clause produces a meaningless or errored quantile result",
+      "Explains that adding `job` or `container` to the `by` clause is what produces per-container series in the panel"
+    ]
+  },
+  {
+    "id": 3,
+    "prompt": "I have a Sonarr container on my homelab. I want an alert that fires when Sonarr is down. I wrote: `absent(up{job=\"sonarr\"})` with `for: 5m`. My colleague says I should use `up{job=\"sonarr\"} == 0` instead. Which is correct, and when does each fire?",
+    "expected_output": "`absent(up{job=\"sonarr\"})` fires only when the entire job disappears from Prometheus scrape targets — meaning the exporter itself is unreachable (container crashed, network down). `up{job=\"sonarr\"} == 0` fires when the exporter is reachable but reports the service as down (exporter running, Sonarr process dead). For a single-instance container where the exporter and service are co-located, either works, but they detect different failure modes. If you have multiple Sonarr instances, `absent()` won't fire when one instance is down but others are still up — use `up{job=\"sonarr\"} == 0` with `for: 5m` for per-instance alerting.",
+    "files": [],
+    "expectations": [
+      "Distinguishes `absent()` (entire job missing from scrape) from `up == 0` (exporter reachable but service down) as detecting different failure modes",
+      "Explains that `absent(up{job=\"sonarr\"})` will NOT fire if one instance is down but other instances in the same job are still up",
+      "Recommends `up{job=\"sonarr\"} == 0` with `for: 5m` for per-instance alerting when multiple instances exist",
+      "Avoids recommending `absent_over_time` as the primary fix for 'service down' (the skill reserves it for missing scrape data, not `up == 0`)"
+    ]
+  }
+] }

@@ -1,0 +1,41 @@
+{ "skill_name": "homelab-monitoring", "evals": [
+  {
+    "id": 1,
+    "prompt": "I'm running Plex, Sonarr, and Radarr on Docker Compose and I want to add log collection so I can search container logs in Grafana. What agent should I use and how do I configure it?",
+    "expected_output": "Use Alloy (not the Docker Loki log driver) as a separate container in the Compose stack. Configure it with a discovery.docker block pointing at the Docker socket, a discovery.relabel block to extract container and service labels, a loki.source.docker block to collect logs, and a loki.write block targeting http://loki:3100/loki/api/v1/push. Mount /var/run/docker.sock and /var/lib/docker/containers read-only. The Docker Loki log driver should be avoided because it sends logs synchronously and will block container stdout if Loki is unreachable.",
+    "files": [],
+    "expectations": [
+      "Recommends Alloy, not the Docker Loki log driver",
+      "Explains that the Docker Loki log driver blocks container stdout when Loki is unreachable, causing containers to hang",
+      "Shows a discovery.docker block with host = \"unix:///var/run/docker.sock\" in Alloy's .alloy config syntax",
+      "Shows a loki.source.docker block forwarding to loki.write.default.receiver",
+      "Mounts /var/run/docker.sock and /var/lib/docker/containers read-only into the Alloy container"
+    ]
+  },
+  {
+    "id": 2,
+    "prompt": "I deployed kube-prometheus-stack on my k3s homelab and created a ServiceMonitor for my Sonarr exporter, but Prometheus shows 0 targets and never scrapes it. What's wrong?",
+    "expected_output": "The default kube-prometheus-stack configuration only discovers ServiceMonitors that carry the same Helm release labels, silently ignoring any you create manually. Fix this by setting serviceMonitorSelectorNilUsesHelmValues: false, podMonitorSelectorNilUsesHelmValues: false, and ruleSelectorNilUsesHelmValues: false under prometheus.prometheusSpec in your Helm values, then upgrading the release. This is the #1 gotcha with kube-prometheus-stack.",
+    "files": [],
+    "expectations": [
+      "Identifies serviceMonitorSelectorNilUsesHelmValues as the root cause, not a networking or RBAC issue",
+      "Specifies all three selector flags: serviceMonitorSelectorNilUsesHelmValues, podMonitorSelectorNilUsesHelmValues, and ruleSelectorNilUsesHelmValues set to false",
+      "Places the fix under prometheus.prometheusSpec in Helm values (not at the top level)",
+      "Notes that without the fix Prometheus silently ignores manually created ServiceMonitors even though kubectl get servicemonitor shows them",
+      "Avoids recommending manual label matching or recreating the ServiceMonitor as the fix"
+    ]
+  },
+  {
+    "id": 3,
+    "prompt": "I want to set up alerting on my homelab monitoring stack so critical alerts go to Discord and warnings go to email. Show me the Alertmanager config.",
+    "expected_output": "Configure alertmanager.yml with a route that groups by alertname and job, sets group_wait: 30s, group_interval: 5m, and repeat_interval: 4h, with a default receiver of discord. Add a child route matching severity: critical to the discord receiver and severity: warning to the email receiver. The discord receiver uses discord_configs with a webhook_url (reference $DISCORD_WEBHOOK_URL from the environment). The email receiver uses email_configs with smarthost, auth_username, and auth_password. Never commit the webhook URL or SMTP password — use .env file substitution or a Kubernetes Secret mounted via webhook_url_file.",
+    "files": [],
+    "expectations": [
+      "Sets repeat_interval: 4h (not a generic value like 1h or 24h)",
+      "Uses discord_configs under the discord receiver (not a generic webhook_configs block)",
+      "Routes severity: critical to discord and severity: warning to email as separate child routes",
+      "Keeps the webhook URL and SMTP password out of the config file — references $DISCORD_WEBHOOK_URL via env substitution or webhook_url_file for k3s",
+      "Includes group_by: ['alertname', 'job'] matching the skill's reference config"
+    ]
+  }
+] }

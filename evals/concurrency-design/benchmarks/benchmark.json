@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "skill_name": "concurrency-design",
+    "timestamp": "2026-07-22",
+    "evals_run": [
+      "game-server-actor-fault-isolation",
+      "kafka-pipeline-backpressure",
+      "http2-state-machine-vs-coroutines"
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "game-server-actor-fault-isolation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Identifies actors or goroutine-per-match with explicit trap boundaries as the right unit of concurrency for long-lived stateful entities, not a shared thread pool", "passed": true, "evidence": "'actor-per-match, shared-nothing' — 'each match is a long-lived stateful entity with an independent lifecycle — the canonical actor use case.'" },
+        { "text": "Explains that Go goroutines have no fault boundary by default and prescribes defer/recover in each match goroutine", "passed": true, "evidence": "'A goroutine's fault boundary is the entire program: an unrecovered panic kills all 5,000 matches.' Prescribes defer/recover trap boundary signaling a supervisor. Also notes recover cannot catch concurrent-map-write fatals." },
+        { "text": "Recommends one-for-one supervision strategy with justification that matches are independent", "passed": true, "evidence": "'Supervision strategy: one-for-one. Matches are independent — a crash in one restarts only that one. (One-for-all would let match #4999 crashing nuke the other 4,999.)'" },
+        { "text": "Prescribes bounded mailboxes or channels, explaining unbounded queues hide backpressure and cause unbounded memory growth", "passed": true, "evidence": "'Bounded inbox -> backpressure. If a match falls behind 20Hz, a full inbox signals it rather than growing unbounded.'" },
+        { "text": "Addresses topology: recommends thread-per-core sharding by match ID rather than tuning the existing mutex", "passed": true, "evidence": "'sharded state-machine worker pool (thread-per-core discipline)... Each worker owns a partition of matches (shared-nothing across workers)' — explicitly attacks GC/lock contention structurally vs mutex tuning." }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "game-server-actor-fault-isolation",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5 },
+      "expectations": [
+        { "text": "Identifies actors or goroutine-per-match with explicit trap boundaries as the right unit of concurrency for long-lived stateful entities, not a shared thread pool", "passed": true, "evidence": "'an actor is a goroutine that owns state and receives messages on a channel. Your current goroutine-per-match is already 90% of an actor model.'" },
+        { "text": "Explains that Go goroutines have no fault boundary by default and prescribes defer/recover in each match goroutine", "passed": true, "evidence": "Per-match recover() with teardown; explains recover cannot catch concurrent map writes / stack overflow / OOM." },
+        { "text": "Recommends one-for-one supervision strategy with justification that matches are independent", "passed": false, "evidence": "Adds per-match recover + teardown but never names a supervision strategy (one-for-one vs one-for-all) or a supervisor with restart budget; treats isolation as ad-hoc teardown." },
+        { "text": "Prescribes bounded mailboxes or channels, explaining unbounded queues hide backpressure and cause unbounded memory growth", "passed": true, "evidence": "'Use a bounded inbox and decide a drop policy — for a real-time game, dropping stale input under backpressure is usually correct.'" },
+        { "text": "Addresses topology: recommends thread-per-core sharding by match ID rather than tuning the existing mutex", "passed": false, "evidence": "Mentions sharding across GOMAXPROCS workers only as optional future work ('you likely don't need this yet') rather than as the topology answer to lock contention; leads with process-level isolation instead." }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "kafka-pipeline-backpressure",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Diagnoses unbounded task spawning (option A) as the root cause of OOM crashes", "passed": true, "evidence": "'This is where A dies... an unbounded set of live tasks... definitionally an unbounded queue... Your OOM crashes are exactly this failure mode.'" },
+        { "text": "Recommends bounded channels and explains the backpressure propagation chain to the Kafka consumer", "passed": true, "evidence": "'a full downstream channel blocks the upstream send().await, and pressure propagates all the way back to the consumer, which stops polling Kafka.'" },
+        { "text": "Prescribes mandatory timeouts on every enrichment request, naming the permanent-hang failure mode", "passed": true, "evidence": "'a missing timeout converts a transient API failure into a permanent hang, and 2,500 hung calls is instant collapse.'" },
+        { "text": "Addresses control vs data plane separation for the failure signal", "passed": true, "evidence": "Circuit-breaker fast-fail + divert to Kafka retry/dead-letter topic keeps the failure-handling path independent of the congested data channel." },
+        { "text": "Evaluates thread-per-core (option C) with the skill's criteria and explains it doesn't resolve backpressure", "passed": true, "evidence": "'thread-per-core... optimizes a bottleneck you don't have and tightens the coupling you specifically want to break' — a slow API stalls consumer+writer on the same shard." }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "kafka-pipeline-backpressure",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5 },
+      "expectations": [
+        { "text": "Diagnoses unbounded task spawning (option A) as the root cause of OOM crashes", "passed": true, "evidence": "'Option A (task-per-message): no concurrency ceiling... This is almost certainly the source of your OOM crashes today.'" },
+        { "text": "Recommends bounded channels and explains the backpressure propagation chain to the Kafka consumer", "passed": true, "evidence": "'the writer's inbox fills -> enrichment's tx.send().await blocks -> the semaphore stays saturated -> the parser blocks -> the poll loop stops pulling.' Also prescribes pause/resume on partitions." },
+        { "text": "Prescribes mandatory timeouts on every enrichment request, naming the permanent-hang failure mode", "passed": true, "evidence": "'A hung call must never hold a permit forever — otherwise one bad TCP connection slowly drains your 2,500 slots and the whole pipeline seizes.'" },
+        { "text": "Addresses control vs data plane separation for the failure signal", "passed": true, "evidence": "Circuit breaker + bulkhead semaphore + retry/dead-letter topic degrade policy so a sustained outage doesn't stall the consumer." },
+        { "text": "Evaluates thread-per-core (option C) with the skill's criteria and explains it doesn't resolve backpressure", "passed": true, "evidence": "Derives Little's Law (2,500 in-flight); '32 cores give you 640 msg/s total — off by ~80x' and notes it couples the stages you want decoupled." }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "http2-state-machine-vs-coroutines",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5 },
+      "expectations": [
+        { "text": "Recommends state machine encoding over coroutines specifically because it eliminates the colored function problem", "passed": true, "evidence": "Cites the skill's unit table: 'State machine encoding... Coroutine-like behavior without colored functions or runtime complexity' vs 'Coroutines — Fault boundary: caller, no isolation.'" },
+        { "text": "Explains concrete advantages of explicit state machines (no hidden frames, state in struct, per-struct fault isolation)", "passed": true, "evidence": "'no hidden frames to unwind — error handling is just another transition'; per-connection struct with no cross-connection pointers guarantees one bad connection can't corrupt neighbors." },
+        { "text": "Recommends event loop topology (epoll/io_uring) for 50k mostly-idle connections", "passed": true, "evidence": "'event-loop-per-core — one OS thread pinned per core running its own epoll/io_uring loop' citing 'Thousands of idle connections, minimal compute -> event loop.'" },
+        { "text": "Prescribes offloading CPU-intensive work (TLS, HPACK) to a separate thread pool rather than blocking the event loop", "passed": false, "evidence": "Chose event-loop-per-core with crypto running on each core (AES-NI) and did not prescribe a separate CPU-offload pool; the skill's hybrid event-loop+offload pattern was not applied." },
+        { "text": "Distinguishes when coroutines are appropriate vs when state machines win, using decision criteria", "passed": true, "evidence": "'coroutines are fine for simple request-response handlers and state machines win for complex multi-step protocols with many intermediate states. HTTP/2 is squarely the latter.'" }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "http2-state-machine-vs-coroutines",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.4, "passed": 2, "failed": 3, "total": 5 },
+      "expectations": [
+        { "text": "Recommends state machine encoding over coroutines specifically because it eliminates the colored function problem", "passed": false, "evidence": "Argues the coloring fear 'does not apply' in C (stackful coroutines don't color), so it does NOT make the eliminates-coloring case; recommends B primarily on memory grounds." },
+        { "text": "Explains concrete advantages of explicit state machines (no hidden frames, state in struct, per-struct fault isolation)", "passed": false, "evidence": "Focuses on memory (stack cost, SSL buffers) and 'no scheduler'; does not enumerate the skill's advantages — serializable/checkpointable state, testable by injecting event sequences." },
+        { "text": "Recommends event loop topology (epoll/io_uring) for 50k mostly-idle connections", "passed": true, "evidence": "'N event loops = N cores, SO_REUSEPORT... epoll/kqueue... io_uring' — nginx/Envoy worker model." },
+        { "text": "Prescribes offloading CPU-intensive work (TLS, HPACK) to a separate thread pool rather than blocking the event loop", "passed": false, "evidence": "Pins each connection to one thread and runs crypto there; reserves coroutines for the handler layer but does not prescribe a separate CPU-offload pool for TLS/HPACK." },
+        { "text": "Distinguishes when coroutines are appropriate vs when state machines win, using decision criteria", "passed": true, "evidence": "'When would A actually win? If your server were mostly an application gateway... lower connection counts' — distinguishes the regimes." }
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": { "pass_rate": { "mean": 0.933, "stddev": 0.094 } },
+    "without_skill": { "pass_rate": { "mean": 0.667, "stddev": 0.249 } },
+    "delta": { "pass_rate": "+0.27" }
+  },
+  "notes": [
+    "Discriminator: fault-isolation supervision strategy (one-for-one, named) and state-machine-specific advantages (coloring elimination, serializable state). Baseline reaches the single-owner-goroutine and bounded-channel patterns but misses the skill's named supervision and state-machine framing.",
+    "kafka-pipeline-backpressure is NON-discriminating (both 5/5): the model independently derives Little's Law, backpressure chains, timeouts, and circuit breakers for Rust/Tokio pipelines without the skill.",
+    "runs_per_configuration=1; single-run benchmark, no variance across repeated runs measured."
+  ]
+}

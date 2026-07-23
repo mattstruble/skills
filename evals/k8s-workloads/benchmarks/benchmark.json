@@ -1,0 +1,64 @@
+{
+  "metadata": { "skill_name": "k8s-workloads", "timestamp": "2026-07-22", "evals_run": ["zero-downtime-rolling-update-deployment", "one-time-migration-job", "cronjob-concurrency-backup"], "runs_per_configuration": 1 },
+  "runs": [
+    { "eval_id": 1, "eval_name": "zero-downtime-rolling-update-deployment", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "maxUnavailable: 0 prevents replica count dropping during rollout", "passed": true, "evidence": "'pool never drops below the replicas count (3)'"},
+        {"text": "readinessProbe (not liveness/minReadySeconds alone); without it traffic hits unready pods", "passed": true, "evidence": "'without a readinessProbe, a Pod is added to Service endpoints the moment its container starts'"},
+        {"text": "minReadySeconds non-zero; reduces but doesn't eliminate unready-traffic window", "passed": true, "evidence": "minReadySeconds: 20; 'reduces but does not eliminate the unready-traffic window'"},
+        {"text": "kubernetes.io/change-cause annotation for rollout history", "passed": true, "evidence": "change-cause: v1.0.0 '# populates kubectl rollout history'"},
+        {"text": "Warns maxUnavailable:0 hangs if new Pod never ready; progressDeadlineSeconds + rollout undo", "passed": true, "evidence": "'hangs indefinitely if the new Pod never becomes Ready'; progressDeadlineSeconds; 'kubectl rollout undo'"}
+      ] },
+    { "eval_id": 1, "eval_name": "zero-downtime-rolling-update-deployment", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "maxUnavailable: 0 prevents replica count dropping during rollout", "passed": true, "evidence": "'available Pods never drops below the desired replica count'"},
+        {"text": "readinessProbe (not liveness/minReadySeconds alone); without it traffic hits unready pods", "passed": true, "evidence": "'Without a readiness probe, the Service sends traffic the moment the container starts'"},
+        {"text": "minReadySeconds non-zero; reduces but doesn't eliminate unready-traffic window", "passed": true, "evidence": "minReadySeconds: 15; 'reduces but does not eliminate the unready-traffic window'"},
+        {"text": "kubernetes.io/change-cause annotation for rollout history", "passed": true, "evidence": "'populates the CHANGE-CAUSE column in kubectl rollout history'"},
+        {"text": "Warns maxUnavailable:0 hangs if new Pod never ready; progressDeadlineSeconds + rollout undo", "passed": true, "evidence": "'if the new Pod never becomes Ready... it just hangs. Set progressDeadlineSeconds'; 'kubectl rollout undo'"}
+      ] },
+    { "eval_id": 2, "eval_name": "one-time-migration-job", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Recommends a Job (not Deployment/init container)", "passed": true, "evidence": "'Use a Job, not a Deployment... and not an init container'"},
+        {"text": "restartPolicy: Never (keeps failed pod logs) vs OnFailure overwrite", "passed": true, "evidence": "'OnFailure restarts the container in-place, which can overwrite the logs'"},
+        {"text": "ttlSecondsAfterFinished (else Jobs/pods accumulate)", "passed": true, "evidence": "ttlSecondsAfterFinished: 3600; 'accumulate... until someone deletes them manually'"},
+        {"text": "backoffLimit low (0/1), not default 6", "passed": true, "evidence": "backoffLimit: 1; 'not the default 6 retries'"},
+        {"text": "Avoids restartPolicy: Always (invalid for Jobs)", "passed": true, "evidence": "'restartPolicy: Always is invalid for Jobs'"}
+      ] },
+    { "eval_id": 2, "eval_name": "one-time-migration-job", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Recommends a Job (not Deployment/init container)", "passed": true, "evidence": "'Use a Job, not a Deployment... correct primitive for a one-time migration'"},
+        {"text": "restartPolicy: Never (keeps failed pod logs) vs OnFailure overwrite", "passed": true, "evidence": "'OnFailure, the container is restarted in place... can overwrite/lose the logs'"},
+        {"text": "ttlSecondsAfterFinished (else Jobs/pods accumulate)", "passed": true, "evidence": "'Without it... never garbage-collected — they accumulate'"},
+        {"text": "backoffLimit low (0/1), not default 6", "passed": true, "evidence": "backoffLimit: 1; 'The default of 6 is wrong for migrations'"},
+        {"text": "Avoids restartPolicy: Always (invalid for Jobs)", "passed": true, "evidence": "'restartPolicy: Always is invalid for Jobs'"}
+      ] },
+    { "eval_id": 3, "eval_name": "cronjob-concurrency-backup", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "concurrencyPolicy: Forbid (skips new run), correct for non-overlapping backups", "passed": true, "evidence": "'Kubernetes skips the new run entirely... correct for backups that must not overlap'"},
+        {"text": "Exact kubectl create job --from=cronjob/<name> to trigger immediately", "passed": true, "evidence": "'kubectl create job --from=cronjob/db-backup backup-now -n db'"},
+        {"text": "failedJobsHistoryLimit above default 1 (recommends 10)", "passed": true, "evidence": "failedJobsHistoryLimit: 10; 'from the default of 1 to 10'"},
+        {"text": "Distinguishes Replace (kills previous) from Forbid; Replace wrong for backups", "passed": true, "evidence": "'Replace is wrong here — it kills the previous running Job... mid-write'"},
+        {"text": "Avoids recommending a Deployment for the scheduled task", "passed": true, "evidence": "'Keep it as a CronJob... a Deployment would just run continuously'"}
+      ] },
+    { "eval_id": 3, "eval_name": "cronjob-concurrency-backup", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "concurrencyPolicy: Forbid (skips new run), correct for non-overlapping backups", "passed": true, "evidence": "'the new run is skipped entirely... correct for backups that must never overlap'"},
+        {"text": "Exact kubectl create job --from=cronjob/<name> to trigger immediately", "passed": true, "evidence": "'kubectl create job --from=cronjob/db-backup db-backup-manual-test'"},
+        {"text": "failedJobsHistoryLimit above default 1 (recommends 10)", "passed": true, "evidence": "failedJobsHistoryLimit: 10; 'the default is 1... Raise it (e.g. 10)'"},
+        {"text": "Distinguishes Replace (kills previous) from Forbid; Replace wrong for backups", "passed": true, "evidence": "'Replace: kills the currently running Job... would terminate an in-progress backup mid-write'"},
+        {"text": "Avoids recommending a Deployment for the scheduled task", "passed": true, "evidence": "keeps CronJob throughout; never recommends a Deployment"}
+      ] }
+  ],
+  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "delta": {"pass_rate": "+0%"} },
+  "notes": [
+    "NON-DISCRIMINATING on all 3 evals (15/15 both configs). Baseline covered every discriminating expectation (maxUnavailable:0 + readinessProbe + minReadySeconds nuance + change-cause + rollout-hang recovery; Job + restartPolicy Never vs OnFailure + ttlSecondsAfterFinished + backoffLimit:1 + Always-invalid; concurrencyPolicy Forbid vs Replace + create job --from + failedJobsHistoryLimit:10).",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

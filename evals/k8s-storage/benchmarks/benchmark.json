@@ -1,0 +1,64 @@
+{
+  "metadata": { "skill_name": "k8s-storage", "timestamp": "2026-07-22", "evals_run": ["hetzner-rwo-shared-volume-podaffinity", "postgres-statefulset-volumeclaimtemplates-pvc-cleanup", "configmap-to-secret-volume-mount-rotation"], "runs_per_configuration": 1 },
+  "runs": [
+    { "eval_id": 1, "eval_name": "hetzner-rwo-shared-volume-podaffinity", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Uses soft (preferred) podAffinity, explains hard-variant first-deploy deadlock", "passed": true, "evidence": "'use preferred... hard self-referential affinity deadlocks the first deploy'"},
+        {"text": "Specifies topologyKey: kubernetes.io/hostname", "passed": true, "evidence": "topologyKey: kubernetes.io/hostname"},
+        {"text": "Sets accessModes: ReadWriteOnce (Hetzner has no RWX)", "passed": true, "evidence": "'RWO because Hetzner Cloud Volumes do not support RWX'"},
+        {"text": "Mentions Longhorn as RWX alternative that drops podAffinity", "passed": true, "evidence": "'switch the StorageClass to Longhorn, which supports RWX... drop the podAffinity'"},
+        {"text": "Avoids recommending ReadWriteMany on Hetzner Cloud Volumes", "passed": true, "evidence": "'Do not set accessModes: ReadWriteMany... Hetzner rejects it'"}
+      ] },
+    { "eval_id": 1, "eval_name": "hetzner-rwo-shared-volume-podaffinity", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Uses soft (preferred) podAffinity, explains hard-variant first-deploy deadlock", "passed": true, "evidence": "'a hard self-referential pod affinity rule deadlocks the very first deploy... Pending forever'"},
+        {"text": "Specifies topologyKey: kubernetes.io/hostname", "passed": true, "evidence": "topologyKey: kubernetes.io/hostname"},
+        {"text": "Sets accessModes: ReadWriteOnce (Hetzner has no RWX)", "passed": true, "evidence": "ReadWriteOnce # Hetzner block volumes are RWO only"},
+        {"text": "Mentions Longhorn as RWX alternative that drops podAffinity", "passed": true, "evidence": "'Switch the volume to Longhorn... drop the pod affinity entirely'"},
+        {"text": "Avoids recommending ReadWriteMany on Hetzner Cloud Volumes", "passed": true, "evidence": "'Do not request ReadWriteMany against hcloud-volumes — the PVC will never bind'"}
+      ] },
+    { "eval_id": 2, "eval_name": "postgres-statefulset-volumeclaimtemplates-pvc-cleanup", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Recommends StatefulSet + volumeClaimTemplates, not Deployment + shared PVC", "passed": true, "evidence": "'Use a StatefulSet with volumeClaimTemplates, not a Deployment with a single shared PVC'"},
+        {"text": "States PVC auto-naming <template>-<sts>-<ordinal>", "passed": true, "evidence": "'data-postgres-0, data-postgres-1, data-postgres-2'"},
+        {"text": "Warns deleting the StatefulSet does NOT delete PVCs (delete by name)", "passed": true, "evidence": "'kubectl delete statefulset postgres does not delete the PVCs... delete by name'"},
+        {"text": "Warns against label-based bulk PVC delete", "passed": true, "evidence": "'Avoid kubectl delete pvc -l app=postgres — can hit other PVCs sharing that label'"},
+        {"text": "Notes no podAffinity needed (each Pod owns its PVC)", "passed": true, "evidence": "'No podAffinity needed — each Pod owns its PVC'"}
+      ] },
+    { "eval_id": 2, "eval_name": "postgres-statefulset-volumeclaimtemplates-pvc-cleanup", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Recommends StatefulSet + volumeClaimTemplates, not Deployment + shared PVC", "passed": true, "evidence": "'Use a StatefulSet with volumeClaimTemplates... each replica must own its independent data directory'"},
+        {"text": "States PVC auto-naming <template>-<sts>-<ordinal>", "passed": true, "evidence": "'data-cache-0 data-cache-1 data-cache-2'"},
+        {"text": "Warns deleting the StatefulSet does NOT delete PVCs (delete by name)", "passed": true, "evidence": "'deleting the StatefulSet does NOT delete the PVCs... remove them explicitly by name'"},
+        {"text": "Warns against label-based bulk PVC delete", "passed": true, "evidence": "'DANGEROUS... kubectl delete pvc -l app=cache... any other PVC... gets deleted too'"},
+        {"text": "Notes no podAffinity needed (each Pod owns its PVC)", "passed": true, "evidence": "'No podAffinity is required — every Pod has its own PVC'"}
+      ] },
+    { "eval_id": 3, "eval_name": "configmap-to-secret-volume-mount-rotation", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Moves credential ConfigMap->Secret, cites encryption-at-rest", "passed": true, "evidence": "'ConfigMaps cannot be encrypted at rest; Secrets can'"},
+        {"text": "Recommends volume mount readOnly over envFrom (env leaks to /proc, crash dumps)", "passed": true, "evidence": "'mount it as a volume with readOnly: true... Env vars leak: crash dumps, /proc/<pid>/environ'"},
+        {"text": "Explains envFrom env vars never update at runtime (restart required)", "passed": true, "evidence": "'envFrom/env vars never update at runtime... a restart is still required'"},
+        {"text": "Names a specific update strategy (rollout restart/Reloader/append-hash/checksum)", "passed": true, "evidence": "'kubectl rollout restart; Reloader controller; --append-hash; checksum/config annotation'"},
+        {"text": "Avoids recommending ConfigMap for the DB password", "passed": true, "evidence": "'Do not keep the database password in a ConfigMap'"}
+      ] },
+    { "eval_id": 3, "eval_name": "configmap-to-secret-volume-mount-rotation", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Moves credential ConfigMap->Secret, cites encryption-at-rest", "passed": true, "evidence": "'Secrets can be encrypted at rest... ConfigMaps cannot'"},
+        {"text": "Recommends volume mount readOnly over envFrom (env leaks to /proc, crash dumps)", "passed": true, "evidence": "'Mount it as a volume with readOnly: true... show up in docker inspect, /proc/<pid>/environ, crash dumps'"},
+        {"text": "Explains envFrom env vars never update at runtime (restart required)", "passed": true, "evidence": "'injected once at container start and is frozen... A rollout restart is always required'"},
+        {"text": "Names a specific update strategy (rollout restart/Reloader/append-hash/checksum)", "passed": true, "evidence": "'kubectl rollout restart; Reloader; checksum/config annotation; --append-hash'"},
+        {"text": "Avoids recommending ConfigMap for the DB password", "passed": true, "evidence": "moves password ConfigMap->Secret; never recommends ConfigMap"}
+      ] }
+  ],
+  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "delta": {"pass_rate": "+0%"} },
+  "notes": [
+    "NON-DISCRIMINATING on all 3 evals (15/15 both configs). Baseline matched every discriminating detail (soft-vs-hard podAffinity deadlock, Hetzner RWO/Longhorn RWX, volumeClaimTemplates naming, delete-by-name + label-delete warning, Secret volume mount + rotation strategies). Strong base-model K8s storage knowledge.",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

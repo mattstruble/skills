@@ -1,0 +1,64 @@
+{
+  "metadata": { "skill_name": "prd-writing", "timestamp": "2026-07-22", "evals_run": ["one-question-at-a-time", "behavioral-not-implementation", "write-prd-with-coverage-check"], "runs_per_configuration": 1 },
+  "runs": [
+    { "eval_id": 1, "eval_name": "one-question-at-a-time", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Asks exactly one question, not a list", "passed": true, "evidence": "Single question: 'Who are the primary users of this CSV export feature?'"},
+        {"text": "Provides a recommended answer, not a blank placeholder", "passed": true, "evidence": "'(Recommended: analysts and operations staff...)'"},
+        {"text": "Declines to batch, explains one-at-a-time is better", "passed": true, "evidence": "'I won't batch the questions ... produces a much better PRD'"},
+        {"text": "First question targets problem/actors (Phase 1)", "passed": true, "evidence": "'Phase 1 — Problem & actors'"},
+        {"text": "No architecture/class/file questions", "passed": true, "evidence": "only asks about users"}
+      ] },
+    { "eval_id": 1, "eval_name": "one-question-at-a-time", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.4, "passed": 2, "failed": 3, "total": 5},
+      "expectations": [
+        {"text": "Asks exactly one question, not a list", "passed": false, "evidence": "Lists 8 numbered questions"},
+        {"text": "Provides a recommended answer, not a blank placeholder", "passed": false, "evidence": "no pre-populated recommended answer"},
+        {"text": "Declines to batch, explains one-at-a-time is better", "passed": false, "evidence": "'let me ask them a few at a time' then batches 8"},
+        {"text": "First question targets problem/actors (Phase 1)", "passed": true, "evidence": "'1. Who are the users?' leads"},
+        {"text": "No architecture/class/file questions", "passed": true, "evidence": "asks format/volume/permissions, no class names"}
+      ] },
+    { "eval_id": 2, "eval_name": "behavioral-not-implementation", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Identifies bullets describe implementation structure, not behavior", "passed": true, "evidence": "'describes how the feature is built internally, not what the system does'"},
+        {"text": "Flags a specific offender (ExportController, Apache POI, etc.)", "passed": true, "evidence": "'ExportController / ExportService.generate() ... Apache POI'"},
+        {"text": "Explains outside-in behavioral principle", "passed": true, "evidence": "'what the system does and why, in plain language, from the outside'"},
+        {"text": "Offers a rewritten behavioral statement", "passed": true, "evidence": "'User can download the currently displayed rows as a CSV file.'"},
+        {"text": "Avoids recommending relocating impl to a design doc rather than removing", "passed": true, "evidence": "'should be removed and replaced ... not relocated to a design doc'"}
+      ] },
+    { "eval_id": 2, "eval_name": "behavioral-not-implementation", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5},
+      "expectations": [
+        {"text": "Identifies bullets describe implementation structure, not behavior", "passed": true, "evidence": "'describes how the feature is built, not what it does'"},
+        {"text": "Flags a specific offender (ExportController, Apache POI, etc.)", "passed": true, "evidence": "'Names internal classes ... a specific library (Apache POI)'"},
+        {"text": "Explains outside-in behavioral principle", "passed": true, "evidence": "'observable, user-facing behavior — what the system does from the outside'"},
+        {"text": "Offers a rewritten behavioral statement", "passed": true, "evidence": "'The user can export the current data view as a CSV file.'"},
+        {"text": "Avoids recommending relocating impl to a design doc rather than removing", "passed": false, "evidence": "'leave the how (classes, libraries, endpoints, hooks) to a design doc' — the anti-pattern the expectation guards against"}
+      ] },
+    { "eval_id": 3, "eval_name": "write-prd-with-coverage-check", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Presents captured behaviors and asks 'What's missing?' before writing", "passed": true, "evidence": "'the coverage check ... What's missing?'"},
+        {"text": "Exact template order: Problem/User Stories/Expected Behaviors/Open Questions/Out of Scope", "passed": true, "evidence": "sections in exact order"},
+        {"text": "Expected Behaviors flat under capability headings, not nested/impl", "passed": true, "evidence": "flat bullets under File Upload / Data Preview"},
+        {"text": "States file -> docs/prd.md and committing is user's responsibility", "passed": true, "evidence": "'I will not commit it ... committing is your responsibility'"},
+        {"text": "User Stories 3-8 As a/I want/so that entries", "passed": true, "evidence": "3 As-a/I-want/so-that entries"}
+      ] },
+    { "eval_id": 3, "eval_name": "write-prd-with-coverage-check", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Presents captured behaviors and asks 'What's missing?' before writing", "passed": true, "evidence": "'a quick coverage check ... What's missing / worth confirming before I write?'"},
+        {"text": "Exact template order: Problem/User Stories/Expected Behaviors/Open Questions/Out of Scope", "passed": true, "evidence": "sections in order"},
+        {"text": "Expected Behaviors flat under capability headings, not nested/impl", "passed": true, "evidence": "flat bullets under File Upload / Data Preview"},
+        {"text": "States file -> docs/prd.md and committing is user's responsibility", "passed": true, "evidence": "'I won't write it to disk — creating and committing the file is up to you'"},
+        {"text": "User Stories 3-8 As a/I want/so that entries", "passed": true, "evidence": "5 As-a/I-want/so-that entries"}
+      ] }
+  ],
+  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 0.733, "stddev": 0.249}}, "delta": {"pass_rate": "+26.7%"} },
+  "notes": [
+    "Strongest discriminator: one-question-at-a-time (eval 1) — baseline batched 8 questions with no recommended answer and did not decline to batch (2/5). behavioral-not-implementation (eval 2) discriminated on the relocate-vs-remove anti-pattern: baseline suggested moving the 'how' to a design doc, which the skill warns against. write-prd-with-coverage-check (eval 3) was non-discriminating — baseline knew the coverage gate, template order, and no-commit rule.",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

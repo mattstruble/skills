@@ -1,0 +1,65 @@
+{
+  "metadata": { "skill_name": "skill-creator", "timestamp": "2026-07-22", "evals_run": ["create-conventional-commit-skill", "analyze-python-design-benchmark", "fix-logging-description-triggering"], "runs_per_configuration": 1 },
+  "runs": [
+    { "eval_id": 1, "eval_name": "create-conventional-commit-skill", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Description uses MUST language, not soft 'Use when'", "passed": true, "evidence": "'You MUST use this skill when authoring git commits'"},
+        {"text": "Includes explicit NOT-for exclusions naming adjacent skills", "passed": true, "evidence": "'NOT for branching, merging, rebasing ... creating PRs (see git-pr)'"},
+        {"text": "Test prompts saved to repo-root evals/git-commit/evals.json", "passed": true, "evidence": "'evals/git-commit/evals.json (repo-root evals/, not in the skill dir or workspace)'"},
+        {"text": "Proposes with-skill and baseline runs in the same turn", "passed": true, "evidence": "'spawn two subagents in the same turn — a with-skill run and a baseline'"},
+        {"text": "Description does not summarize workflow steps", "passed": true, "evidence": "'No workflow summary — does not say parses the staged diff, formats a message'"}
+      ] },
+    { "eval_id": 1, "eval_name": "create-conventional-commit-skill", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Description uses MUST language, not soft 'Use when'", "passed": true, "evidence": "'You MUST use this skill whenever authoring a git commit message'"},
+        {"text": "Includes explicit NOT-for exclusions naming adjacent skills", "passed": true, "evidence": "'NOT for writing PR descriptions, branching/merging ... reviewing (see code-reviewer)'"},
+        {"text": "Test prompts saved to repo-root evals/git-commit/evals.json", "passed": true, "evidence": "'repo-root evals directory — evals/git-commit/evals.json (not inside the skill dir)'"},
+        {"text": "Proposes with-skill and baseline runs in the same turn", "passed": true, "evidence": "'spawn two subagent runs in parallel right now: one with-skill ... one baseline'"},
+        {"text": "Description does not summarize workflow steps", "passed": true, "evidence": "'deliberately does not summarize the workflow'"}
+      ] },
+    { "eval_id": 2, "eval_name": "analyze-python-design-benchmark", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Copies finalized benchmark to evals/python-design/benchmarks/benchmark.json", "passed": true, "evidence": "'cp python-design-workspace/iteration-2/benchmark.json evals/python-design/benchmarks/benchmark.json'"},
+        {"text": "Flags 100%-in-both assertions as non-discriminating", "passed": true, "evidence": "'Non-discriminating assertions — pass ~100% in both configs'"},
+        {"text": "Checks high-variance evals as flaky", "passed": true, "evidence": "'High-variance evals — large stddev relative to mean ... Flag as potentially flaky'"},
+        {"text": "Presents aggregate delta and qualitative patterns before edits", "passed": true, "evidence": "'Present both ... Then, and only then'"},
+        {"text": "Iteration artifacts remain in workspace, not tracked evals/", "passed": true, "evidence": "'grading.json, the eval-*/ run directories ... stay in python-design-workspace/'"}
+      ] },
+    { "eval_id": 2, "eval_name": "analyze-python-design-benchmark", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Copies finalized benchmark to evals/python-design/benchmarks/benchmark.json", "passed": true, "evidence": "'evals/python-design/benchmarks/benchmark.json ... not python-design/benchmarks/'"},
+        {"text": "Flags 100%-in-both assertions as non-discriminating", "passed": true, "evidence": "'passes at 100% in both configs is carrying no signal'"},
+        {"text": "Checks high-variance evals as flaky", "passed": true, "evidence": "'High-variance / flaky evals ... stddev relative to mean'"},
+        {"text": "Presents aggregate delta and qualitative patterns before edits", "passed": true, "evidence": "'I give you both layers ... Only after you've seen that do I ask what to change'"},
+        {"text": "Iteration artifacts remain in workspace, not tracked evals/", "passed": true, "evidence": "'grading.json, run directories, raw transcripts — stays in python-design-workspace/'"}
+      ] },
+    { "eval_id": 3, "eval_name": "fix-logging-description-triggering", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Identifies topic-vs-activity mismatch; rewrites to trigger on activity", "passed": true, "evidence": "'topic-vocabulary vs activity-vocabulary mismatch'; opener names FastAPI/workers/queue consumers"},
+        {"text": "Rewritten description follows ~80-word opener+triggers+exclusions template", "passed": true, "evidence": "~78 words, all three parts present"},
+        {"text": "Generates 20 queries, should/should-not mix with near-miss negatives", "passed": true, "evidence": "'10 should-trigger / 10 should-not'; negatives loki/LogQL/PR-review/logrotate"},
+        {"text": "Queries concrete with paths/frameworks/context", "passed": true, "evidence": "'spinning up a new FastAPI service for our internal billing API ...'"},
+        {"text": "No keyword-variant list; broad opener catches them", "passed": true, "evidence": "'No keyword-variant list — the broad activity opener catches add logs / set up logging'"}
+      ] },
+    { "eval_id": 3, "eval_name": "fix-logging-description-triggering", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Identifies topic-vs-activity mismatch; rewrites to trigger on activity", "passed": true, "evidence": "'topic-vocabulary vs. activity-vocabulary mismatch'; opener names FastAPI/queue consumers/workers"},
+        {"text": "Rewritten description follows ~80-word opener+triggers+exclusions template", "passed": true, "evidence": "~60 words, three-part structure intact (terser than target)"},
+        {"text": "Generates 20 queries, should/should-not mix with near-miss negatives", "passed": true, "evidence": "'should_not_trigger (10) — near-misses'; grafana-loki/LogQL/logrotate"},
+        {"text": "Queries concrete with paths/frameworks/context", "passed": true, "evidence": "'Wrap the payment call in services/billing.py in a try/except'"},
+        {"text": "No keyword-variant list; broad opener catches them", "passed": true, "evidence": "'No keyword list. A broad activity-based opener catches add logs/log this'"}
+      ] }
+  ],
+  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "delta": {"pass_rate": "+0%"} },
+  "notes": [
+    "NON-DISCRIMINATING on all 3 evals (15/15 both configs). Baseline independently reproduced the full skill-creator methodology — MUST-language openers, adjacent-skill NOT-for exclusions, the repo-root evals/<skill>/evals.json path (correctly rejecting the older in-skill path), same-turn with-skill+baseline runs, non-discriminating + high-variance analyst checks, workspace-vs-tracked separation, topic-vs-activity diagnosis, and 20 near-miss trigger queries. The new-path-convention hint did not discriminate: baseline used the correct path unprompted.",
+    "with_skill was marginally richer (tighter near-miss negatives, description closer to the ~80-word target) but never flipped an expectation.",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

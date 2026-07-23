@@ -1,0 +1,64 @@
+{
+  "metadata": { "skill_name": "knowledge-base", "timestamp": "2026-07-22", "evals_run": ["log-postgres-job-queue-decision", "supersede-reversed-decision-note", "add-collaborator-person-note"], "runs_per_configuration": 1 },
+  "runs": [
+    { "eval_id": 1, "eval_name": "log-postgres-job-queue-decision", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Greps decisions/ before creating any file", "passed": true, "evidence": "'grep -ril \"redis|job-queue|job queue\" decisions/'"},
+        {"text": "File in decisions/ with YYYY-MM-DD- prefix", "passed": true, "evidence": "decisions/2026-07-22-postgres-for-job-queue.md"},
+        {"text": "Frontmatter type: decision, status: active, decision_date, tags type/decision", "passed": true, "evidence": "'type: decision ... decision_date ... status: active ... tags: [type/decision]'"},
+        {"text": "Body uses Context/Decided/Why/Open structure", "passed": true, "evidence": "'**Context:** **Decided:** **Why:** **Open:**'"},
+        {"text": "Updates a MOC and confirms exact filename", "passed": true, "evidence": "'[[decisions/2026-07-22-postgres-for-job-queue]]' + confirmation"}
+      ] },
+    { "eval_id": 1, "eval_name": "log-postgres-job-queue-decision", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5},
+      "expectations": [
+        {"text": "Greps decisions/ before creating any file", "passed": true, "evidence": "'rg -il \"job queue|redis|postgres\" decisions/ notes/'"},
+        {"text": "File in decisions/ with YYYY-MM-DD- prefix", "passed": true, "evidence": "decisions/2026-07-22-postgres-for-job-queue.md"},
+        {"text": "Frontmatter type: decision, status: active, decision_date, tags type/decision", "passed": false, "evidence": "uses 'date:' not decision_date, and bare 'tags: [decision, infrastructure]' not type/decision"},
+        {"text": "Body uses Context/Decided/Why/Open structure", "passed": false, "evidence": "uses ADR headers Context/Decision/Rationale/Consequences/Open questions"},
+        {"text": "Updates a MOC and confirms exact filename", "passed": true, "evidence": "'[[decisions/2026-07-22-postgres-for-job-queue]]' + 'Logged ...'"}
+      ] },
+    { "eval_id": 2, "eval_name": "supersede-reversed-decision-note", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Sets status: superseded on old note, not deleting", "passed": true, "evidence": "'On the OLD note ... status: superseded'"},
+        {"text": "Adds supersedes: full-path wikilink to new note", "passed": true, "evidence": "'supersedes: [\"[[decisions/2024-11-03-use-redis-for-job-queue.md]]\"]'"},
+        {"text": "Bumps updated: on the old note", "passed": true, "evidence": "'updated: 2026-07-22 # bump'"},
+        {"text": "Updates MOC to point to the new decision", "passed": true, "evidence": "'repoint the link from the old note to the new one'"},
+        {"text": "Avoids recommending deletion of old note", "passed": true, "evidence": "'Do not delete the old note.'"}
+      ] },
+    { "eval_id": 2, "eval_name": "supersede-reversed-decision-note", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Sets status: superseded on old note, not deleting", "passed": true, "evidence": "'Don't delete the old note.' + status: superseded"},
+        {"text": "Adds supersedes: full-path wikilink to new note", "passed": true, "evidence": "'supersedes: [[decisions/2024-11-03-use-redis-for-job-queue]]' (folder-path, omits .md)"},
+        {"text": "Bumps updated: on the old note", "passed": true, "evidence": "'Bump the updated: field since you changed the note.'"},
+        {"text": "Updates MOC to point to the new decision", "passed": true, "evidence": "'current pointer moves to the Postgres note'"},
+        {"text": "Avoids recommending deletion of old note", "passed": true, "evidence": "'Decision records are an audit trail'"}
+      ] },
+    { "eval_id": 3, "eval_name": "add-collaborator-person-note", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Note at people/dana-chen.md (kebab-case, people/ folder)", "passed": true, "evidence": "'people/dana-chen.md — kebab-case filename in the people/ folder'"},
+        {"text": "Frontmatter type: person and tags type/person + role/collaborator", "passed": true, "evidence": "'tags: [type/person, domain/data-pipeline, role/collaborator]'"},
+        {"text": "related field uses full-path wikilinks", "passed": true, "evidence": "'related: [\"[[orgs/partner-org]]\", \"[[topics/data-pipeline]]\"]'"},
+        {"text": "Updates people MOC with [[people/dana-chen|Dana Chen]] + one-line context", "passed": true, "evidence": "'[[people/dana-chen|Dana Chen]] — ML infra lead at partner org'"},
+        {"text": "Avoids markdown-style links for inter-wiki references", "passed": true, "evidence": "'Avoid markdown-style links like [Dana](./people/dana-chen.md)'"}
+      ] },
+    { "eval_id": 3, "eval_name": "add-collaborator-person-note", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5},
+      "expectations": [
+        {"text": "Note at people/dana-chen.md (kebab-case, people/ folder)", "passed": true, "evidence": "'people/dana-chen.md'"},
+        {"text": "Frontmatter type: person and tags type/person + role/collaborator", "passed": false, "evidence": "'type: person' present but bare 'tags: [person, collaborator, ml-infra]' not namespaced"},
+        {"text": "related field uses full-path wikilinks", "passed": true, "evidence": "'related: - [[orgs/partner-org]] - [[topics/data-pipeline]]'"},
+        {"text": "Updates people MOC with [[people/dana-chen|Dana Chen]] + one-line context", "passed": true, "evidence": "'[[people/dana-chen|Dana Chen]] — ML infra lead at partner org'"},
+        {"text": "Avoids markdown-style links for inter-wiki references", "passed": true, "evidence": "'markdown relative links don't participate in the wiki graph'"}
+      ] }
+  ],
+  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 0.8, "stddev": 0.163}}, "delta": {"pass_rate": "+20%"} },
+  "notes": [
+    "Discriminates on repo-specific wiki conventions the baseline can't guess: the decision_date frontmatter field, the type/decision + role/collaborator namespaced tag taxonomy, and the Context/Decided/Why/Open decision body structure (baseline defaulted to generic ADR headers and bare tags). Supersession pattern (eval 2) was non-discriminating — baseline independently knew status: superseded + supersedes link + keep-old-note + repoint MOC.",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

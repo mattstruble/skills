@@ -1,0 +1,44 @@
+{
+  "skill_name": "k8s-operations",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My deployment has 3 replicas and I'm doing a rolling update. The new pods keep getting traffic before they're actually ready — users are hitting 502 errors during rollouts. I have a liveness probe on /healthz but nothing else. What's wrong and how do I fix it?",
+      "expected_output": "The missing readinessProbe is the root cause: without it, Kubernetes adds pods to Service endpoints as soon as they start, regardless of whether they can serve traffic. Add a readinessProbe with failureThreshold: 1 and periodSeconds: 15 so pods are removed from endpoints immediately on failure. Also set maxUnavailable: 0 and maxSurge: 25% so the rollout adds capacity before removing old pods, preventing any capacity drop during the transition.",
+      "files": [],
+      "expectations": [
+        "Identifies the missing readinessProbe (not liveness alone) as the direct cause of traffic routing to unready pods",
+        "Recommends readinessProbe with failureThreshold: 1 to remove pods from endpoints immediately on failure, not a higher threshold",
+        "Recommends maxUnavailable: 0 (not maxUnavailable: 1) with the explicit reasoning that 1 drops capacity to 2/3 and risks downtime if another pod fails simultaneously",
+        "Sets livenessProbe.failureThreshold higher than readinessProbe.failureThreshold so the pod gets a recovery window before restart",
+        "Avoids recommending livenessProbe alone as a substitute for readinessProbe"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to reboot a worker node for kernel updates. It's running several production pods. What's the correct procedure to do this safely, and what should I watch out for on a single-node cluster?",
+      "expected_output": "Drain the node with kubectl drain <node> --delete-emptydir-data=true --ignore-daemonsets --timeout=360s before rebooting. This evicts all pods and marks the node unschedulable. After maintenance, run kubectl uncordon <node> to re-enable scheduling. On a single-node cluster, draining evicts CoreDNS, causing a brief cluster-wide DNS outage — plan accordingly.",
+      "files": [],
+      "expectations": [
+        "Provides the exact drain flags --delete-emptydir-data=true --ignore-daemonsets --timeout=360s, not a bare kubectl drain",
+        "Explains that --ignore-daemonsets is required because DaemonSet pods cannot be moved and would otherwise block the drain",
+        "Includes kubectl uncordon <node> as the post-maintenance step to re-enable scheduling",
+        "Specifically warns that draining a single-node cluster evicts CoreDNS and causes a DNS outage",
+        "Avoids recommending kubectl cordon alone (without drain) as sufficient preparation before a reboot"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm writing a CI/CD deployment script that fetches the live Deployment YAML, patches the image tag, and applies it back with kubectl apply. My script works fine normally but fails intermittently with a conflict error when the HPA or ArgoCD is also active. How should I handle this?",
+      "expected_output": "The conflict is caused by keeping resourceVersion in the patched YAML. By default, deleting resourceVersion makes the apply unconditional, which works for single-writer pipelines but causes a reconciliation fight with GitOps tools or HPA. The correct fix for multi-writer environments is to keep resourceVersion to detect concurrent modifications, then retry the read-patch-apply loop on conflict. Also look up containers and env vars by name, never by index, since order can change.",
+      "files": [],
+      "expectations": [
+        "Identifies resourceVersion as the optimistic concurrency token causing the conflict, not a generic 'race condition'",
+        "Distinguishes the two valid approaches: delete resourceVersion for single-writer CI vs. keep it and retry the read-patch-apply loop when GitOps or HPA is active",
+        "Explicitly names ArgoCD and HPA as the multi-writer scenario that makes unconditional apply dangerous (reconciliation fight)",
+        "Recommends looking up containers and env vars by name (not by index) because order in the containers array can change",
+        "Avoids recommending kubectl set image as a universal fix, since it does not update annotations like kubernetes.io/change-cause or env vars used for version tracing"
+      ]
+    }
+  ]
+}

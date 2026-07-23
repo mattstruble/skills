@@ -1,0 +1,44 @@
+{
+  "skill_name": "k8s-storage",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a Deployment with 5 replicas that all need to read and write to the same 10Gi volume. My cluster uses Hetzner Cloud Volumes as the StorageClass. How do I set this up correctly?",
+      "expected_output": "Create a single PVC with accessModes: ReadWriteOnce against the hcloud-volumes StorageClass, then add a podAffinity rule using preferredDuringSchedulingIgnoredDuringExecution with topologyKey: kubernetes.io/hostname to co-locate all Pods on the same node. Do not use requiredDuringSchedulingIgnoredDuringExecution because a hard self-referential affinity deadlocks the first deploy — no node has an app Pod yet, so all Pods stay Pending. If cross-node spread is needed, switch to Longhorn which supports RWX.",
+      "files": [],
+      "expectations": [
+        "Uses preferredDuringSchedulingIgnoredDuringExecution (soft) podAffinity, not requiredDuringSchedulingIgnoredDuringExecution (hard), and explains the first-deploy deadlock risk of the hard variant",
+        "Specifies topologyKey: kubernetes.io/hostname in the podAffinityTerm to co-locate Pods on the same node",
+        "Sets accessModes: ReadWriteOnce on the PVC because Hetzner Cloud Volumes do not support RWX",
+        "Mentions Longhorn as the alternative that enables RWX and allows Pods to spread across nodes without podAffinity",
+        "Avoids recommending ReadWriteMany on Hetzner Cloud Volumes, which does not support that access mode"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm deploying a PostgreSQL StatefulSet with 3 replicas. Each replica needs its own 20Gi volume. Should I use a single PVC in the Deployment spec or volumeClaimTemplates in a StatefulSet? Show me the right approach.",
+      "expected_output": "Use StatefulSet with volumeClaimTemplates — each Pod gets a dedicated PVC named data-cache-0, data-cache-1, data-cache-2, so replicas can schedule independently on different nodes with no podAffinity required. Warn that kubectl delete statefulset does not delete the PVCs; they must be deleted explicitly by name after verifying with kubectl get pvc. Avoid kubectl delete pvc -l app=cache because label-based bulk delete can affect other PVCs in the namespace.",
+      "files": [],
+      "expectations": [
+        "Recommends StatefulSet with volumeClaimTemplates, not Deployment + single shared PVC, because each DB replica needs independent state",
+        "States that volumeClaimTemplates auto-names PVCs as <template-name>-<statefulset-name>-<ordinal> (e.g., data-cache-0)",
+        "Explicitly warns that deleting the StatefulSet does NOT delete the PVCs and they must be deleted by name",
+        "Warns against kubectl delete pvc -l <label> because label-based bulk delete can hit unintended PVCs in the namespace",
+        "Notes that no podAffinity is needed because each Pod has its own PVC and can schedule on any node"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "My app reads a database password from a ConfigMap env var today. My security team says this is wrong. What's the correct way to handle this, and how do I make sure Pods pick up the new value when the secret changes?",
+      "expected_output": "Move the password to a Secret (type Opaque) and mount it as a volume with readOnly: true rather than using envFrom, because env vars are visible in crash dumps, /proc, and docker inspect. Volume-mounted Secrets update on disk within ~1 minute (kubelet sync), but most apps don't re-read files at runtime, so a rollout restart is still needed. For automated restarts on Secret changes, use the Reloader controller. For Helm-managed workloads, add a checksum/config annotation to the pod template.",
+      "files": [],
+      "expectations": [
+        "Moves the credential from ConfigMap to Secret, citing that Secrets can be encrypted at rest while ConfigMaps cannot",
+        "Recommends mounting the Secret as a volume with readOnly: true rather than envFrom, because env vars leak into crash dumps and /proc",
+        "Explains that envFrom env vars never update at runtime — they are set at container start — so a rollout restart is always required",
+        "Names at least one specific update strategy from the skill: kubectl rollout restart, Reloader controller, hash-based naming with --append-hash, or checksum/config Helm annotation",
+        "Avoids recommending ConfigMap for the database password"
+      ]
+    }
+  ]
+}

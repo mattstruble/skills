@@ -1,102 +1,44 @@
-[
-  {
-    "query": "I'm building a game server that handles 10k concurrent connections. Should I use an actor model or Go channels for isolating per-player state? Worried about one player's crash affecting others.",
-    "should_trigger": true,
-    "reasoning": "Explicitly asks about actor vs channel model selection and fault isolation — core concurrency design decisions"
-  },
-  {
-    "query": "We're migrating a single-threaded Rust service to use all CPU cores. Trying to decide between thread-per-core (Seastar-style) and a Tokio work-stealing pool. What are the tradeoffs?",
-    "should_trigger": true,
-    "reasoning": "Directly asks about thread topology selection (thread-per-core vs work-stealing) for scaling to multi-core"
-  },
-  {
-    "query": "Designing a message-passing topology for a pipeline: Kafka consumer → enrichment workers → Postgres writer. How should I structure the channels and what happens when the writer falls behind?",
-    "should_trigger": true,
-    "reasoning": "Message-passing topology design with backpressure concern — exactly what this skill covers"
-  },
-  {
-    "query": "I want to review the fault isolation boundaries in our microservice. Right now a crash in the auth component takes down the whole request handler. How do I design independent crash domains?",
-    "should_trigger": true,
-    "reasoning": "Fault isolation boundary design is a named trigger in the description"
-  },
-  {
-    "query": "Should my connection handler be a state machine or use async/await? I'm worried about the colored function problem spreading through the codebase.",
-    "should_trigger": true,
-    "reasoning": "State machine vs coroutine architecture decision — covered explicitly in the skill's unit-of-concurrency section"
-  },
-  {
-    "query": "We have a CPU-bound image processing service. Tasks vary wildly in size — some take 1ms, some take 500ms. Which thread model handles load balancing best without manual work distribution?",
-    "should_trigger": true,
-    "reasoning": "Implicit thread topology question (work-stealing fits variable task sizes) without using concurrency vocabulary directly"
-  },
-  {
-    "query": "How do I separate the control plane from the data plane in a streaming pipeline? I need shutdown signals to get through even when the data channel is saturated.",
-    "should_trigger": true,
-    "reasoning": "Control vs data plane separation is a named pattern in the skill"
-  },
-  {
-    "query": "I'm designing a supervisor tree for a set of independent workers. If one worker crashes, should the others keep running or restart together? How do I set a restart budget?",
-    "should_trigger": true,
-    "reasoning": "Supervision strategy selection (one-for-one vs one-for-all) and recovery budgets — core fault isolation content"
-  },
-  {
-    "query": "We're building a trading system where producers and consumers run at different rates. How do I propagate backpressure from a slow consumer back to the producer without unbounded queues?",
-    "should_trigger": true,
-    "reasoning": "Backpressure design via bounded channels/mailboxes — explicitly covered in the communication section"
-  },
-  {
-    "query": "Our service processes events from multiple sources. I need to fan out each event to 5 downstream processors and collect all their responses before replying. What's the right pattern?",
-    "should_trigger": true,
-    "reasoning": "Scatter-gather message pattern — covered in the message patterns section; implicit need without concurrency vocabulary"
-  },
-  {
-    "query": "My Tokio application has high tail latency. How do I tune the worker thread count and the I/O driver polling interval to reduce p99?",
-    "should_trigger": false,
-    "reasoning": "Tokio runtime configuration and performance tuning — explicitly excluded as 'language-specific async runtimes (tokio internals)'"
-  },
-  {
-    "query": "I need to implement Raft consensus for a distributed key-value store. How do I handle leader election and log replication across nodes?",
-    "should_trigger": false,
-    "reasoning": "Distributed consensus (Raft) — explicitly excluded in the description"
-  },
-  {
-    "query": "We have a hot path that's bottlenecked on a mutex. I ran perf and see 40% of time in lock contention. How do I profile which specific critical section is the problem?",
-    "should_trigger": false,
-    "reasoning": "Performance profiling of an existing race/contention issue — excluded as 'debugging specific race conditions in existing code'"
-  },
-  {
-    "query": "I want to vectorize my matrix multiply using AVX-512 SIMD intrinsics. How do I structure the loop to maximize throughput on a single core?",
-    "should_trigger": false,
-    "reasoning": "SIMD compute parallelism — explicitly excluded as 'compute parallelism (SIMD, GPU kernels)'"
-  },
-  {
-    "query": "How do I configure a PostgreSQL connection pool size for a web service with 200 concurrent requests? Should I use pgBouncer or the driver's built-in pooling?",
-    "should_trigger": false,
-    "reasoning": "Database connection pooling — infrastructure/config concern, not concurrency architecture design"
-  },
-  {
-    "query": "I'm getting a data race in my Go code between two goroutines accessing a shared map. The race detector shows the exact line. How do I fix it?",
-    "should_trigger": false,
-    "reasoning": "Debugging a specific race condition in existing code — explicitly excluded"
-  },
-  {
-    "query": "How do I implement a spinlock in C++ with the right memory ordering semantics? I need acquire/release on the lock and unlock operations.",
-    "should_trigger": false,
-    "reasoning": "Lock implementation internals — low-level primitive implementation, not architectural design"
-  },
-  {
-    "query": "I want to run my test suite in parallel across 8 GitHub Actions runners. How do I split the test matrix and cache dependencies between runs?",
-    "should_trigger": false,
-    "reasoning": "CI/CD pipeline parallelism — build infrastructure, not concurrent system design"
-  },
-  {
-    "query": "How do Python asyncio coroutines work under the hood? I want to understand the event loop's selector and how await suspends execution.",
-    "should_trigger": false,
-    "reasoning": "Language-specific coroutine internals (asyncio) — excluded as 'language-specific async runtimes'"
-  },
-  {
-    "query": "I'm implementing the TCP three-way handshake state machine in a custom network stack. How should I handle the SYN_RECEIVED → ESTABLISHED transition and timeout retries?",
-    "should_trigger": false,
-    "reasoning": "Network protocol state machine implementation — protocol engineering, not concurrency architecture; the state machine here is a protocol FSM, not a concurrency unit-of-execution pattern"
-  }
-]
+{
+  "skill_name": "concurrency-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a real-time multiplayer game server in Go. Each match has ~100 players; we expect 5,000 concurrent matches. Each player has position, health, and inventory state that updates 20 times/second. Right now everything runs in a single goroutine per match with a big mutex. CPU is fine but we're seeing p99 latency spikes when GC kicks in. I want to redesign the concurrency model. Should I use actors, goroutines with channels, or something else? The main concern is that a bug in one match's logic shouldn't be able to corrupt another match's state or crash the whole server.",
+      "expected_output": "Recommend actors (or goroutine-per-match with explicit trap boundaries) as the unit of concurrency because each match is a long-lived stateful entity with an independent lifecycle — the canonical actor use case. Explain that goroutines have no fault boundary by default (an unrecovered panic kills the program), so each match goroutine needs a defer/recover trap boundary that signals a supervisor to restart only that match (one-for-one strategy, since matches are independent). Recommend bounded mailboxes/channels for player input to propagate backpressure rather than unbounded queues. Note that the current mutex design is the wrong topology for this workload: thread-per-core sharding by match ID would eliminate lock contention and GC pressure from shared state.",
+      "files": [],
+      "expectations": [
+        "Identifies actors or goroutine-per-match with explicit trap boundaries as the right unit of concurrency for long-lived stateful entities, not a shared thread pool",
+        "Explains that Go goroutines have no fault boundary by default — an unrecovered panic kills the program — and prescribes defer/recover in each match goroutine to convert panics into supervisor signals",
+        "Recommends one-for-one supervision strategy (restart only the crashed match) with justification that matches are independent and a crash in one doesn't affect others",
+        "Prescribes bounded mailboxes or channels for player input, explaining that unbounded queues hide backpressure and cause unbounded memory growth under load",
+        "Addresses the topology question: recommends thread-per-core sharding by match ID (or similar shared-nothing partitioning) to eliminate lock contention rather than tuning the existing mutex design"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We have a Kafka consumer pipeline in Rust: consumer → parser → enrichment (calls an external API, ~50ms latency) → Postgres writer. The enrichment stage is the bottleneck. I'm considering three options: (A) spawn a Tokio task per message in the enrichment stage, (B) use a fixed-size worker pool with bounded channels between stages, or (C) switch to a thread-per-core design where each core owns a slice of partitions end-to-end. We process about 50k messages/second at peak. The Postgres writer sometimes falls behind and we've had OOM crashes from queue buildup. The team is also worried about what happens if the enrichment API goes down — we don't want that to stall the Kafka consumer.",
+      "expected_output": "Recommend option B (bounded channels between stages) as the correct fix for the OOM crashes: bounded channels provide backpressure that propagates upstream — a slow Postgres writer fills its input channel, which blocks enrichment workers, which blocks the parser, which stops the Kafka consumer from reading. Explain that option A (unbounded task spawning) is the root cause of the OOM: spawning a task per message with no bound creates an unbounded buffer. For the enrichment API failure concern, prescribe separating the control plane from the data plane: a timeout on every enrichment request (missing timeout = permanent hang) plus a circuit-breaker or error channel that signals the supervisor without blocking the data path. Option C (thread-per-core) is a valid topology for latency-sensitive work but doesn't address the backpressure problem and is a larger architectural change.",
+      "files": [],
+      "expectations": [
+        "Diagnoses unbounded task spawning (option A) as the root cause of OOM crashes — it creates an unbounded buffer with no backpressure signal to the producer",
+        "Recommends bounded channels between pipeline stages and explains the backpressure propagation chain: slow writer → full channel → enrichment blocks → parser blocks → Kafka consumer stops reading",
+        "Prescribes mandatory timeouts on every enrichment API request, naming the specific failure mode: a missing timeout converts a transient API failure into a permanent hang that stalls the pipeline",
+        "Addresses control vs data plane separation: the enrichment failure signal must travel on a path that isn't blocked by a congested data channel, so shutdown/circuit-breaker signals reach the supervisor even under load",
+        "Evaluates thread-per-core (option C) using the skill's decision criteria — appropriate for latency-sensitive I/O with natural key partitioning — and explains why it doesn't resolve the backpressure problem without also bounding the queues"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm designing a connection handler for a high-performance HTTP/2 server in C. Each connection needs to track: TLS handshake state, HPACK header table, active stream states (up to 100 concurrent streams per connection), and flow control windows. I'm considering two approaches: (A) use async/await with a coroutine library so each stream can be written as sequential code, or (B) encode each connection as an explicit state machine struct driven by an event loop. We expect 50k concurrent connections on a single server. The team is worried about the 'colored function' problem spreading through the codebase if we go with coroutines.",
+      "expected_output": "Recommend state machine encoding (option B) for this workload. Explain that state machine encoding avoids the colored function problem entirely — the handler is a plain function called by the event loop, so callers don't need to be async. All connection state lives in the struct (no hidden stack frames), which makes the state serializable, checkpointable, and directly testable by injecting event sequences. For the topology, recommend an event loop (epoll/io_uring) as the right model for 50k mostly-idle connections with minimal compute per event — a single thread can manage this without multi-core scaling. If CPU-intensive work (TLS, compression) is needed, offload to a separate thread pool rather than blocking the event loop. Note that coroutines are appropriate for simpler sequential request-response handlers but become harder to reason about for multi-stream protocols with complex intermediate states.",
+      "files": [],
+      "expectations": [
+        "Recommends state machine encoding over coroutines specifically because it eliminates the colored function problem — the handle function is a plain function, callers don't need to be async",
+        "Explains the concrete advantages of explicit state machines for this use case: no hidden stack frames, all state is in the struct (serializable and checkpointable), and fault isolation is per-struct rather than per-coroutine frame",
+        "Recommends event loop topology (epoll/io_uring) for 50k mostly-idle connections with minimal compute per event, citing the skill's criterion that event loops are correct for I/O-bound services where compute per request is minimal",
+        "Prescribes offloading CPU-intensive work (TLS handshake, HPACK compression) to a separate thread pool rather than blocking the event loop, matching the skill's hybrid pattern for event loop + CPU offload",
+        "Distinguishes when coroutines are appropriate (simple sequential request-response) from when state machines are better (complex multi-step protocols with many intermediate states), using the skill's decision criteria rather than a blanket recommendation"
+      ]
+    }
+  ]
+}

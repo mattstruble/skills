@@ -1,0 +1,62 @@
+{
+  "metadata": { "skill_name": "promql", "timestamp": "2026-07-22", "evals_run": ["predict-linear-disk-fill", "histogram-quantile-per-container", "absent-vs-up-zero"], "runs_per_configuration": 1 },
+  "runs": [
+    { "eval_id": 1, "eval_name": "predict-linear-disk-fill", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Uses predict_linear(...[6h], 24*3600) < 0 with the projected-full explanation", "passed": true, "evidence": "'predict_linear(...[6h], 24*3600) < 0 ... on track to hit zero free bytes inside the next 24h'"},
+        {"text": "Recommends 6h-24h regression window, explains short windows are noisy", "passed": true, "evidence": "'use a 6h–24h window ... [15m] makes the regression chase scrape noise'"},
+        {"text": "Identifies for: 1h as cause of late firing, recommends shortening", "passed": true, "evidence": "'for: 15m, not for: 1h'"},
+        {"text": "Explains long for: consumes prediction lead time", "passed": true, "evidence": "'you receive the alert with only ~23h left and lose an hour'"},
+        {"text": "Avoids a simple byte-threshold as the primary fix", "passed": true, "evidence": "'Don't fall back to a bigger byte threshold'"}
+      ] },
+    { "eval_id": 1, "eval_name": "predict-linear-disk-fill", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Uses predict_linear(...[6h], 24*3600) < 0 with the projected-full explanation", "passed": true, "evidence": "'predict_linear(...[6h], 24*3600) < 0 ... will have hit zero ... within the next 24 hours'"},
+        {"text": "Recommends 6h-24h regression window, explains short windows are noisy", "passed": true, "evidence": "'Use a 6h–24h window ... Too short a window produces noisy predictions'"},
+        {"text": "Identifies for: 1h as cause of late firing, recommends shortening", "passed": true, "evidence": "'shorten for: from 1h to 15m. This is the second cause of late firing'"},
+        {"text": "Explains long for: consumes prediction lead time", "passed": true, "evidence": "'you've burned an hour of your prediction lead time'"},
+        {"text": "Avoids a simple byte-threshold as the primary fix", "passed": true, "evidence": "'Do not go back to a bigger static byte threshold'"}
+      ] },
+    { "eval_id": 2, "eval_name": "histogram-quantile-per-container", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Identifies missing by (le) as root cause", "passed": true, "evidence": "'no by (le) ... can't reconstruct clean bucket boundaries'"},
+        {"text": "Adds sum by (le, job) around rate(), inside histogram_quantile", "passed": true, "evidence": "'sum by (le, job) inside histogram_quantile, wrapping the rate()'"},
+        {"text": "Applies rate() to _bucket before aggregating", "passed": true, "evidence": "'rate() goes on the raw _bucket counter first, then you aggregate'"},
+        {"text": "Explains omitting le yields meaningless/errored quantile", "passed": true, "evidence": "'yields a garbage or errored result'"},
+        {"text": "Explains job/container in by clause produces per-container series", "passed": true, "evidence": "'job (or container) in the by clause is what produces per-container lines'"}
+      ] },
+    { "eval_id": 2, "eval_name": "histogram-quantile-per-container", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5},
+      "expectations": [
+        {"text": "Identifies missing by (le) as root cause", "passed": true, "evidence": "'le is mandatory ... Your original query had no by at all'"},
+        {"text": "Adds sum by (le, job) around rate(), inside histogram_quantile", "passed": true, "evidence": "'histogram_quantile(0.95, sum by (le, job) (rate(...)))'"},
+        {"text": "Applies rate() to _bucket before aggregating", "passed": true, "evidence": "'rate() goes on the _bucket counters, inside the sum, before the quantile'"},
+        {"text": "Explains omitting le yields meaningless/errored quantile", "passed": true, "evidence": "'the result is meaningless (and Prometheus will error or return nothing)'"},
+        {"text": "Explains job/container in by clause produces per-container series", "passed": true, "evidence": "'Adding job (or container) ... restores per-container series'"}
+      ] },
+    { "eval_id": 3, "eval_name": "absent-vs-up-zero", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4},
+      "expectations": [
+        {"text": "Distinguishes absent() (job missing) from up == 0 (exporter up, service down)", "passed": true, "evidence": "'absent ... entire sonarr job has vanished'; 'up==0 fires when Prometheus can reach the target but the scrape fails'"},
+        {"text": "Explains absent(up{job}) won't fire if one of many instances is down", "passed": true, "evidence": "'the selector still matches ... absent() stays silent and you miss the outage'"},
+        {"text": "Recommends up{job} == 0 with for: 5m for per-instance alerting", "passed": true, "evidence": "'up{job=\"sonarr\"}==0, for: 5m ... fires independently for each affected instance'"},
+        {"text": "Avoids recommending absent_over_time as the primary fix for service-down", "passed": true, "evidence": "'Don't reach for absent_over_time(...) here ... the wrong tool'"}
+      ] },
+    { "eval_id": 3, "eval_name": "absent-vs-up-zero", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4},
+      "expectations": [
+        {"text": "Distinguishes absent() (job missing) from up == 0 (exporter up, service down)", "passed": true, "evidence": "'absent ... entire job has vanished'; 'up==0 ... target exists but the last scrape didn't succeed'"},
+        {"text": "Explains absent(up{job}) won't fire if one of many instances is down", "passed": true, "evidence": "'absent(up{job=\"sonarr\"}) will NOT fire if one instance is down but others are still up'"},
+        {"text": "Recommends up{job} == 0 with for: 5m for per-instance alerting", "passed": true, "evidence": "'Use up{job=\"sonarr\"} == 0 with for: 5m for per-instance alerting'"},
+        {"text": "Avoids recommending absent_over_time as the primary fix for service-down", "passed": true, "evidence": "'reserve absent_over_time(...) for detecting missing scrape data'"}
+      ] }
+  ],
+  "run_summary": { "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "without_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0}}, "delta": {"pass_rate": "+0%"} },
+  "notes": [
+    "NON-DISCRIMINATING on all 3 evals (14/14 both configs). Baseline independently produced predict_linear([6h],24*3600)<0 + for: shortening rationale, sum by (le, job) inside histogram_quantile with rate-ordering, and the absent() vs up==0 failure-mode distinction incl. the multi-instance caveat and absent_over_time reservation. Base model knows PromQL deeply.",
+    "runs_per_configuration=1; single-run benchmark."
+  ]
+}

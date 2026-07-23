@@ -1,0 +1,16 @@
+[
+  {"query": "our brief says no guitars but the game needs to feel aggressive and heavy — how do we get that without guitars?", "should_trigger": true},
+  {"query": "our rapid-fire weapon sounds great solo but clashes with the combat music — the whole mix gets muddy when the player fires it", "should_trigger": true},
+  {"query": "we built a complex adaptive music system with 12 stems but playtesters say the music feels choppy and keeps interrupting the action", "should_trigger": true},
+  {"query": "our composer keeps playing it safe and everything sounds like every other game in the genre — how do we push them toward something unique?", "should_trigger": true},
+  {"query": "we're releasing the DOOM OST and want to know how to structure it — just export the loops from Wwise or do something different?", "should_trigger": true},
+  {"query": "glory kill animations in our game have variable duration — sometimes 1 second, sometimes 4 seconds — and we need audio that works for both", "should_trigger": true},
+  {"query": "I want to use a sine wave as the starting point for all my weapon sounds — is that a valid approach?", "should_trigger": true},
+  {"query": "our audio team is afraid to experiment because the director keeps rejecting early attempts — how do we fix the culture?", "should_trigger": true},
+  {"query": "how do I implement a Wwise RTPC to blend between two music states in Unity?", "should_trigger": false},
+  {"query": "what's the best reverb plugin for game audio post-processing?", "should_trigger": false},
+  {"query": "how do I set up FMOD Studio with Unreal Engine 5?", "should_trigger": false},
+  {"query": "my game's enemy footstep sounds are too loud in the mix — how do I set up a sidechain compressor?", "should_trigger": false},
+  {"query": "I need to write a boss fight theme in 7/8 time — any tips on keeping it driving without losing the odd meter feel?", "should_trigger": false},
+  {"query": "how do I implement spatial audio with HRTF for a VR game in Unity?", "should_trigger": false}
+]

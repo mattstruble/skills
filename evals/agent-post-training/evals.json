@@ -7,15 +7,29 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": ["agent-architecture"],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Recommends the model-swap experiment before committing to fine-tuning: swap to a stronger frontier model with the same harness and check whether scores improve materially",
+        "Frames the decision correctly: if scores jump on model swap, the bottleneck is the model (SFT is warranted); if scores don't improve, the bottleneck is still the harness (context quality, tool design, prompt structure)",
+        "Applies the YAGNI gate: post-training is 10–100× more expensive than harness iteration and harder to reverse — exhaust the harness first",
+        "Identifies what SFT is appropriate for in this context: stabilizing output format and baking in protocol knowledge, not injecting factual knowledge about return policies (that belongs in context)",
+        "Avoids recommending RL at this stage — RL is warranted only when SFT has hit its ceiling and deployment distribution shifts systematically, neither of which is established here"
+      ]
     },
     {
       "id": 2,
-      "prompt": "should we use SFT or RL to train our coding agent? it needs to handle novel codebases it's never seen before. we have about 2000 labeled examples of good code edits",
+      "prompt": "should we use SFT or RL to train our coding agent? it needs to handle novel codebases it's never seen before. can handle novel codebases it's never seen before. we have about 2000 labeled examples of good code edits",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the one-sentence rule: SFT memorizes (fixed input→output mapping from demonstrations), RL generalizes (transferable strategy by optimizing for outcomes)",
+        "Identifies novel codebases as a distribution shift problem — the classic SFT failure mode — making RL the appropriate tool for generalization beyond the training distribution",
+        "Notes the ordering constraint: SFT must precede RL for smaller models with structured output requirements — 2000 examples may be sufficient to stabilize format before RL",
+        "Addresses demonstration quality: 2000 examples is a reasonable SFT dataset, but the ceiling is the demonstrator's level — verify examples cover the deployment distribution before committing",
+        "Identifies the RL prerequisite: verifiable correctness (tests pass/fail) makes this task well-suited for RL since the reward signal is clear and the environment is buildable"
+      ]
     },
     {
       "id": 3,
@@ -23,7 +37,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Recommends the model-swap experiment first: swap to a stronger frontier model with the same prompt and measure the accuracy delta before committing to fine-tuning",
+        "Identifies this as a strong SFT candidate if fine-tuning is warranted: the task is classification with a fixed label set, training and deployment distributions are close, and format stabilization is the primary need",
+        "Notes SFT's ceiling: fine-tuning cannot exceed the quality of the demonstration labels — if the 82% ceiling reflects ambiguous categories or inconsistent labeling, SFT will not break through it",
+        "Applies the YAGNI gate: post-training is expensive and hard to reverse; 82% with a prompt may be close to the ceiling for this task regardless of training approach",
+        "Identifies what SFT cannot do here: inject knowledge about legal contract nuances that the model doesn't have — that requires better context (contract definitions, examples) not model weights"
+      ]
     },
     {
       "id": 4,
@@ -31,7 +52,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": ["agent-tool-design"],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Identifies this as a protocol knowledge problem — exactly what SFT is designed for: baking in 'how to say and do things' (the correct API call sequence)",
+        "Recommends SFT over RL: the call sequence is fixed and known, the training and deployment distributions are close, and the task does not require discovering novel strategies",
+        "Notes that a few hundred high-quality demonstration trajectories showing the correct sequence will efficiently bake the protocol into the model",
+        "Applies the YAGNI gate: RL is not warranted unless the API usage patterns are highly variable and optimal call sequences need to be discovered — neither is true here",
+        "Addresses demonstration quality: demonstrations must show the complete correct sequence including authentication, not just the happy path — coverage of the full protocol is the key data requirement"
+      ]
     },
     {
       "id": 5,
@@ -39,7 +67,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Diagnoses this as the classic SFT failure mode: SFT memorized the training distribution and degrades when deployment conditions differ — adding more examples of the same distribution does not fix distribution shift",
+        "Recommends RL as the appropriate tool: RL learns a transferable strategy that re-solves problems with the same strategy even when the input distribution shifts",
+        "Applies the distribution test: the deployment environment shifts systematically from training, which is the explicit criterion for when RL becomes relevant over SFT",
+        "Notes the data quality issue: before committing to RL, verify that the production distribution is actually captured in the training environment — a distorted environment trains a policy that works only in simulation",
+        "Avoids recommending simply collecting more SFT data from production: the root cause is SFT's optimization objective (memorization), not data quantity — more examples of the same type will not generalize"
+      ]
     },
     {
       "id": 6,
@@ -47,7 +82,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the reward density spectrum: binary outcome reward (plan changed successfully) is the starting point, but multi-step information collection warrants milestone rewards for each piece of information collected",
+        "Recommends the 'reward the outcome, constrain the process' pattern: outcome reward as the primary signal, plus verifiable path penalties for skipping required information collection steps",
+        "Addresses multi-turn credit assignment: in a multi-turn phone call, which turn caused the final success or failure — turn-level credit assignment is the practical compromise",
+        "Notes that process rewards (per-step feedback) accelerate convergence but may prevent the model from discovering more efficient information-collection strategies",
+        "Identifies the penalty target correctly: the penalty must target a specific detectable bad action (skipping account number collection), never 'lack of progress' — that teaches the agent to do nothing"
+      ]
     },
     {
       "id": 7,
@@ -55,7 +97,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": ["agent-tool-design"],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the YAGNI gate: exhaust prompt engineering and tool design before committing to fine-tuning — 30% error rate on a new API may be fixable with better tool descriptions and examples",
+        "Identifies this as a protocol knowledge problem if fine-tuning is warranted: SFT is designed to bake in 'how to do things' (correct endpoint selection and query format)",
+        "Recommends the model-swap experiment: swap to a stronger frontier model with improved tool descriptions to determine whether the bottleneck is the model or the harness",
+        "Notes the ACI principle: if endpoint names and parameter schemas are ambiguous, the problem may be tool design — rename endpoints so the correct choice is obvious without a comment",
+        "Recommends SFT over RL if fine-tuning is needed: the API usage patterns are fixed and known, the training and deployment distributions are close, and no strategy discovery is required"
+      ]
     },
     {
       "id": 8,
@@ -63,7 +112,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the decision framework in order: (1) is post-training needed at all — run the model-swap experiment first; (2) if training is needed, try SFT first; (3) only add RL when SFT is insufficient",
+        "Identifies the RL-warranted criteria that apply here: multi-step tasks where the optimal tool selection path is unknown, and annotation cost is too high to demonstrate every path",
+        "Notes the RL cost: 10–100× more expensive than harness iteration and harder to reverse — the team must establish that the harness ceiling is genuinely reached before committing",
+        "Addresses the practical test for SFT ceiling: 'when no matter how many demonstrations are added, new scenarios still perform poorly' — that is the tipping point to switch to RL",
+        "Identifies the RL prerequisite: a verifiable reward signal (task completion quality) and a buildable training environment that resembles real research tasks — both must be established before RL investment is justified"
+      ]
     },
     {
       "id": 9,
@@ -71,7 +127,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the reward density spectrum: binary outcome reward (issue resolved) vs process rewards (per-turn feedback) vs milestone rewards (key dialogue checkpoints)",
+        "Addresses multi-turn credit assignment: in an 8-12 turn task, which turn caused the final success or failure — turn-level credit assignment is the practical compromise between trajectory-level (too coarse) and token-level (too expensive)",
+        "Notes the process reward tradeoff: per-turn rewards accelerate convergence but may prevent the model from discovering more efficient dialogue strategies — outcome rewards allow discovery at higher training cost",
+        "Recommends starting with binary outcome rewards and adding density only when training fails to converge — the default is to start simple",
+        "Identifies the 'reward the outcome, constrain the process' pattern: outcome reward as primary signal, plus verifiable path penalties for specific bad actions (skipping identity verification, making false promises)"
+      ]
     },
     {
       "id": 10,
@@ -79,7 +142,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Identifies this as reward hacking: the agent is optimizing the binary success proxy without actually satisfying the underlying constraints — pure outcome rewards actively incentivize constraint violations",
+        "Recommends the 'reward the outcome, constrain the process' pattern: add verifiable path penalties for specific detectable bad actions (skipping identity verification, editing test files)",
+        "Specifies that penalty targets must be specific detectable actions, never 'lack of progress' — that teaches the agent to do nothing",
+        "Notes that the penalty must be machine-detectable (deterministic checks), not learned scorers — a learned scorer can itself be gamed",
+        "Addresses the RLVP (reward outcome, penalize path) pattern: the penalty restores gradient signal for the constraint violations that the binary success reward cannot express"
+      ]
     },
     {
       "id": 11,
@@ -87,7 +157,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the decision framework: before adding RL, verify that SFT has genuinely hit its ceiling — the signal is 'adding more demonstrations no longer improves performance on new scenarios'",
+        "Identifies what more SFT can still deliver: better data coverage of edge cases, higher-quality demonstrations, and diversity of solutions — these can push SFT further before RL is needed",
+        "Addresses demonstration quality: SFT's ceiling is the demonstrator's level — if the current ceiling reflects mediocre demonstrations, improving data quality is cheaper than switching to RL",
+        "Notes the ordering constraint: SFT must be solid before RL — overtraining SFT collapses the model onto the training distribution, limiting RL's optimization space",
+        "Identifies the RL-warranted signal: when the task requires generalization beyond the training distribution or the optimal strategy is unknown — neither may be true if in-distribution performance is already great"
+      ]
     },
     {
       "id": 12,

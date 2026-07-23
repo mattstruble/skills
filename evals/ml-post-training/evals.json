@@ -7,15 +7,29 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "Guidance on applying LoRA to MLP layers (gate_proj, up_proj, down_proj), rank selection for SFT, and format stabilization target (<10% failure rate before RL)"
+      "expected_output": "Guidance on applying LoRA to MLP layers (gate_proj, up_proj, down_proj), rank selection for SFT, and format stabilization target (<10% failure rate before RL)",
+      "expectations": [
+        "Identifies the root cause as LoRA targeting only attention layers: MLP layers (gate_proj, up_proj, down_proj) have the largest parameter count and must be included — applying LoRA only to attention layers costs accuracy",
+        "Specifies the format stabilization target: the SFT phase is complete when parse failure rate drops below ~5–10% — at 30% the model is not ready to proceed to RL",
+        "Recommends SFT LoRA rank in the 64–256 range for structured output tasks, with alpha typically 2× rank",
+        "Notes that 2000 training steps may be insufficient — the stopping condition is format stability (parse failure < 10%), not a fixed step count",
+        "Avoids recommending RL as the next step at 30% parse failure rate — RL will be unstable because the reward function cannot parse malformed JSON, producing NaN rewards and zero gradients"
+      ]
     },
     {
       "id": 2,
-      "prompt": "We're starting RL training on a customer service agent using GRPO. After about 500 steps, training just stops improving — the reward is flat and the loss isn't moving. I checked and about 90% of our training groups are all-pass (the model solves most prompts correctly). How do I fix this?",
+      "prompt": "We're starting RL training on a customer service agent using GRPO. After about 500 steps, training just stops improving — the reward is flat and the loss isn't moving. I checked and about 90% of our training groups are all-pass (the model solves most prompts correctly). What do I fix this?",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "Explanation of GRPO zero-variance deadlock in all-pass groups, dynamic sampling to filter them out, and adding harder prompts to the training distribution"
+      "expected_output": "Explanation of GRPO zero-variance deadlock in all-pass groups, dynamic sampling to filter them out, and adding harder prompts to the training distribution",
+      "expectations": [
+        "Identifies the root cause as GRPO zero-variance deadlock: when all N trajectories in a group pass, within-group variance is zero, the advantage is zero for all samples, and gradients go to zero",
+        "Recommends dynamic sampling to filter out zero-variance groups: reduce samples for easy prompts already solved at high rate, increase samples for prompts in the 20–80% success-rate range",
+        "Recommends adding harder prompts to the training distribution to restore within-group variance — the model needs prompts where some rollouts succeed and some fail",
+        "Notes this is the all-pass variant of the zero-variance deadlock (the all-fail variant occurs early in training when the task is too hard)",
+        "Avoids recommending simply increasing training steps or learning rate — the problem is zero gradient signal, not slow convergence"
+      ]
     },
     {
       "id": 3,
@@ -23,7 +37,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "RLVP pattern: verified penalty for constraint violations, milestone rewards for correct ordering, deterministic checks not learned scorers"
+      "expected_output": "RLVP pattern: verified penalty for constraint violations, milestone rewards for correct ordering, deterministic checks not learned scorers",
+      "expectations": [
+        "Recommends the RLVP pattern (reward outcome, penalize path): outcome reward as the primary signal, plus a verified penalty for each ordering constraint violation",
+        "Specifies that penalty targets must be specific detectable actions (calling summarize before search, accessing account data before identity verification) — never 'lack of progress'",
+        "Recommends deterministic checks for the penalties, not learned scorers — ordering violations are cheap to detect programmatically and a learned scorer can itself be gamed",
+        "Recommends milestone rewards for correct intermediate steps (identity verified, search completed before summarize) to provide positive gradient signal for the correct ordering",
+        "Notes that pure outcome rewards actively incentivize constraint violations: skipping identity verification raises apparent success rate, so the penalty is load-bearing, not optional"
+      ]
     },
     {
       "id": 4,
@@ -31,7 +52,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "PPO recommendation for long-trajectory multi-turn tasks (value network provides per-step credit assignment); GRPO's coarse credit assignment degrades for long horizons"
+      "expected_output": "PPO recommendation for long-trajectory multi-turn tasks (value network provides per-step credit assignment); GRPO's coarse credit assignment degrades for long horizons",
+      "expectations": [
+        "Recommends PPO for trajectories of 15-25 turns: PPO's value network provides per-step credit assignment via GAE (Generalized Advantage Estimation), which is required when trajectories are long",
+        "Explains why GRPO degrades for long trajectories: GRPO treats the entire response as a single action and uses within-group variance as the advantage — coarse credit assignment that cannot identify which of 15-25 steps drove the outcome",
+        "States the algorithm selection rule explicitly: use GRPO for single-turn or short-trajectory tasks (≤~5 turns); use PPO when trajectories exceed ~5 turns or fine-grained per-step credit assignment is required",
+        "Notes the PPO cost: requires training and storing a value network alongside the policy, and is more sensitive to hyperparameters than GRPO",
+        "Avoids recommending GRPO as the simpler option without addressing the credit assignment degradation for 15-25 turn trajectories"
+      ]
     },
     {
       "id": 5,
@@ -39,7 +67,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "Reward hacking diagnosis, KL penalty increase (kl_coef), early stopping based on human eval, reward model over-optimization explanation"
+      "expected_output": "Reward hacking diagnosis, KL penalty increase (kl_coef), early stopping based on human eval, reward model over-optimization explanation",
+      "expectations": [
+        "Diagnoses this as reward hacking: the model has learned to game the reward proxy (score well on the reward model) without actually improving at the task — proxy reward climbs while true quality peaks and falls",
+        "Recommends increasing the KL penalty coefficient (`kl_coef`): the KL term prevents reward hacking by penalizing divergence from the reference policy",
+        "Recommends early stopping based on human eval: use the held-out human evaluation as the stopping criterion, not the proxy reward — stop when human eval quality peaks",
+        "Explains the over-optimization dynamic: without KL regularization, the model learns to produce outputs that score highly on the reward model's learned patterns (verbosity, hedging) rather than genuine quality",
+        "Notes that the KL reference policy should be the safety-aligned SFT checkpoint, not the raw base model, to preserve safety behaviors during RL"
+      ]
     },
     {
       "id": 6,
@@ -47,7 +82,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "RL LoRA rank 8-32 (lower than SFT because per-step information is small), learning rate ~10x full fine-tuning LR, all major weight matrices including MLP layers"
+      "expected_output": "RL LoRA rank 8-32 (lower than SFT because per-step information is small), learning rate ~10x full fine-tuning LR, all major weight matrices including MLP layers",
+      "expectations": [
+        "Recommends RL LoRA rank in the 8–32 range — significantly lower than SFT rank (64–256) because per-step information in RL is small and high rank is wasteful",
+        "Recommends learning rate approximately 10× the full fine-tuning learning rate — same as SFT, but the lower rank means fewer parameters are updated per step",
+        "Specifies targeting all major weight matrices including MLP layers (gate_proj, up_proj, down_proj) — applying LoRA only to attention layers costs accuracy",
+        "Confirms that rank=128 from SFT is indeed overkill for RL: the information content per gradient step in RL is much smaller than in SFT, making high rank unnecessary",
+        "Sets alpha to approximately 2× rank — the standard LoRA alpha convention applies to both SFT and RL configurations"
+      ]
     },
     {
       "id": 7,
@@ -55,7 +97,14 @@
       "should_trigger": true,
       "co_triggers": ["agent-architecture"],
       "files": [],
-      "expected_output": "Reset semantics (snapshot/restore or ephemeral containers), throughput/parallelism requirements, fidelity to production environment, reward computability"
+      "expected_output": "Reset semantics (snapshot/restore or ephemeral containers), throughput/parallelism requirements, fidelity to production environment, reward computability",
+      "expectations": [
+        "Identifies reset semantics as the primary requirement: the environment must be able to reset to a clean starting state between episodes — without this, state bleeds across trajectories and the reward signal becomes meaningless",
+        "Recommends snapshot/restore or ephemeral containers as the reset mechanism for web browsing: browser state (cookies, localStorage, form data) must be fully reset between episodes",
+        "Addresses throughput and parallelism: on-policy training requires generating many rollouts per step — the environment must support 100+ parallel workers for non-trivial tasks",
+        "Addresses fidelity: the simulation must resemble the real production web environment — training on a simplified environment that differs from production is a form of distribution shift",
+        "Addresses reward computability: the environment must be able to determine success/failure (or partial progress) deterministically — if the reward function returns NaN on 20%+ of trajectories, training will be unstable"
+      ]
     },
     {
       "id": 8,
@@ -63,7 +112,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "Yes, SFT must come first for smaller models with structured output requirements; base model produces unstructured output → reward function can't parse → NaN → zero gradients. Exception: very strong base models (DeepSeek-R1-Zero scale)"
+      "expected_output": "Yes, SFT must come first for smaller models with structured output requirements; base model produces unstructured output → reward function can't parse → NaN → zero gradients. Exception: very strong base models (DeepSeek-R1-Zero scale)",
+      "expectations": [
+        "Confirms this is expected: the base model produces unstructured output, the reward function cannot parse it, returns NaN, gradients go to zero, and training fails completely",
+        "Explains the ordering constraint: SFT must precede RL for smaller models with structured output requirements — SFT's job is to stabilize output format so RL has a parseable starting point",
+        "Notes the exception: very strong base models (DeepSeek-R1-Zero scale) may produce adequate output from the start and can attempt direct RL — but the cost is poor output readability",
+        "Notes that DeepSeek ultimately added 'cold-start SFT' in R1 to re-establish format, confirming that even at scale, SFT-first is the more reliable path",
+        "Recommends running SFT until parse failure rate drops below ~10% before attempting RL — the format stability check is the concrete stopping criterion"
+      ]
     },
     {
       "id": 9,
@@ -71,7 +127,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "Process rewards for pedagogical steps (explanation quality, question asking, scaffolding), milestone rewards for intermediate steps, vector rewards for multiple quality dimensions"
+      "expected_output": "Process rewards for pedagogical steps (explanation quality, question asking, scaffolding), milestone rewards for intermediate steps, vector rewards for multiple quality dimensions",
+      "expectations": [
+        "Recommends process rewards (PRM) for pedagogical steps: per-step feedback for explanation quality, question-asking, and scaffolding — binary outcome reward alone cannot express the process constraint",
+        "Recommends milestone rewards for correct intermediate steps: partial credit when the agent asks a clarifying question, explains a concept, or guides the student to the next step",
+        "Recommends vector rewards for multiple quality dimensions: accuracy (correct final answer), pedagogy (guiding vs. giving), and engagement (question-asking) are separable axes that should be rewarded independently",
+        "Applies the RLVP pattern: add a verified penalty for giving the answer directly (the specific detectable bad action) rather than relying solely on positive rewards for good behavior",
+        "Notes the process reward tradeoff: per-step rewards accelerate convergence but may prevent the model from discovering more effective tutoring strategies — the balance depends on whether the optimal pedagogical path is known"
+      ]
     },
     {
       "id": 10,
@@ -79,7 +142,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "Prompt distillation recipe: collect trajectories from teacher, filter incorrect final answers with rule-based validator, SFT on problem→<think>reasoning</think>+answer format, watch for inherited systematic errors and verbose thinking"
+      "expected_output": "Prompt distillation recipe: collect trajectories from teacher, filter incorrect final answers with rule-based validator, SFT on problem→<think>reasoning</think>+answer format, watch for inherited systematic errors and verbose thinking",
+      "expectations": [
+        "Recommends prompt distillation: collect trajectories from the teacher model (DeepSeek-R1) by sampling on the training problem set, then SFT the student on those trajectories",
+        "Specifies filtering with a rule-based validator: reject trajectories where the final answer is incorrect — SFT bakes errors into parameters verbatim, so incorrect demonstrations must be filtered before training",
+        "Specifies the training format: `problem → <think>reasoning</think> + answer` — the student must learn to produce the full reasoning chain, not just the final answer",
+        "Warns about inherited systematic errors: if the teacher model has systematic biases or errors in its reasoning, the student will inherit them — verify the teacher's trajectories on a held-out set before committing to the full distillation",
+        "Warns about verbose thinking: teacher models often produce unnecessarily long reasoning chains — monitor response length distribution and consider filtering or truncating excessively verbose trajectories"
+      ]
     },
     {
       "id": 11,
@@ -87,7 +157,14 @@
       "should_trigger": true,
       "co_triggers": ["agent-tool-design"],
       "files": [],
-      "expected_output": "SFT warm-up to establish tool-call format, then RL with sandbox execution loop; token-level policy gradient loss, dynamic sampling, overlong reward shaping"
+      "expected_output": "SFT warm-up to establish tool-call format, then RL with sandbox execution loop; token-level policy gradient loss, dynamic sampling, overlong reward shaping",
+      "expectations": [
+        "Specifies the two-stage recipe: (1) SFT warm-up (~1 hour) to establish basic tool-call format from pure-text reasoning data converted to tool-augmented trajectories; (2) RL training with sandbox execution loop interleaved with rollouts",
+        "Describes the RL execution loop: model generates `<code>` tags → sandbox executes → result returned in `<interpreter>` tags → model continues — the sandbox is inside the RL loop, not a separate step",
+        "Recommends token-level policy gradient loss: normalize across all tokens in the batch (not per-sample) so long responses receive gradient proportional to their length",
+        "Recommends dynamic sampling: reduce samples for easy prompts already solved at high rate, increase for prompts in the 20–80% success-rate range — the most informative region for gradient signal",
+        "Recommends overlong reward shaping: soft penalty for responses that grow long without improving accuracy — prevents the model from padding responses to avoid committing to an answer"
+      ]
     },
     {
       "id": 12,
@@ -95,7 +172,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "DPO recommendation when high-quality preference data already exists and budget is constrained; no online sampling needed, no reward model training, no PPO loop"
+      "expected_output": "DPO recommendation when high-quality preference data already exists and budget is constrained; no online sampling needed, no reward model training, no PPO loop",
+      "expectations": [
+        "Recommends DPO: high-quality preference pairs already exist and budget is constrained — DPO turns preference pairs directly into a classification loss without requiring online sampling or a reward model",
+        "Explains the DPO advantage for this scenario: no reward model training, no PPO loop, no value network — significantly lower compute cost than PPO",
+        "Notes DPO's limitation: it is off-policy and cannot explore new policies — quality is bounded by the coverage of the 50k preference pairs",
+        "Applies the practical selection path: 'high-quality preference pairs already exist → DPO/KTO' — this is the explicit criterion in the algorithm selection framework",
+        "Avoids recommending PPO without a concrete justification for why online sampling is needed — with 50k high-quality preference pairs and a budget constraint, PPO's additional cost is not justified"
+      ]
     },
     {
       "id": 13,
@@ -103,7 +187,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "Target <10% parse failure rate before starting RL; at 15% RL will be unstable; continue SFT; check for template inconsistency or base model mismatch if not improving"
+      "expected_output": "Target <10% parse failure rate before starting RL; at 15% RL will be unstable; continue SFT; check for template inconsistency or base model mismatch if not improving",
+      "expectations": [
+        "States the stopping condition explicitly: format is stable when parse failure rate drops below ~5–10% — at 15% the model is not ready for RL",
+        "Explains why 15% is too high: RL needs parseable output to compute rewards — a 15% parse failure rate means the reward function returns NaN on 15% of trajectories, producing unstable training",
+        "Recommends continuing SFT until the target is reached — the stopping condition is format stability, not a fixed step count",
+        "Suggests diagnosing why improvement has stalled at 15%: check for chat template inconsistency (mixed formats in training data), base model mismatch, or insufficient data coverage of the failure cases",
+        "Notes that overtraining SFT beyond the format stability target collapses the model onto the training distribution, limiting RL's optimization space — stop at the target, not far past it"
+      ]
     },
     {
       "id": 14,
@@ -111,7 +202,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "All-fail groups (early training, task too hard) → zero within-group variance → zero gradient. Add milestone/partial credit rewards, use easier warmup tasks, or add RLVP partial credit for reachable progress"
+      "expected_output": "All-fail groups (early training, task too hard) → zero within-group variance → zero gradient. Add milestone/partial credit rewards, use easier warmup tasks, or add RLVP partial credit for reachable progress",
+      "expectations": [
+        "Identifies the root cause as the all-fail variant of GRPO zero-variance deadlock: at 5% success rate, most groups have all N trajectories failing, within-group variance is zero, and gradients go to zero",
+        "Recommends adding milestone or partial credit rewards: if the task has reachable intermediate progress (partial completion, correct format, correct first step), reward it to restore gradient signal in all-fail groups",
+        "Recommends the RLVP pattern for partial credit: add verified partial credit for reachable progress rather than relying solely on binary success/failure",
+        "Recommends using easier warmup tasks to bootstrap the model: start with a curriculum of simpler problems where the model can achieve some success, then gradually increase difficulty",
+        "Notes that dynamic sampling alone cannot fix all-fail groups — filtering them out removes all training signal; the fix is adding reward density so some gradient flows even when the final task fails"
+      ]
     },
     {
       "id": 15,
@@ -167,7 +265,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "SFT vs RL comparison for CoT: SFT memorizes demonstrated reasoning patterns (fast, stable, ceiling = demonstration quality); RL generalizes reasoning strategy (slower, higher ceiling, can discover novel approaches). Recommend SFT first for format, then RL for generalization."
+      "expected_output": "SFT vs RL comparison for CoT: SFT memorizes demonstrated reasoning patterns (fast, stable, ceiling = demonstration quality); RL generalizes reasoning strategy (slower, higher ceiling, can discover novel approaches). Recommend SFT first for format, then RL for generalization.",
+      "expectations": [
+        "Applies the one-sentence rule: SFT memorizes demonstrated reasoning patterns (ceiling = demonstration quality); RL generalizes reasoning strategy (can discover novel approaches beyond any demonstrator)",
+        "Recommends the ordering constraint: SFT first to establish the CoT format (`<think>...</think>` structure), then RL to generalize the reasoning strategy beyond the training distribution",
+        "Explains why RL has a higher ceiling for CoT: verification is easier than generation — math answers can be checked against a key, so RL can train a model stronger than any available demonstrator",
+        "Notes SFT's limitation for CoT: SFT cannot generalize beyond its training distribution — if the demonstrations cover only certain problem types, the model will fail on novel reasoning patterns",
+        "Addresses the practical tradeoff: SFT is fast and stable (hours to days); RL is 10–100× more expensive and harder to stabilize — start with SFT and add RL only when SFT has hit its ceiling"
+      ]
     },
     {
       "id": 22,
@@ -175,7 +280,14 @@
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
-      "expected_output": "KL penalty too low (0.01 is very small); increase kl_coef; verify reference model is frozen; check for distribution collapse symptoms"
+      "expected_output": "KL penalty too low (0.01 is very small); increase kl_coef; verify reference model is frozen; check for distribution collapse symptoms",
+      "expectations": [
+        "Identifies the root cause as KL penalty too low: 0.01 is very small and insufficient to prevent distribution collapse — the model is free to diverge from the reference policy",
+        "Recommends increasing `kl_coef`: the KL term prevents distribution collapse by penalizing divergence from the reference policy — a higher coefficient is needed to stabilize training",
+        "Recommends verifying the reference model is frozen: if the reference policy is being updated during training, the KL term loses its regularization effect",
+        "Explains the collapse mechanism: without adequate KL regularization, the policy degenerates into repetition or a single mode — the model learns to output whatever scores highest on the reward regardless of input",
+        "Notes the effective reward formula: `r_effective = r_RM - β · KL(π_θ ‖ π_ref)` — at β=0.01, the KL penalty is nearly absent and the reward model score dominates unchecked"
+      ]
     },
     {
       "id": 23,

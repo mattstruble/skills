@@ -5,19 +5,40 @@
       "id": 1,
       "prompt": "I'm making a fennel love2d game and I have an enemy spawner module. Every time I ,reload the module my enemy list gets wiped out and all the enemies disappear. The enemies are tables with a metatable that has :draw and :update methods. How do I fix this so the enemy list AND the metatable survive reloads?",
       "expected_output": "Should recommend the state module for the enemy list and the hot-table macro for the metatable. Should show the persist macro for the count, hot-table macro for the Enemy metatable, and accessing the enemy list from state.fnl. Should explain WHY metatables break on reload (new table reference).",
-      "files": []
+      "files": [],
+      "expectations": [
+        "Recommends storing the enemy list in `state.fnl` — the dedicated state module for data that must survive reloads — not as a module-level local in the spawner module",
+        "Recommends the `hot-table` macro for the Enemy metatable: it persists the table reference but overwrites its members with new values, so existing enemy objects retain valid method references after reload",
+        "Explains why metatables break on reload: when a module is reloaded, its metatable is a new table — existing objects still hold a reference to the old metatable, so method calls no longer reflect the updated code",
+        "Warns against reloading `state.fnl` during development: modules that already captured its reference will continue using the old table while new `require` calls return a fresh one, causing split-brain state bugs",
+        "Uses `(import-macros {: hot-table} :persist)` syntax to import the macro, not a plain function call — `hot-table` is a macro, not a runtime function"
+      ]
     },
     {
       "id": 2,
       "prompt": "I want to start a new love2d game using fennel with interactive development. I've never used fennel before. Walk me through setting up the project from scratch and show me how to get a basic game loop running with hot-reloading.",
       "expected_output": "Should recommend the min-love2d-fennel template as the starting point. Should walk through cloning, customizing conf.lua/makefile, the project structure (main.lua, wrap.fnl, mode files), running with love ., using the REPL, and using ,reload to hot-reload modules.",
-      "files": []
+      "files": [],
+      "expectations": [
+        "Recommends the min-love2d-fennel template (https://codeberg.org/alexjgriffith/min-love2d-fennel) as the starting point — not a manual setup from scratch",
+        "Explains the mode system architecture: `main.lua` initializes Fennel and calls `wrap.fnl`; each mode is a Fennel module returning a table of callbacks (`draw`, `update`, `activate`)",
+        "Shows running with `love .` from the project directory and explains that the REPL (`>>` prompt) appears in the shell alongside the game window",
+        "Explains `,reload module-name` as the key hot-reload command — reloads a module file and updates `package.loaded` so the mode system picks up new callbacks on the next frame",
+        "Warns against overwriting Love2D callbacks directly (`love.draw`, `love.update`) from the REPL or modules — the mode system intercepts these callbacks and bypassing it leads to unrecoverable crashes"
+      ]
     },
     {
       "id": 3,
       "prompt": "My fennel love2d game has gameplay working in mode-game.fnl. Now I need to add a pause screen that shows when the player hits escape, and lets them resume or quit. How should I structure this with the mode system?",
       "expected_output": "Should create a mode-pause.fnl that returns draw and update callbacks. Should show using set-mode to switch from mode-game to mode-pause on escape, and from mode-pause back to mode-game on resume. Should address state preservation (game state survives in state module while paused).",
-      "files": []
+      "files": [],
+      "expectations": [
+        "Creates a separate `mode-pause.fnl` module that returns a table of callbacks (`draw`, `update`) — each distinct game state gets its own mode file",
+        "Uses `(set-mode :mode-pause)` in `mode-game.fnl`'s update callback when escape is pressed — `set-mode` is passed as a parameter to `update`, not imported directly",
+        "Uses `(set-mode :mode-game)` in `mode-pause.fnl`'s update callback when the player chooses resume — mode switching is symmetric",
+        "Addresses state preservation: game state (player position, score, enemies) survives in `state.fnl` while paused because the state module is never reloaded and mode switching does not reset it",
+        "Avoids overwriting `love.draw` or `love.update` directly — all rendering and logic goes through mode callbacks, not direct Love2D callback assignment"
+      ]
     }
   ]
 }

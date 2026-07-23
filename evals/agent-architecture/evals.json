@@ -7,7 +7,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Recommends a workflow (fixed code path) rather than a fully autonomous agent for this well-defined task",
+        "Specifies all three mandatory stopping conditions: task-complete signal, max iterations ceiling, and unrecoverable-error exit path",
+        "Applies dynamic tool risk rating to the refund action — reversibility, permission level, and financial impact — rather than treating all tools as equal risk",
+        "Addresses the Correct harness function: retry on transient failure, then escalate to human when retries are exhausted",
+        "Frames the refund API error as a Verify/Correct problem, not just an orchestration problem — the harness must detect the failure and route to the fallback path"
+      ]
     },
     {
       "id": 2,
@@ -15,7 +22,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the YAGNI ladder — questions whether a fully autonomous agent is needed or whether a workflow with fixed triage logic would suffice",
+        "Rates labeling/assigning as lower-risk (reversible) and closing issues as high-risk (irreversible), requiring explicit confirmation before execution",
+        "Distinguishes jailbreak from prompt injection as separate threats — issue content could contain prompt injection attempting to hijack the agent's actions",
+        "Recommends a reasoning model for the triage/classification step given the need to decompose and decide, with output speed as a secondary axis since latency is not interactive",
+        "Specifies human-in-the-loop triggers: low-confidence triage, novel issue types the agent hasn't seen, or any destructive action (close/delete)"
+      ]
     },
     {
       "id": 3,
@@ -23,7 +37,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the YAGNI ladder: the iterative test-fix loop requires the LLM to decide the execution path at runtime, justifying an autonomous agent over a fixed workflow",
+        "Specifies all three stopping conditions for the autonomous loop: task-complete (tests pass), max iterations hard ceiling, and unrecoverable-error exit",
+        "Applies dynamic tool risk rating to file system access — reading is low-risk, writing to source files is medium-risk, deleting files is high-risk — with confirmation thresholds per risk level",
+        "Recommends a reasoning model given the need to plan, decompose, and recover from unexpected test failures",
+        "Addresses the ACI (Agent-Computer Interface) principle: tool names and parameters should make the risk of each action explicit, not require a comment to explain side effects"
+      ]
     },
     {
       "id": 4,
@@ -31,7 +52,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Diagnoses the infinite loop as a missing stopping condition — the agent lacks a max-iterations ceiling or a task-complete signal it can assert",
+        "Diagnoses hallucinated citations as a Verify gap — the harness has no output validation step that cross-references claims against source URLs",
+        "Names context rot as a contributing factor: accumulated raw search results push the model out-of-distribution over a long horizon, degrading output quality even without a hard failure",
+        "Recommends the Correct harness function for the loop: explicit exit on max search calls, timeout, or a 'done' signal the model must emit",
+        "Recommends isolation over compression for the search results — delegating retrieval to sub-agents so raw tool output does not accumulate in the root context"
+      ]
     },
     {
       "id": 5,
@@ -39,7 +67,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the YAGNI ladder explicitly: the execution path is fixed in advance (extract → validate → flag), so a workflow is the correct choice over an autonomous agent",
+        "Identifies the decision criterion: does the LLM need to decide what happens next, or can code decide? For this task, code decides every transition",
+        "Notes the workflow advantages that apply here: deterministic, auditable, lower cost, and a confined attack surface compared to an autonomous agent",
+        "Recommends a single LLM call or a short fixed workflow rather than a ReAct loop, since no runtime path discovery is needed",
+        "Avoids recommending an autonomous agent without a concrete justification for why the execution path cannot be known in advance"
+      ]
     },
     {
       "id": 6,
@@ -47,7 +82,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the four durable model-selection axes — reasoning requirement, output speed, multimodal need, and open vs closed — rather than just comparing named models",
+        "Identifies multimodal as a hard requirement given charts and tables in PDFs, not an optional feature",
+        "Identifies the reasoning-required gate: reasoning across inconsistencies across sections requires a reasoning model, not a simple extraction model",
+        "Notes the durability caveat: specific model versions iterate faster than any recommendation, so the axes are more durable than the named comparison",
+        "Recommends evaluating on the actual task rather than relying on benchmarks, since benchmark performance does not transfer to specific document analysis tasks"
+      ]
     },
     {
       "id": 7,
@@ -55,7 +97,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the Verify harness function to the planner-worker interface: the planner must validate worker outputs against expected format and constraints before incorporating them",
+        "Recommends structured output contracts between planner and workers — the ACI principle applied to inter-agent communication, not just tool calls",
+        "Addresses the Correct function: what the planner does when a worker output fails validation — retry, reassign, or escalate",
+        "Recommends isolation: worker contexts should be self-contained so raw intermediate tokens do not flow back into the planner's context, preventing context rot in the orchestrator",
+        "Notes that each worker should receive a locally in-distribution task description — a self-contained prompt that resembles training data, not a fragment of the planner's accumulated trajectory"
+      ]
     },
     {
       "id": 8,
@@ -63,7 +112,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": ["application-architecture"],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the YAGNI ladder: the return flow has mostly fixed steps (check eligibility → initiate return → send confirmation), suggesting a workflow with LLM assist at the customer-dialogue step rather than a fully autonomous agent",
+        "Rates OMS write and database write as high-risk operations requiring explicit confirmation before execution, given their irreversibility and financial impact",
+        "Specifies all three stopping conditions for any autonomous loop: task-complete signal, max iterations, and unrecoverable-error exit path",
+        "Addresses human-in-the-loop triggers: eligibility edge cases, customer disputes, or any operation that would modify order records beyond the defined return flow",
+        "Distinguishes the agent architecture concerns (orchestration, guardrails, tool risk) from the application architecture concerns (where state lives, how sessions are persisted) — noting the boundary between the two skills"
+      ]
     },
     {
       "id": 9,
@@ -71,7 +127,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the three-axis dynamic tool risk rating: reversibility (web browsing is reversible; code execution with side effects may not be), permission level, and financial impact",
+        "Emphasizes that risk is parameter-dependent, not per-tool: `execute_script(read_file)` is low-risk; `execute_script(rm -rf /)` is high-risk — the same tool can span the full risk spectrum",
+        "Identifies prompt injection as the primary threat for web browsing: malicious instructions embedded in web pages the agent reads could hijack subsequent code execution",
+        "Recommends sandboxing code execution with explicit resource limits and network isolation as an execution-side Constrain measure",
+        "Recommends high-risk operations (code with file system writes, network calls, or process spawning) require explicit confirmation before execution"
+      ]
     },
     {
       "id": 10,
@@ -79,7 +142,14 @@
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": ["application-architecture"],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Identifies this as primarily a read-only agent (retrieval + synthesis), which simplifies the guardrail requirements — no high-risk write operations to production systems",
+        "Applies the YAGNI ladder: a single LLM call with retrieval context may suffice; a full autonomous agent loop is only warranted if the query requires multi-step reasoning or tool chaining",
+        "Addresses the transparency principle: the agent logic must be visible and debuggable — the orchestration layer should not be a black box relative to the API layer",
+        "Notes that auth is an input-side Constrain concern: the agent should never see data the authenticated user is not permitted to access, enforced before the LLM call",
+        "Distinguishes the agent architecture concerns (orchestration, guardrails) from the application architecture concerns (layering, service boundaries) — noting the boundary between the two skills"
+      ]
     },
     {
       "id": 11,
@@ -167,7 +237,14 @@
       "expected_output": "Good output should: (1) Start by questioning whether a full autonomous agent is warranted vs a simpler workflow — content moderation with fixed policy rules is a strong candidate for a deterministic workflow with LLM assist rather than a fully autonomous agent. (2) If recommending an agent, specify the orchestration pattern (likely a linear workflow with a classification step, not a ReAct loop) and explain why. (3) Address model selection with concrete reasoning: a smaller/faster model for initial triage, escalation to a larger model only for edge cases — latency and cost matter at 10k/day. (4) Define the tool risk model: reading posts is low-risk, approve/reject actions are high-risk and should require confidence thresholds or human confirmation. (5) Specify guardrails: input validation (adversarial content trying to manipulate the agent), output validation (structured decision format, not free text), and human-in-the-loop triggers (low confidence, appeals, novel violation types). (6) Address the human escalation path concretely — what the summary should contain, how to prevent the agent from over-escalating or under-escalating. Output should NOT just list generic agent design principles without applying them to the specific constraints (volume, policy rules, human reviewer workflow).",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the YAGNI ladder: content moderation with fixed policy rules is a strong candidate for a workflow (LLM inside fixed nodes) rather than a fully autonomous agent that decides the execution path at runtime",
+        "Applies dynamic tool risk rating: reading posts is low-risk, approve/reject writes are high-risk and require confidence thresholds or human confirmation before execution",
+        "Specifies human-in-the-loop triggers anchored to the harness model: low-confidence classification, novel violation types, and appeals — not just 'add a human review step'",
+        "Addresses the output-side Verify function: the agent's decision must be structured (approve/reject/escalate with a reason), not free text, so downstream systems can process it deterministically",
+        "Addresses model selection using the four durable axes: output speed matters at 10k/day volume, reasoning is required for edge-case classification, and a tiered approach (cheaper model for clear cases, stronger model for ambiguous ones) is appropriate"
+      ]
     },
     {
       "id": 22,
@@ -175,7 +252,14 @@
       "expected_output": "Good output should: (1) Diagnose the three failure modes separately — hallucination, over-refusal, and infinite loops — with root cause analysis for each. Hallucination likely means missing output validation (no grounding check against source URLs). Over-refusal suggests the agent's context window is filling up or the instructions are too restrictive. Loops indicate missing iteration caps or no exit condition on the search tool. (2) Propose concrete fixes for each: output validation that cross-references claims against source URLs; a context management strategy (summarize intermediate results rather than accumulating raw text); explicit loop termination (max N search calls, timeout, or a 'done' signal the agent must emit). (3) Address the tool design — the search tool should return structured results with source attribution, not raw text, so the agent can't hallucinate a source. (4) Recommend a verification step before the final report is written: a separate pass that checks each factual claim has a cited source. Output should be specific to the failure modes described, not a generic 'here are agent best practices' response.",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Diagnoses the infinite loop as a missing stopping condition — specifically the absence of a max-iterations ceiling and a task-complete signal the model can assert",
+        "Diagnoses hallucinated citations as a Verify gap: the harness has no output validation step that cross-references factual claims against source URLs before writing the report",
+        "Names context rot as a contributing factor to the over-refusal and degrading quality: accumulated raw web content pushes the model out-of-distribution over a long horizon",
+        "Applies the ACI principle to the search tool: it should return structured results with source attribution rather than raw text, so the agent cannot hallucinate a source it never retrieved",
+        "Recommends isolation over compression for intermediate search results — delegating retrieval to sub-agents so raw tool output does not accumulate in the root context and drive the model OOD"
+      ]
     },
     {
       "id": 23,
@@ -183,15 +267,29 @@
       "expected_output": "Good output should: (1) Identify this as a good fit for a structured workflow agent (not fully autonomous) — the task is well-defined, the output format is fixed, and there's no need for open-ended reasoning loops. (2) Lay out the orchestration pattern: a linear pipeline with parallel tool calls where possible (Salesforce lookup and web research can run concurrently). (3) Address model selection: a capable reasoning model is warranted (the synthesis step requires connecting disparate information), but the retrieval steps can use cheaper models or be deterministic. (4) Define the tools with risk ratings: Salesforce read (low risk), web search (low risk), document write (low risk) — this is a read-heavy agent with no write-back to production systems, which simplifies the guardrail requirements significantly. (5) Specify output validation: the briefing doc should have a fixed schema (talking points, risks, deal history summary) so the agent can't produce a free-form blob. (6) Address failure modes specific to this use case: stale CRM data, web search returning irrelevant results, hallucinated talking points. The output should feel like advice from someone who has built this kind of agent before, not a textbook recitation of agent design principles.",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Applies the YAGNI ladder: the task is well-defined with a fixed output format, making a structured workflow the right choice over a fully autonomous agent",
+        "Identifies this as a read-heavy agent with no write-back to production systems, which significantly simplifies the guardrail requirements — all tools are low-risk",
+        "Recommends parallel tool execution for Salesforce lookup and web research since they are independent, reducing end-to-end latency",
+        "Applies the output-side Verify function: the briefing doc should have a fixed schema (talking points, risks, deal history) so the agent cannot produce a free-form blob",
+        "Addresses failure modes specific to this use case: stale CRM data, web search returning irrelevant competitor pages, and hallucinated talking points — each requiring a specific Verify or Correct response"
+      ]
     },
     {
       "id": 24,
-      "prompt": "We built a research agent that's great on quick lookups but falls apart on long multi-hour research sessions — it starts forgetting findings from early on and sometimes fabricates sources. Architecturally it just appends every search result and its own reasoning to one growing conversation and keeps going. Quality visibly degrades the longer it runs even though nothing errors out. What's actually going wrong here and how should we restructure it?",
+      "prompt": "We built a research agent that's great on quick lookups but falls apart on long multi-hour research sessions — it starts forgetting findings from early on and sometimes fabricates sources. Architecturally it just appends every search result and its own reasoning to one growing conversation and keeps going. Quality visibly degrades the longer it runs even though nothing errors out.",
       "expected_output": "Good output should: (1) Name the root cause as context accumulation driving the root LM out-of-distribution over a long horizon (context rot / degrading locally-in-distribution observations), NOT just 'the context window is full'. (2) Recommend offloading task-specific content out of the main trajectory — isolate sub-tasks into sub-agents/sub-calls whose raw outputs do not flow back into the root context, passing references/summaries instead of appending everything. (3) Frame the fix as keeping each individual LM call in-distribution / making structurally similar steps look similar to the model, rather than only 'summarize the history' or 'add memory'. (4) Address the fabrication separately as a Verify/grounding gap (cross-check claims against source URLs). A strong answer connects the degradation to the append-everything harness design specifically.",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Names the root cause as context rot — the append-everything harness design pushes the root LM out-of-distribution over a long horizon, not merely 'the context window is filling up'",
+        "Recommends programmatic sub-agent calling as the fix: offload task-specific tokens to sub-agents whose raw outputs do not flow back into the root context, passing references or summaries instead",
+        "Frames the fix using the LID (locally in-distribution) criterion: each LM call should see an observation that resembles training data, which the append-everything design violates as the trajectory grows",
+        "Addresses fabricated sources separately as a Verify gap: the harness needs an output validation step that cross-references claims against source URLs, independent of the context management fix",
+        "Avoids recommending simple summarization as the primary fix — isolation (keeping raw content out of the root context entirely) is preferred over compression (summarizing after the fact)"
+      ]
     },
     {
       "id": 25,
@@ -199,7 +297,14 @@
       "expected_output": "Good output should: (1) Recommend decomposing the task so each LM call sees a small, in-distribution chunk rather than the whole corpus — a harness that keeps every call locally in-distribution. (2) Recommend programmatic decomposition: chunk/fan-out sub-calls, store intermediate results in variables/memory outside the root context, and have the root model orchestrate over references rather than reading raw content. (3) Note that this can generalize across input length because the root model's view stays roughly constant regardless of corpus size. (4) Avoid defaulting to 'just use RAG' or 'use a bigger model' as the whole answer — retrieval may be a component, but the core is harness-level decomposition keeping calls in-distribution. Bonus: caution that the decomposition must be genuinely general, not collapse to offloading the whole problem to one sub-call.",
       "should_trigger": true,
       "co_triggers": [],
-      "files": []
+      "files": [],
+      "expectations": [
+        "Recommends harness-level decomposition: fan-out sub-calls over document chunks so each individual LM call sees a locally in-distribution observation, not the full 500k-token corpus",
+        "Recommends programmatic sub-agent calling: store intermediate results in variables outside the root context so the root model orchestrates over references rather than reading raw document content",
+        "Notes the length-generalization property: the root model's view stays roughly constant regardless of corpus size, so the harness scales without retraining or a larger context window",
+        "Avoids treating RAG or a larger context model as the complete answer — retrieval may be a component, but the core fix is harness-level decomposition that keeps each call in-distribution",
+        "Cautions that the decomposition must be genuinely general and not collapse to offloading the entire problem to one sub-call, which would reintroduce the original context problem"
+      ]
     }
   ]
 }

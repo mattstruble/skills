@@ -1,5 +1,7 @@
 ---
 name: love2d-fennel
+summary: Fennel + Love2D interactive development: REPL workflow, hot-reloading, mode architecture
+type: behavioral
 description: Use when working with Fennel and Love2D together — writing `.fnl` files in a Love2D project, setting up REPL-driven development, hot-reloading modules during live gameplay, using the min-love2d-fennel template, writing Fennel macros for state persistence across reloads, or structuring a Love2D project with the mode-based architecture. NOT for Love2D engine API patterns. NOT for engine-agnostic pattern theory (see game-patterns).
 ---
 

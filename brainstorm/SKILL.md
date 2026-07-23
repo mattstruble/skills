@@ -1,5 +1,7 @@
 ---
 name: brainstorm
+summary: Interview-driven design through relentless questioning before implementation
+type: behavioral
 description: "You MUST use this before any creative work — creating features, building components, adding functionality, or modifying behavior. Also trigger when the user mentions brainstorming, wants to think through a design, stress-test a plan, or says 'grill me'. NOT for debugging, code review, writing tests, committing, or mechanical refactors (renaming, version bumps, config changes)."
 ---
 

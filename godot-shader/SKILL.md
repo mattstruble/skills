@@ -1,5 +1,7 @@
 ---
 name: godot-shader
+summary: Godot 4.x GDSL shader authoring: spatial, canvas_item, and particle shaders
+type: reference
 description: You MUST consult this skill when writing or reviewing `.gdshader` files, GDSL shader code, visual effects, lighting models, or post-processing in Godot. Also trigger on Shadertoy porting, vertex displacement, procedural shapes in shaders, screen-space effects, normal maps, transparency sorting, ray marching, or particle shader logic. NOT for GDScript game logic, scene architecture, or node patterns (see godot). NOT for C# or visual shaders.
 ---
 

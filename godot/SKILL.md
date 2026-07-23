@@ -1,5 +1,7 @@
 ---
 name: godot
+summary: Godot 4.x GDScript development: scenes, nodes, signals, AutoLoads, and patterns
+type: reference
 description: Use when working on any Godot 4.x development — writing or reviewing .gd files, designing scene trees, implementing game systems in GDScript, structuring Godot projects, or asking about nodes, signals, AutoLoads, Resources, or the Godot editor. Also trigger when implementing game patterns (Observer, State, Command, etc.) in a Godot project — this skill takes precedence over game-patterns for Godot-specific implementation. NOT for engine-agnostic pattern theory (see game-patterns). NOT for Love2D (see love2d). NOT for shaders or visual effects (see godot-shader).
 ---
 

@@ -1,5 +1,7 @@
 ---
 name: multi-agent-collaboration
+summary: Designing multi-agent topologies, context sharing, handoff protocols, and failure modes
+type: behavioral
 description: You MUST consult this skill when designing systems where multiple LLM agents collaborate — choosing collaboration topology (peer, manager, decentralized), deciding context sharing vs isolation, designing handoff protocols, implementing verification loops, or debugging multi-agent failure modes (conflicting edits, error cascading, runaway iteration). Also trigger when deciding whether multi-agent adds value over a single agent with more compute. NOT for single-agent workflow orchestration or sub-agent spawning (see agent-architecture), or for the tool interface design of spawn_subagent or send_message (see agent-tool-design).
 ---
 

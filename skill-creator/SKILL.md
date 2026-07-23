@@ -1,5 +1,7 @@
 ---
 name: skill-creator
+summary: Creating, iterating, and benchmarking skills through eval-driven refinement
+type: behavioral
 description: Use when creating a new skill from scratch, editing or optimizing an existing skill, running evals to test a skill, benchmarking skill performance with variance analysis, or optimizing a skill's description for better triggering accuracy.
 ---
 

@@ -1,5 +1,7 @@
 ---
 name: docker
+summary: Dockerfile authoring, multi-stage builds, image optimization, and container networking
+type: reference
 description: Use when writing Dockerfiles, Docker Compose files, building or debugging container images, choosing base images, pushing to registries, or running containers locally. Also trigger when asked about multi-stage builds, .dockerignore, container networking, volumes, or self-hosting an application with Docker. NOT for Kubernetes workloads (see k8s-workloads), Helm charts (see helm), Docker in CI pipelines (see github-actions), or GPU operator configuration (see gpu-operator).
 ---
 

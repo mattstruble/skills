@@ -1,5 +1,7 @@
 ---
 name: k8s-networking
+summary: DNS, Ingress, TLS, NetworkPolicy, and VPN access for self-hosted Kubernetes
+type: reference
 description: Use when configuring DNS records for a self-hosted domain, installing or configuring the NGINX Ingress controller, setting up TLS/SSL certificates with cert-manager and Let's Encrypt, writing NetworkPolicy resources, or creating a WireGuard VPN for cluster access. Also trigger on Flannel CNI configuration, exposing services externally, or debugging ingress routing. NOT for cluster setup (see k3s), workload resources (see k8s-workloads), storage/ConfigMaps/Secrets (see k8s-storage), Helm charts (see helm), or rollout strategies (see k8s-operations).
 ---
 

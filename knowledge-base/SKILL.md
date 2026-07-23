@@ -1,5 +1,7 @@
 ---
 name: knowledge-base
+summary: Maintaining and writing to a persistent Obsidian-style cross-session knowledge graph
+type: behavioral
 description: "Load when writing to the wiki, proposing wiki writes, or performing advanced graph operations (backlink queries, tag searches, decision-chain traversal). Explicit triggers: \"log this\", \"remember\", \"add to the wiki\", \"wrap up\". Also load on beads task closure when the promotion review requires wiki writes. NOT for reading alone — the AGENTS.md reading protocol handles session-start context loading without requiring this skill."
 ---
 

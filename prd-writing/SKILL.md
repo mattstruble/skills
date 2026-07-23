@@ -1,5 +1,7 @@
 ---
 name: prd-writing
+summary: Co-authoring behavioral product requirements documents through structured interview
+type: behavioral
 description: "Behavioral PRD writing — co-author a product requirements document through structured interview and codebase exploration, saved as a local Markdown file. Use when user wants to write a PRD, create a product requirements document, plan a new feature, define requirements, capture expected behaviors, or scope a project. Also trigger when the user mentions \"PRD\", \"product requirements\", \"requirements doc\", or wants to define what a system should do before implementation begins."
 ---
 

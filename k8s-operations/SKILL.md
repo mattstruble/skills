@@ -1,5 +1,7 @@
 ---
 name: k8s-operations
+summary: Day-2 Kubernetes operations: probes, rollouts, hardening, and deployment automation
+type: reference
 description: Use when configuring health probes (liveness, readiness, startup), choosing or tuning rollout strategies, writing deployment automation scripts or CI/CD pipelines, hardening a self-hosted cluster, tuning the NGINX Ingress controller for caching/compression/rate limiting, setting resource limits, or maintaining nodes. Also trigger on server security (fail2ban, ufw, SSH hardening), Ansible automation for server management, or kubectl operational commands (drain, debug, events). NOT for cluster setup (see k3s), workload resource definitions (see k8s-workloads), networking/TLS (see k8s-networking), storage/config (see k8s-storage), or Helm (see helm).
 ---
 

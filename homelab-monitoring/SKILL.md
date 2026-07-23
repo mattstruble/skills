@@ -1,5 +1,7 @@
 ---
 name: homelab-monitoring
+summary: Deploying Loki, Prometheus, Grafana, and Alertmanager on k3s or Docker Compose
+type: reference
 description: "You MUST consult this skill when deploying or operating a monitoring stack (Loki, Prometheus, Grafana, Alertmanager) on a homelab — k3s or Docker Compose. Also trigger when choosing a log collection agent (Alloy, Fluent Bit, Docker log driver), configuring retention, setting up alerting contact points (Discord, email, webhook), or troubleshooting Loki not ingesting logs, Prometheus showing 0 targets, or containers hanging due to the Docker log driver. NOT for query syntax (see logql, promql), dashboard authoring (see grafana), or cloud/EKS deployments."
 ---
 

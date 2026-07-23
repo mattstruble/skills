@@ -1,5 +1,7 @@
 ---
 name: helm
+summary: Helm chart installation, value overrides, upgrades, rollbacks, and chart discovery
+type: reference
 description: Use when installing Helm charts, managing Kubernetes releases, overriding chart values, discovering charts on Artifact Hub, upgrading or rolling back deployments, or deploying third-party software (databases, message queues, stacks) on Kubernetes. Also trigger when extending a Bitnami chart image, writing a values override file, or pinning chart versions for reproducibility. NOT for cluster setup (see k3s), writing Kubernetes manifests directly (see k8s-workloads, k8s-storage), networking and ingress (see k8s-networking), or day-2 cluster operations (see k8s-operations).
 ---
 

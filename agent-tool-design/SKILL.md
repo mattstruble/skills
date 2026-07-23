@@ -1,5 +1,7 @@
 ---
 name: agent-tool-design
+summary: Designing tool interfaces that LLMs can reliably discover, select, and invoke
+type: behavioral
 description: You MUST consult this skill when designing or reviewing tool interfaces that LLMs consume — function-calling schemas, MCP tool definitions, tool descriptions, parameter design, granularity decisions, or whether a capability needs a dedicated tool vs a general executor. Also trigger when an agent picks the wrong tool, calls a tool with wrong parameters, or a tool works for humans but the agent can't use it reliably. When wrapping a REST API as an MCP tool, both this skill and api-design should fire: api-design shapes the HTTP surface, this skill shapes how the LLM perceives it. NOT for HTTP API surface design for human callers (see api-design). NOT for agent runtime loop or orchestration (see agent-architecture).
 ---
 

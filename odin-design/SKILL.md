@@ -1,5 +1,7 @@
 ---
 name: odin-design
+summary: Idiomatic Odin patterns, allocators, package structure, and LLM knowledge-gap corrections
+type: behavioral
 description: You MUST consult this skill when writing, reviewing, or generating Odin code. Also trigger on .odin files, Odin package structure, allocator patterns, or any Odin-specific design question. LLMs have significant knowledge gaps about Odin — this skill fills them. NOT for general systems programming advice or C/Zig/Rust unless comparing to Odin idioms.
 ---
 

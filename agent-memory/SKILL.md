@@ -1,5 +1,7 @@
 ---
 name: agent-memory
+summary: Cross-session memory design for personalized agents: storage, consolidation, retrieval
+type: behavioral
 description: You MUST consult this skill when designing cross-session memory for personalized agents — choosing storage formats, handling contradictory memories, building consolidation pipelines, evaluating memory quality, or deciding what to persist. Also trigger when an agent forgets user preferences across sessions, surfaces conflicting facts, grows unbounded memory, or needs to anticipate user needs from past context. NOT for operating an existing knowledge base (see knowledge-base), managing the context window within a session (see context-engineering), building a retrieval pipeline for a document corpus (see rag-design), or agent runtime orchestration (see agent-architecture).
 ---
 

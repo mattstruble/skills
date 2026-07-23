@@ -1,5 +1,7 @@
 ---
 name: agent-self-evolution
+summary: Designing agents that accumulate experience and improve across sessions without retraining
+type: behavioral
 description: You MUST consult this skill when designing agents that improve across sessions without retraining — building experience accumulation systems, implementing workflow record/replay, creating skill-generation pipelines, designing system prompt optimization loops, or building tool-creation systems. Also trigger when asking "how does this agent get better over time?" or designing the learning lifecycle (distill → organize → apply → evolve). NOT for user memory storage/retrieval (see agent-memory), tool interface design (see agent-tool-design), prompt structure or KV-cache layout (see context-engineering), post-training or weight changes (see agent-post-training or ml-post-training), or code generation patterns (see coding-agent-design).
 ---
 

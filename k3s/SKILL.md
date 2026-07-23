@@ -1,5 +1,7 @@
 ---
 name: k3s
+summary: Installing and managing self-hosted Kubernetes clusters with k3s
+type: reference
 description: Use when installing or managing a self-hosted Kubernetes cluster with k3s, setting up kubectl or kubeconfig, adding server or agent nodes, or choosing between single-node and multi-node topologies. Also trigger on embedded etcd vs SQLite datastore decisions, k3s systemd service configuration, or accessing a cluster remotely. NOT for workload resources like Deployments or Services (see k8s-workloads), networking and ingress (see k8s-networking), storage (see k8s-storage), Helm (see helm), or containerizing applications (see docker).
 ---
 

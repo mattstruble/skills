@@ -1,5 +1,7 @@
 ---
 name: git-pr
+summary: Pull request creation: sizing, title conventions, and description writing
+type: behavioral
 description: Git pull request creation — use this skill whenever creating a pull request from a feature branch, writing PR titles or descriptions, or when any agent needs to open a PR as part of a workflow. Also trigger when the user says "open a PR", "create a pull request", or asks to submit their work for review. NOT for reviewing PRs (see code-reviewer), writing commits (see git-commit), or merging/rebasing.
 ---
 

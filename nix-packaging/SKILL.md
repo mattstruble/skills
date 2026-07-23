@@ -1,5 +1,7 @@
 ---
 name: nix-packaging
+summary: Writing Nix derivations with stdenv and language-specific builders from scratch
+type: reference
 description: "Use when writing Nix packages from scratch, authoring derivations with stdenv.mkDerivation or language-specific builders (buildPythonPackage, buildRustPackage, buildGoModule), debugging build phase failures, patching package sources, or managing build/runtime dependencies. Also trigger on closure size analysis, wrapProgram, substituteInPlace, or fetchpatch. NOT for system configuration, dev shells, or customizing existing packages with override/overrideAttrs (see nix)."
 ---
 

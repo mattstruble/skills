@@ -1,5 +1,7 @@
 ---
 name: concurrency-design
+summary: Choosing thread topology, concurrency units, and inter-component communication models
+type: behavioral
 description: You MUST consult this skill when choosing a concurrency architecture: thread topology (thread-per-core, work-stealing, event loop), unit of concurrency (actors, goroutines, state machines), or inter-component communication model (message passing, channels, shared memory). Also trigger when designing fault isolation boundaries, supervision trees, or backpressure propagation; when scaling a single-threaded design to multi-core; or when choosing between actor vs CSP channel models. NOT for lock primitive implementation, network protocol state machines, database connection pooling, language-specific async runtime config (tokio, asyncio), compute parallelism (SIMD, GPU), or distributed consensus (Raft, Paxos).
 ---
 

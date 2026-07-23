@@ -1,5 +1,7 @@
 ---
 name: love2d
+summary: Love2D 11.x Lua development: callbacks, input, shaders, and game loop patterns
+type: reference
 description: Use when working on any Love2D project — writing Lua for Love2D, implementing Love2D callbacks (love.load, love.update, love.draw), handling input, writing shaders, structuring a game loop, or asking about Love2D APIs. Also trigger when implementing game patterns (Observer, State, Command, etc.) in a Love2D project — this skill takes precedence over game-patterns for Love2D-specific implementation. NOT for Fennel interactive development workflow (see love2d-fennel). NOT for engine-agnostic pattern theory (see game-patterns).
 ---
 

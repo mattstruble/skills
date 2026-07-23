@@ -1,5 +1,7 @@
 ---
 name: test-driven-development
+summary: Red-green-refactor TDD workflow: writing tests before implementation
+type: behavioral
 description: You MUST use this skill before implementing any feature, fixing any bug, or refactoring existing code. The TDD workflow applies whenever the task involves substantial new functionality, restructuring how code is organized, or reproducing a bug. Also trigger on mentions of TDD, red-green-refactor, or test-first development. NOT for trivial one-liner fixes, config changes, renaming, documentation, or test quality in isolation (see test-design).
 ---
 

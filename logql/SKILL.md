@@ -1,5 +1,7 @@
 ---
 name: logql
+summary: LogQL query syntax for Grafana Loki: filtering, parsing, and log-based metrics
+type: reference
 description: "You MUST consult this skill when writing or debugging LogQL queries for Grafana Loki. Also trigger when building Grafana dashboard panels backed by Loki, creating log-based alerting rules, diagnosing empty results or parser errors, extracting metrics from logs with rate/count_over_time/unwrap, or correlating logs across multiple services. NOT for Loki deployment or configuration (see homelab-monitoring), Prometheus metrics (see promql), or PromQL dashboards."
 ---
 

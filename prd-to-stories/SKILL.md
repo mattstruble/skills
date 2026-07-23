@@ -1,5 +1,7 @@
 ---
 name: prd-to-stories
+summary: Decomposing behavioral PRDs into deliverable stories with specific acceptance criteria
+type: behavioral
 description: "Decompose a behavioral PRD into deliverable stories with technically specific acceptance criteria, saved as Markdown files. Use when the user wants to generate stories from a PRD, break capability groups into work items, create acceptance criteria, or go from PRD to implementable stories. Also trigger when the user mentions \"stories from PRD\", \"decompose the PRD\", \"break down capabilities\", or wants to turn behavioral requirements into testable deliverables."
 ---
 

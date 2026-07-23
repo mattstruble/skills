@@ -1,5 +1,7 @@
 ---
 name: game-rendering
+summary: 3D rendering pipeline math: coordinate spaces, rasterization, projection, lighting
+type: reference
 description: You MUST consult this skill when reasoning about 3D rendering pipelines — coordinate spaces (model/world/view/clip/screen), perspective vs orthographic projection, affine transformations, triangle rasterization, barycentric coordinates, z-buffering, backface and frustum culling, UV mapping with perspective-correct interpolation, and lighting models (flat, Phong, multi-light blending). Also trigger when implementing a software renderer, debugging projection issues, or reasoning about what a GPU does internally. NOT for shader implementation in a specific engine (see godot-shader). NOT for art direction or visual legibility (see game-visuals). NOT for engine-specific renderer configuration.
 ---
 

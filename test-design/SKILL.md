@@ -1,5 +1,7 @@
 ---
 name: test-design
+summary: Test quality tradeoffs using Kent Beck's Test Desiderata: behavior over structure
+type: behavioral
 description: You MUST consult this skill when writing, reviewing, or fixing tests at any level (unit, integration, e2e). Also trigger when delivering features where tests are expected, when tests break on refactors, or when asking what makes a good test — even if 'write tests' wasn't explicitly requested. NOT for TDD workflow (see test-driven-development), test infrastructure setup (CI config, test runners), or diagnosing production code bugs.
 ---
 

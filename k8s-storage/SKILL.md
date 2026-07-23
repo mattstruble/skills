@@ -1,5 +1,7 @@
 ---
 name: k8s-storage
+summary: Kubernetes ConfigMaps, Secrets, PersistentVolumes, and backup strategies
+type: reference
 description: Use when working with Kubernetes ConfigMaps, Secrets, PersistentVolumes, PersistentVolumeClaims, or StorageClasses. Also trigger on volume mounts vs env vars decisions, handling ConfigMap/Secret updates (rollout restart, hash-based naming), access mode selection (RWO/ROX/RWX), choosing between Deployment+PVC and StatefulSet+volumeClaimTemplates, dynamic provisioning, or planning backup strategies for cluster state and persistent data. NOT for cluster setup (see k3s), Deployments/Services (see k8s-workloads), networking/ingress (see k8s-networking), Helm (see helm), or rollout strategies (see k8s-operations).
 ---
 

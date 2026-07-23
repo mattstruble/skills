@@ -1,5 +1,7 @@
 ---
 name: k8s-workloads
+summary: Kubernetes workload resources: Deployments, StatefulSets, DaemonSets, Jobs, Services
+type: reference
 description: Use when creating or configuring Kubernetes workload resources — Deployments, StatefulSets, DaemonSets, Services, Jobs, or CronJobs. Also trigger when choosing between workload resource types, configuring rolling update strategies, setting up scheduled tasks, or wiring Services to Deployments. NOT for cluster setup (see k3s), networking/ingress (see k8s-networking), storage/ConfigMaps/Secrets (see k8s-storage), Helm charts (see helm), or advanced rollout strategies and probes (see k8s-operations).
 ---
 

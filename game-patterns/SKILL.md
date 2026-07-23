@@ -1,5 +1,7 @@
 ---
 name: game-patterns
+summary: Engine-agnostic game programming patterns: ECS, state machines, event systems, pooling
+type: behavioral
 description: Consult this skill when making game architecture decisions, choosing how to structure game systems, or asking which pattern fits a problem. Also trigger when designing entity/component systems, input handling, game state machines, event/messaging systems, object pooling, spatial queries, or scripting/modding support. NOT for engine-specific implementation (see godot, love2d, odin-gamedev). NOT for general software design outside game development (see software-design).
 ---
 

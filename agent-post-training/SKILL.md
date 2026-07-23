@@ -1,5 +1,7 @@
 ---
 name: agent-post-training
+summary: Decision framework for when and how to fine-tune models for agent tasks
+type: behavioral
 description: You MUST consult this skill when deciding whether to fine-tune a model for an agent task, choosing between SFT and RL, designing reward signals, or evaluating whether post-training ROI justifies the cost. Also trigger when someone asks "should we fine-tune this?", when prompt engineering has hit a ceiling, or when choosing between harness optimization and model training. NOT for actually running training (→ ml-post-training), designing eval systems (→ agent-evaluation), or agent architecture unrelated to training decisions (→ agent-architecture).
 ---
 

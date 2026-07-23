@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "broad-exception-handler-review",
       "prompt": "Here's my request handler. Can you review it?\n\n```python\ndef handle_request(request: Request) -> Response:\n    try:\n        user = db.get_user(request.user_id)\n        result = process(user, request.data)\n        return Response(status=200, body=result)\n    except Exception:\n        log.error(\"request failed\")\n        return Response(status=500, body=\"internal error\")\n```",
       "expected_output": "The response identifies `except Exception` as too broad, asks which specific exceptions `db.get_user` and `process` can raise, and rewrites the handler catching those specific types (e.g., `UserNotFoundError`, `ValueError`). If a broad catch is kept at a system boundary, it adds an inline comment justifying it.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "empty-string-sentinel-default",
       "prompt": "Write a search function for users. The query parameter is optional — if not provided, return all users.\n\n```python\ndef search_users(query: str = \"\") -> list[User]:\n    if query == \"\":\n        return db.all_users()\n    return db.search(query)\n```",
       "expected_output": "The response replaces `query: str = \"\"` with `query: str | None = None` (or removes the default entirely and requires the caller to pass `None` explicitly). The empty-string sentinel check becomes a `None` check. The response explains that `\"\"` is not \"no value\" and that `None` communicates intent clearly.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "redundant-docstring-type-annotations",
       "prompt": "Does this docstring look right to you?\n\n```python\ndef calculate_discount(price: Decimal, rate: float) -> Decimal:\n    \"\"\"Calculate the discounted price.\n\n    Args:\n        price (Decimal): The original price.\n        rate (float): The discount rate as a decimal (e.g., 0.1 for 10%).\n\n    Returns:\n        Decimal: The price after applying the discount.\n    \"\"\"\n    return price * Decimal(str(1 - rate))\n```",
       "expected_output": "The response identifies two problems: (1) type annotations in the docstring duplicate the signature annotations, and (2) the `Returns` section restates what the return type annotation already says. The rewrite removes the type annotations from `Args` and drops the `Returns` section entirely, keeping only the one-line summary (and a `Raises` section if relevant).",
       "files": [],
@@ -42,6 +45,7 @@
     },
     {
       "id": 4,
+      "name": "unnecessary-future-annotations-import",
       "prompt": "I'm on Python 3.12 and added this import to avoid forward reference errors:\n\n```python\nfrom __future__ import annotations\nfrom dataclasses import dataclass\n\n@dataclass\nclass Config:\n    name: str\n    value: int\n```\n\nIs this correct?",
       "expected_output": "The response explains that `from __future__ import annotations` is unnecessary on Python 3.12 — modern Python supports `X | Y` union syntax and `list[int]` natively. The import is only needed for genuine circular type references via `TYPE_CHECKING`. The response removes the import and points to the TYPE_CHECKING pattern in references/advanced-patterns.md for the legitimate use case.",
       "files": [],
@@ -55,6 +59,7 @@
     },
     {
       "id": 5,
+      "name": "generic-repository-abstraction-value",
       "prompt": "I'm building a data access layer and want to make it generic so I can reuse it. Here's my design:\n\n```python\nfrom typing import TypeVar, Generic\nfrom dataclasses import dataclass\n\nT = TypeVar(\"T\")\n\nclass Repository(Generic[T]):\n    def get(self, id: str) -> T: ...\n    def save(self, entity: T) -> None: ...\n    def delete(self, id: str) -> None: ...\n\nclass UserRepository(Repository[User]):\n    def get_by_email(self, email: str) -> User: ...\n    def get_active_users(self) -> list[User]: ...\n\nclass OrderRepository(Repository[Order]):\n    def get_by_user(self, user_id: str) -> list[Order]: ...\n    def get_pending(self) -> list[Order]: ...\n```\n\nIs this a good design?",
       "expected_output": "The response applies generics restraint: since UserRepository and OrderRepository each add domain-specific methods that the generic base doesn't capture, the generic base `Repository[T]` only provides the trivial CRUD skeleton. The response suggests evaluating whether a caller-facing Protocol (e.g., `Readable[T]`, `Writable[T]`) provides more value, or whether the repositories should simply be named directly without a generic base. It does not unconditionally endorse the generic design.",
       "files": [],
@@ -68,6 +73,7 @@
     },
     {
       "id": 6,
+      "name": "protocol-vs-abc-plugin-system",
       "prompt": "I'm designing a plugin system and need to define an interface that third-party plugins must implement. Should I use Protocol or ABC? The plugins will be loaded dynamically at runtime and I don't control their source code.",
       "expected_output": "The response recommends Protocol for the caller-facing contract since plugins don't need to inherit from anything — structural typing means any plugin with matching methods satisfies the contract. If shared implementation (argument parsing, error wrapping, lifecycle hooks) would benefit plugin authors, an ABC can be provided as an implementor convenience layer that callers still type against the Protocol. The response maps to the interface contracts table in the skill.",
       "files": [],
@@ -81,6 +87,7 @@
     },
     {
       "id": 7,
+      "name": "pydantic-model-in-business-logic",
       "prompt": "Here's my service layer. Is there anything wrong with how I'm using Pydantic?\n\n```python\nfrom pydantic import BaseModel\n\nclass UserProfile(BaseModel):\n    user_id: str\n    name: str\n    email: str\n    preferences: dict\n\ndef calculate_loyalty_score(profile: UserProfile) -> float:\n    # complex business logic using profile.user_id, profile.preferences\n    ...\n\ndef generate_recommendations(profile: UserProfile) -> list[str]:\n    # uses profile.preferences extensively\n    ...\n\ndef format_display_name(profile: UserProfile) -> str:\n    return f\"{profile.name} ({profile.email})\"\n```",
       "expected_output": "The response identifies that Pydantic BaseModel is being used throughout internal business logic, which spreads validation overhead and mutability into the domain. It recommends converting UserProfile to a frozen dataclass for internal use, keeping Pydantic only at the validation boundary (e.g., API request parsing). The rewrite shows a Pydantic model for the boundary and a frozen dataclass for the domain object.",
       "files": [],

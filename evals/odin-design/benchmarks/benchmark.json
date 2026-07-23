@@ -2,13 +2,13 @@
   "metadata": {
     "skill_name": "odin-design",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5"],
+    "evals_run": ["game-skeleton-entity-particle-world", "cyclic-package-dependency-restructure", "tilemap-loader-arena-allocator", "builtin-matrix-vector-types", "per-frame-spall-profiling-workflow"],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "game-skeleton-entity-particle-world",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -62,7 +62,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "game-skeleton-entity-particle-world",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -116,7 +116,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "cyclic-package-dependency-restructure",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -155,7 +155,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "cyclic-package-dependency-restructure",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -194,7 +194,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "tilemap-loader-arena-allocator",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -248,7 +248,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "tilemap-loader-arena-allocator",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -302,7 +302,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "builtin-matrix-vector-types",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -346,7 +346,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "builtin-matrix-vector-types",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -390,7 +390,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "per-frame-spall-profiling-workflow",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -444,7 +444,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "per-frame-spall-profiling-workflow",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {

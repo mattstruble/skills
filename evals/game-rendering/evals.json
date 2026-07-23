@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "affine-vs-perspective-correct-uv",
       "prompt": "I'm building a CPU-side 3D renderer (rasterizing triangles, doing my own UV mapping). My textured cube renders fine when it's facing the camera, but as I rotate it the texture appears to slide and stretch unevenly across each face — almost like the texture is sticking to the silhouette instead of the surface. The texture coordinates are correct (verified by drawing them directly as colors). What's happening, why does it happen specifically with perspective projection, and what's the fix?",
       "expected_output": "Identifies this as the classic affine-vs-perspective-correct UV interpolation bug. Explains why it specifically appears under perspective projection (the inverse depth term varies non-linearly across the screen-space triangle). Gives the fix: store 1/w per projected vertex, interpolate U/w, V/w, and 1/w linearly across the triangle, then divide back at each pixel. Mentions barycentric weights as the per-pixel interpolation mechanism. May reference PS1-era games as the classic example of the bug.",
       "files": [],
@@ -18,6 +19,7 @@
     },
     {
       "id": 2,
+      "name": "perspective-projection-matrix-construction",
       "prompt": "Walk me through constructing a perspective projection matrix for a 3D renderer from these inputs: vertical field-of-view in degrees, screen width in pixels, screen height in pixels, near plane, and far plane. Include (a) what the view frustum is and what each parameter controls about it, (b) how the focal length / aspect ratio enter the matrix, (c) the actual 4x4 matrix entries, (d) what perspective division is and where it happens in the pipeline.",
       "expected_output": "Defines view frustum as the truncated pyramid of visible space. Explains FOV controls the width of the cone, aspect ratio (= width/height) compensates for non-square viewports, near/far define the depth range. Derives the focal length term f = 1/tan(fov/2) (with conversion from degrees to radians). Shows the standard 4x4 matrix with f/aspect on [0,0], f on [1,1], the depth-mapping terms on [2,2] and [2,3] (near/far), and the -1 in [3,2] that produces the perspective divide. Explains perspective division: after multiplying a point by this matrix, divide x/y/z by w (the resulting homogeneous coordinate) to get NDC. Mentions that w stores depth information that's needed later for perspective-correct interpolation.",
       "files": [],

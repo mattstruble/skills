@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "agent-tool-design",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "document-management-mcp-schemas",
+      "search-vs-read-tool-confusion",
+      "jira-tool-proliferation-consolidation"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "document-management-mcp-schemas",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -31,7 +35,7 @@
         {
           "text": "Each tool description includes boundary/exclusion clauses stating what the tool does NOT accept",
           "passed": true,
-          "evidence": "upload: 'Does NOT process or extract content'; search: 'Does NOT return the full document content'; download: 'Does NOT search — use search_documents first to find the document_id.'"
+          "evidence": "upload: 'Does NOT process or extract content'; search: 'Does NOT return the full document content'; download: 'Does NOT search \u2014 use search_documents first to find the document_id.'"
         },
         {
           "text": "Return value structure is documented for at least one tool",
@@ -41,18 +45,18 @@
         {
           "text": "Tool names follow a consistent verb_noun or action-oriented convention",
           "passed": true,
-          "evidence": "upload_document, search_documents, download_document — all follow verb_noun pattern consistently."
+          "evidence": "upload_document, search_documents, download_document \u2014 all follow verb_noun pattern consistently."
         },
         {
           "text": "The search tool description distinguishes it from the download tool to prevent agent confusion",
           "passed": true,
-          "evidence": "search: 'Does NOT return the full document content — use download_document with the returned document_id to get the file.' download: 'Does NOT search — use search_documents first to find the document_id.' Mutual cross-references prevent confusion."
+          "evidence": "search: 'Does NOT return the full document content \u2014 use download_document with the returned document_id to get the file.' download: 'Does NOT search \u2014 use search_documents first to find the document_id.' Mutual cross-references prevent confusion."
         }
       ]
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "document-management-mcp-schemas",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -85,18 +89,18 @@
         {
           "text": "Tool names follow a consistent verb_noun or action-oriented convention",
           "passed": true,
-          "evidence": "upload_document, search_documents, download_document — consistent verb_noun pattern."
+          "evidence": "upload_document, search_documents, download_document \u2014 consistent verb_noun pattern."
         },
         {
           "text": "The search tool description distinguishes it from the download tool to prevent agent confusion",
           "passed": true,
-          "evidence": "search: 'Use this when you need to FIND documents matching a query — not when you already have a document ID (use download_document for that).' download: 'Use this when you already have the document ID.' Clear mutual distinction."
+          "evidence": "search: 'Use this when you need to FIND documents matching a query \u2014 not when you already have a document ID (use download_document for that).' download: 'Use this when you already have the document ID.' Clear mutual distinction."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "search-vs-read-tool-confusion",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -124,10 +128,10 @@
         {
           "text": "At least one rewritten description includes a boundary/exclusion clause",
           "passed": true,
-          "evidence": "search_files: 'Does NOT return file contents — use read_file after finding the path.' read_file: 'Does NOT search for files — use search_files first if you don't know the path.'"
+          "evidence": "search_files: 'Does NOT return file contents \u2014 use read_file after finding the path.' read_file: 'Does NOT search for files \u2014 use search_files first if you don't know the path.'"
         },
         {
-          "text": "The two rewritten descriptions are clearly distinguishable — an agent reading both would know which to call",
+          "text": "The two rewritten descriptions are clearly distinguishable \u2014 an agent reading both would know which to call",
           "passed": true,
           "evidence": "search_files requires 'You do NOT know the exact file path yet'; read_file requires 'you already KNOW the exact file path'. The precondition contrast makes selection unambiguous."
         }
@@ -135,7 +139,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "search-vs-read-tool-confusion",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -148,7 +152,7 @@
         {
           "text": "Identifies that the root cause is vague 'what it does' descriptions rather than model failure",
           "passed": true,
-          "evidence": "'The descriptions are too vague. Both say essentially \"does something with files\" — the model can't distinguish when to use which.' Root cause correctly identified as description quality."
+          "evidence": "'The descriptions are too vague. Both say essentially \"does something with files\" \u2014 the model can't distinguish when to use which.' Root cause correctly identified as description quality."
         },
         {
           "text": "Rewrites search_files description with a 'when to use' clause (e.g., 'Use when you need to find files by name or pattern but don't know the exact path')",
@@ -163,10 +167,10 @@
         {
           "text": "At least one rewritten description includes a boundary/exclusion clause",
           "passed": true,
-          "evidence": "search_files: 'Do NOT use this to read file contents — use read_file for that.' read_file: 'Do NOT use this to find files — use search_files for that. Do NOT use this with glob patterns.'"
+          "evidence": "search_files: 'Do NOT use this to read file contents \u2014 use read_file for that.' read_file: 'Do NOT use this to find files \u2014 use search_files for that. Do NOT use this with glob patterns.'"
         },
         {
-          "text": "The two rewritten descriptions are clearly distinguishable — an agent reading both would know which to call",
+          "text": "The two rewritten descriptions are clearly distinguishable \u2014 an agent reading both would know which to call",
           "passed": true,
           "evidence": "search_files: 'don't know their exact path'; read_file: 'already know the file path'. The precondition contrast ('know vs. don't know the path') makes selection unambiguous."
         }
@@ -174,7 +178,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "jira-tool-proliferation-consolidation",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -197,17 +201,17 @@
         {
           "text": "Proposes a concrete consolidation (not just 'consider merging') with specific tool groupings",
           "passed": true,
-          "evidence": "Provides a complete 4-tool plan: jira_issue_read, jira_issue_write, jira_issue_delete, jira_comment — with specific replacements listed for each."
+          "evidence": "Provides a complete 4-tool plan: jira_issue_read, jira_issue_write, jira_issue_delete, jira_comment \u2014 with specific replacements listed for each."
         },
         {
           "text": "The proposed consolidated tool count is meaningfully lower (ideally 4-6 tools from 15)",
           "passed": true,
-          "evidence": "'Final plan: 4 tools' — reduced from 15 to 4, well within the 4-6 target range."
+          "evidence": "'Final plan: 4 tools' \u2014 reduced from 15 to 4, well within the 4-6 target range."
         },
         {
           "text": "At least one consolidated tool schema or description is provided as an example",
           "passed": true,
-          "evidence": "All four tools include descriptions: jira_issue_read: 'Use when you need to look up issues — find a specific issue by key, or list/filter issues by project, assignee, status, or label.'"
+          "evidence": "All four tools include descriptions: jira_issue_read: 'Use when you need to look up issues \u2014 find a specific issue by key, or list/filter issues by project, assignee, status, or label.'"
         },
         {
           "text": "Mentions or applies the ~100-tool selection-accuracy threshold or equivalent reasoning about tool proliferation",
@@ -218,7 +222,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "jira-tool-proliferation-consolidation",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -246,7 +250,7 @@
         {
           "text": "The proposed consolidated tool count is meaningfully lower (ideally 4-6 tools from 15)",
           "passed": true,
-          "evidence": "'Result: 15 tools → 3 tools.' Three tools is below the 4-6 ideal range but is meaningfully lower than 15 and demonstrates the consolidation principle."
+          "evidence": "'Result: 15 tools \u2192 3 tools.' Three tools is below the 4-6 ideal range but is meaningfully lower than 15 and demonstrates the consolidation principle."
         },
         {
           "text": "At least one consolidated tool schema or description is provided as an example",

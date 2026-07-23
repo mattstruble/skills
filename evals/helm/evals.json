@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "bitnami-upgrade-password-ignored",
       "prompt": "I'm upgrading a Bitnami PostgreSQL release and my connections are breaking after the upgrade. I have auth.postgresPassword set in my values file. Here's my upgrade command:\n\n```bash\nhelm upgrade postgres0 bitnami/postgresql \\\n  --version 16.4.9 \\\n  --values postgres0_values.yaml \\\n  --namespace db \\\n  --atomic\n```\n\nWhy are connections failing and how do I fix it?",
       "expected_output": "Bitnami charts auto-generate passwords on first install and store them in a Kubernetes Secret. On helm upgrade, the chart reads from that Secret and silently ignores any auth.postgresPassword in your values file — if the value differs from the stored Secret, the Secret is updated but the running database retains the old password, breaking all connections. Fix: retrieve the existing password from the Secret and pass it explicitly via --set auth.postgresPassword.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "atomic-install-failure-retry",
       "prompt": "I ran `helm install postgres0 bitnami/postgresql --values postgres0_values.yaml --namespace db --atomic` and it failed partway through. Now I want to retry. Should I run `helm upgrade` or `helm install` again? Also, what does --atomic actually do on failure?",
       "expected_output": "When --atomic is used and an install fails, Helm automatically rolls back and deletes the release entirely — there is no revision left in the namespace. Because the release no longer exists, you must re-run helm install (not helm upgrade). Additionally, every helm install and helm upgrade command must include --version to pin the chart version; omitting it silently pulls the latest chart, which may restructure values or rename keys.",
       "files": [],
@@ -28,6 +30,7 @@
     },
     {
       "id": 3,
+      "name": "custom-image-pull-secret-values",
       "prompt": "I want to deploy a custom PostgreSQL image that extends the Bitnami base with the pgvector extension. My image is at rg.fr-par.scw.cloud/myorg/pgvector:17.3.0-debian-12-r0 and I have a registry pull secret named scaleway.registry in the db namespace. Write the values file section I need.",
       "expected_output": "The values file needs global.security.allowInsecureImages: true because Bitnami enforces image signing and custom images fail that check. The imagePullSecrets entry must be a flat string list (- scaleway.registry), not a list of objects ({name: scaleway.registry}) which is the Kubernetes pod spec format. The image block should pin registry, repository, and tag exactly.",
       "files": [],

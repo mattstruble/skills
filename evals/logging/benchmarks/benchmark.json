@@ -2,13 +2,18 @@
   "metadata": {
     "skill_name": "logging",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4"],
+    "evals_run": [
+      "write-service",
+      "add-error-handling",
+      "code-review",
+      "debug-issue"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "write-service",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -36,23 +41,23 @@
         {
           "text": "Includes a correlation ID or job ID that threads through all log lines for a single job",
           "passed": true,
-          "evidence": "task_log = log.bind(task_id=task_id, correlation_id=str(uuid4())) — bound at task start, threads through all subsequent log lines."
+          "evidence": "task_log = log.bind(task_id=task_id, correlation_id=str(uuid4())) \u2014 bound at task start, threads through all subsequent log lines."
         },
         {
           "text": "Logs all major branches (success, transient failure, fatal failure, retry, exhaustion)",
           "passed": false,
-          "evidence": "Code logs api_failed (transient) and db_store_failed (fatal) but has no retry logic or exhaustion logging — those branches are absent from the implementation."
+          "evidence": "Code logs api_failed (transient) and db_store_failed (fatal) but has no retry logic or exhaustion logging \u2014 those branches are absent from the implementation."
         },
         {
           "text": "Does not log sensitive data (no raw payloads with potential PII, no tokens)",
           "passed": false,
-          "evidence": "task_log.info('task_received', payload_keys=list(task_data.keys())) logs only keys, not values — no raw payload. However, the code logs task_data.get('endpoint') which could contain sensitive path info. Marginal pass/fail; graded fail due to potential endpoint sensitivity."
+          "evidence": "task_log.info('task_received', payload_keys=list(task_data.keys())) logs only keys, not values \u2014 no raw payload. However, the code logs task_data.get('endpoint') which could contain sensitive path info. Marginal pass/fail; graded fail due to potential endpoint sensitivity."
         }
       ]
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "write-service",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -85,18 +90,18 @@
         {
           "text": "Logs all major branches (success, transient failure, fatal failure, retry, exhaustion)",
           "passed": true,
-          "evidence": "job.completed (success), job.transient_failure (transient), job.fatal_failure (fatal), job.retry_enqueued (retry), job.retries_exhausted (exhaustion) — all 5 branches logged."
+          "evidence": "job.completed (success), job.transient_failure (transient), job.fatal_failure (fatal), job.retry_enqueued (retry), job.retries_exhausted (exhaustion) \u2014 all 5 branches logged."
         },
         {
           "text": "Does not log sensitive data (no raw payloads with potential PII, no tokens)",
           "passed": true,
-          "evidence": "Logs job_id, queue name, status codes, and error messages — no raw task payloads or tokens logged."
+          "evidence": "Logs job_id, queue name, status codes, and error messages \u2014 no raw task payloads or tokens logged."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "add-error-handling",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -124,23 +129,23 @@
         {
           "text": "Includes a correlation ID or request ID that threads through log lines",
           "passed": true,
-          "evidence": "plog = log.bind(correlation_id=correlation_id, order_id=order_id, user_id=user_id, payment_method=payment_method) — bound at start, threads through all lines."
+          "evidence": "plog = log.bind(correlation_id=correlation_id, order_id=order_id, user_id=user_id, payment_method=payment_method) \u2014 bound at start, threads through all lines."
         },
         {
           "text": "Error logs include the state/context that led to the error, not just the exception message",
           "passed": true,
-          "evidence": "plog.error('gateway_charge_failed', error=type(e).__name__, detail=str(e), duration_ms=...) — plog carries order_id, user_id, payment_method context."
+          "evidence": "plog.error('gateway_charge_failed', error=type(e).__name__, detail=str(e), duration_ms=...) \u2014 plog carries order_id, user_id, payment_method context."
         },
         {
           "text": "Does not log sensitive payment data (no card numbers, tokens, raw PII)",
           "passed": true,
-          "evidence": "Logs order_id, user_id, transaction_id, payment_method (method type, not card details) — no card numbers or tokens."
+          "evidence": "Logs order_id, user_id, transaction_id, payment_method (method type, not card details) \u2014 no card numbers or tokens."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "add-error-handling",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -173,18 +178,18 @@
         {
           "text": "Error logs include the state/context that led to the error, not just the exception message",
           "passed": true,
-          "evidence": "logger.error('payment.db_update_failed', extra={**log, 'charge_id': charge_result['id'], 'error': str(exc)}) — includes charge_id and full log context."
+          "evidence": "logger.error('payment.db_update_failed', extra={**log, 'charge_id': charge_result['id'], 'error': str(exc)}) \u2014 includes charge_id and full log context."
         },
         {
           "text": "Does not log sensitive payment data (no card numbers, tokens, raw PII)",
           "passed": true,
-          "evidence": "Logs order_id, amount_cents, charge_id, decline_code — no card numbers or raw payment method details."
+          "evidence": "Logs order_id, amount_cents, charge_id, decline_code \u2014 no card numbers or raw payment method details."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "code-review",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -197,7 +202,7 @@
         {
           "text": "Flags missing or inadequate logging as a production-readiness issue (not ranked last or treated as a nice-to-have)",
           "passed": true,
-          "evidence": "Item #1 is 'No logging on the success path' — logging gaps are the first and primary concern raised."
+          "evidence": "Item #1 is 'No logging on the success path' \u2014 logging gaps are the first and primary concern raised."
         },
         {
           "text": "Specifically mentions logging the success path, not just errors",
@@ -207,7 +212,7 @@
         {
           "text": "Mentions correlation IDs or request tracing as something that should be added",
           "passed": true,
-          "evidence": "'No correlation ID. The webhook likely carries an event ID from the third-party provider — bind it to the logger at entry so all subsequent log lines include it.'"
+          "evidence": "'No correlation ID. The webhook likely carries an event ID from the third-party provider \u2014 bind it to the logger at entry so all subsequent log lines include it.'"
         },
         {
           "text": "Mentions structured logging (key=value or JSON) rather than string interpolation",
@@ -223,7 +228,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "code-review",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -236,7 +241,7 @@
         {
           "text": "Flags missing or inadequate logging as a production-readiness issue (not ranked last or treated as a nice-to-have)",
           "passed": true,
-          "evidence": "'Missing success-path logging (HIGH)' is item #1 — ranked first and marked HIGH priority."
+          "evidence": "'Missing success-path logging (HIGH)' is item #1 \u2014 ranked first and marked HIGH priority."
         },
         {
           "text": "Specifically mentions logging the success path, not just errors",
@@ -246,7 +251,7 @@
         {
           "text": "Mentions correlation IDs or request tracing as something that should be added",
           "passed": true,
-          "evidence": "'No correlation ID / request tracing (HIGH). A webhook arrives, gets processed through multiple stages — without a request ID threaded through every log line, correlating a failure is impossible.'"
+          "evidence": "'No correlation ID / request tracing (HIGH). A webhook arrives, gets processed through multiple stages \u2014 without a request ID threaded through every log line, correlating a failure is impossible.'"
         },
         {
           "text": "Mentions structured logging (key=value or JSON) rather than string interpolation",
@@ -262,7 +267,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "debug-issue",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -275,7 +280,7 @@
         {
           "text": "Fixed version logs the happy path (successful order retrieval produces a log line)",
           "passed": true,
-          "evidence": "rlog.info('order_status_served', has_shipping=shipping is not None) — happy path logged at the end."
+          "evidence": "rlog.info('order_status_served', has_shipping=shipping is not None) \u2014 happy path logged at the end."
         },
         {
           "text": "Fixed version logs entry or exit of the external shipping API call with timing",
@@ -290,18 +295,18 @@
         {
           "text": "Includes a correlation ID or request ID in the fixed version",
           "passed": true,
-          "evidence": "correlation_id = request.headers.get('X-Correlation-ID') or str(uuid4()) — extracted from headers or generated, bound to rlog."
+          "evidence": "correlation_id = request.headers.get('X-Correlation-ID') or str(uuid4()) \u2014 extracted from headers or generated, bound to rlog."
         },
         {
           "text": "Logging is presented as part of the fix strategy, not listed last or as an afterthought",
           "passed": true,
-          "evidence": "'Immediate fix — add observability:' — the fix IS the logging; the code block is the solution, not an addendum."
+          "evidence": "'Immediate fix \u2014 add observability:' \u2014 the fix IS the logging; the code block is the solution, not an addendum."
         }
       ]
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "debug-issue",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -314,7 +319,7 @@
         {
           "text": "Fixed version logs the happy path (successful order retrieval produces a log line)",
           "passed": true,
-          "evidence": "logger.info('order_status.success', extra=log) — happy path logged at the end of the function."
+          "evidence": "logger.info('order_status.success', extra=log) \u2014 happy path logged at the end of the function."
         },
         {
           "text": "Fixed version logs entry or exit of the external shipping API call with timing",
@@ -334,7 +339,7 @@
         {
           "text": "Logging is presented as part of the fix strategy, not listed last or as an afterthought",
           "passed": true,
-          "evidence": "'Fix (logging is part of the fix, not an afterthought):' — explicitly framed as part of the fix, not a separate concern."
+          "evidence": "'Fix (logging is part of the fix, not an afterthought):' \u2014 explicitly framed as part of the fix, not a separate concern."
         }
       ]
     }
@@ -359,7 +364,7 @@
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
     "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
-    "NEGATIVE delta — baseline outperforms with_skill on these evals. Likely eval-quality issue: expectations are too easy for baseline (basic logging practices) or misaligned with skill-specific guidance. Flag for eval rework.",
+    "NEGATIVE delta \u2014 baseline outperforms with_skill on these evals. Likely eval-quality issue: expectations are too easy for baseline (basic logging practices) or misaligned with skill-specific guidance. Flag for eval rework.",
     "Committed delta was -9%; re-graded delta is -8% (within tolerance)."
   ]
 }

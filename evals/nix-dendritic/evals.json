@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "multi-host-nixos-darwin-scaffold",
       "prompt": "I want to set up a new nix config for my desktop (NixOS x86_64) and laptop (macOS with nix-darwin, aarch64). Both machines should share Home Manager config. Can you scaffold the basic structure?",
       "expected_output": "A complete dendritic scaffold with flake.nix, flake-parts.nix, and system-default.nix. Darwin and Home Manager helpers should be uncommented. Directory structure should follow dendritic conventions.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "multi-context-printing-aspect",
       "prompt": "I have a dendritic nix config already set up. I need to add printing support -- it should configure CUPS on my NixOS machines and also set up printer-specific PPD paths in Home Manager for my user. The NixOS side needs to pull in the Home Manager config automatically. How should I structure this?",
       "expected_output": "A Multi Context Aspect in modules/services/printing.nix that defines flake.modules.nixos.printing (with CUPS config and home-manager.sharedModules pulling in the HM module) and flake.modules.homeManager.printing (with user-level printer config).",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "conditional-import-mkif-antipattern",
       "prompt": "In my dendritic config, I'm trying to conditionally import a feature based on whether X11 is enabled. I wrote this:\n\n```nix\n{ inputs, lib, config, ... }:\n{\n  flake.modules.nixos.my-host = {\n    imports = [\n      (lib.mkIf config.services.xserver.enable inputs.self.modules.nixos.desktop-apps)\n    ];\n  };\n}\n```\n\nBut desktop-apps always gets imported even when xserver is disabled. What's going on?",
       "expected_output": "Identifies the lib.mkIf-in-imports anti-pattern, explains that Nix evaluates imports unconditionally, and suggests using the Conditional Aspect (lib.mkMerge + lib.mkIf on config values) or restructuring so the host simply includes or excludes the import.",
       "files": [],
@@ -41,6 +44,7 @@
     },
     {
       "id": 4,
+      "name": "host-centric-to-feature-migration",
       "prompt": "I have an existing NixOS config with 3 hosts organized by host (hosts/laptop/configuration.nix, hosts/desktop/configuration.nix, hosts/server/configuration.nix). Each host has its own big configuration.nix with SSH, printing, users, packages, all mixed together. I use specialArgs to pass inputs and a username variable around. I want to restructure this using dendritic so I can share features between hosts. Where do I start?",
       "expected_output": "A migration plan that follows the dendritic migration guide: add flake-parts + import-tree, wrap outputs with mkFlake, replace specialArgs with let-bindings or Constants Aspect, reorganize from host-centric to feature-centric one feature at a time.",
       "files": [],

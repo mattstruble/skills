@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "multi-agent-collaboration",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "research-write-review-topology-choice",
+      "reviewer-always-approves-no-improvement",
+      "concurrent-agents-overwriting-cascading-bugs"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "research-write-review-topology-choice",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -21,12 +25,12 @@
         {
           "text": "Applies the new-information criterion to evaluate whether a reviewer agent adds value",
           "passed": true,
-          "evidence": "'If the reviewer is the same model re-reading its own output with no new information, it's ineffective.' — new-information criterion applied explicitly."
+          "evidence": "'If the reviewer is the same model re-reading its own output with no new information, it's ineffective.' \u2014 new-information criterion applied explicitly."
         },
         {
           "text": "Identifies that a reviewer re-reading the same text without external tools adds no new signal",
           "passed": true,
-          "evidence": "'Self-review by the same model is ineffective — the model has no new signal to improve on.' and 'If the Reviewer can only re-read the report with no external tools, use a single agent with more thinking budget instead.'"
+          "evidence": "'Self-review by the same model is ineffective \u2014 the model has no new signal to improve on.' and 'If the Reviewer can only re-read the report with no external tools, use a single agent with more thinking budget instead.'"
         },
         {
           "text": "Recommends a specific topology (peer Proposer-Reviewer or single-agent with role switching) with justification",
@@ -36,18 +40,18 @@
         {
           "text": "Explains when shared vs non-shared context is appropriate for this pipeline",
           "passed": true,
-          "evidence": "'non-shared context — conclusions, not full trajectory' for Writer receiving from Research; 'the report + the original source references (for cross-checking)' for Reviewer."
+          "evidence": "'non-shared context \u2014 conclusions, not full trajectory' for Writer receiving from Research; 'the report + the original source references (for cross-checking)' for Reviewer."
         },
         {
-          "text": "Addresses the YAGNI gate — whether multi-agent is justified at all for this task",
+          "text": "Addresses the YAGNI gate \u2014 whether multi-agent is justified at all for this task",
           "passed": true,
-          "evidence": "'Apply the YAGNI Gate first: does multi-agent add new information here?' — explicitly named and applied."
+          "evidence": "'Apply the YAGNI Gate first: does multi-agent add new information here?' \u2014 explicitly named and applied."
         }
       ]
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "research-write-review-topology-choice",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -65,12 +69,12 @@
         {
           "text": "Identifies that a reviewer re-reading the same text without external tools adds no new signal",
           "passed": false,
-          "evidence": "Baseline's reviewer 'checks factual claims against the research notes' — it has access to source material, but the answer doesn't identify re-reading as a signal-free action."
+          "evidence": "Baseline's reviewer 'checks factual claims against the research notes' \u2014 it has access to source material, but the answer doesn't identify re-reading as a signal-free action."
         },
         {
           "text": "Recommends a specific topology (peer Proposer-Reviewer or single-agent with role switching) with justification",
           "passed": true,
-          "evidence": "'Use a simple pipeline: Researcher → Writer → Reviewer' with justification for why not peer review and why not a manager agent."
+          "evidence": "'Use a simple pipeline: Researcher \u2192 Writer \u2192 Reviewer' with justification for why not peer review and why not a manager agent."
         },
         {
           "text": "Explains when shared vs non-shared context is appropriate for this pipeline",
@@ -78,7 +82,7 @@
           "evidence": "Baseline does not discuss shared vs non-shared context between agents; it focuses on task decomposition and pipeline structure."
         },
         {
-          "text": "Addresses the YAGNI gate — whether multi-agent is justified at all for this task",
+          "text": "Addresses the YAGNI gate \u2014 whether multi-agent is justified at all for this task",
           "passed": true,
           "evidence": "'Start with a single agent using staged prompting... Only split into separate agents when you hit context window limits or need different tool access per stage.'"
         }
@@ -86,7 +90,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "reviewer-always-approves-no-improvement",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -99,12 +103,12 @@
         {
           "text": "Correctly diagnoses the root cause as the reviewer lacking new information (not just 'bad prompting')",
           "passed": true,
-          "evidence": "'The reviewer saying looks good every time is the §1 problem: no new information. The reviewer is the same model re-reading output it could have produced itself.'"
+          "evidence": "'The reviewer saying looks good every time is the \u00a71 problem: no new information. The reviewer is the same model re-reading output it could have produced itself.'"
         },
         {
           "text": "Explains the new-information criterion specifically in the context of the Proposer-Reviewer pattern",
           "passed": true,
-          "evidence": "Table shows 'Re-reads the copy → No new information → This is what's happening' — new-information criterion applied directly to the Proposer-Reviewer pattern."
+          "evidence": "Table shows 'Re-reads the copy \u2192 No new information \u2192 This is what's happening' \u2014 new-information criterion applied directly to the Proposer-Reviewer pattern."
         },
         {
           "text": "Recommends concrete ways to give the reviewer access to new information (external tools, metrics, brand guidelines, etc.)",
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "reviewer-always-approves-no-improvement",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -138,7 +142,7 @@
         {
           "text": "Correctly diagnoses the root cause as the reviewer lacking new information (not just 'bad prompting')",
           "passed": false,
-          "evidence": "Baseline lists 5 causes with #1 being 'Vague review criteria' (prompting) and #3 being 'Same model, same biases' — no single root cause of lacking new information."
+          "evidence": "Baseline lists 5 causes with #1 being 'Vague review criteria' (prompting) and #3 being 'Same model, same biases' \u2014 no single root cause of lacking new information."
         },
         {
           "text": "Explains the new-information criterion specifically in the context of the Proposer-Reviewer pattern",
@@ -158,13 +162,13 @@
         {
           "text": "Does NOT recommend just 'improving the reviewer prompt' as the primary fix",
           "passed": false,
-          "evidence": "'The fix is almost always #1: The reviewer needs a specific rubric with concrete, binary-checkable criteria.' — improving the prompt/rubric IS the primary fix."
+          "evidence": "'The fix is almost always #1: The reviewer needs a specific rubric with concrete, binary-checkable criteria.' \u2014 improving the prompt/rubric IS the primary fix."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "concurrent-agents-overwriting-cascading-bugs",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -177,7 +181,7 @@
         {
           "text": "Identifies concurrency conflicts and cascading amplification as two distinct failure modes",
           "passed": true,
-          "evidence": "'Two distinct failure modes: concurrency conflicts and cascading error amplification.' — named and separated explicitly."
+          "evidence": "'Two distinct failure modes: concurrency conflicts and cascading error amplification.' \u2014 named and separated explicitly."
         },
         {
           "text": "Recommends working copy isolation (Git branches or worktrees per agent) for the concurrency problem",
@@ -187,7 +191,7 @@
         {
           "text": "Recommends external validation (tests, compilers) as chain breakers for the cascading amplification problem",
           "passed": true,
-          "evidence": "'External validation as chain breakers. Run tests, type checks, and linters after each agent's work. These ground the system in reality — a failing test breaks the amplification chain regardless of how many agents agree the code is correct.'"
+          "evidence": "'External validation as chain breakers. Run tests, type checks, and linters after each agent's work. These ground the system in reality \u2014 a failing test breaks the amplification chain regardless of how many agents agree the code is correct.'"
         },
         {
           "text": "Recommends cross-validation from an independent agent that hasn't seen prior output",
@@ -203,7 +207,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "concurrent-agents-overwriting-cascading-bugs",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -216,7 +220,7 @@
         {
           "text": "Identifies concurrency conflicts and cascading amplification as two distinct failure modes",
           "passed": true,
-          "evidence": "'You have two problems: write conflicts and error propagation/mutual confirmation bias.' — two distinct failure modes identified."
+          "evidence": "'You have two problems: write conflicts and error propagation/mutual confirmation bias.' \u2014 two distinct failure modes identified."
         },
         {
           "text": "Recommends working copy isolation (Git branches or worktrees per agent) for the concurrency problem",
@@ -231,12 +235,12 @@
         {
           "text": "Recommends cross-validation from an independent agent that hasn't seen prior output",
           "passed": false,
-          "evidence": "Baseline recommends 'Spec-anchored review' (checking against requirements) and 'Immutable shared context' (agents don't see in-progress code) — but not specifically an independent agent that hasn't seen prior output."
+          "evidence": "Baseline recommends 'Spec-anchored review' (checking against requirements) and 'Immutable shared context' (agents don't see in-progress code) \u2014 but not specifically an independent agent that hasn't seen prior output."
         },
         {
           "text": "Addresses both problems rather than only one",
           "passed": true,
-          "evidence": "'Problem 1: Overwriting each other's changes' and 'Problem 2: Bug propagation and false confirmation' — both addressed with distinct solutions."
+          "evidence": "'Problem 1: Overwriting each other's changes' and 'Problem 2: Bug propagation and false confirmation' \u2014 both addressed with distinct solutions."
         }
       ]
     }

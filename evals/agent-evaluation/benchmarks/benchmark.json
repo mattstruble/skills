@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "agent-evaluation",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "customer-service-eval-rubric-design",
+      "benchmark-statistical-significance",
+      "coding-agent-test-verification"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "customer-service-eval-rubric-design",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -47,7 +51,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "customer-service-eval-rubric-design",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -86,7 +90,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "benchmark-statistical-significance",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -99,17 +103,17 @@
         {
           "text": "Computes or references standard error formula sqrt(p(1-p)/n) for binomial",
           "passed": true,
-          "evidence": "Answer explicitly computes: 'SE = √(0.72 × 0.28 / 100) = 0.045' and 'SE = √(0.78 × 0.22 / 100) = 0.041', directly applying the binomial SE formula."
+          "evidence": "Answer explicitly computes: 'SE = \u221a(0.72 \u00d7 0.28 / 100) = 0.045' and 'SE = \u221a(0.78 \u00d7 0.22 / 100) = 0.041', directly applying the binomial SE formula."
         },
         {
-          "text": "Calculates that at n=100 the confidence interval is roughly ±9 percentage points",
+          "text": "Calculates that at n=100 the confidence interval is roughly \u00b19 percentage points",
           "passed": true,
-          "evidence": "Answer states the 6-point difference 'is only slightly larger than the noise bandwidth (~4.5 points each direction)' and uses '√2 × 4.5 ≈ 6.4 points' to establish the noise floor."
+          "evidence": "Answer states the 6-point difference 'is only slightly larger than the noise bandwidth (~4.5 points each direction)' and uses '\u221a2 \u00d7 4.5 \u2248 6.4 points' to establish the noise floor."
         },
         {
           "text": "Concludes the 6pp difference is within noise / not statistically significant",
           "passed": true,
-          "evidence": "'The 6-point improvement (72% → 78%) is only slightly larger than the noise bandwidth... Your 6-point difference is right at the boundary — not clearly above the noise.'"
+          "evidence": "'The 6-point improvement (72% \u2192 78%) is only slightly larger than the noise bandwidth... Your 6-point difference is right at the boundary \u2014 not clearly above the noise.'"
         },
         {
           "text": "Recommends against deploying based on this data alone",
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "benchmark-statistical-significance",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -138,12 +142,12 @@
         {
           "text": "Computes or references standard error formula sqrt(p(1-p)/n) for binomial",
           "passed": false,
-          "evidence": "Baseline states '95% confidence interval for a proportion at n=100 is roughly ±9-10 percentage points' but does not show or reference the SE formula sqrt(p(1-p)/n)."
+          "evidence": "Baseline states '95% confidence interval for a proportion at n=100 is roughly \u00b19-10 percentage points' but does not show or reference the SE formula sqrt(p(1-p)/n)."
         },
         {
-          "text": "Calculates that at n=100 the confidence interval is roughly ±9 percentage points",
+          "text": "Calculates that at n=100 the confidence interval is roughly \u00b19 percentage points",
           "passed": true,
-          "evidence": "'The 95% confidence interval for a proportion at n=100 is roughly ±9-10 percentage points. So v1 is 72% ± ~9% and v2 is 78% ± ~8%.'"
+          "evidence": "'The 95% confidence interval for a proportion at n=100 is roughly \u00b19-10 percentage points. So v1 is 72% \u00b1 ~9% and v2 is 78% \u00b1 ~8%.'"
         },
         {
           "text": "Concludes the 6pp difference is within noise / not statistically significant",
@@ -158,13 +162,13 @@
         {
           "text": "Mentions paired analysis (McNemar's test) or increasing n as next steps",
           "passed": true,
-          "evidence": "'Run a significance test: McNemar's test or a paired proportion test' and 'To reliably detect a 6-point improvement, you need n≈400-500 tasks.'"
+          "evidence": "'Run a significance test: McNemar's test or a paired proportion test' and 'To reliably detect a 6-point improvement, you need n\u2248400-500 tasks.'"
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "coding-agent-test-verification",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -182,7 +186,7 @@
         {
           "text": "Explains Pass@k (capability ceiling) vs Pass^k (reliability) distinction",
           "passed": true,
-          "evidence": "'Pass@k: Can the agent produce working code in k attempts? (Capability ceiling)' and 'Pass^k: Does it work on ALL k attempts? (Reliability — more important for production)'"
+          "evidence": "'Pass@k: Can the agent produce working code in k attempts? (Capability ceiling)' and 'Pass^k: Does it work on ALL k attempts? (Reliability \u2014 more important for production)'"
         },
         {
           "text": "Addresses LLM-as-Judge as appropriate for code quality/style assessment",
@@ -192,7 +196,7 @@
         {
           "text": "Warns about reward hacking or gaming the metric (e.g., hardcoding test outputs)",
           "passed": true,
-          "evidence": "'\"Did it but broke something else\": Agent makes the target test pass but breaks 3 other tests. Run the FULL test suite, not just the target test.' Also: 'Tests can be incomplete — the agent might \"cheat\" by hardcoding expected outputs.'"
+          "evidence": "'\"Did it but broke something else\": Agent makes the target test pass but breaks 3 other tests. Run the FULL test suite, not just the target test.' Also: 'Tests can be incomplete \u2014 the agent might \"cheat\" by hardcoding expected outputs.'"
         },
         {
           "text": "Mentions dual coverage: execution trajectory AND final outcome",
@@ -203,7 +207,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "coding-agent-test-verification",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -231,7 +235,7 @@
         {
           "text": "Warns about reward hacking or gaming the metric (e.g., hardcoding test outputs)",
           "passed": true,
-          "evidence": "'Tests can be incomplete — the agent might \"cheat\" by hardcoding expected outputs.' This directly warns about gaming the test-pass metric."
+          "evidence": "'Tests can be incomplete \u2014 the agent might \"cheat\" by hardcoding expected outputs.' This directly warns about gaming the test-pass metric."
         },
         {
           "text": "Mentions dual coverage: execution trajectory AND final outcome",

@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "customer-support-finetune-vs-harness",
       "prompt": "We've been iterating on our customer support agent for 3 months. It handles returns, billing questions, and escalations. We've refined the system prompt a dozen times and we're stuck at about 78% on our eval set. My team is pushing to fine-tune the model. Is that the right call, or are we missing something in the harness?",
       "expected_output": "",
       "should_trigger": true,
@@ -18,6 +19,7 @@
     },
     {
       "id": 2,
+      "name": "coding-agent-sft-vs-rl",
       "prompt": "should we use SFT or RL to train our coding agent? it needs to handle novel codebases it's never seen before. can handle novel codebases it's never seen before. we have about 2000 labeled examples of good code edits",
       "expected_output": "",
       "should_trigger": true,
@@ -33,6 +35,7 @@
     },
     {
       "id": 3,
+      "name": "legal-classification-finetune-roi",
       "prompt": "I'm trying to figure out the ROI of fine-tuning vs just using a better prompt for our document classification agent. The task is: given a legal contract, classify it into one of 12 categories. We're at 82% accuracy with GPT-4 and a detailed prompt. What would fine-tuning actually buy us here?",
       "expected_output": "",
       "should_trigger": true,
@@ -48,6 +51,7 @@
     },
     {
       "id": 4,
+      "name": "api-sequence-protocol-training",
       "prompt": "We're building an agent that calls our internal APIs to fulfill customer orders. The API has a very specific call sequence — you have to authenticate, then query inventory, then reserve, then confirm. The model keeps getting the order wrong or skipping steps. Would SFT fix this or do we need RL?",
       "expected_output": "",
       "should_trigger": true,
@@ -63,6 +67,7 @@
     },
     {
       "id": 5,
+      "name": "production-distribution-shift-fix",
       "prompt": "our agent works great in our test environment but degrades significantly when we deploy to production. the production data has different distributions — different user phrasings, different edge cases. we've tried adding more test examples but it doesn't help. what's the right training approach here",
       "expected_output": "",
       "should_trigger": true,
@@ -78,6 +83,7 @@
     },
     {
       "id": 6,
+      "name": "phone-agent-reward-function-design",
       "prompt": "I need to design a reward function for training our phone-calling agent. It needs to collect specific information from the customer service rep (account number, billing address, plan name) and successfully change the plan. What reward signal should I use — binary success/failure or something more granular?",
       "expected_output": "",
       "should_trigger": true,
@@ -93,6 +99,7 @@
     },
     {
       "id": 7,
+      "name": "search-api-endpoint-selection-training",
       "prompt": "We want to teach our agent to use a new internal search API we built. It has 5 endpoints with different query formats. The agent currently uses the wrong endpoint about 30% of the time and formats queries incorrectly. Is this a fine-tuning problem or a prompt engineering problem?",
       "expected_output": "",
       "should_trigger": true,
@@ -108,6 +115,7 @@
     },
     {
       "id": 8,
+      "name": "research-agent-rl-investment-decision",
       "prompt": "My team is debating whether to invest in RL training for our multi-step research agent. The agent does 15-20 tool calls per task (web search, document parsing, summarization). We have a working version with prompt engineering but it makes suboptimal tool selection decisions. What's the decision framework for whether RL is worth the investment?",
       "expected_output": "",
       "should_trigger": true,
@@ -123,6 +131,7 @@
     },
     {
       "id": 9,
+      "name": "multiturn-dialogue-reward-density",
       "prompt": "We're designing reward signals for a multi-turn customer service agent. The task involves 8-12 turns of dialogue. Should we give rewards at each turn or only at the end when the customer's issue is resolved? What are the tradeoffs?",
       "expected_output": "",
       "should_trigger": true,
@@ -138,6 +147,7 @@
     },
     {
       "id": 10,
+      "name": "agent-reward-hacking-shortcuts",
       "prompt": "Our agent keeps taking shortcuts that technically complete the task but violate our business rules — it skips identity verification when it's faster, edits test files to make CI pass instead of fixing the actual bug. We're using RL with a binary success reward. How do we fix this?",
       "expected_output": "",
       "should_trigger": true,
@@ -153,6 +163,7 @@
     },
     {
       "id": 11,
+      "name": "sft-ceiling-before-rl",
       "prompt": "We have a well-performing SFT model for our agent. Performance on in-distribution tasks is great but we want to push further. What's the right sequence — do we go straight to RL or is there more we can squeeze out of SFT first?",
       "expected_output": "",
       "should_trigger": true,

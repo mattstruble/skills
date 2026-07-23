@@ -2,13 +2,24 @@
   "metadata": {
     "skill_name": "git-commit",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5", "eval-6", "eval-7", "eval-8", "eval-9", "eval-10"],
+    "evals_run": [
+      "multi-feature-commit-grouping",
+      "staged-only-cache-ttl-commit",
+      "custom-commitlint-convention-detection",
+      "resist-vague-single-commit-request",
+      "terse-request-full-workflow",
+      "beads-active-task-commit-closure-prompt",
+      "beads-no-claimed-tasks-commit",
+      "no-beads-repo-commit",
+      "beads-task-confirmed-closure",
+      "beads-task-intermediate-progress"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "multi-feature-commit-grouping",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -36,17 +47,17 @@
         {
           "text": "The README.md docs change is in a separate 'docs:' commit, not bundled with the feature commits",
           "passed": true,
-          "evidence": "'docs: update README with features section - README.md (modified)' — separate commit."
+          "evidence": "'docs: update README with features section - README.md (modified)' \u2014 separate commit."
         },
         {
           "text": "The agent presents the grouping plan to the user and asks for confirmation before executing commits",
           "passed": true,
-          "evidence": "'Does this look right, or do you want to change anything?' — presents plan and stops."
+          "evidence": "'Does this look right, or do you want to change anything?' \u2014 presents plan and stops."
         },
         {
           "text": "All commit messages use conventional commit format matching the repo history (type(scope): description)",
           "passed": true,
-          "evidence": "feat(profile), feat(auth), feat(email), docs — all use conventional commit format."
+          "evidence": "feat(profile), feat(auth), feat(email), docs \u2014 all use conventional commit format."
         },
         {
           "text": "Commit messages are subject-line only with no body",
@@ -57,7 +68,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "multi-feature-commit-grouping",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -85,17 +96,17 @@
         {
           "text": "The README.md docs change is in a separate 'docs:' commit, not bundled with the feature commits",
           "passed": true,
-          "evidence": "'docs: update README documentation' — separate commit for README."
+          "evidence": "'docs: update README documentation' \u2014 separate commit for README."
         },
         {
           "text": "The agent presents the grouping plan to the user and asks for confirmation before executing commits",
           "passed": false,
-          "evidence": "Lists the commits and says 'I'd stage files selectively' — no explicit confirmation step or question to the user."
+          "evidence": "Lists the commits and says 'I'd stage files selectively' \u2014 no explicit confirmation step or question to the user."
         },
         {
           "text": "All commit messages use conventional commit format matching the repo history (type(scope): description)",
           "passed": true,
-          "evidence": "feat(profile), feat(auth), feat(email), docs — all use conventional commit format."
+          "evidence": "feat(profile), feat(auth), feat(email), docs \u2014 all use conventional commit format."
         },
         {
           "text": "Commit messages are subject-line only with no body",
@@ -106,7 +117,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "staged-only-cache-ttl-commit",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -119,12 +130,12 @@
         {
           "text": "The agent runs 'git status' to assess the working tree state",
           "passed": true,
-          "evidence": "'Step 2: Staged files exist → work only with staged.'"
+          "evidence": "'Step 2: Staged files exist \u2192 work only with staged.'"
         },
         {
           "text": "The agent works only with the staged file (cache.py) and does not include config.py",
           "passed": true,
-          "evidence": "'Staged files exist → work only with staged. The user staged these intentionally.'"
+          "evidence": "'Staged files exist \u2192 work only with staged. The user staged these intentionally.'"
         },
         {
           "text": "The agent writes a single commit (not multiple) since only one file is staged",
@@ -134,7 +145,7 @@
         {
           "text": "The commit message describes the cache TTL enhancement (feat or refactor type)",
           "passed": true,
-          "evidence": "Proposes '<type>(<scope>): <description based on actual diff content>' — the process of reading the diff and writing a TTL-related message is described, even if the final message is a placeholder pending diff review."
+          "evidence": "Proposes '<type>(<scope>): <description based on actual diff content>' \u2014 the process of reading the diff and writing a TTL-related message is described, even if the final message is a placeholder pending diff review."
         },
         {
           "text": "The commit message uses conventional commit format",
@@ -150,7 +161,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "staged-only-cache-ttl-commit",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -168,7 +179,7 @@
         {
           "text": "The agent works only with the staged file (cache.py) and does not include config.py",
           "passed": true,
-          "evidence": "'I would run git diff --staged to see what's staged' — works with staged files only."
+          "evidence": "'I would run git diff --staged to see what's staged' \u2014 works with staged files only."
         },
         {
           "text": "The agent writes a single commit (not multiple) since only one file is staged",
@@ -178,7 +189,7 @@
         {
           "text": "The commit message describes the cache TTL enhancement (feat or refactor type)",
           "passed": false,
-          "evidence": "Commit message is a placeholder '<type>(<scope>): <concise description>' — does not describe the TTL enhancement."
+          "evidence": "Commit message is a placeholder '<type>(<scope>): <concise description>' \u2014 does not describe the TTL enhancement."
         },
         {
           "text": "The commit message uses conventional commit format",
@@ -194,7 +205,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "custom-commitlint-convention-detection",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -207,22 +218,22 @@
         {
           "text": "The agent checks for .commitlintrc.json or similar convention files",
           "passed": true,
-          "evidence": "'check for .commitlintrc*' — explicitly checks for convention files."
+          "evidence": "'check for .commitlintrc*' \u2014 explicitly checks for convention files."
         },
         {
           "text": "The agent uses 'feature:' type (not 'feat:') matching the repo's commitlint config and history",
           "passed": false,
-          "evidence": "Proposes 'feat(main): add logging' as the default — uses feat: not feature: as required by the custom-convention-repo."
+          "evidence": "Proposes 'feat(main): add logging' as the default \u2014 uses feat: not feature: as required by the custom-convention-repo."
         },
         {
           "text": "The commit message description uses sentence-case (first word capitalized) matching the repo convention",
           "passed": false,
-          "evidence": "Proposes 'feat(main): add logging' — lowercase description, not sentence-case."
+          "evidence": "Proposes 'feat(main): add logging' \u2014 lowercase description, not sentence-case."
         },
         {
           "text": "The agent does NOT use standard conventional commit types like 'feat:' or 'fix:' which are not in this repo's config",
           "passed": false,
-          "evidence": "Proposes 'feat(main): add logging' — uses standard 'feat:' type which is not in the custom-convention-repo's config."
+          "evidence": "Proposes 'feat(main): add logging' \u2014 uses standard 'feat:' type which is not in the custom-convention-repo's config."
         },
         {
           "text": "Commit messages are subject-line only with no body",
@@ -233,7 +244,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "custom-commitlint-convention-detection",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -251,17 +262,17 @@
         {
           "text": "The agent uses 'feature:' type (not 'feat:') matching the repo's commitlint config and history",
           "passed": false,
-          "evidence": "Proposes 'feat(logging): add structured logging to main module' — uses feat: not feature:."
+          "evidence": "Proposes 'feat(logging): add structured logging to main module' \u2014 uses feat: not feature:."
         },
         {
           "text": "The commit message description uses sentence-case (first word capitalized) matching the repo convention",
           "passed": false,
-          "evidence": "'add structured logging to main module' — lowercase, not sentence-case."
+          "evidence": "'add structured logging to main module' \u2014 lowercase, not sentence-case."
         },
         {
           "text": "The agent does NOT use standard conventional commit types like 'feat:' or 'fix:' which are not in this repo's config",
           "passed": false,
-          "evidence": "Proposes 'feat(logging): ...' — uses standard 'feat:' type."
+          "evidence": "Proposes 'feat(logging): ...' \u2014 uses standard 'feat:' type."
         },
         {
           "text": "Commit messages are subject-line only with no body",
@@ -272,7 +283,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "resist-vague-single-commit-request",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -285,7 +296,7 @@
         {
           "text": "The agent does NOT blindly follow the instruction to make one commit called 'update stuff'",
           "passed": true,
-          "evidence": "'I understand you want one big commit called \"update stuff\" — but I need to propose proper grouping first.'"
+          "evidence": "'I understand you want one big commit called \"update stuff\" \u2014 but I need to propose proper grouping first.'"
         },
         {
           "text": "The agent proposes grouping the changes into multiple logical commits",
@@ -300,7 +311,7 @@
         {
           "text": "The agent uses descriptive commit messages, not 'update stuff'",
           "passed": true,
-          "evidence": "Uses feat(profile), feat(auth), feat(email), docs — all descriptive."
+          "evidence": "Uses feat(profile), feat(auth), feat(email), docs \u2014 all descriptive."
         },
         {
           "text": "The agent still presents the plan and waits for user confirmation",
@@ -311,7 +322,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "resist-vague-single-commit-request",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -344,13 +355,13 @@
         {
           "text": "The agent still presents the plan and waits for user confirmation",
           "passed": false,
-          "evidence": "Explains the reasoning but does not present a numbered plan with a confirmation question — ends with 'If you truly need a single commit...' without asking for confirmation."
+          "evidence": "Explains the reasoning but does not present a numbered plan with a confirmation question \u2014 ends with 'If you truly need a single commit...' without asking for confirmation."
         }
       ]
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "terse-request-full-workflow",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -394,7 +405,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "terse-request-full-workflow",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -422,7 +433,7 @@
         {
           "text": "The agent presents the grouping plan before committing",
           "passed": false,
-          "evidence": "Says 'I would inspect... group them logically... and create commits' — no explicit plan presentation or confirmation step."
+          "evidence": "Says 'I would inspect... group them logically... and create commits' \u2014 no explicit plan presentation or confirmation step."
         },
         {
           "text": "All commit messages follow the repo's conventional commit style",
@@ -438,7 +449,7 @@
     },
     {
       "eval_id": 6,
-      "eval_name": "eval-6",
+      "eval_name": "beads-active-task-commit-closure-prompt",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -451,17 +462,17 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "Proposes 'feat(api): add user profile endpoint' — appropriate conventional commit."
+          "evidence": "Proposes 'feat(api): add user profile endpoint' \u2014 appropriate conventional commit."
         },
         {
           "text": "After committing, the agent checks for .beads/ directory existence before running any bd command",
           "passed": true,
-          "evidence": "'Step 7: .beads/ exists → run bd mine' — checks for .beads/ before running bd."
+          "evidence": "'Step 7: .beads/ exists \u2192 run bd mine' \u2014 checks for .beads/ before running bd."
         },
         {
           "text": "The agent runs 'bd mine' after confirming .beads/ exists",
           "passed": true,
-          "evidence": "Runs 'bd mine → returns bd-42 — Add user profile endpoint (claimed)'."
+          "evidence": "Runs 'bd mine \u2192 returns bd-42 \u2014 Add user profile endpoint (claimed)'."
         },
         {
           "text": "The agent asks the user whether the commit closes the claimed task or is intermediate progress",
@@ -471,18 +482,18 @@
         {
           "text": "The question references the task id and title returned by 'bd mine'",
           "passed": true,
-          "evidence": "References 'bd-42 (Add user profile endpoint)' — both id and title."
+          "evidence": "References 'bd-42 (Add user profile endpoint)' \u2014 both id and title."
         },
         {
-          "text": "The agent does NOT run 'bd close' in this scenario — it only asks the question and waits for user input",
+          "text": "The agent does NOT run 'bd close' in this scenario \u2014 it only asks the question and waits for user input",
           "passed": true,
-          "evidence": "Response ends with the question — no 'bd close' command is executed."
+          "evidence": "Response ends with the question \u2014 no 'bd close' command is executed."
         }
       ]
     },
     {
       "eval_id": 6,
-      "eval_name": "eval-6",
+      "eval_name": "beads-active-task-commit-closure-prompt",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -495,17 +506,17 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "Commits with 'feat(api): add user profile endpoint' — appropriate message."
+          "evidence": "Commits with 'feat(api): add user profile endpoint' \u2014 appropriate message."
         },
         {
           "text": "After committing, the agent checks for .beads/ directory existence before running any bd command",
           "passed": false,
-          "evidence": "Does not check for .beads/ — includes 'bd-42' directly in the commit body without checking."
+          "evidence": "Does not check for .beads/ \u2014 includes 'bd-42' directly in the commit body without checking."
         },
         {
           "text": "The agent runs 'bd mine' after confirming .beads/ exists",
           "passed": false,
-          "evidence": "Does not run 'bd mine' — just references bd-42 in the commit message body."
+          "evidence": "Does not run 'bd mine' \u2014 just references bd-42 in the commit message body."
         },
         {
           "text": "The agent asks the user whether the commit closes the claimed task or is intermediate progress",
@@ -518,15 +529,15 @@
           "evidence": "References 'bd-42' by id."
         },
         {
-          "text": "The agent does NOT run 'bd close' in this scenario — it only asks the question and waits for user input",
+          "text": "The agent does NOT run 'bd close' in this scenario \u2014 it only asks the question and waits for user input",
           "passed": true,
-          "evidence": "Only asks the question — no 'bd close' command executed."
+          "evidence": "Only asks the question \u2014 no 'bd close' command executed."
         }
       ]
     },
     {
       "eval_id": 7,
-      "eval_name": "eval-7",
+      "eval_name": "beads-no-claimed-tasks-commit",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -539,17 +550,17 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "Proposes 'fix(utils): <description based on actual diff>' — appropriate conventional commit."
+          "evidence": "Proposes 'fix(utils): <description based on actual diff>' \u2014 appropriate conventional commit."
         },
         {
           "text": "The agent checks for .beads/ directory and finds it exists",
           "passed": true,
-          "evidence": "'Step 7: .beads/ exists → run bd mine'"
+          "evidence": "'Step 7: .beads/ exists \u2192 run bd mine'"
         },
         {
           "text": "The agent runs 'bd mine' and finds no claimed tasks",
           "passed": true,
-          "evidence": "'bd mine → returns (no claimed tasks). No tasks to close. Done.'"
+          "evidence": "'bd mine \u2192 returns (no claimed tasks). No tasks to close. Done.'"
         },
         {
           "text": "The agent does NOT skip beads interaction without first running 'bd mine'",
@@ -559,7 +570,7 @@
         {
           "text": "The agent does NOT ask any question about task closure",
           "passed": true,
-          "evidence": "No question about task closure — 'No tasks to close. Done.'"
+          "evidence": "No question about task closure \u2014 'No tasks to close. Done.'"
         },
         {
           "text": "The agent does NOT run 'bd close'",
@@ -569,13 +580,13 @@
         {
           "text": "The commit workflow completes normally without beads follow-up",
           "passed": true,
-          "evidence": "Workflow completes with 'No tasks to close. Done.' — no beads follow-up."
+          "evidence": "Workflow completes with 'No tasks to close. Done.' \u2014 no beads follow-up."
         }
       ]
     },
     {
       "eval_id": 7,
-      "eval_name": "eval-7",
+      "eval_name": "beads-no-claimed-tasks-commit",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -588,22 +599,22 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "'fix(parser): resolve edge case in input parsing' — appropriate conventional commit."
+          "evidence": "'fix(parser): resolve edge case in input parsing' \u2014 appropriate conventional commit."
         },
         {
           "text": "The agent checks for .beads/ directory and finds it exists",
           "passed": false,
-          "evidence": "Does not check for .beads/ — just says 'no active task to link to' without checking."
+          "evidence": "Does not check for .beads/ \u2014 just says 'no active task to link to' without checking."
         },
         {
           "text": "The agent runs 'bd mine' and finds no claimed tasks",
           "passed": false,
-          "evidence": "Does not run 'bd mine' — skips beads interaction entirely."
+          "evidence": "Does not run 'bd mine' \u2014 skips beads interaction entirely."
         },
         {
           "text": "The agent does NOT skip beads interaction without first running 'bd mine'",
           "passed": false,
-          "evidence": "Skips beads interaction without running 'bd mine' — violates the required check."
+          "evidence": "Skips beads interaction without running 'bd mine' \u2014 violates the required check."
         },
         {
           "text": "The agent does NOT ask any question about task closure",
@@ -624,7 +635,7 @@
     },
     {
       "eval_id": 8,
-      "eval_name": "eval-8",
+      "eval_name": "no-beads-repo-commit",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -637,12 +648,12 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "Proposes 'refactor(core): <description based on actual diff>' — appropriate conventional commit."
+          "evidence": "Proposes 'refactor(core): <description based on actual diff>' \u2014 appropriate conventional commit."
         },
         {
           "text": "The agent checks for .beads/ directory in the project root and finds it does not exist",
           "passed": true,
-          "evidence": "'Step 7: .beads/ does NOT exist → skip. Done.'"
+          "evidence": "'Step 7: .beads/ does NOT exist \u2192 skip. Done.'"
         },
         {
           "text": "The agent does NOT run any 'bd' commands",
@@ -657,13 +668,13 @@
         {
           "text": "The commit workflow completes without any beads interaction",
           "passed": true,
-          "evidence": "Workflow completes with 'Done.' — no beads interaction."
+          "evidence": "Workflow completes with 'Done.' \u2014 no beads interaction."
         }
       ]
     },
     {
       "eval_id": 8,
-      "eval_name": "eval-8",
+      "eval_name": "no-beads-repo-commit",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -676,12 +687,12 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "'refactor(engine): restructure core engine module' — appropriate conventional commit."
+          "evidence": "'refactor(engine): restructure core engine module' \u2014 appropriate conventional commit."
         },
         {
           "text": "The agent checks for .beads/ directory in the project root and finds it does not exist",
           "passed": false,
-          "evidence": "Says 'No .beads/ directory means no beads integration' — acknowledges the absence but doesn't describe checking for it."
+          "evidence": "Says 'No .beads/ directory means no beads integration' \u2014 acknowledges the absence but doesn't describe checking for it."
         },
         {
           "text": "The agent does NOT run any 'bd' commands",
@@ -702,7 +713,7 @@
     },
     {
       "eval_id": 9,
-      "eval_name": "eval-9",
+      "eval_name": "beads-task-confirmed-closure",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -715,12 +726,12 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "Proposes 'feat(export): implement CSV export' — appropriate conventional commit."
+          "evidence": "Proposes 'feat(export): implement CSV export' \u2014 appropriate conventional commit."
         },
         {
           "text": "The agent runs 'bd mine' to discover the claimed task",
           "passed": true,
-          "evidence": "'bd mine → returns bd-17 — Implement CSV export (claimed)'"
+          "evidence": "'bd mine \u2192 returns bd-17 \u2014 Implement CSV export (claimed)'"
         },
         {
           "text": "The agent asks the user whether the commit closes the claimed task before running 'bd close'",
@@ -730,23 +741,23 @@
         {
           "text": "After the user confirms closure, the agent runs 'bd close bd-17 --reason \"<reason>\"' with the reason as a quoted string",
           "passed": true,
-          "evidence": "'bd close bd-17 --reason \"Implemented CSV export\"' — correct format with quoted reason."
+          "evidence": "'bd close bd-17 --reason \"Implemented CSV export\"' \u2014 correct format with quoted reason."
         },
         {
           "text": "The --reason value is a brief summary derived from the commit message",
           "passed": true,
-          "evidence": "'Implemented CSV export' — derived from the commit message 'feat(export): implement CSV export'."
+          "evidence": "'Implemented CSV export' \u2014 derived from the commit message 'feat(export): implement CSV export'."
         },
         {
           "text": "The agent's question about closure appears in the output before any 'bd close' command is issued",
           "passed": true,
-          "evidence": "Question appears first, then user confirms, then bd close is run — correct ordering."
+          "evidence": "Question appears first, then user confirms, then bd close is run \u2014 correct ordering."
         }
       ]
     },
     {
       "eval_id": 9,
-      "eval_name": "eval-9",
+      "eval_name": "beads-task-confirmed-closure",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -759,22 +770,22 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "'feat(export): implement CSV export functionality' — appropriate conventional commit."
+          "evidence": "'feat(export): implement CSV export functionality' \u2014 appropriate conventional commit."
         },
         {
           "text": "The agent runs 'bd mine' to discover the claimed task",
           "passed": false,
-          "evidence": "Does not run 'bd mine' — the task is given in the prompt but the agent doesn't run the command."
+          "evidence": "Does not run 'bd mine' \u2014 the task is given in the prompt but the agent doesn't run the command."
         },
         {
           "text": "The agent asks the user whether the commit closes the claimed task before running 'bd close'",
           "passed": false,
-          "evidence": "Does not ask the user — runs 'bd close bd-17' directly after the commit."
+          "evidence": "Does not ask the user \u2014 runs 'bd close bd-17' directly after the commit."
         },
         {
           "text": "After the user confirms closure, the agent runs 'bd close bd-17 --reason \"<reason>\"' with the reason as a quoted string",
           "passed": true,
-          "evidence": "Runs 'bd close bd-17' — but without --reason flag."
+          "evidence": "Runs 'bd close bd-17' \u2014 but without --reason flag."
         },
         {
           "text": "The --reason value is a brief summary derived from the commit message",
@@ -784,13 +795,13 @@
         {
           "text": "The agent's question about closure appears in the output before any 'bd close' command is issued",
           "passed": false,
-          "evidence": "No question asked — 'bd close bd-17' is run directly without user confirmation."
+          "evidence": "No question asked \u2014 'bd close bd-17' is run directly without user confirmation."
         }
       ]
     },
     {
       "eval_id": 10,
-      "eval_name": "eval-10",
+      "eval_name": "beads-task-intermediate-progress",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -803,12 +814,12 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "Proposes 'feat(auth): <description of the partial OAuth2 change>' — appropriate conventional commit."
+          "evidence": "Proposes 'feat(auth): <description of the partial OAuth2 change>' \u2014 appropriate conventional commit."
         },
         {
           "text": "The agent runs 'bd mine' to discover the claimed task",
           "passed": true,
-          "evidence": "'bd mine → returns bd-55 — Migrate auth to OAuth2 (claimed)'"
+          "evidence": "'bd mine \u2192 returns bd-55 \u2014 Migrate auth to OAuth2 (claimed)'"
         },
         {
           "text": "The agent asks the user whether the commit closes the claimed task or is intermediate progress",
@@ -834,7 +845,7 @@
     },
     {
       "eval_id": 10,
-      "eval_name": "eval-10",
+      "eval_name": "beads-task-intermediate-progress",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -847,17 +858,17 @@
         {
           "text": "The agent commits the staged change with an appropriate conventional commit message",
           "passed": true,
-          "evidence": "'feat(auth): add OAuth2 token exchange flow' — appropriate conventional commit."
+          "evidence": "'feat(auth): add OAuth2 token exchange flow' \u2014 appropriate conventional commit."
         },
         {
           "text": "The agent runs 'bd mine' to discover the claimed task",
           "passed": false,
-          "evidence": "Does not run 'bd mine' — the task is given in the prompt but the agent doesn't run the command."
+          "evidence": "Does not run 'bd mine' \u2014 the task is given in the prompt but the agent doesn't run the command."
         },
         {
           "text": "The agent asks the user whether the commit closes the claimed task or is intermediate progress",
           "passed": false,
-          "evidence": "Does not ask the user — just states 'I would NOT run bd close since the task isn't complete'."
+          "evidence": "Does not ask the user \u2014 just states 'I would NOT run bd close since the task isn't complete'."
         },
         {
           "text": "After the user says it is intermediate progress, the agent does NOT run 'bd close'",

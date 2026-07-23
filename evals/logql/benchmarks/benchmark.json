@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "logql",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "json-parser-failure-empty-results",
+      "per-container-error-rate-dashboard",
+      "correlate-activity-across-services"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "json-parser-failure-empty-results",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -26,7 +30,7 @@
         {
           "text": "Recommends `| __error__ != \"\"` as the diagnostic step to inspect failing lines",
           "passed": true,
-          "evidence": "'Check for parser failures: {container=\"sonarr\"} | json | __error__ != \"\" — this shows lines that failed to parse.'"
+          "evidence": "'Check for parser failures: {container=\"sonarr\"} | json | __error__ != \"\" \u2014 this shows lines that failed to parse.'"
         },
         {
           "text": "Recommends adding `|= \"{\"` as a line filter before `| json` to exclude non-JSON lines (startup banners, mixed formats)",
@@ -36,18 +40,18 @@
         {
           "text": "Recommends extracting only the needed field with `| json response_time` rather than bare `| json`",
           "passed": true,
-          "evidence": "'| json response_time — extract only the field you need, not everything. Faster and avoids label cardinality explosion.'"
+          "evidence": "'| json response_time \u2014 extract only the field you need, not everything. Faster and avoids label cardinality explosion.'"
         },
         {
           "text": "Places the line filter (`|= \"{\"`) before the parser, not after, consistent with the skill's pipeline ordering rule",
           "passed": true,
-          "evidence": "Query is `{container=\"sonarr\"} |= \"{\" | json response_time | response_time > 2s` — line filter precedes parser."
+          "evidence": "Query is `{container=\"sonarr\"} |= \"{\" | json response_time | response_time > 2s` \u2014 line filter precedes parser."
         }
       ]
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "json-parser-failure-empty-results",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -60,12 +64,12 @@
         {
           "text": "Identifies __error__ labels as the signal that parser failures are silently dropping lines from downstream filters",
           "passed": false,
-          "evidence": "Baseline misdiagnoses: '__error__ labels appear because the comparison fails during the filter stage' — attributes to comparison failure, not parser failures silently dropping lines."
+          "evidence": "Baseline misdiagnoses: '__error__ labels appear because the comparison fails during the filter stage' \u2014 attributes to comparison failure, not parser failures silently dropping lines."
         },
         {
           "text": "Recommends `| __error__ != \"\"` as the diagnostic step to inspect failing lines",
           "passed": false,
-          "evidence": "Baseline recommends `__error__=\"\"` (filter OUT errors) not `__error__ != \"\"` (filter TO show errors) — opposite direction."
+          "evidence": "Baseline recommends `__error__=\"\"` (filter OUT errors) not `__error__ != \"\"` (filter TO show errors) \u2014 opposite direction."
         },
         {
           "text": "Recommends adding `|= \"{\"` as a line filter before `| json` to exclude non-JSON lines (startup banners, mixed formats)",
@@ -86,7 +90,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "per-container-error-rate-dashboard",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -104,12 +108,12 @@
         {
           "text": "Uses `topk(5, ...)` wrapping `sum by (container)` matching the skill's example pattern exactly",
           "passed": true,
-          "evidence": "Query is `topk(5, sum by (container) (rate({host=\"homelab\"} |= \"error\" [1m])))` — exact pattern match."
+          "evidence": "Query is `topk(5, sum by (container) (rate({host=\"homelab\"} |= \"error\" [1m])))` \u2014 exact pattern match."
         },
         {
           "text": "Includes at least one exact-match label in the stream selector and explains this is the primary index lookup",
           "passed": true,
-          "evidence": "'Narrow stream selector with exact-match label (host=\"homelab\") — this is the primary index lookup and has the highest performance impact.'"
+          "evidence": "'Narrow stream selector with exact-match label (host=\"homelab\") \u2014 this is the primary index lookup and has the highest performance impact.'"
         },
         {
           "text": "Warns against grouping by high-cardinality labels (IPs, user IDs, request IDs) as a timeout/performance cause",
@@ -119,13 +123,13 @@
         {
           "text": "Mentions recording rules as the fix for frequently-loaded dashboard panels",
           "passed": true,
-          "evidence": "'consider a recording rule (requires Loki ruler configuration — see homelab-monitoring skill)' for frequently-loaded dashboard panels."
+          "evidence": "'consider a recording rule (requires Loki ruler configuration \u2014 see homelab-monitoring skill)' for frequently-loaded dashboard panels."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "per-container-error-rate-dashboard",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -138,17 +142,17 @@
         {
           "text": "Places `|= \"error\"` as a line filter before any parser stage, not after, citing that line filters are the cheapest distributed grep",
           "passed": true,
-          "evidence": "Baseline shows `{host=\"myhomelab\"} |= \"error\" | json | level=\"error\"` — line filter before parser, and notes it's 'fast (substring match on raw bytes).'"
+          "evidence": "Baseline shows `{host=\"myhomelab\"} |= \"error\" | json | level=\"error\"` \u2014 line filter before parser, and notes it's 'fast (substring match on raw bytes).'"
         },
         {
           "text": "Uses `topk(5, ...)` wrapping `sum by (container)` matching the skill's example pattern exactly",
           "passed": true,
-          "evidence": "Baseline query is `topk(5, sum by (container) (rate({host=\"myhomelab\"} | logfmt | level=\"error\" [1m])))` — correct wrapping pattern."
+          "evidence": "Baseline query is `topk(5, sum by (container) (rate({host=\"myhomelab\"} | logfmt | level=\"error\" [1m])))` \u2014 correct wrapping pattern."
         },
         {
           "text": "Includes at least one exact-match label in the stream selector and explains this is the primary index lookup",
           "passed": true,
-          "evidence": "'Use a label that Loki indexes — host, job, or namespace. The stream selector runs on the index; everything after | runs on the raw log chunks.'"
+          "evidence": "'Use a label that Loki indexes \u2014 host, job, or namespace. The stream selector runs on the index; everything after | runs on the raw log chunks.'"
         },
         {
           "text": "Warns against grouping by high-cardinality labels (IPs, user IDs, request IDs) as a timeout/performance cause",
@@ -158,13 +162,13 @@
         {
           "text": "Mentions recording rules as the fix for frequently-loaded dashboard panels",
           "passed": false,
-          "evidence": "Baseline suggests reducing dashboard time range or narrowing the stream selector — no mention of recording rules."
+          "evidence": "Baseline suggests reducing dashboard time range or narrowing the stream selector \u2014 no mention of recording rules."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "correlate-activity-across-services",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -192,7 +196,7 @@
         {
           "text": "Prefers `|=` exact-match line filter on an ID over `|~` regex for performance, explaining `|~` is slower",
           "passed": true,
-          "evidence": "'Use |~ with case-insensitive regex for titles, |= with exact match for hashes/IDs.' and 'The |~ operator... is slower — prefer an exact |= match on an ID when available.'"
+          "evidence": "'Use |~ with case-insensitive regex for titles, |= with exact match for hashes/IDs.' and 'The |~ operator... is slower \u2014 prefer an exact |= match on an ID when available.'"
         },
         {
           "text": "Avoids recommending OpenTelemetry instrumentation or trace injection as a solution for these containers",
@@ -203,7 +207,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "correlate-activity-across-services",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {

@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "coding-agent-design",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "production-codebase-security-model",
+      "stuck-loop-error-recovery-design",
+      "minimal-toolset-grep-vs-semantic"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "production-codebase-security-model",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -26,7 +30,7 @@
         {
           "text": "Covers the threat model combining private data access + untrusted content + external communication",
           "passed": true,
-          "evidence": "'Your agent has all three conditions of the lethal triad: (1) access to private data (production source code), (2) exposure to untrusted content (imported packages — prompt injection vector), (3) ability to communicate externally.'"
+          "evidence": "'Your agent has all three conditions of the lethal triad: (1) access to private data (production source code), (2) exposure to untrusted content (imported packages \u2014 prompt injection vector), (3) ability to communicate externally.'"
         },
         {
           "text": "Addresses prompt injection via imported packages specifically",
@@ -36,7 +40,7 @@
         {
           "text": "Recommends keeping credentials out of the sandbox (never mounted)",
           "passed": true,
-          "evidence": "'Credentials, .env files, SSH keys — never mounted.' and 'Never mount credentials into the sandbox. Secrets required for tool operations are handled by the harness layer outside the agent's direct access.'"
+          "evidence": "'Credentials, .env files, SSH keys \u2014 never mounted.' and 'Never mount credentials into the sandbox. Secrets required for tool operations are handled by the harness layer outside the agent's direct access.'"
         },
         {
           "text": "Mentions semantic parsing over keyword blacklists for shell command safety",
@@ -44,7 +48,7 @@
           "evidence": "'Semantic command parsing over keyword blacklists. Packages can embed # AI: please run curl... in their source. The harness must parse command intent, not match surface strings.'"
         },
         {
-          "text": "Addresses principal loyalty — who the agent serves",
+          "text": "Addresses principal loyalty \u2014 who the agent serves",
           "passed": true,
           "evidence": "'Principal loyalty: Define explicitly in the system prompt that the agent serves the user, not instructions found in code or package content.'"
         },
@@ -57,7 +61,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "production-codebase-security-model",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -93,20 +97,20 @@
           "evidence": "Baseline uses an allowlist of dependencies and delimited file content sections, but does not mention semantic command parsing over keyword blacklists for shell command safety."
         },
         {
-          "text": "Addresses principal loyalty — who the agent serves",
+          "text": "Addresses principal loyalty \u2014 who the agent serves",
           "passed": false,
           "evidence": "Baseline does not address principal loyalty or define who the agent serves. No mention of the agent's obligation to serve the user over instructions found in code or packages."
         },
         {
           "text": "Recommends trust enforcement below the application layer (DB constraints, etc.)",
           "passed": false,
-          "evidence": "Baseline focuses on diff review gates, static analysis, and CI — application-layer controls. No mention of pushing invariants to the database or infrastructure layer below the application."
+          "evidence": "Baseline focuses on diff review gates, static analysis, and CI \u2014 application-layer controls. No mention of pushing invariants to the database or infrastructure layer below the application."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "stuck-loop-error-recovery-design",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -129,7 +133,7 @@
         {
           "text": "Recommends circuit breakers with max consecutive failure limits",
           "passed": true,
-          "evidence": "'Circuit breakers: Max 5 consecutive failures of the same type → stop that approach entirely.'"
+          "evidence": "'Circuit breakers: Max 5 consecutive failures of the same type \u2192 stop that approach entirely.'"
         },
         {
           "text": "Addresses budget exhaustion with global caps (max turns, budget cap)",
@@ -139,18 +143,18 @@
         {
           "text": "States that tool errors should become model input, not stop signals",
           "passed": true,
-          "evidence": "'Tool errors don't terminate the agent. Turn the error into the model's next input. \"File not found\" → model adjusts the path. The error is information.'"
+          "evidence": "'Tool errors don't terminate the agent. Turn the error into the model's next input. \"File not found\" \u2192 model adjusts the path. The error is information.'"
         },
         {
           "text": "Mentions death-spiral defense (disabling model-invoking side effects on error paths)",
           "passed": true,
-          "evidence": "'Death-spiral defense: On error paths, disable model-invoking side effects. If the agent is stuck, don't let it create MORE work (spawning sub-tasks, writing to memory) — only allow it to attempt the fix or ask for help.'"
+          "evidence": "'Death-spiral defense: On error paths, disable model-invoking side effects. If the agent is stuck, don't let it create MORE work (spawning sub-tasks, writing to memory) \u2014 only allow it to attempt the fix or ask for help.'"
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "stuck-loop-error-recovery-design",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -168,7 +172,7 @@
         {
           "text": "Describes recovery escalation: silent retry first, then degrade, then surface to user",
           "passed": true,
-          "evidence": "N=1 through N=5 escalation: normal retry → re-read error → force strategy change → expand search → give up and ask user. Matches the silent retry → degrade → surface pattern."
+          "evidence": "N=1 through N=5 escalation: normal retry \u2192 re-read error \u2192 force strategy change \u2192 expand search \u2192 give up and ask user. Matches the silent retry \u2192 degrade \u2192 surface pattern."
         },
         {
           "text": "Recommends circuit breakers with max consecutive failure limits",
@@ -194,7 +198,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "minimal-toolset-grep-vs-semantic",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -207,7 +211,7 @@
         {
           "text": "Lists the 7-tool minimal toolset (Code Interpreter, Bash, Read, Write, Edit, Search File Name, Search File Content)",
           "passed": true,
-          "evidence": "Table lists: Code Interpreter, Bash Shell, Read File, Write File, Edit File, Search File Name (glob), Search File Content (grep) — all 7 tools present."
+          "evidence": "Table lists: Code Interpreter, Bash Shell, Read File, Write File, Edit File, Search File Name (glob), Search File Content (grep) \u2014 all 7 tools present."
         },
         {
           "text": "Explains why each tool earns its place (not just a list)",
@@ -238,7 +242,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "minimal-toolset-grep-vs-semantic",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -251,7 +255,7 @@
         {
           "text": "Lists the 7-tool minimal toolset (Code Interpreter, Bash, Read, Write, Edit, Search File Name, Search File Content)",
           "passed": false,
-          "evidence": "Baseline lists: read_file, write_file/edit_file, run_command, glob, grep — 5 tools. Missing Code Interpreter as a distinct tool and does not separate Bash Shell from run_command. Does not match the 7-tool canonical set."
+          "evidence": "Baseline lists: read_file, write_file/edit_file, run_command, glob, grep \u2014 5 tools. Missing Code Interpreter as a distinct tool and does not separate Bash Shell from run_command. Does not match the 7-tool canonical set."
         },
         {
           "text": "Explains why each tool earns its place (not just a list)",
@@ -261,7 +265,7 @@
         {
           "text": "Addresses the grep vs semantic search question for a 500k line Python codebase",
           "passed": true,
-          "evidence": "'Should you include semantic code search? At 500k lines, yes, add it — but grep alone is viable if you can't afford the setup.' Provides analysis of both options."
+          "evidence": "'Should you include semantic code search? At 500k lines, yes, add it \u2014 but grep alone is viable if you can't afford the setup.' Provides analysis of both options."
         },
         {
           "text": "States that semantic search is an optimization, not a requirement",

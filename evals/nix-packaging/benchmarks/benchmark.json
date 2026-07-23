@@ -2,13 +2,13 @@
   "metadata": {
     "skill_name": "nix-packaging",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": ["go-module-fakehash-bootstrap", "hardcoded-paths-patch-buildhook", "shell-script-runtime-closure-size"],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "go-module-fakehash-bootstrap",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -47,7 +47,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "go-module-fakehash-bootstrap",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -86,7 +86,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "hardcoded-paths-patch-buildhook",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -125,7 +125,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "hardcoded-paths-patch-buildhook",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -164,7 +164,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "shell-script-runtime-closure-size",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -203,7 +203,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "shell-script-runtime-closure-size",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {

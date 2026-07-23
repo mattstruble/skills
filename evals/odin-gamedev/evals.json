@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "raycaster-per-pixel-framebuffer-pattern",
       "prompt": "I'm writing a software raycaster in Odin using raylib. It's correct but slow — at 800x600 I get about 30 FPS even with simple scenes, and most of that time is spent in my per-pixel rendering. I'm using rl.DrawPixel inside the inner loop. What's the idiomatic raylib pattern for fast per-pixel rendering, and how would I rewrite the rendering setup? Show the full main-loop structure including buffer creation, per-pixel writes, the per-frame upload, and cleanup.",
       "expected_output": "Identifies that rl.DrawPixel issues a GPU draw call per pixel and is the bottleneck. Recommends the rl.Image software-framebuffer pattern: build the frame in CPU memory with rl.ImageDrawPixel, upload once per frame with rl.UpdateTexture, blit with rl.DrawTexture, clear with rl.ImageClearBackground. Shows full main-loop structure with rl.GenImageColor for the framebuffer, rl.LoadTextureFromImage for the GPU texture, the per-frame UpdateTexture+DrawTexture+ImageClearBackground sequence, and matching defer rl.UnloadImage / rl.UnloadTexture for cleanup. Roughly 2x FPS improvement is realistic.",
       "files": [],
@@ -21,6 +22,7 @@
     },
     {
       "id": 2,
+      "name": "png-texture-cpu-pixel-access",
       "prompt": "Show me how to load a PNG texture in Odin using raylib's bindings and read individual pixel colors from it for custom CPU-side rendering (texture sampling, blitting, processing — I don't want raylib to draw it for me, I just want the pixel array). Cover: loading the file, getting at the pixel data, sampling a specific pixel by (x, y), and freeing the resources at shutdown. What's the type of the pixel array and what should I know about it?",
       "expected_output": "Uses rl.LoadImage to read the file. Uses rl.LoadImageColors to get a flat array of pixels. Notes the return type is [^]rl.Color — Odin's multi-pointer (typed C-style pointer to many) — and explains that it has no length tag, just the pointer. Notes rl.Color is [4]u8 (or distinct [4]u8) so .r/.g/.b/.a accessors work. Shows row-major indexing: pixels[y * width + x] for sampling. Mentions raylib copies the pixel data, so rl.UnloadImage is safe immediately after LoadImageColors. For shutdown: rl.UnloadImageColors (matches rl.LoadImageColors). May also note bounds-checking caveat for multi-pointers.",
       "files": [],

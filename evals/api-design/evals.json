@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "user-org-roles-resource-design",
       "prompt": "I'm designing a REST API for a user management system. Users can belong to multiple organizations, and each organization has roles. I need endpoints for managing users, organizations, and role assignments. Can you help me design the resource hierarchy and endpoints following best practices?",
       "expected_output": "A resource-oriented API design with: proper path structure (e.g., /v1/users, /v1/organizations, /v1/organizations/{org_id}/members or similar), standard CRUD methods using correct HTTP verbs (GET/POST/PATCH/DELETE), paginated List responses with 'results' array, user-specified IDs as query params on Create, PATCH for updates (not PUT), and a checklist or notes covering standard fields (create_time, update_time, etag).",
       "expectations": [
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "book-api-consistency-review",
       "prompt": "Review this API design for consistency problems:\n\n```\nGET  /api/getBooks\nPOST /api/createBook\nPUT  /api/updateBook/{bookId}\nDEL  /api/deleteBook/{id}\nGET  /api/book/{book_id}/getChapters\nPOST /api/books/{bookId}/chapters/create\n\nList response: { \"bookList\": [...], \"count\": 50 }\nCreate request body: { \"id\": \"my-book\", \"title\": \"...\", \"author\": \"...\" }\nTimestamp fields: createdAt, updatedAt\n```\n\nWhat's wrong with this design?",
       "expected_output": "A review identifying: (1) verb-oriented paths instead of resource-oriented, (2) PUT instead of PATCH for updates, (3) inconsistent ID parameter naming (bookId vs book_id vs id), (4) List response uses 'bookList' instead of 'results', (5) 'id' should be a query param not body field on Create, (6) timestamp fields use wrong suffix (createdAt/updatedAt instead of create_time/update_time with _time suffix), (7) path naming inconsistencies.",
       "expectations": [
@@ -28,6 +30,7 @@
     },
     {
       "id": 3,
+      "name": "video-transcoding-lro-design",
       "prompt": "I have a video processing service. When a user uploads a video, it needs to be transcoded into multiple formats (720p, 1080p, 4K). This can take 5-30 minutes. Should I use a standard Create endpoint that returns the video resource, or something else? How should I design this so clients can track progress?",
       "expected_output": "Recommendation to use Long-running Operations (LROs): POST to create the video resource returns 202 Accepted with an Operation resource containing path, done, metadata, response, error fields. Expose GET /v1/operations/{operation_id} for polling. The video resource should appear in List/Get immediately with a state field (e.g., PROCESSING, READY, FAILED). Mention state enum conventions (UPPER_SNAKE_CASE, STATE_UNSPECIFIED as value 0).",
       "expectations": [
@@ -39,6 +42,7 @@
     },
     {
       "id": 4,
+      "name": "document-archive-publish-custom-methods",
       "prompt": "I need to add an 'archive' action to my documents API. Archived documents are hidden from normal List results but can be retrieved with a flag. I also need a way to 'publish' a document (which sends notifications and changes its visibility). Should these be standard CRUD operations or something else? How should I model the document states?",
       "expected_output": "Recommendation to use custom methods for archive and publish (POST /v1/documents/{doc_id}:archive, POST /v1/documents/{doc_id}:publish) since they're state transitions that can't be expressed as field updates. State should be an output-only enum (DRAFT, PUBLISHED, ARCHIVED) not directly writable via Update. List should support bool show_deleted or bool show_archived. Soft-delete pattern for archive (with delete_time field and Undelete method). State enum should use UPPER_SNAKE_CASE with STATE_UNSPECIFIED.",
       "expectations": [

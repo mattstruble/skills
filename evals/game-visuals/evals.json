@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 0,
+      "name": "readability-and-brief",
       "eval_name": "readability-and-brief",
       "prompt": "My game looks technically fine but plays badly — players keep missing enemies and important objects, and the screen feels busy. Separately, I have only a vague art idea and need to brief an artist. Help with both.",
       "expected_output": "Applies the visual information-channels idea (color/shape/surface-contrast; removing channels hurts playability), addresses composition (maximize actionable play-area, separate foreground from background, deliberate camera), and gives a breadth-first reference-gathering plus artist-briefing workflow with concrete refs and rough programmer-art.",

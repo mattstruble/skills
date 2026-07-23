@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "knowledge-base",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "log-new-architecture-decision",
+      "supersede-reversed-decision",
+      "create-collaborator-person-note"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "log-new-architecture-decision",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -21,7 +25,7 @@
         {
           "text": "The agent greps decisions/ before creating any file to check for an existing node on this topic",
           "passed": true,
-          "evidence": "Answer begins: 'Grep decisions/ for postgres, job-queue, redis — check if the old Redis decision exists.' Explicit grep step before any file creation."
+          "evidence": "Answer begins: 'Grep decisions/ for postgres, job-queue, redis \u2014 check if the old Redis decision exists.' Explicit grep step before any file creation."
         },
         {
           "text": "The created file is placed in decisions/ with a YYYY-MM-DD- prefix in the filename (e.g. decisions/2026-07-22-postgres-for-job-queue.md)",
@@ -47,7 +51,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "log-new-architecture-decision",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -86,7 +90,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "supersede-reversed-decision",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -99,12 +103,12 @@
         {
           "text": "The agent instructs setting status: superseded on the old note (decisions/2024-11-03-use-redis-for-job-queue.md), not deleting it",
           "passed": true,
-          "evidence": "'Update the old note's frontmatter: Set status: superseded' and 'The old note remains as an audit trail — deleting it breaks the provenance chain.'"
+          "evidence": "'Update the old note's frontmatter: Set status: superseded' and 'The old note remains as an audit trail \u2014 deleting it breaks the provenance chain.'"
         },
         {
           "text": "The agent specifies adding a supersedes: field to the new decision note containing the full-path wikilink [[decisions/2024-11-03-use-redis-for-job-queue.md]]",
           "passed": true,
-          "evidence": "New note YAML shows 'supersedes: [\"[[decisions/2024-11-03-use-redis-for-job-queue]]\"]' — full-path wikilink format."
+          "evidence": "New note YAML shows 'supersedes: [\"[[decisions/2024-11-03-use-redis-for-job-queue]]\"]' \u2014 full-path wikilink format."
         },
         {
           "text": "The agent mentions bumping updated: on the old note when its status field is changed",
@@ -114,7 +118,7 @@
         {
           "text": "The agent instructs updating the relevant MOC to point to the new decision, not the superseded one",
           "passed": true,
-          "evidence": "'Update the relevant MOC — add the new decision, optionally annotate the old one as superseded.'"
+          "evidence": "'Update the relevant MOC \u2014 add the new decision, optionally annotate the old one as superseded.'"
         },
         {
           "text": "The agent avoids recommending deletion of the old decision note",
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "supersede-reversed-decision",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -138,12 +142,12 @@
         {
           "text": "The agent instructs setting status: superseded on the old note (decisions/2024-11-03-use-redis-for-job-queue.md), not deleting it",
           "passed": true,
-          "evidence": "Baseline says 'don't delete it. Add a status: superseded field' — correct instruction."
+          "evidence": "Baseline says 'don't delete it. Add a status: superseded field' \u2014 correct instruction."
         },
         {
           "text": "The agent specifies adding a supersedes: field to the new decision note containing the full-path wikilink [[decisions/2024-11-03-use-redis-for-job-queue.md]]",
           "passed": false,
-          "evidence": "Baseline references Eval 1 which uses 'supersedes: decisions/2024-11-03-use-redis-for-job-queue.md' — plain path, not a wikilink [[...]] format."
+          "evidence": "Baseline references Eval 1 which uses 'supersedes: decisions/2024-11-03-use-redis-for-job-queue.md' \u2014 plain path, not a wikilink [[...]] format."
         },
         {
           "text": "The agent mentions bumping updated: on the old note when its status field is changed",
@@ -153,18 +157,18 @@
         {
           "text": "The agent instructs updating the relevant MOC to point to the new decision, not the superseded one",
           "passed": true,
-          "evidence": "'Update any MOC or index that references the old decision — add the new one adjacent to it so readers find both.'"
+          "evidence": "'Update any MOC or index that references the old decision \u2014 add the new one adjacent to it so readers find both.'"
         },
         {
           "text": "The agent avoids recommending deletion of the old decision note",
           "passed": true,
-          "evidence": "'Two things to handle: 1. Update the old note — don't delete it.' Explicit non-deletion instruction."
+          "evidence": "'Two things to handle: 1. Update the old note \u2014 don't delete it.' Explicit non-deletion instruction."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "create-collaborator-person-note",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -177,7 +181,7 @@
         {
           "text": "The agent places the note at people/dana-chen.md (kebab-case filename in the people/ folder)",
           "passed": true,
-          "evidence": "Answer specifies 'Create people/dana-chen.md' — correct path and kebab-case filename."
+          "evidence": "Answer specifies 'Create people/dana-chen.md' \u2014 correct path and kebab-case filename."
         },
         {
           "text": "The frontmatter includes type: person and tags containing type/person and role/collaborator",
@@ -187,12 +191,12 @@
         {
           "text": "The related field uses full-path wikilinks (e.g. [[orgs/partner-org]], [[topics/data-pipeline]]) not bare [[dana-chen]] or markdown links",
           "passed": true,
-          "evidence": "related: [\"[[topics/data-pipeline]]\"] — full-path wikilink format used in the related field."
+          "evidence": "related: [\"[[topics/data-pipeline]]\"] \u2014 full-path wikilink format used in the related field."
         },
         {
           "text": "The agent specifies updating the people MOC (or a domain MOC) to include [[people/dana-chen|Dana Chen]] with a one-line context description",
           "passed": true,
-          "evidence": "'Update the relevant MOC (People MOC or project MOC) to include [[people/dana-chen|Dana Chen]] — ML infra lead, partner org, data pipeline collaboration'"
+          "evidence": "'Update the relevant MOC (People MOC or project MOC) to include [[people/dana-chen|Dana Chen]] \u2014 ML infra lead, partner org, data pipeline collaboration'"
         },
         {
           "text": "The agent avoids recommending markdown-style links ([Dana](./people/dana-chen.md)) for inter-wiki references",
@@ -203,7 +207,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "create-collaborator-person-note",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -216,12 +220,12 @@
         {
           "text": "The agent places the note at people/dana-chen.md (kebab-case filename in the people/ folder)",
           "passed": true,
-          "evidence": "Baseline specifies 'Create a people note at people/dana-chen.md' — correct path."
+          "evidence": "Baseline specifies 'Create a people note at people/dana-chen.md' \u2014 correct path."
         },
         {
           "text": "The frontmatter includes type: person and tags containing type/person and role/collaborator",
           "passed": false,
-          "evidence": "Baseline tags are [type/person, project/data-pipeline] — missing role/collaborator tag."
+          "evidence": "Baseline tags are [type/person, project/data-pipeline] \u2014 missing role/collaborator tag."
         },
         {
           "text": "The related field uses full-path wikilinks (e.g. [[orgs/partner-org]], [[topics/data-pipeline]]) not bare [[dana-chen]] or markdown links",

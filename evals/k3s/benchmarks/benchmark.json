@@ -2,13 +2,13 @@
   "metadata": {
     "skill_name": "k3s",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-4", "eval-5", "eval-6"],
+    "evals_run": ["initial-setup", "add-nodes", "kubectl-essentials"],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "initial-setup",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -52,7 +52,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "initial-setup",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -96,7 +96,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "add-nodes",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -140,7 +140,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "add-nodes",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -184,7 +184,7 @@
     },
     {
       "eval_id": 6,
-      "eval_name": "eval-6",
+      "eval_name": "kubectl-essentials",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -228,7 +228,7 @@
     },
     {
       "eval_id": 6,
-      "eval_name": "eval-6",
+      "eval_name": "kubectl-essentials",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {

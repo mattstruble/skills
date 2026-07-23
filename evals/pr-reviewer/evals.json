@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "auth-endpoint-jwt-findings",
       "prompt": "Review this peer's PR. The diff adds a new authentication endpoint. Here are the findings from the four sub-reviewers:\n\n- correctness-reviewer: The JWT expiry is checked with `exp < time.time()` but `exp` is never validated to exist on the token payload — a missing claim will raise a KeyError and crash the handler. Positive: the token parsing is wrapped in a try/except that logs the raw exception.\n- failure-path-reviewer: No finding.\n- readability-reviewer: The function `do_auth` would be clearer as `authenticate_request`. Positive: inline comments explain the HMAC verification steps well.\n- security-reviewer: The error response on failed auth returns the specific failure reason ('token expired' vs 'invalid signature') — this leaks information useful to an attacker.\n\nProduce the formatted draft review output for PR #47.",
       "expected_output": "The output presents tiered draft comments under 🔴 Blocking, 🟡 Should-fix, and 🟢 Nits sections with a Recommendation line and a Highlights section. The missing `exp` claim crash and the error-message information leak are blocking findings with no prefix. The rename suggestion carries an `Optional:` or `Nit:` prefix. Comments are written about the code, not the author. A Recommendation line states how many blocking and should-fix comments to post.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "hardcoded-credential-blocking-review",
       "prompt": "You are reviewing PR #12 for a peer. The diff is below. Produce draft review comments following the pr-reviewer workflow.\n\n```diff\n+# config.py\n+CLOUD_SECRET = \"<REDACTED_EXAMPLE_CREDENTIAL_VALUE>\"\n+DB_HOST = \"prod-db.internal\"\n+\n+def get_connection():\n+    return psycopg2.connect(host=DB_HOST, password=CLOUD_SECRET)\n```\n\nSub-reviewer findings:\n- security-reviewer: Hardcoded cloud credential committed to source at config.py line 2. Blocking. Positive: the connection function is simple and easy to audit.\n- correctness-reviewer: No finding.\n- failure-path-reviewer: No finding.\n- readability-reviewer: `CLOUD_SECRET` is being used as a database password, which is a confusing name. Positive: short, readable function.",
       "expected_output": "The hardcoded credential is flagged as a 🔴 Blocking finding. The comment references the file and line but does NOT reproduce the secret value. The naming confusion is tiered as Should-fix or Nit with an `Optional:` or `Nit:` prefix. The Recommendation line leads with the blocking finding count. Highlights note the auditability or readability positives.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "clean-pr-lgtm-highlights",
       "prompt": "You ran the four sub-reviewers on PR #88 and all four returned LGTM with no findings. Each did note a positive observation:\n- correctness-reviewer: The boundary conditions on the pagination cursor are handled correctly for both empty results and last-page edge cases.\n- failure-path-reviewer: The retry logic correctly handles transient 503s with exponential backoff and a cap.\n- readability-reviewer: Variable names throughout are clear and consistent with the module's existing conventions.\n- security-reviewer: Input is validated and sanitized before use in the query builder.\n\nProduce the review output for PR #88.",
       "expected_output": "The output uses the clean-PR variant template: the Recommendation line states the PR is clean with no findings, and the output contains only a ✅ Highlights section with specific observations distilled from the sub-reviewer positives. No 🔴, 🟡, or 🟢 tier sections appear.",
       "files": [],

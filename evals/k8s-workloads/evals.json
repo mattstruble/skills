@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "zero-downtime-rolling-deployment",
       "prompt": "I'm deploying a stateless Node.js API to my production namespace. I want zero-downtime rolling updates and to make sure traffic isn't routed to a Pod that hasn't finished starting up. Write a production-ready Deployment manifest.",
       "expected_output": "A Deployment manifest with maxUnavailable: 0, a readinessProbe, minReadySeconds set to 10-30s, and a kubernetes.io/change-cause annotation. The response explains that maxUnavailable: 0 prevents dropping below replica count during rollout, and that a readinessProbe is required to avoid routing traffic to unready Pods — minReadySeconds alone does not eliminate this window.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "one-time-migration-job",
       "prompt": "I need to run a one-time database migration as part of my deployment pipeline. The migration must complete successfully before the new app version starts, and I need to be able to inspect logs if it fails. What Kubernetes resource should I use and how should I configure it?",
       "expected_output": "A Job manifest with restartPolicy: Never, backoffLimit: 1, ttlSecondsAfterFinished set, and completionMode explained. The response explains why Never is preferred over OnFailure for log retention, and why ttlSecondsAfterFinished must always be set to prevent accumulation of completed Jobs.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "cronjob-overlap-prevention",
       "prompt": "I have a CronJob that backs up a database every 4 hours. Sometimes the backup takes longer than 4 hours and I end up with two backup Jobs running at the same time, which corrupts the backup. How do I fix this, and how do I test the CronJob immediately without waiting for the schedule?",
       "expected_output": "Set concurrencyPolicy: Forbid on the CronJob to skip a new Job if the previous one is still running. To test immediately: kubectl create job --from=cronjob/<name> <test-job-name> -n <namespace>. The response also recommends increasing failedJobsHistoryLimit above the default of 1 to retain failure logs.",
       "files": [],

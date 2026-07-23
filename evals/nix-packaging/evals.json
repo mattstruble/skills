@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "go-module-fakehash-bootstrap",
       "prompt": "I'm packaging a Go CLI tool (github.com/example/mytool v1.2.0) with buildGoModule. The tool only needs the binary from cmd/mytool, not the other binaries in the repo. I set vendorHash to lib.fakeHash to bootstrap the hash — is that correct? What's the right workflow, and what should I watch out for?",
       "expected_output": "Use lib.fakeHash as a bootstrap sentinel: build once to get the hash mismatch error that prints the correct hash, then replace lib.fakeHash with that hash. Set subPackages = [ \"cmd/mytool\" ] to build only the target binary. Never commit lib.fakeHash or an empty string as the final vendorHash — both always fail the build. Use vendorHash = null only when the module has no external dependencies.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "hardcoded-paths-patch-buildhook",
       "prompt": "I'm writing a stdenv.mkDerivation for a C project. The source has hardcoded paths like /usr/bin/curl and /usr/local/share/myapp. I need to patch them to use Nix store paths. I also need to override buildPhase to run a custom make target. Show me the correct approach for both.",
       "expected_output": "Use substituteInPlace with --replace-fail (not --replace) inside postPatch to fix hardcoded paths; ${curl} is Nix interpolation expanding to the store path at instantiation, while $out is a shell variable available at build time. When overriding buildPhase entirely, include runHook preBuild at the start and runHook postBuild at the end — omitting these silently breaks any pre/postBuild hooks set by dependencies.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "shell-script-runtime-closure-size",
       "prompt": "I packaged a shell script with stdenv.mkDerivation. The script calls curl and jq at runtime. After building, I ran nix path-info -Sh and the closure is much larger than expected. How do I make curl and jq available to the script at runtime, and how do I diagnose what's actually pulling in the large closure?",
       "expected_output": "Use wrapProgram with --prefix PATH : ${lib.makeBinPath [ curl jq ]} in postInstall, with makeWrapper in nativeBuildInputs. To diagnose the large closure, check whether the installed binary is actually a wrapper script (file /nix/store/xxx/bin/myscript will say 'POSIX shell script'), then use strings on it to see embedded store paths, and nix why-depends to trace which dependency is responsible for the size.",
       "files": [],

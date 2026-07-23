@@ -2,13 +2,13 @@
   "metadata": {
     "skill_name": "homelab-monitoring",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": ["alloy-docker-log-collection", "servicemonitor-not-discovered", "alertmanager-discord-email-routing"],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "alloy-docker-log-collection",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -47,7 +47,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "alloy-docker-log-collection",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -86,7 +86,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "servicemonitor-not-discovered",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -125,7 +125,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "servicemonitor-not-discovered",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -164,7 +164,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "alertmanager-discord-email-routing",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -203,7 +203,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "alertmanager-discord-email-routing",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {

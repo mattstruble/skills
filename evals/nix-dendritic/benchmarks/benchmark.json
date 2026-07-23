@@ -2,13 +2,13 @@
   "metadata": {
     "skill_name": "nix-dendritic",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4"],
+    "evals_run": ["multi-host-nixos-darwin-scaffold", "multi-context-printing-aspect", "conditional-import-mkif-antipattern", "host-centric-to-feature-migration"],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "multi-host-nixos-darwin-scaffold",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -47,7 +47,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "multi-host-nixos-darwin-scaffold",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -86,7 +86,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "multi-context-printing-aspect",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -125,7 +125,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "multi-context-printing-aspect",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -164,7 +164,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "conditional-import-mkif-antipattern",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -198,7 +198,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "conditional-import-mkif-antipattern",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -232,7 +232,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "host-centric-to-feature-migration",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -266,7 +266,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "host-centric-to-feature-migration",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {

@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "log-new-architecture-decision",
       "prompt": "We just decided to use Postgres for the job queue instead of Redis — we benchmarked both and Postgres handles our volume fine and removes a dependency. Log this decision.",
       "expected_output": "The agent greps decisions/ for existing redis or job-queue notes, finds none, creates decisions/YYYY-MM-DD-postgres-for-job-queue.md with full YAML frontmatter (type: decision, tags including type/decision and status/active, decision_date, status: active), writes a body with Context/Decided/Why/Open sections, updates the relevant MOC to link the new note, and confirms briefly with the filename.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "supersede-reversed-decision",
       "prompt": "I have a decision note at decisions/2024-11-03-use-redis-for-job-queue.md that we're now reversing — we're moving to Postgres. How should I handle the old decision note, and what do I need to update?",
       "expected_output": "The agent explains the supersession pattern: set status: superseded on the old note, create the new decision note with supersedes: pointing to the old note's wikilink, and update any MOC entries. It does not recommend deleting the old note.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "create-collaborator-person-note",
       "prompt": "I want to add a note about my new collaborator Dana Chen — she's the ML infra lead at a partner org we're working with on the data pipeline project. What should the note look like and where does it go?",
       "expected_output": "The agent describes creating people/dana-chen.md with YAML frontmatter (type: person, title, aliases, tags including type/person and role/collaborator, created, updated, related linking to the relevant org and topic notes), a brief prose body, and updating the people MOC. It uses full-path wikilinks for all cross-references.",
       "files": [],

@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "customer-service-eval-rubric-design",
       "prompt": "I'm building a customer service agent and need to evaluate its conversations. How do I design a scoring system? The agent handles refunds, account changes, and general inquiries. Some conversations are clearly right/wrong but others are more subjective.",
       "expected_output": "Guidance on rubric design covering: paradigm selection (user-simulator for conversational agents), rubric principles (expert guidance, comprehensive coverage, importance weights, self-contained items), LLM-as-Judge calibration for subjective cases, and how to handle the mix of deterministic and subjective outcomes.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "benchmark-statistical-significance",
       "prompt": "My agent scores 72% on our eval benchmark with n=100 tasks. A new prompt version scores 78%. Should I deploy the new version? How confident should I be in this improvement?",
       "expected_output": "Statistical analysis: compute standard error for binomial at n=100, show the confidence intervals overlap (±9pp each), conclude the 6pp difference is within noise, recommend not deploying without more data or paired analysis (McNemar's test).",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "coding-agent-test-verification",
       "prompt": "I'm evaluating a coding agent that takes natural language task descriptions and produces working code. What evaluation approach should I use — should I just run the tests, use an LLM to judge code quality, or something else?",
       "expected_output": "Recommends tool-calling verification (run the tests) as primary paradigm since code has verifiable outcomes, explains Pass@k vs Pass^k distinction, notes LLM-as-Judge is appropriate for code quality/style as a secondary signal, warns about reward hacking if only test pass rate is used.",
       "files": [],

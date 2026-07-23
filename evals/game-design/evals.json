@@ -4,6 +4,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "roguelike-card-pick-stress",
       "prompt": "I'm making a roguelike deckbuilder and right now after each fight the player gets to pick from 5 cards. Playtesters say they feel stressed about the picks and don't feel great about what they chose. What's going wrong and how do I fix it?",
       "expected_output": "Should identify that 5 options is above the comfortable evaluation threshold for a time-pressured post-combat reward, recommend reducing to 3, explain the decoy effect and contextual decoys, and discuss how archetype commitment naturally creates contextual decoys.",
       "expectations": [
@@ -17,6 +18,7 @@
     },
     {
       "id": 2,
+      "name": "twelve-class-selection-variety",
       "prompt": "I'm designing a character class selection screen for an RPG. We have 12 classes and I want players to feel excited by the variety but not overwhelmed. The game is single-player, no time pressure at this point. Any advice on how to present these?",
       "expected_output": "Should explain the 8+ threshold for creating a sense of 'boundless' options, confirm that 12 is above working memory so it will feel large (which is the goal here), and suggest compression techniques like categorical grouping, visual clustering, or progressive disclosure to prevent paralysis while maintaining the feeling of abundance.",
       "expectations": [
@@ -30,6 +32,7 @@
     },
     {
       "id": 3,
+      "name": "draft-pack-new-player-paralysis",
       "prompt": "In my card game draft mode, players pick from packs of 10 cards. New players seem lost and take forever on each pick, but experienced players love it. Is the problem just that new players need to 'git gud' or is there a design issue?",
       "expected_output": "Should identify analysis paralysis as the issue for new players, explain that 10 exceeds comfortable evaluation without structural support, discuss how experienced players develop heuristics (color commitment, archetype signals, BREAD-like priority lists) that new players lack, and suggest design interventions that support heuristic development for newcomers (rarity signals, archetype labels, recommended picks).",
       "expectations": [

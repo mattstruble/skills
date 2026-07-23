@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "rwo-multi-replica-pod-affinity",
       "prompt": "I have a Deployment with 5 replicas that all need to read and write to the same 10Gi volume. My cluster uses Hetzner Cloud Volumes as the StorageClass. How do I set this up correctly?",
       "expected_output": "Create a single PVC with accessModes: ReadWriteOnce against the hcloud-volumes StorageClass, then add a podAffinity rule using preferredDuringSchedulingIgnoredDuringExecution with topologyKey: kubernetes.io/hostname to co-locate all Pods on the same node. Do not use requiredDuringSchedulingIgnoredDuringExecution because a hard self-referential affinity deadlocks the first deploy — no node has an app Pod yet, so all Pods stay Pending. If cross-node spread is needed, switch to Longhorn which supports RWX.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "statefulset-per-replica-volumes",
       "prompt": "I'm deploying a PostgreSQL StatefulSet with 3 replicas. Each replica needs its own 20Gi volume. Should I use a single PVC in the Deployment spec or volumeClaimTemplates in a StatefulSet? Show me the right approach.",
       "expected_output": "Use StatefulSet with volumeClaimTemplates — each Pod gets a dedicated PVC named data-cache-0, data-cache-1, data-cache-2, so replicas can schedule independently on different nodes with no podAffinity required. Warn that kubectl delete statefulset does not delete the PVCs; they must be deleted explicitly by name after verifying with kubectl get pvc. Avoid kubectl delete pvc -l app=cache because label-based bulk delete can affect other PVCs in the namespace.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "secret-volume-mount-rotation",
       "prompt": "My app reads a database password from a ConfigMap env var today. My security team says this is wrong. What's the correct way to handle this, and how do I make sure Pods pick up the new value when the secret changes?",
       "expected_output": "Move the password to a Secret (type Opaque) and mount it as a volume with readOnly: true rather than using envFrom, because env vars are visible in crash dumps, /proc, and docker inspect. Volume-mounted Secrets update on disk within ~1 minute (kubelet sync), but most apps don't re-read files at runtime, so a rollout restart is still needed. For automated restarts on Secret changes, use the Reloader controller. For Helm-managed workloads, add a checksum/config annotation to the pod template.",
       "files": [],

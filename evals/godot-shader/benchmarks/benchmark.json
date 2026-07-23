@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "godot-shader",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "fresnel-rim-light-function-conflict",
+      "shadertoy-water-ripple-port",
+      "heightmap-displacement-normal-artifacts"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "fresnel-rim-light-function-conflict",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -21,7 +25,7 @@
         {
           "text": "Identifies that RIM and RIM_TINT in fragment() are silently ignored when light() is defined, not a bug in the Fresnel formula itself",
           "passed": true,
-          "evidence": "'RIM and RIM_TINT are fragment() built-in outputs that Godot handles automatically — but only when light() is NOT defined. Once you define light(), Godot's entire lighting pipeline is overridden.'"
+          "evidence": "'RIM and RIM_TINT are fragment() built-in outputs that Godot handles automatically \u2014 but only when light() is NOT defined. Once you define light(), Godot's entire lighting pipeline is overridden.'"
         },
         {
           "text": "Implements Fresnel manually inside light() using `pow(1.0 - max(0.0, dot(NORMAL, VIEW)), power)` added to DIFFUSE_LIGHT with +=",
@@ -47,7 +51,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "fresnel-rim-light-function-conflict",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -60,7 +64,7 @@
         {
           "text": "Identifies that RIM and RIM_TINT in fragment() are silently ignored when light() is defined, not a bug in the Fresnel formula itself",
           "passed": true,
-          "evidence": "'when you define a light() function in a spatial shader, the engine stops applying the default lighting model... you must handle ALL lighting there — including effects like rim/Fresnel that you might have put in fragment()'"
+          "evidence": "'when you define a light() function in a spatial shader, the engine stops applying the default lighting model... you must handle ALL lighting there \u2014 including effects like rim/Fresnel that you might have put in fragment()'"
         },
         {
           "text": "Implements Fresnel manually inside light() using `pow(1.0 - max(0.0, dot(NORMAL, VIEW)), power)` added to DIFFUSE_LIGHT with +=",
@@ -70,23 +74,23 @@
         {
           "text": "Uses += (not =) for both DIFFUSE_LIGHT and SPECULAR_LIGHT, explaining that light() runs once per light and these variables accumulate across lights",
           "passed": false,
-          "evidence": "Uses += but the explanation is 'All three effects are in light() because that's where per-light data is available' — does not explain that variables accumulate across multiple lights."
+          "evidence": "Uses += but the explanation is 'All three effects are in light() because that's where per-light data is available' \u2014 does not explain that variables accumulate across multiple lights."
         },
         {
           "text": "Includes the Blinn-Phong shadow guard `float(dot(NORMAL, LIGHT) > 0.0)` to prevent specular highlights on back-lit surfaces",
           "passed": false,
-          "evidence": "No shadow guard present — specular is computed as 'float spec = pow(max(dot(NORMAL, half_dir), 0.0), shininess)' without a guard for back-lit surfaces."
+          "evidence": "No shadow guard present \u2014 specular is computed as 'float spec = pow(max(dot(NORMAL, half_dir), 0.0), shininess)' without a guard for back-lit surfaces."
         },
         {
           "text": "Recommends render_mode ambient_light_disabled to prevent Godot's ambient from accumulating on top of the custom lighting result",
           "passed": false,
-          "evidence": "Uses 'render_mode diffuse_lambert' — not ambient_light_disabled. Ambient light isolation is not addressed."
+          "evidence": "Uses 'render_mode diffuse_lambert' \u2014 not ambient_light_disabled. Ambient light isolation is not addressed."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "shadertoy-water-ripple-port",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -99,12 +103,12 @@
         {
           "text": "Specifies the node setup as a canvas_item shader on a ColorRect with Anchor set to Full Rect inside a CanvasLayer, and notes the effect only appears at runtime",
           "passed": true,
-          "evidence": "Scene setup step 1-4 specifies CanvasLayer → ColorRect with Anchors Full Rect → ShaderMaterial, and 'Effect only visible at runtime — not in editor viewport'."
+          "evidence": "Scene setup step 1-4 specifies CanvasLayer \u2192 ColorRect with Anchors Full Rect \u2192 ShaderMaterial, and 'Effect only visible at runtime \u2014 not in editor viewport'."
         },
         {
           "text": "Maps iResolution.xy to `1.0 / SCREEN_PIXEL_SIZE` (not a custom uniform or VIEWPORT_SIZE, which is the spatial equivalent)",
           "passed": true,
-          "evidence": "Table shows 'iResolution.xy → 1.0 / SCREEN_PIXEL_SIZE' and code uses 'vec2 resolution = 1.0 / SCREEN_PIXEL_SIZE'."
+          "evidence": "Table shows 'iResolution.xy \u2192 1.0 / SCREEN_PIXEL_SIZE' and code uses 'vec2 resolution = 1.0 / SCREEN_PIXEL_SIZE'."
         },
         {
           "text": "Identifies the Y-axis flip as the cause of the upside-down appearance and fixes it with `uv.y = 1.0 - uv.y`, explaining Shadertoy is Y-up while Godot is Y-down",
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "shadertoy-water-ripple-port",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -138,12 +142,12 @@
         {
           "text": "Specifies the node setup as a canvas_item shader on a ColorRect with Anchor set to Full Rect inside a CanvasLayer, and notes the effect only appears at runtime",
           "passed": false,
-          "evidence": "Recommends 'MeshInstance3D with a QuadMesh sized 2×2' as the primary approach, with ColorRect in CanvasLayer as an alternative — does not specify the correct canvas_item setup with Anchor Full Rect."
+          "evidence": "Recommends 'MeshInstance3D with a QuadMesh sized 2\u00d72' as the primary approach, with ColorRect in CanvasLayer as an alternative \u2014 does not specify the correct canvas_item setup with Anchor Full Rect."
         },
         {
           "text": "Maps iResolution.xy to `1.0 / SCREEN_PIXEL_SIZE` (not a custom uniform or VIEWPORT_SIZE, which is the spatial equivalent)",
           "passed": true,
-          "evidence": "Variable mapping table shows 'iResolution → 1.0 / SCREEN_PIXEL_SIZE' and code uses 'vec2 resolution = 1.0 / SCREEN_PIXEL_SIZE'."
+          "evidence": "Variable mapping table shows 'iResolution \u2192 1.0 / SCREEN_PIXEL_SIZE' and code uses 'vec2 resolution = 1.0 / SCREEN_PIXEL_SIZE'."
         },
         {
           "text": "Identifies the Y-axis flip as the cause of the upside-down appearance and fixes it with `uv.y = 1.0 - uv.y`, explaining Shadertoy is Y-up while Godot is Y-down",
@@ -153,7 +157,7 @@
         {
           "text": "Declares the screen texture with `hint_screen_texture, repeat_disable, filter_linear` and explains repeat_disable prevents tiling artifacts at screen edges",
           "passed": false,
-          "evidence": "Uses 'screen_texture' as a built-in sampler2D without explicit hint declaration — no hint_screen_texture, repeat_disable, or filter_linear hints."
+          "evidence": "Uses 'screen_texture' as a built-in sampler2D without explicit hint declaration \u2014 no hint_screen_texture, repeat_disable, or filter_linear hints."
         },
         {
           "text": "Notes that iMouse has no built-in equivalent and must be passed as a custom `uniform vec2 _Mouse` updated each frame from GDScript via set_shader_parameter",
@@ -164,7 +168,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "heightmap-displacement-normal-artifacts",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -190,9 +194,9 @@
           "evidence": "Does not mention that VERTEX is in object/model space or the MODEL_MATRIX transform relationship."
         },
         {
-          "text": "Avoids recommending texture() in vertex() for any purpose — consistently uses textureLod with explicit LOD 0",
+          "text": "Avoids recommending texture() in vertex() for any purpose \u2014 consistently uses textureLod with explicit LOD 0",
           "passed": true,
-          "evidence": "All texture samples in vertex() use textureLod with explicit LOD 0 — texture() is never recommended."
+          "evidence": "All texture samples in vertex() use textureLod with explicit LOD 0 \u2014 texture() is never recommended."
         },
         {
           "text": "Notes that for production quality, baking normals into a normal map is preferable to approximating them from the displacement derivative",
@@ -203,7 +207,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "heightmap-displacement-normal-artifacts",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -229,9 +233,9 @@
           "evidence": "Does not mention that VERTEX is in object/model space or the MODEL_MATRIX transform relationship."
         },
         {
-          "text": "Avoids recommending texture() in vertex() for any purpose — consistently uses textureLod with explicit LOD 0",
+          "text": "Avoids recommending texture() in vertex() for any purpose \u2014 consistently uses textureLod with explicit LOD 0",
           "passed": true,
-          "evidence": "All texture samples in vertex() use textureLod with explicit LOD 0 — texture() is never recommended."
+          "evidence": "All texture samples in vertex() use textureLod with explicit LOD 0 \u2014 texture() is never recommended."
         },
         {
           "text": "Notes that for production quality, baking normals into a normal map is preferable to approximating them from the displacement derivative",

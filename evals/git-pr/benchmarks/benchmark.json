@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "git-pr",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "single-commit-pr-no-body",
+      "multi-commit-oauth-pr-body",
+      "pr-template-backend-no-screenshots"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "single-commit-pr-no-body",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -19,14 +23,14 @@
       },
       "expectations": [
         {
-          "text": "Title matches the commit subject exactly: 'fix(parser): handle empty input without panic' — single-commit PRs use the commit subject verbatim",
+          "text": "Title matches the commit subject exactly: 'fix(parser): handle empty input without panic' \u2014 single-commit PRs use the commit subject verbatim",
           "passed": true,
-          "evidence": "'Title: fix(parser): handle empty input without panic' — matches the commit subject exactly."
+          "evidence": "'Title: fix(parser): handle empty input without panic' \u2014 matches the commit subject exactly."
         },
         {
-          "text": "No body is included — single-commit PRs do not get a body; the title says it all",
+          "text": "No body is included \u2014 single-commit PRs do not get a body; the title says it all",
           "passed": true,
-          "evidence": "'Body: (none)' — explicitly no body for the single-commit PR."
+          "evidence": "'Body: (none)' \u2014 explicitly no body for the single-commit PR."
         },
         {
           "text": "Checks for a PR template before composing (runs the detection step even when the answer is 'no template found')",
@@ -34,20 +38,20 @@
           "evidence": "Step 1 explicitly states 'Check for PR template and recent merged PR titles' before composing."
         },
         {
-          "text": "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms",
+          "text": "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms",
           "passed": true,
-          "evidence": "'Does this look right, or do you want to change anything?' — presents for confirmation and stops."
+          "evidence": "'Does this look right, or do you want to change anything?' \u2014 presents for confirmation and stops."
         },
         {
-          "text": "Avoids adding a body, bullet-point summary, or 'Changes made' section — these are anti-rationalization patterns the skill explicitly prohibits",
+          "text": "Avoids adding a body, bullet-point summary, or 'Changes made' section \u2014 these are anti-rationalization patterns the skill explicitly prohibits",
           "passed": true,
-          "evidence": "No body, no bullet points, no 'Changes made' section — only title and explicit '(none)' for body."
+          "evidence": "No body, no bullet points, no 'Changes made' section \u2014 only title and explicit '(none)' for body."
         }
       ]
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "single-commit-pr-no-body",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -58,35 +62,35 @@
       },
       "expectations": [
         {
-          "text": "Title matches the commit subject exactly: 'fix(parser): handle empty input without panic' — single-commit PRs use the commit subject verbatim",
+          "text": "Title matches the commit subject exactly: 'fix(parser): handle empty input without panic' \u2014 single-commit PRs use the commit subject verbatim",
           "passed": false,
-          "evidence": "Title is 'fix: resolve token parser crash on empty input' — does not match the commit subject 'fix(parser): handle empty input without panic'."
+          "evidence": "Title is 'fix: resolve token parser crash on empty input' \u2014 does not match the commit subject 'fix(parser): handle empty input without panic'."
         },
         {
-          "text": "No body is included — single-commit PRs do not get a body; the title says it all",
+          "text": "No body is included \u2014 single-commit PRs do not get a body; the title says it all",
           "passed": false,
-          "evidence": "Includes a full body with '## Summary', '## Changes', and '## Testing' sections — violates the no-body rule for single-commit PRs."
+          "evidence": "Includes a full body with '## Summary', '## Changes', and '## Testing' sections \u2014 violates the no-body rule for single-commit PRs."
         },
         {
           "text": "Checks for a PR template before composing (runs the detection step even when the answer is 'no template found')",
           "passed": false,
-          "evidence": "No PR template check is mentioned — jumps directly to 'gh pr create' without template detection."
+          "evidence": "No PR template check is mentioned \u2014 jumps directly to 'gh pr create' without template detection."
         },
         {
-          "text": "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms",
+          "text": "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms",
           "passed": false,
           "evidence": "Runs 'gh pr create' directly in the response without presenting for confirmation first."
         },
         {
-          "text": "Avoids adding a body, bullet-point summary, or 'Changes made' section — these are anti-rationalization patterns the skill explicitly prohibits",
+          "text": "Avoids adding a body, bullet-point summary, or 'Changes made' section \u2014 these are anti-rationalization patterns the skill explicitly prohibits",
           "passed": false,
-          "evidence": "Includes '## Changes' bullet list and '## Testing' section — exactly the anti-rationalization patterns prohibited."
+          "evidence": "Includes '## Changes' bullet list and '## Testing' section \u2014 exactly the anti-rationalization patterns prohibited."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "multi-commit-oauth-pr-body",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -97,27 +101,27 @@
       },
       "expectations": [
         {
-          "text": "Title summarizes the overall intent at commit-subject granularity — not a list of commits, not 'and'-joined, under 72 characters in conventional commit format",
+          "text": "Title summarizes the overall intent at commit-subject granularity \u2014 not a list of commits, not 'and'-joined, under 72 characters in conventional commit format",
           "passed": true,
-          "evidence": "'feat(auth): add OAuth support' — single conventional commit format title summarizing the overall intent."
+          "evidence": "'feat(auth): add OAuth support' \u2014 single conventional commit format title summarizing the overall intent."
         },
         {
-          "text": "Body is 2-4 sentences explaining the *why* (what problem this solves, what context a reviewer needs) — not what was done, not a list of commits, not a list of files changed",
+          "text": "Body is 2-4 sentences explaining the *why* (what problem this solves, what context a reviewer needs) \u2014 not what was done, not a list of commits, not a list of files changed",
           "passed": true,
-          "evidence": "Body explains 'The existing authentication relied on username/password only. This adds OAuth 2.0 as an authentication method, enabling SSO integration and third-party login providers.' — explains the why."
+          "evidence": "Body explains 'The existing authentication relied on username/password only. This adds OAuth 2.0 as an authentication method, enabling SSO integration and third-party login providers.' \u2014 explains the why."
         },
         {
           "text": "Appends 'Closes #312' footer derived from the branch name 'feat/312-oauth-support'",
           "passed": false,
-          "evidence": "Uses '[If an issue is linked via branch name or commits: Closes #XXX]' as a placeholder — does not derive the actual #312 from the branch name."
+          "evidence": "Uses '[If an issue is linked via branch name or commits: Closes #XXX]' as a placeholder \u2014 does not derive the actual #312 from the branch name."
         },
         {
-          "text": "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms",
+          "text": "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms",
           "passed": true,
-          "evidence": "'Does this look right, or do you want to change anything?' — presents for confirmation and stops."
+          "evidence": "'Does this look right, or do you want to change anything?' \u2014 presents for confirmation and stops."
         },
         {
-          "text": "Avoids listing what each commit does in the body — the Commits tab exists for that; the body explains why, not how",
+          "text": "Avoids listing what each commit does in the body \u2014 the Commits tab exists for that; the body explains why, not how",
           "passed": true,
           "evidence": "Body explains motivation (why OAuth is being added) without listing individual commits or files changed."
         }
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "multi-commit-oauth-pr-body",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -136,35 +140,35 @@
       },
       "expectations": [
         {
-          "text": "Title summarizes the overall intent at commit-subject granularity — not a list of commits, not 'and'-joined, under 72 characters in conventional commit format",
+          "text": "Title summarizes the overall intent at commit-subject granularity \u2014 not a list of commits, not 'and'-joined, under 72 characters in conventional commit format",
           "passed": true,
-          "evidence": "'feat: add OAuth authentication support' — conventional format, summarizes overall intent."
+          "evidence": "'feat: add OAuth authentication support' \u2014 conventional format, summarizes overall intent."
         },
         {
-          "text": "Body is 2-4 sentences explaining the *why* (what problem this solves, what context a reviewer needs) — not what was done, not a list of commits, not a list of files changed",
+          "text": "Body is 2-4 sentences explaining the *why* (what problem this solves, what context a reviewer needs) \u2014 not what was done, not a list of commits, not a list of files changed",
           "passed": false,
-          "evidence": "Body includes '## Changes' bullet list of what was done ('Added OAuth token exchange endpoint', etc.) — explains what, not why."
+          "evidence": "Body includes '## Changes' bullet list of what was done ('Added OAuth token exchange endpoint', etc.) \u2014 explains what, not why."
         },
         {
           "text": "Appends 'Closes #312' footer derived from the branch name 'feat/312-oauth-support'",
           "passed": false,
-          "evidence": "No 'Closes #312' footer — the issue number from the branch name is not extracted."
+          "evidence": "No 'Closes #312' footer \u2014 the issue number from the branch name is not extracted."
         },
         {
-          "text": "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms",
+          "text": "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms",
           "passed": false,
           "evidence": "Runs 'gh pr create' directly without presenting for confirmation first."
         },
         {
-          "text": "Avoids listing what each commit does in the body — the Commits tab exists for that; the body explains why, not how",
+          "text": "Avoids listing what each commit does in the body \u2014 the Commits tab exists for that; the body explains why, not how",
           "passed": false,
-          "evidence": "'## Changes' section lists 'Added OAuth token exchange endpoint', 'Integrated refresh token rotation' — exactly the commit-listing anti-pattern."
+          "evidence": "'## Changes' section lists 'Added OAuth token exchange endpoint', 'Integrated refresh token rotation' \u2014 exactly the commit-listing anti-pattern."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "pr-template-backend-no-screenshots",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -175,35 +179,35 @@
       },
       "expectations": [
         {
-          "text": "Uses the PR template as the skeleton — template takes priority over skill defaults when a .github/PULL_REQUEST_TEMPLATE.md exists",
+          "text": "Uses the PR template as the skeleton \u2014 template takes priority over skill defaults when a .github/PULL_REQUEST_TEMPLATE.md exists",
           "passed": false,
-          "evidence": "Response asks for 'git log --oneline' and says it cannot compose without seeing commits — does not use the provided template context."
+          "evidence": "Response asks for 'git log --oneline' and says it cannot compose without seeing commits \u2014 does not use the provided template context."
         },
         {
-          "text": "Removes the Screenshots section entirely since this is a backend-only change — does not write 'N/A' or filler, removes sections with nothing genuine to say",
+          "text": "Removes the Screenshots section entirely since this is a backend-only change \u2014 does not write 'N/A' or filler, removes sections with nothing genuine to say",
           "passed": false,
-          "evidence": "No PR is composed at all — the response asks for more information rather than working with the provided context."
+          "evidence": "No PR is composed at all \u2014 the response asks for more information rather than working with the provided context."
         },
         {
           "text": "Title summarizes the overall intent of both commits at commit-subject granularity in conventional commit format",
           "passed": false,
-          "evidence": "No title is provided — the response defers to asking for git log output."
+          "evidence": "No title is provided \u2014 the response defers to asking for git log output."
         },
         {
-          "text": "Fills template sections minimally — one or two sentences per section, not exhaustive prose",
+          "text": "Fills template sections minimally \u2014 one or two sentences per section, not exhaustive prose",
           "passed": false,
-          "evidence": "No template sections are filled — the response asks for clarification instead of working with the provided commit context."
+          "evidence": "No template sections are filled \u2014 the response asks for clarification instead of working with the provided commit context."
         },
         {
-          "text": "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms",
+          "text": "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms",
           "passed": true,
-          "evidence": "The response asks a clarifying question and stops — it does not run 'gh pr create'."
+          "evidence": "The response asks a clarifying question and stops \u2014 it does not run 'gh pr create'."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "pr-template-backend-no-screenshots",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -214,27 +218,27 @@
       },
       "expectations": [
         {
-          "text": "Uses the PR template as the skeleton — template takes priority over skill defaults when a .github/PULL_REQUEST_TEMPLATE.md exists",
+          "text": "Uses the PR template as the skeleton \u2014 template takes priority over skill defaults when a .github/PULL_REQUEST_TEMPLATE.md exists",
           "passed": false,
-          "evidence": "Uses a generic '## Summary / ## Changes / ## Testing' structure — not the provided template with Description/Testing/Screenshots/Breaking Changes sections."
+          "evidence": "Uses a generic '## Summary / ## Changes / ## Testing' structure \u2014 not the provided template with Description/Testing/Screenshots/Breaking Changes sections."
         },
         {
-          "text": "Removes the Screenshots section entirely since this is a backend-only change — does not write 'N/A' or filler, removes sections with nothing genuine to say",
+          "text": "Removes the Screenshots section entirely since this is a backend-only change \u2014 does not write 'N/A' or filler, removes sections with nothing genuine to say",
           "passed": false,
-          "evidence": "No Screenshots section handling — the response uses a different template structure entirely."
+          "evidence": "No Screenshots section handling \u2014 the response uses a different template structure entirely."
         },
         {
           "text": "Title summarizes the overall intent of both commits at commit-subject granularity in conventional commit format",
           "passed": false,
-          "evidence": "Title is a placeholder '<type>: <summary based on actual changes>' — no actual title is provided."
+          "evidence": "Title is a placeholder '<type>: <summary based on actual changes>' \u2014 no actual title is provided."
         },
         {
-          "text": "Fills template sections minimally — one or two sentences per section, not exhaustive prose",
+          "text": "Fills template sections minimally \u2014 one or two sentences per section, not exhaustive prose",
           "passed": false,
-          "evidence": "All sections are placeholders ('<Description derived from the diff>') — no content is provided."
+          "evidence": "All sections are placeholders ('<Description derived from the diff>') \u2014 no content is provided."
         },
         {
-          "text": "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms",
+          "text": "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms",
           "passed": false,
           "evidence": "Runs 'gh pr create' directly in the response without presenting for confirmation first."
         }

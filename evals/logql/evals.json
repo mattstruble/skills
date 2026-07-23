@@ -1,6 +1,7 @@
 { "skill_name": "logql", "evals": [
   {
     "id": 1,
+    "name": "json-parser-failure-empty-results",
     "prompt": "I'm querying Sonarr JSON logs in Loki to find all lines where the HTTP response time exceeds 2 seconds. My current query is: {container=\"sonarr\"} | json | response_time > 2s — but I'm getting empty results and I see __error__ labels appearing. What's wrong and how do I fix it?",
     "expected_output": "The empty results are caused by parser failures: lines that fail `| json` parsing produce `__error__` labels and are excluded from downstream label filters, so the `response_time > 2s` filter sees nothing. Debug by adding `| __error__ != \"\"` after the parser to inspect failing lines — common causes are startup banners or non-JSON lines mixed into the stream. Fix by adding `|= \"{\"` as a line filter before `| json` to pre-filter to JSON-only lines, then extract only the needed field with `| json response_time` rather than parsing all fields.",
     "files": [],
@@ -14,6 +15,7 @@
   },
   {
     "id": 2,
+    "name": "per-container-error-rate-dashboard",
     "prompt": "I want a LogQL metric query for a Grafana dashboard panel showing the per-minute error rate for each container on my homelab host, with the top 5 containers highlighted. The query is timing out. How should I write this correctly and efficiently?",
     "expected_output": "Use `topk(5, sum by (container) (rate({host=\"homelab\"} |= \"error\" [1m])))` — the `|= \"error\"` line filter runs as a distributed grep before any parsing, which is the cheapest filter and dramatically reduces data volume before aggregation. Avoid grouping `by(container)` on a high-cardinality label like request IDs or IPs; `container` is acceptable here. If the query still times out, add a more specific exact-match label to the stream selector (e.g., `compose_service`) to narrow the index lookup, and consider a recording rule for a frequently-loaded dashboard panel.",
     "files": [],
@@ -27,6 +29,7 @@
   },
   {
     "id": 3,
+    "name": "correlate-activity-across-services",
     "prompt": "Radarr added a movie but I can't tell if Prowlarr actually searched for it or if the download got stuck in qBittorrent. I don't have distributed tracing set up. How do I correlate activity across these three services in Loki?",
     "expected_output": "Since off-the-shelf containers like Radarr, Prowlarr, and qBittorrent have no OpenTelemetry instrumentation, use shared domain identifiers as the homelab substitute for distributed tracing. Query `{container=~\"radarr|prowlarr|qbittorrent\"} |= \"<tmdb-or-download-hash>\"` to pull all log lines across services that reference the same movie or download. Use the TMDB ID if you know it (`|= \"tmdbId=12345\"`), or the download hash once Radarr hands off to qBittorrent. The `|~` operator can do a case-insensitive title search (`|~ \"(?i)inception\"`) but is slower — prefer an exact `|=` match on an ID when available.",
     "files": [],

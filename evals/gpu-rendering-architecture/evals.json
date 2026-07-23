@@ -3,12 +3,13 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "My GPU-driven culling compute shader writes draw arguments and a draw count into a GPU buffer, then I issue vkCmdDrawIndexedIndirectCount. The first frame renders correctly, but subsequent frames either draw zero objects or render stale geometry from the previous frame. I'm not doing anything obviously wrong — the culling dispatch fires, the argument buffer is allocated. What are the two most likely causes and how do I fix each?",
-      "expected_output": "The two root causes are: (1) missing HAZARD_DRAW_ARGUMENTS barrier — the command processor prefetches indirect arguments before the compute shader's writes are visible; the barrier's destination stage must be STAGE_DRAW_INDIRECT (not STAGE_COMPUTE). (2) the draw count buffer is not zeroed before the culling dispatch each frame, so InterlockedAdd accumulates across frames; fix by clearing the count buffer to 0 each frame and placing a barrier(TRANSFER, COMPUTE) or barrier(COMPUTE, COMPUTE) between the clear and the culling dispatch. A third common issue is setting maxDrawCount to UINT32_MAX instead of the actual buffer capacity, which lets the command processor read past the buffer end.",
+      "name": "indirect-draw-barrier-count-reset",
+      "prompt": "My GPU-driven culling compute shader writes draw arguments and a draw count into a GPU buffer, then I issue vkCmdDrawIndexedIndirectCount. The first frame renders correctly, but subsequent frames either draw zero objects or render stale geometry from the previous frame. I'm not doing anything obviously wrong \u2014 the culling dispatch fires, the argument buffer is allocated. What are the two most likely causes and how do I fix each?",
+      "expected_output": "The two root causes are: (1) missing HAZARD_DRAW_ARGUMENTS barrier \u2014 the command processor prefetches indirect arguments before the compute shader's writes are visible; the barrier's destination stage must be STAGE_DRAW_INDIRECT (not STAGE_COMPUTE). (2) the draw count buffer is not zeroed before the culling dispatch each frame, so InterlockedAdd accumulates across frames; fix by clearing the count buffer to 0 each frame and placing a barrier(TRANSFER, COMPUTE) or barrier(COMPUTE, COMPUTE) between the clear and the culling dispatch. A third common issue is setting maxDrawCount to UINT32_MAX instead of the actual buffer capacity, which lets the command processor read past the buffer end.",
       "files": [],
       "expectations": [
         "Identifies the missing HAZARD_DRAW_ARGUMENTS hazard flag as a root cause, not just a generic 'missing barrier'",
-        "Specifies that the barrier destination stage must be STAGE_DRAW_INDIRECT (or VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT), not STAGE_COMPUTE — using STAGE_COMPUTE as dst does not synchronize the command processor argument prefetch",
+        "Specifies that the barrier destination stage must be STAGE_DRAW_INDIRECT (or VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT), not STAGE_COMPUTE \u2014 using STAGE_COMPUTE as dst does not synchronize the command processor argument prefetch",
         "Identifies the draw count buffer not being zeroed before each frame's culling dispatch as a distinct second cause (InterlockedAdd accumulates across frames)",
         "Notes that a barrier is needed between the draw count clear and the culling dispatch (not just between culling and the draw call)",
         "Warns against setting maxDrawCount to UINT32_MAX or omitting it, and states it must equal the allocated buffer capacity"
@@ -16,27 +17,29 @@
     },
     {
       "id": 2,
+      "name": "bindless-material-id-nonuniform-index",
       "prompt": "I'm designing a material system for a deferred renderer. The G-buffer pass writes a per-pixel material ID, and the lighting pass reads that ID to index into a bindless texture heap and sample the albedo, normal, and PBR textures for each pixel. On AMD hardware I'm seeing wrong textures on some pixels and a GPU crash on others. What's causing this and what exactly do I need to fix in both the shader code and the barrier between passes?",
       "expected_output": "The shader bug is missing NonUniformResourceIndex (HLSL) / nonuniformEXT (GLSL) on the heap index derived from the per-pixel material ID. In the lighting pass, different lanes in a wave may have different material IDs, making the heap index non-uniform; without the annotation, AMD's scalarization loop is not emitted and the sampler reads the wrong descriptor. The barrier between the G-buffer and lighting passes must use STAGE_RASTER_COLOR_OUT as the source stage (not STAGE_PIXEL_SHADER) and must include HAZARD_DESCRIPTORS if the descriptor heap was updated during the frame.",
       "files": [],
       "expectations": [
         "Identifies the missing NonUniformResourceIndex() (HLSL) or nonuniformEXT() (GLSL) annotation as the direct cause of wrong pixels and potential GPU crash on AMD",
         "Explains why the annotation is required specifically in the lighting pass: per-pixel material IDs make the heap index non-uniform across lanes in a wave (deferred shading pattern), which AMD handles via a scalarization loop that requires the annotation to emit",
-        "States that NonUniformResourceIndex is NOT needed for buffer pointer arithmetic — only when indexing the texture descriptor heap",
+        "States that NonUniformResourceIndex is NOT needed for buffer pointer arithmetic \u2014 only when indexing the texture descriptor heap",
         "Specifies the inter-pass barrier must use STAGE_RASTER_COLOR_OUT as the producer stage (not STAGE_PIXEL_SHADER), because the G-buffer writes happen in the ROP output stage",
         "Notes that HAZARD_DESCRIPTORS must be added to the barrier if the descriptor heap was written (e.g., streaming new textures) between the G-buffer and lighting passes, to invalidate the sampler's internal descriptor cache"
       ]
     },
     {
       "id": 3,
+      "name": "tbdr-mobile-blend-state-gbuffer-ops",
       "prompt": "I'm porting a PC renderer to a mobile target (Mali-G710 and Adreno 650). My current pipeline uses separate depth-stencil state objects set dynamically per draw, blend state set dynamically via vkCmdSetColorBlendEquationEXT, and a deferred shading G-buffer with three color attachments. The G-buffer depth attachment uses storeOp=DONT_CARE after the geometry pass since I only need it for the lighting pass's depth test. What changes do I need to make for correct and efficient rendering on these TBDR GPUs?",
-      "expected_output": "Three changes are required: (1) Blend state must be baked into the PSO on TBDR GPUs (Mali, Adreno) because the driver appends blend instructions to the pixel shader microcode — dynamic blend state via vkCmdSetColorBlendEquationEXT is not valid on these architectures. (2) The G-buffer depth attachment storeOp must be STORE if the lighting pass reads it for depth testing; DONT_CARE discards the tile data before it reaches VRAM, so the lighting pass reads garbage. (3) G-buffer color attachments that are fully overwritten each frame should use loadOp=DONT_CARE to allow the TBDR to skip the tile load from VRAM, reducing bandwidth. The depth attachment for the geometry pass can use loadOp=CLEAR with storeOp=DONT_CARE only if depth is not consumed downstream.",
+      "expected_output": "Three changes are required: (1) Blend state must be baked into the PSO on TBDR GPUs (Mali, Adreno) because the driver appends blend instructions to the pixel shader microcode \u2014 dynamic blend state via vkCmdSetColorBlendEquationEXT is not valid on these architectures. (2) The G-buffer depth attachment storeOp must be STORE if the lighting pass reads it for depth testing; DONT_CARE discards the tile data before it reaches VRAM, so the lighting pass reads garbage. (3) G-buffer color attachments that are fully overwritten each frame should use loadOp=DONT_CARE to allow the TBDR to skip the tile load from VRAM, reducing bandwidth. The depth attachment for the geometry pass can use loadOp=CLEAR with storeOp=DONT_CARE only if depth is not consumed downstream.",
       "files": [],
       "expectations": [
-        "Identifies that blend state must be baked into the PSO on Mali and Adreno (TBDR architectures) because the driver appends blend instructions to the pixel shader microcode — dynamic blend state does not work correctly on these GPUs",
-        "Flags the storeOp=DONT_CARE on the depth attachment as incorrect if the lighting pass needs depth for depth testing — DONT_CARE discards tile data before VRAM write, so the downstream pass reads garbage or undefined values",
+        "Identifies that blend state must be baked into the PSO on Mali and Adreno (TBDR architectures) because the driver appends blend instructions to the pixel shader microcode \u2014 dynamic blend state does not work correctly on these GPUs",
+        "Flags the storeOp=DONT_CARE on the depth attachment as incorrect if the lighting pass needs depth for depth testing \u2014 DONT_CARE discards tile data before VRAM write, so the downstream pass reads garbage or undefined values",
         "Recommends loadOp=DONT_CARE for G-buffer color attachments that are fully overwritten each geometry pass, explaining this allows the TBDR to skip the tile load from VRAM (zero bandwidth cost for that attachment)",
-        "Avoids recommending Vulkan subpasses as the solution — the skill explicitly states Vulkan 1.3 dynamic rendering + VK_EXT_shader_tile_image is the correct model, not subpasses",
+        "Avoids recommending Vulkan subpasses as the solution \u2014 the skill explicitly states Vulkan 1.3 dynamic rendering + VK_EXT_shader_tile_image is the correct model, not subpasses",
         "Notes that Apple Silicon Macs (M1/M2/M3) are also TBDR and require the same baked-blend-in-PSO treatment, not just ARM Mali and Adreno"
       ]
     }

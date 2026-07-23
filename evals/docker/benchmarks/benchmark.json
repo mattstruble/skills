@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "docker",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "go-api-production-dockerfile",
+      "qbittorrent-compose-security-hardening",
+      "nextcloud-nfs-volume-compose"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "go-api-production-dockerfile",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -21,7 +25,7 @@
         {
           "text": "Dockerfile uses multi-stage build with a separate builder and runtime stage",
           "passed": true,
-          "evidence": "Uses 'FROM golang:1.23-bookworm AS builder' and 'FROM gcr.io/distroless/static AS runner' — two distinct stages."
+          "evidence": "Uses 'FROM golang:1.23-bookworm AS builder' and 'FROM gcr.io/distroless/static AS runner' \u2014 two distinct stages."
         },
         {
           "text": "CGO_ENABLED=0 is set in the build command to produce a static binary",
@@ -36,7 +40,7 @@
         {
           "text": "USER directive sets a non-root user (UID 65534 or similar) in the runtime stage",
           "passed": true,
-          "evidence": "'USER nonroot' — distroless provides UID 65532 as the nonroot user."
+          "evidence": "'USER nonroot' \u2014 distroless provides UID 65532 as the nonroot user."
         },
         {
           "text": "ENTRYPOINT uses exec form (JSON array), not shell form",
@@ -52,7 +56,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "go-api-production-dockerfile",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -65,7 +69,7 @@
         {
           "text": "Dockerfile uses multi-stage build with a separate builder and runtime stage",
           "passed": true,
-          "evidence": "Uses 'FROM golang:1.22-alpine AS builder' and 'FROM scratch' — two distinct stages."
+          "evidence": "Uses 'FROM golang:1.22-alpine AS builder' and 'FROM scratch' \u2014 two distinct stages."
         },
         {
           "text": "CGO_ENABLED=0 is set in the build command to produce a static binary",
@@ -75,7 +79,7 @@
         {
           "text": "Runtime stage uses gcr.io/distroless/static or scratch (not a full OS image)",
           "passed": true,
-          "evidence": "Runtime stage is 'FROM scratch' — minimal base with zero attack surface."
+          "evidence": "Runtime stage is 'FROM scratch' \u2014 minimal base with zero attack surface."
         },
         {
           "text": "USER directive sets a non-root user (UID 65534 or similar) in the runtime stage",
@@ -96,7 +100,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "qbittorrent-compose-security-hardening",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -130,7 +134,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "qbittorrent-compose-security-hardening",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -143,7 +147,7 @@
         {
           "text": "Recommends pinning the image tag away from 'latest' to a specific version",
           "passed": false,
-          "evidence": "The compose snippet still shows 'image: lscr.io/linuxserver/qbittorrent:latest' — the tag is not pinned."
+          "evidence": "The compose snippet still shows 'image: lscr.io/linuxserver/qbittorrent:latest' \u2014 the tag is not pinned."
         },
         {
           "text": "Recommends adding security_opt with no-new-privileges=true",
@@ -164,7 +168,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "nextcloud-nfs-volume-compose",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -198,7 +202,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "nextcloud-nfs-volume-compose",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -211,7 +215,7 @@
         {
           "text": "Compose file defines a named volume with driver: local and driver_opts for NFS (type: nfs, addr pointing to 192.168.1.50, device with the share path)",
           "passed": false,
-          "evidence": "Volume defines driver_opts but omits the explicit 'driver: local' field — the expectation requires both driver: local and driver_opts to be present."
+          "evidence": "Volume defines driver_opts but omits the explicit 'driver: local' field \u2014 the expectation requires both driver: local and driver_opts to be present."
         },
         {
           "text": "The NFS volume uses driver_opts with 'o' field containing addr=192.168.1.50",

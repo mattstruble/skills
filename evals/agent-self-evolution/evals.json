@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "telecom-cancellation-process-reuse",
       "prompt": "We built a customer service agent for our telecom company 6 months ago. It handles billing disputes, plan changes, and cancellations. Every time it encounters a new carrier's cancellation process, it rediscovers the steps from scratch — burning 15 minutes and 40+ LLM calls. How do we make it stop reinventing the wheel?",
       "expected_output": "Recommends externalizing the discovered process into a persistent, retrievable resource rather than relying on context alone; names a concrete mechanism (strategy summary and/or workflow recording); addresses reuse on future similar tasks; surfaces a transferability or verification consideration.",
       "should_trigger": true,
@@ -33,6 +34,7 @@
     },
     {
       "id": 4,
+      "name": "research-agent-learning-loop",
       "prompt": "We're building a general-purpose research agent that should get better at finding information over time. After each successful research task, we want it to learn what worked — which search strategies, which sources, which synthesis approaches. How do we design this learning loop?",
       "expected_output": "Describes an explicit distill→organize→apply→evolve learning loop; recommends strategy summaries (reflect on successful trajectory → structured note → retrieve for future tasks); includes a transferability gate; addresses how past experience is injected into new tasks.",
       "should_trigger": true,
@@ -47,6 +49,7 @@
     },
     {
       "id": 5,
+      "name": "over-escalation-prompt-sharpening",
       "prompt": "My customer support agent keeps over-escalating to human agents — it escalates whenever a customer mentions a policy dispute, even when it could just explain the policy. The transfer rule in the system prompt is too vague. How do I systematically sharpen these behavioral rules from real failures without manually rewriting the prompt every time?",
       "expected_output": "Identifies system prompt optimization / 'system prompt learning' as the mechanism; describes edge-case sharpening of the gray-zone rule; describes an automated loop (coding-agent-writes-diff + human review, and/or DSPy/OPRO/GEPA); distinguishes online case-by-case from offline batch.",
       "should_trigger": true,
@@ -77,6 +80,7 @@
     },
     {
       "id": 8,
+      "name": "voyager-enterprise-tool-safety",
       "prompt": "We want to implement something like Voyager for our enterprise automation agent — it should be able to discover new capabilities by searching our internal tool registry and GitHub, test them, and add them to its library. What are the safety guardrails we need to put around this?",
       "expected_output": "Describes the tool-creation cycle (explore → verify task completion → store → reuse); emphasizes concrete safety boundaries (sandbox, security scan, whitelist, human review, pre-storage verification); addresses privilege escalation via tool composition; notes enterprise adaptation beyond the game setting.",
       "should_trigger": true,
@@ -179,6 +183,7 @@
     },
     {
       "id": 20,
+      "name": "reusable-utility-functions-evolution",
       "prompt": "We have a coding agent that writes and executes Python. I want it to generate reusable utility functions that it can call in future tasks. Is this agent self-evolution or just normal code generation?",
       "expected_output": "Correctly identifies this as self-evolution when the generated functions are stored and reused across tasks (the distinguishing criterion is persistence + reuse, not one-off code gen); connects to tool creation / three-layer accumulation; routes one-off code-generation patterns to coding-agent-design.",
       "should_trigger": true,

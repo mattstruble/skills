@@ -2,13 +2,19 @@
   "metadata": {
     "skill_name": "agent-self-evolution",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-4", "eval-5", "eval-8", "eval-20"],
+    "evals_run": [
+      "telecom-cancellation-process-reuse",
+      "research-agent-learning-loop",
+      "over-escalation-prompt-sharpening",
+      "voyager-enterprise-tool-safety",
+      "reusable-utility-functions-evolution"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "telecom-cancellation-process-reuse",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -42,7 +48,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "telecom-cancellation-process-reuse",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -76,7 +82,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "research-agent-learning-loop",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -87,9 +93,9 @@
       },
       "expectations": [
         {
-          "text": "Describes an explicit learning loop (distill → organize → apply → evolve, or equivalent) rather than implying the model learns automatically",
+          "text": "Describes an explicit learning loop (distill \u2192 organize \u2192 apply \u2192 evolve, or equivalent) rather than implying the model learns automatically",
           "passed": true,
-          "evidence": "'Three-layer accumulation over time' and the learning lifecycle table: Distillation → Organization → Application → Evolution. Explicitly named as a designed loop, not automatic learning."
+          "evidence": "'Three-layer accumulation over time' and the learning lifecycle table: Distillation \u2192 Organization \u2192 Application \u2192 Evolution. Explicitly named as a designed loop, not automatic learning."
         },
         {
           "text": "Recommends strategy summaries: reflect on the successful trajectory and produce a structured, reusable note",
@@ -97,7 +103,7 @@
           "evidence": "'Post-task reflection: After a successful research task, an LLM generates a structured strategy summary' with task_type, methods_used, pitfalls_encountered, key_insight, and transferability fields."
         },
         {
-          "text": "Includes a transferability gate — not every trajectory becomes stored experience",
+          "text": "Includes a transferability gate \u2014 not every trajectory becomes stored experience",
           "passed": true,
           "evidence": "'Transferability gate: Not every trajectory deserves to become experience. Apply the test: \"Will this lesson carry over to similar tasks?\" A strategy that only works for one specific company has low transferability.'"
         },
@@ -110,7 +116,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "research-agent-learning-loop",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -121,9 +127,9 @@
       },
       "expectations": [
         {
-          "text": "Describes an explicit learning loop (distill → organize → apply → evolve, or equivalent) rather than implying the model learns automatically",
+          "text": "Describes an explicit learning loop (distill \u2192 organize \u2192 apply \u2192 evolve, or equivalent) rather than implying the model learns automatically",
           "passed": true,
-          "evidence": "'Design the learning loop as: Execute → Evaluate → Extract → Store → Retrieve.' Explicitly named as a designed loop with discrete steps."
+          "evidence": "'Design the learning loop as: Execute \u2192 Evaluate \u2192 Extract \u2192 Store \u2192 Retrieve.' Explicitly named as a designed loop with discrete steps."
         },
         {
           "text": "Recommends strategy summaries: reflect on the successful trajectory and produce a structured, reusable note",
@@ -131,7 +137,7 @@
           "evidence": "'Extract: On success, run a reflection pass: \"What search strategy worked?\" Produce a structured \"strategy note\"' with domain, effective_queries, effective_sources, ineffective_approaches, synthesis_approach."
         },
         {
-          "text": "Includes a transferability gate — not every trajectory becomes stored experience",
+          "text": "Includes a transferability gate \u2014 not every trajectory becomes stored experience",
           "passed": false,
           "evidence": "Baseline includes 'Decay unused strategies' and 'Track strategy success rate' as quality controls, but no explicit transferability gate that filters trajectories before storage based on generalizability."
         },
@@ -144,7 +150,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "over-escalation-prompt-sharpening",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -172,13 +178,13 @@
         {
           "text": "Distinguishes online case-by-case optimization from offline batch optimization",
           "passed": true,
-          "evidence": "'Why not batch optimization (DSPy/OPRO)? Batch optimization requires a scored eval set... For this case, each individual failure produces a precise rule update — more data-efficient.' Explicitly contrasts online vs. batch."
+          "evidence": "'Why not batch optimization (DSPy/OPRO)? Batch optimization requires a scored eval set... For this case, each individual failure produces a precise rule update \u2014 more data-efficient.' Explicitly contrasts online vs. batch."
         }
       ]
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "over-escalation-prompt-sharpening",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -196,7 +202,7 @@
         {
           "text": "Frames the fix as sharpening rule boundaries through edge cases (the gray zone)",
           "passed": true,
-          "evidence": "'Cluster them by pattern. Common pattern: \"customer mentions policy dispute\" → agent escalates, but 70% of these were actually just customers asking for an explanation.' Refines the rule with specific boundary conditions."
+          "evidence": "'Cluster them by pattern. Common pattern: \"customer mentions policy dispute\" \u2192 agent escalates, but 70% of these were actually just customers asking for an explanation.' Refines the rule with specific boundary conditions."
         },
         {
           "text": "Describes an automated update loop: a coding agent reads the prompt and generates a reviewed diff, and/or an automated framework (DSPy/OPRO/GEPA)",
@@ -206,13 +212,13 @@
         {
           "text": "Distinguishes online case-by-case optimization from offline batch optimization",
           "passed": true,
-          "evidence": "'Feedback loop cadence: Weekly batch — review escalation outcomes, refine rules, deploy. Not real-time (too noisy).' Explicitly identifies batch cadence and contrasts with real-time."
+          "evidence": "'Feedback loop cadence: Weekly batch \u2014 review escalation outcomes, refine rules, deploy. Not real-time (too noisy).' Explicitly identifies batch cadence and contrasts with real-time."
         }
       ]
     },
     {
       "eval_id": 8,
-      "eval_name": "eval-8",
+      "eval_name": "voyager-enterprise-tool-safety",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -223,9 +229,9 @@
       },
       "expectations": [
         {
-          "text": "Describes the tool-creation cycle: explore/search → verify task completion → store in library → reuse",
+          "text": "Describes the tool-creation cycle: explore/search \u2192 verify task completion \u2192 store in library \u2192 reuse",
           "passed": true,
-          "evidence": "Six-step cycle: 'Capability gap detection → Discovery → Implementation → Verification → Storage → Reuse.' Matches the explore→verify→store→reuse pattern."
+          "evidence": "Six-step cycle: 'Capability gap detection \u2192 Discovery \u2192 Implementation \u2192 Verification \u2192 Storage \u2192 Reuse.' Matches the explore\u2192verify\u2192store\u2192reuse pattern."
         },
         {
           "text": "Lists concrete safety boundaries: sandboxed execution, security scan of created tools, whitelist of permitted tool types, periodic human review",
@@ -246,7 +252,7 @@
     },
     {
       "eval_id": 8,
-      "eval_name": "eval-8",
+      "eval_name": "voyager-enterprise-tool-safety",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -257,14 +263,14 @@
       },
       "expectations": [
         {
-          "text": "Describes the tool-creation cycle: explore/search → verify task completion → store in library → reuse",
+          "text": "Describes the tool-creation cycle: explore/search \u2192 verify task completion \u2192 store in library \u2192 reuse",
           "passed": true,
-          "evidence": "Pipeline: 'Tool Discovery Service → Tool Generator → Sandbox Validator → Approval Gate → Tool Registry.' Covers search→verify→store→reuse cycle."
+          "evidence": "Pipeline: 'Tool Discovery Service \u2192 Tool Generator \u2192 Sandbox Validator \u2192 Approval Gate \u2192 Tool Registry.' Covers search\u2192verify\u2192store\u2192reuse cycle."
         },
         {
           "text": "Lists concrete safety boundaries: sandboxed execution, security scan of created tools, whitelist of permitted tool types, periodic human review",
           "passed": true,
-          "evidence": "'Sandboxed execution', 'Network allowlist', 'Human approval for new data sources', 'Rollback', 'Credential scoping' — covers the key safety boundaries including periodic human review."
+          "evidence": "'Sandboxed execution', 'Network allowlist', 'Human approval for new data sources', 'Rollback', 'Credential scoping' \u2014 covers the key safety boundaries including periodic human review."
         },
         {
           "text": "Addresses privilege escalation through tool composition (a composed tool inherits the union of component permissions)",
@@ -280,7 +286,7 @@
     },
     {
       "eval_id": 20,
-      "eval_name": "eval-20",
+      "eval_name": "reusable-utility-functions-evolution",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -293,7 +299,7 @@
         {
           "text": "Correctly identifies this AS self-evolution when functions are stored and reused across sessions (not one-off generation)",
           "passed": true,
-          "evidence": "'If the agent generates a utility function, stores it in a persistent library, and calls it on future tasks without regenerating it — that IS self-evolution. Specifically, it's the Tool Creation (Voyager cycle).'"
+          "evidence": "'If the agent generates a utility function, stores it in a persistent library, and calls it on future tasks without regenerating it \u2014 that IS self-evolution. Specifically, it's the Tool Creation (Voyager cycle).'"
         },
         {
           "text": "Names the distinguishing criterion: persistence + cross-task reuse, plus a verification gate before a function enters the reusable library",
@@ -308,13 +314,13 @@
         {
           "text": "Routes the mechanics of generating/editing the code itself to coding-agent-design",
           "passed": true,
-          "evidence": "'If the agent generates a utility function, uses it for the current task, and discards it — that's normal code generation (see coding-agent-design).' Explicit routing."
+          "evidence": "'If the agent generates a utility function, uses it for the current task, and discards it \u2014 that's normal code generation (see coding-agent-design).' Explicit routing."
         }
       ]
     },
     {
       "eval_id": 20,
-      "eval_name": "eval-20",
+      "eval_name": "reusable-utility-functions-evolution",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -337,7 +343,7 @@
         {
           "text": "Connects to tool creation and three-layer capability accumulation (tools become building blocks)",
           "passed": false,
-          "evidence": "Baseline mentions 'analogous to Voyager's skill library' but does not connect to the three-layer capability accumulation (tools→knowledge→skills) or explain how tools become building blocks for higher-level capabilities."
+          "evidence": "Baseline mentions 'analogous to Voyager's skill library' but does not connect to the three-layer capability accumulation (tools\u2192knowledge\u2192skills) or explain how tools become building blocks for higher-level capabilities."
         },
         {
           "text": "Routes the mechanics of generating/editing the code itself to coding-agent-design",

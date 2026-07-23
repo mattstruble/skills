@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "notification-channels-composition",
       "prompt": "I need to build a notification system that can send alerts via email, SMS, and push notifications. Different parts of the app need different combinations — the billing service only sends email, the mobile app sends push and SMS. How should I structure this?",
       "expected_output": "Recommend composition over inheritance: define a narrow Notifier protocol/interface, implement separate EmailNotifier, SmsNotifier, PushNotifier classes, and compose them at the call site or via a MultiNotifier that accepts a list of notifiers. Warn against a deep class hierarchy (BaseNotifier -> EmailNotifier, etc.) that couples unrelated channels. Show how the billing service and mobile app can each receive only the notifiers they need.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "user-manager-god-class-split",
       "prompt": "Our UserManager class has grown to 18 methods and depends on a database session, a cache client, an email service, an audit logger, a permissions checker, and a feature flag client. Tests take forever and every change breaks something unrelated. What should I do?",
       "expected_output": "Diagnose the class as doing too many things. Split by asking 'which callers use which parts?' — likely into UserRepository (DB/cache), UserNotifier (email), UserAuditLog (audit), and an access-control boundary. Each focused class has fewer dependencies and is independently testable. Warn against just renaming the class or extracting private helpers that still live in the same file.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "order-processing-pure-io-separation",
       "prompt": "I have a 200-line process_order function that validates the cart, applies discounts, charges the payment method, updates inventory, sends a confirmation email, and logs the transaction. It's hard to test because I have to mock five different services. How do I fix this?",
       "expected_output": "Identify that the function mixes pure business logic with IO side effects. Extract pure functions for validation and discount calculation (no mocks needed). Push IO to the boundary: the caller or a thin orchestrator calls the pure functions and then performs the side effects. Show the before/after structure where the core logic is testable without any mocks.",
       "files": [],
@@ -42,6 +45,7 @@
     },
     {
       "id": 4,
+      "name": "retry-removal-chestertons-fence",
       "prompt": "A teammate opened a PR that removes the retry logic from our external API client. The comment says 'this retry block never fires in production — I checked the logs for the past 30 days.' Should we merge it?",
       "expected_output": "Apply Chesterton's Fence: before removing, understand why the retry logic was added. 30 days of clean logs doesn't prove the code is unnecessary — it may protect against rare but severe failures (network blips, transient 503s, cold-start latency). Ask: what was the incident or failure mode that prompted adding it? If no one knows, treat that as a reason to keep it, not remove it. If the evidence of disuse is conclusive (e.g., the external API no longer has the failure mode), document that reasoning in the PR.",
       "files": [],
@@ -55,6 +59,7 @@
     },
     {
       "id": 5,
+      "name": "file-parser-layered-api-design",
       "prompt": "I'm building a file parser library. Power users need full control — custom delimiters, encoding, error handling, streaming mode. But most callers just want to parse a CSV file and get back a list of dicts. How do I design the API?",
       "expected_output": "Apply layered interfaces: a simple top-level function (parse_csv(path) -> list[dict]) for the 80% case, and lower-level building blocks (open_reader, parse_rows, etc.) for power users. The simple function is implemented using the building blocks. Power users bypass the simple function and compose the building blocks directly. Don't force every caller to supply encoding, delimiter, and error_handler just because one caller needs them.",
       "files": [],
@@ -68,6 +73,7 @@
     },
     {
       "id": 6,
+      "name": "api-fetch-ambiguous-edge-cases",
       "prompt": "Write a function that fetches user data from an API and processes it. The endpoint sometimes returns an empty list, sometimes a partial response if the service is degraded, and occasionally times out.",
       "expected_output": "Stop and ask clarifying questions before writing any code: What should happen on empty list — return empty, raise, or return a sentinel? What counts as a partial response and is it usable? Should timeouts be retried, raised to the caller, or return a default? Document that guessing these behaviors leads to rework when the caller discovers wrong assumptions. Only write code after the behavior is confirmed.",
       "files": [],
@@ -81,6 +87,7 @@
     },
     {
       "id": 7,
+      "name": "redundant-comments-docstring-review",
       "prompt": "Here's some code I wrote. Can you review it for design issues?\n\n```python\ndef get_user_data(user_id):\n    \"\"\"Gets user data for the given user_id and returns it.\"\"\"\n    # Call the database to get the user\n    result = db.query(user_id)  # query the database\n    # Return the result\n    return result\n\ndef process():\n    return run_pipeline()\n```",
       "expected_output": "Flag three conciseness violations: (1) the docstring restates the function signature and adds no information — remove it or replace with what raises/what edge cases exist; (2) the inline comments narrate the code ('Call the database', 'query the database', 'Return the result') — remove them; (3) the process() wrapper adds indirection without simplifying — either inline it or give it a meaningful name and body. Apply the test: if removing a piece loses no information, remove it.",
       "files": [],
@@ -94,6 +101,7 @@
     },
     {
       "id": 8,
+      "name": "silent-exception-mutable-default-review",
       "prompt": "I'm reviewing a PR and I see this code:\n\n```python\ntry:\n    result = plugin.execute(payload)\nexcept Exception:\n    pass\n\ndef configure(settings={}):\n    settings['initialized'] = True\n    return settings\n```\n\nAre there any issues?",
       "expected_output": "Flag two silent convention violations: (1) catching broad Exception and silencing it with 'pass' is a double violation — broad catches are sometimes justified but must be commented with the reason (e.g., 'plugin must not crash host'), and silencing errors entirely is almost never correct; (2) mutable default argument `settings={}` is a Python anti-pattern that causes shared state across calls — if intentional, it needs a comment explaining why; if not, use `settings=None` and initialize inside. Both violations are silent: no comment signals the author considered the tradeoff.",
       "files": [],
@@ -107,6 +115,7 @@
     },
     {
       "id": 9,
+      "name": "dense-access-control-conditional-refactor",
       "prompt": "This access-control check is getting hard to read. Can you help?\n\n```python\nif user.role in ('admin', 'superuser') and not user.suspended and (datetime.now() < user.access_expiry or user.has_permanent_access) and feature_flags.get('new_dashboard_enabled', False):\n    show_dashboard()\n```",
       "expected_output": "Apply expression complexity: break the dense conditional into named intermediate variables. Each intermediate captures one logical concept (is_privileged_role, is_active_account, has_valid_access_window, is_feature_enabled) and can be inspected in a debugger. The final if statement reads like a sentence. Show the before/after.",
       "files": [],
@@ -120,6 +129,7 @@
     },
     {
       "id": 10,
+      "name": "report-format-inheritance-to-composition",
       "prompt": "I'm building a report generator. I started with a Report base class, then added PdfReport, CsvReport, and ExcelReport subclasses. Now I need reports that combine formats — a 'summary package' that generates both PDF and CSV. The inheritance approach is getting messy. What should I do?",
       "expected_output": "Diagnose the inheritance hierarchy as the wrong tool: combining formats via multiple inheritance or a new SummaryReport(PdfReport, CsvReport) is fragile. Recommend composition: define a narrow Renderer protocol, implement PdfRenderer, CsvRenderer, ExcelRenderer independently, and compose them in a ReportPackage that accepts a list of renderers. The summary package is just ReportPackage([PdfRenderer(), CsvRenderer()]). New combinations require no new classes.",
       "files": [],

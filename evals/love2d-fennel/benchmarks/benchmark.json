@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "love2d-fennel",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "enemy-list-metatable-survive-reload",
+      "new-project-setup-hot-reload",
+      "pause-screen-mode-system"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "enemy-list-metatable-survive-reload",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -19,35 +23,35 @@
       },
       "expectations": [
         {
-          "text": "Recommends storing the enemy list in `state.fnl` — the dedicated state module for data that must survive reloads — not as a module-level local in the spawner module",
+          "text": "Recommends storing the enemy list in `state.fnl` \u2014 the dedicated state module for data that must survive reloads \u2014 not as a module-level local in the spawner module",
           "passed": false,
-          "evidence": "Answer uses `(persist enemies [])` in enemy.fnl via the persist macro — not state.fnl. The enemy list stays in the spawner module, not the dedicated state module."
+          "evidence": "Answer uses `(persist enemies [])` in enemy.fnl via the persist macro \u2014 not state.fnl. The enemy list stays in the spawner module, not the dedicated state module."
         },
         {
           "text": "Recommends the `hot-table` macro for the Enemy metatable: it persists the table reference but overwrites its members with new values, so existing enemy objects retain valid method references after reload",
           "passed": true,
-          "evidence": "'hot-table Enemy — persists the table reference but overwrites its members with new values on reload. All existing enemy objects have Enemy as their metatable via setmetatable. After ,reload enemy, the reference they hold is the SAME table — but its :draw and :update methods are updated.'"
+          "evidence": "'hot-table Enemy \u2014 persists the table reference but overwrites its members with new values on reload. All existing enemy objects have Enemy as their metatable via setmetatable. After ,reload enemy, the reference they hold is the SAME table \u2014 but its :draw and :update methods are updated.'"
         },
         {
-          "text": "Explains why metatables break on reload: when a module is reloaded, its metatable is a new table — existing objects still hold a reference to the old metatable, so method calls no longer reflect the updated code",
+          "text": "Explains why metatables break on reload: when a module is reloaded, its metatable is a new table \u2014 existing objects still hold a reference to the old metatable, so method calls no longer reflect the updated code",
           "passed": true,
           "evidence": "'Without hot-table, reload creates a new table, and old objects point to the old (now stale) metatable.'"
         },
         {
           "text": "Warns against reloading `state.fnl` during development: modules that already captured its reference will continue using the old table while new `require` calls return a fresh one, causing split-brain state bugs",
           "passed": true,
-          "evidence": "'Don't reload the state module if enemies live there — causes split-brain bugs.'"
+          "evidence": "'Don't reload the state module if enemies live there \u2014 causes split-brain bugs.'"
         },
         {
-          "text": "Uses `(import-macros {: hot-table} :persist)` syntax to import the macro, not a plain function call — `hot-table` is a macro, not a runtime function",
+          "text": "Uses `(import-macros {: hot-table} :persist)` syntax to import the macro, not a plain function call \u2014 `hot-table` is a macro, not a runtime function",
           "passed": true,
-          "evidence": "Code shows `(import-macros {: persist : hot-table} :persist)` — correct macro import syntax."
+          "evidence": "Code shows `(import-macros {: persist : hot-table} :persist)` \u2014 correct macro import syntax."
         }
       ]
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "enemy-list-metatable-survive-reload",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -58,19 +62,19 @@
       },
       "expectations": [
         {
-          "text": "Recommends storing the enemy list in `state.fnl` — the dedicated state module for data that must survive reloads — not as a module-level local in the spawner module",
+          "text": "Recommends storing the enemy list in `state.fnl` \u2014 the dedicated state module for data that must survive reloads \u2014 not as a module-level local in the spawner module",
           "passed": false,
-          "evidence": "Baseline uses `_G.enemy-list` (a raw global) to persist the enemy list — not state.fnl."
+          "evidence": "Baseline uses `_G.enemy-list` (a raw global) to persist the enemy list \u2014 not state.fnl."
         },
         {
           "text": "Recommends the `hot-table` macro for the Enemy metatable: it persists the table reference but overwrites its members with new values, so existing enemy objects retain valid method references after reload",
           "passed": false,
-          "evidence": "Baseline uses per-frame `setmetatable` re-attachment in update-all instead of the hot-table macro — a different (and less idiomatic) approach."
+          "evidence": "Baseline uses per-frame `setmetatable` re-attachment in update-all instead of the hot-table macro \u2014 a different (and less idiomatic) approach."
         },
         {
-          "text": "Explains why metatables break on reload: when a module is reloaded, its metatable is a new table — existing objects still hold a reference to the old metatable, so method calls no longer reflect the updated code",
+          "text": "Explains why metatables break on reload: when a module is reloaded, its metatable is a new table \u2014 existing objects still hold a reference to the old metatable, so method calls no longer reflect the updated code",
           "passed": true,
-          "evidence": "'After a reload, M is the new module table with updated methods' — implies the old metatable reference is stale, though not stated as explicitly as the skill would."
+          "evidence": "'After a reload, M is the new module table with updated methods' \u2014 implies the old metatable reference is stale, though not stated as explicitly as the skill would."
         },
         {
           "text": "Warns against reloading `state.fnl` during development: modules that already captured its reference will continue using the old table while new `require` calls return a fresh one, causing split-brain state bugs",
@@ -78,7 +82,7 @@
           "evidence": "Baseline does not mention state.fnl or warn against reloading a state module."
         },
         {
-          "text": "Uses `(import-macros {: hot-table} :persist)` syntax to import the macro, not a plain function call — `hot-table` is a macro, not a runtime function",
+          "text": "Uses `(import-macros {: hot-table} :persist)` syntax to import the macro, not a plain function call \u2014 `hot-table` is a macro, not a runtime function",
           "passed": false,
           "evidence": "Baseline uses no macros; it uses plain Lua-style Fennel with `_G` globals and per-frame setmetatable calls."
         }
@@ -86,7 +90,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "new-project-setup-hot-reload",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -97,14 +101,14 @@
       },
       "expectations": [
         {
-          "text": "Recommends the min-love2d-fennel template (https://codeberg.org/alexjgriffith/min-love2d-fennel) as the starting point — not a manual setup from scratch",
+          "text": "Recommends the min-love2d-fennel template (https://codeberg.org/alexjgriffith/min-love2d-fennel) as the starting point \u2014 not a manual setup from scratch",
           "passed": true,
-          "evidence": "'git clone https://codeberg.org/alexjgriffith/min-love2d-fennel.git my-game' — template recommended as the starting point."
+          "evidence": "'git clone https://codeberg.org/alexjgriffith/min-love2d-fennel.git my-game' \u2014 template recommended as the starting point."
         },
         {
           "text": "Explains the mode system architecture: `main.lua` initializes Fennel and calls `wrap.fnl`; each mode is a Fennel module returning a table of callbacks (`draw`, `update`, `activate`)",
           "passed": true,
-          "evidence": "'main.lua bootstraps Fennel, then calls wrap.fnl' and 'mode-intro.fnl — starter mode (your game code goes here)' with mode files returning {: draw : update}."
+          "evidence": "'main.lua bootstraps Fennel, then calls wrap.fnl' and 'mode-intro.fnl \u2014 starter mode (your game code goes here)' with mode files returning {: draw : update}."
         },
         {
           "text": "Shows running with `love .` from the project directory and explains that the REPL (`>>` prompt) appears in the shell alongside the game window",
@@ -112,12 +116,12 @@
           "evidence": "'love .' and 'A game window appears and the shell shows a >> REPL prompt. You're now in a live Fennel environment inside Love2D.'"
         },
         {
-          "text": "Explains `,reload module-name` as the key hot-reload command — reloads a module file and updates `package.loaded` so the mode system picks up new callbacks on the next frame",
+          "text": "Explains `,reload module-name` as the key hot-reload command \u2014 reloads a module file and updates `package.loaded` so the mode system picks up new callbacks on the next frame",
           "passed": true,
-          "evidence": "'>> ,reload mode-game' and 'Changes take effect immediately — no restart. The mode system picks up the new draw and update callbacks on the next frame.'"
+          "evidence": "'>> ,reload mode-game' and 'Changes take effect immediately \u2014 no restart. The mode system picks up the new draw and update callbacks on the next frame.'"
         },
         {
-          "text": "Warns against overwriting Love2D callbacks directly (`love.draw`, `love.update`) from the REPL or modules — the mode system intercepts these callbacks and bypassing it leads to unrecoverable crashes",
+          "text": "Warns against overwriting Love2D callbacks directly (`love.draw`, `love.update`) from the REPL or modules \u2014 the mode system intercepts these callbacks and bypassing it leads to unrecoverable crashes",
           "passed": false,
           "evidence": "Eval 2 answer does not explicitly warn against overwriting love.draw/love.update; this warning appears in eval 3's answer, not here."
         }
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "new-project-setup-hot-reload",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -136,35 +140,35 @@
       },
       "expectations": [
         {
-          "text": "Recommends the min-love2d-fennel template (https://codeberg.org/alexjgriffith/min-love2d-fennel) as the starting point — not a manual setup from scratch",
+          "text": "Recommends the min-love2d-fennel template (https://codeberg.org/alexjgriffith/min-love2d-fennel) as the starting point \u2014 not a manual setup from scratch",
           "passed": false,
-          "evidence": "Baseline builds from scratch: 'Get Fennel. Download fennel.lua from the Fennel releases page' — no template recommended."
+          "evidence": "Baseline builds from scratch: 'Get Fennel. Download fennel.lua from the Fennel releases page' \u2014 no template recommended."
         },
         {
           "text": "Explains the mode system architecture: `main.lua` initializes Fennel and calls `wrap.fnl`; each mode is a Fennel module returning a table of callbacks (`draw`, `update`, `activate`)",
           "passed": false,
-          "evidence": "Baseline uses a single game.fnl module with direct love.* callback overrides in main.lua — no mode system architecture."
+          "evidence": "Baseline uses a single game.fnl module with direct love.* callback overrides in main.lua \u2014 no mode system architecture."
         },
         {
           "text": "Shows running with `love .` from the project directory and explains that the REPL (`>>` prompt) appears in the shell alongside the game window",
           "passed": true,
-          "evidence": "'Run with: love .' — correct run command shown."
+          "evidence": "'Run with: love .' \u2014 correct run command shown."
         },
         {
-          "text": "Explains `,reload module-name` as the key hot-reload command — reloads a module file and updates `package.loaded` so the mode system picks up new callbacks on the next frame",
+          "text": "Explains `,reload module-name` as the key hot-reload command \u2014 reloads a module file and updates `package.loaded` so the mode system picks up new callbacks on the next frame",
           "passed": false,
-          "evidence": "Baseline uses F5 key to reload ('Press F5 → package.loaded[\"game\"] is cleared') — not the ,reload REPL command."
+          "evidence": "Baseline uses F5 key to reload ('Press F5 \u2192 package.loaded[\"game\"] is cleared') \u2014 not the ,reload REPL command."
         },
         {
-          "text": "Warns against overwriting Love2D callbacks directly (`love.draw`, `love.update`) from the REPL or modules — the mode system intercepts these callbacks and bypassing it leads to unrecoverable crashes",
+          "text": "Warns against overwriting Love2D callbacks directly (`love.draw`, `love.update`) from the REPL or modules \u2014 the mode system intercepts these callbacks and bypassing it leads to unrecoverable crashes",
           "passed": false,
-          "evidence": "Baseline's main.lua explicitly overwrites love.update and love.draw directly — the opposite of what the expectation requires."
+          "evidence": "Baseline's main.lua explicitly overwrites love.update and love.draw directly \u2014 the opposite of what the expectation requires."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "pause-screen-mode-system",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -175,35 +179,35 @@
       },
       "expectations": [
         {
-          "text": "Creates a separate `mode-pause.fnl` module that returns a table of callbacks (`draw`, `update`) — each distinct game state gets its own mode file",
+          "text": "Creates a separate `mode-pause.fnl` module that returns a table of callbacks (`draw`, `update`) \u2014 each distinct game state gets its own mode file",
           "passed": true,
-          "evidence": "Answer creates mode-pause.fnl returning `{: draw : update}` — correct structure."
+          "evidence": "Answer creates mode-pause.fnl returning `{: draw : update}` \u2014 correct structure."
         },
         {
-          "text": "Uses `(set-mode :mode-pause)` in `mode-game.fnl`'s update callback when escape is pressed — `set-mode` is passed as a parameter to `update`, not imported directly",
+          "text": "Uses `(set-mode :mode-pause)` in `mode-game.fnl`'s update callback when escape is pressed \u2014 `set-mode` is passed as a parameter to `update`, not imported directly",
           "passed": true,
-          "evidence": "`(fn update [dt set-mode]` with `(set-mode :mode-pause)` when escape pressed — set-mode is a parameter, not imported."
+          "evidence": "`(fn update [dt set-mode]` with `(set-mode :mode-pause)` when escape pressed \u2014 set-mode is a parameter, not imported."
         },
         {
-          "text": "Uses `(set-mode :mode-game)` in `mode-pause.fnl`'s update callback when the player chooses resume — mode switching is symmetric",
+          "text": "Uses `(set-mode :mode-game)` in `mode-pause.fnl`'s update callback when the player chooses resume \u2014 mode switching is symmetric",
           "passed": true,
           "evidence": "mode-pause.fnl shows `(fn update [dt set-mode]` with `(set-mode :mode-game)` when escape pressed in pause mode."
         },
         {
           "text": "Addresses state preservation: game state (player position, score, enemies) survives in `state.fnl` while paused because the state module is never reloaded and mode switching does not reset it",
           "passed": true,
-          "evidence": "'Game state (in state.fnl) is unaffected by mode switches — it persists across transitions.'"
+          "evidence": "'Game state (in state.fnl) is unaffected by mode switches \u2014 it persists across transitions.'"
         },
         {
-          "text": "Avoids overwriting `love.draw` or `love.update` directly — all rendering and logic goes through mode callbacks, not direct Love2D callback assignment",
+          "text": "Avoids overwriting `love.draw` or `love.update` directly \u2014 all rendering and logic goes through mode callbacks, not direct Love2D callback assignment",
           "passed": true,
-          "evidence": "'Don't overwrite love.update or love.draw directly — the mode system owns those callbacks. Always use mode tables with set-mode for transitions.'"
+          "evidence": "'Don't overwrite love.update or love.draw directly \u2014 the mode system owns those callbacks. Always use mode tables with set-mode for transitions.'"
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "pause-screen-mode-system",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -214,29 +218,29 @@
       },
       "expectations": [
         {
-          "text": "Creates a separate `mode-pause.fnl` module that returns a table of callbacks (`draw`, `update`) — each distinct game state gets its own mode file",
+          "text": "Creates a separate `mode-pause.fnl` module that returns a table of callbacks (`draw`, `update`) \u2014 each distinct game state gets its own mode file",
           "passed": true,
-          "evidence": "Baseline creates mode-pause.fnl with draw, update, keypressed, enter, exit callbacks — separate module per game state."
+          "evidence": "Baseline creates mode-pause.fnl with draw, update, keypressed, enter, exit callbacks \u2014 separate module per game state."
         },
         {
-          "text": "Uses `(set-mode :mode-pause)` in `mode-game.fnl`'s update callback when escape is pressed — `set-mode` is passed as a parameter to `update`, not imported directly",
+          "text": "Uses `(set-mode :mode-pause)` in `mode-game.fnl`'s update callback when escape is pressed \u2014 `set-mode` is passed as a parameter to `update`, not imported directly",
           "passed": false,
-          "evidence": "Baseline uses `modes.push :mode-pause` from a separate modes module — not `(set-mode ...)` passed as a parameter to update."
+          "evidence": "Baseline uses `modes.push :mode-pause` from a separate modes module \u2014 not `(set-mode ...)` passed as a parameter to update."
         },
         {
-          "text": "Uses `(set-mode :mode-game)` in `mode-pause.fnl`'s update callback when the player chooses resume — mode switching is symmetric",
+          "text": "Uses `(set-mode :mode-game)` in `mode-pause.fnl`'s update callback when the player chooses resume \u2014 mode switching is symmetric",
           "passed": false,
-          "evidence": "Baseline uses `modes.pop` to return to game — not `(set-mode :mode-game)` as the symmetric pattern requires."
+          "evidence": "Baseline uses `modes.pop` to return to game \u2014 not `(set-mode :mode-game)` as the symmetric pattern requires."
         },
         {
           "text": "Addresses state preservation: game state (player position, score, enemies) survives in `state.fnl` while paused because the state module is never reloaded and mode switching does not reset it",
           "passed": false,
-          "evidence": "Baseline uses _G.state (global) not state.fnl; 'The game state is untouched because it was never exited' — concept present but wrong mechanism."
+          "evidence": "Baseline uses _G.state (global) not state.fnl; 'The game state is untouched because it was never exited' \u2014 concept present but wrong mechanism."
         },
         {
-          "text": "Avoids overwriting `love.draw` or `love.update` directly — all rendering and logic goes through mode callbacks, not direct Love2D callback assignment",
+          "text": "Avoids overwriting `love.draw` or `love.update` directly \u2014 all rendering and logic goes through mode callbacks, not direct Love2D callback assignment",
           "passed": false,
-          "evidence": "Baseline's main.lua (from eval 2) directly overwrites love.update and love.draw — the baseline architecture fundamentally uses direct callback assignment."
+          "evidence": "Baseline's main.lua (from eval 2) directly overwrites love.update and love.draw \u2014 the baseline architecture fundamentally uses direct callback assignment."
         }
       ]
     }

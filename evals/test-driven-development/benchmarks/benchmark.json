@@ -2,13 +2,13 @@
   "metadata": {
     "skill_name": "test-driven-development",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5"],
+    "evals_run": ["email-validator-tdd-red-green", "bug-fix-reproducing-test-first", "refactor-with-characterization-tests", "tdd-discipline-on-trivial-task", "vertical-vs-horizontal-test-slicing"],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "email-validator-tdd-red-green",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -52,7 +52,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "email-validator-tdd-red-green",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -96,7 +96,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "bug-fix-reproducing-test-first",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -135,7 +135,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "bug-fix-reproducing-test-first",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -174,7 +174,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "refactor-with-characterization-tests",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -218,7 +218,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "refactor-with-characterization-tests",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -262,7 +262,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "tdd-discipline-on-trivial-task",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -296,7 +296,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "tdd-discipline-on-trivial-task",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -330,7 +330,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "vertical-vs-horizontal-test-slicing",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -364,7 +364,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "vertical-vs-horizontal-test-slicing",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {

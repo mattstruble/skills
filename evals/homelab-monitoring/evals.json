@@ -1,6 +1,7 @@
 { "skill_name": "homelab-monitoring", "evals": [
   {
     "id": 1,
+    "name": "alloy-docker-log-collection",
     "prompt": "I'm running Plex, Sonarr, and Radarr on Docker Compose and I want to add log collection so I can search container logs in Grafana. What agent should I use and how do I configure it?",
     "expected_output": "Use Alloy (not the Docker Loki log driver) as a separate container in the Compose stack. Configure it with a discovery.docker block pointing at the Docker socket, a discovery.relabel block to extract container and service labels, a loki.source.docker block to collect logs, and a loki.write block targeting http://loki:3100/loki/api/v1/push. Mount /var/run/docker.sock and /var/lib/docker/containers read-only. The Docker Loki log driver should be avoided because it sends logs synchronously and will block container stdout if Loki is unreachable.",
     "files": [],
@@ -14,6 +15,7 @@
   },
   {
     "id": 2,
+    "name": "servicemonitor-not-discovered",
     "prompt": "I deployed kube-prometheus-stack on my k3s homelab and created a ServiceMonitor for my Sonarr exporter, but Prometheus shows 0 targets and never scrapes it. What's wrong?",
     "expected_output": "The default kube-prometheus-stack configuration only discovers ServiceMonitors that carry the same Helm release labels, silently ignoring any you create manually. Fix this by setting serviceMonitorSelectorNilUsesHelmValues: false, podMonitorSelectorNilUsesHelmValues: false, and ruleSelectorNilUsesHelmValues: false under prometheus.prometheusSpec in your Helm values, then upgrading the release. This is the #1 gotcha with kube-prometheus-stack.",
     "files": [],
@@ -27,6 +29,7 @@
   },
   {
     "id": 3,
+    "name": "alertmanager-discord-email-routing",
     "prompt": "I want to set up alerting on my homelab monitoring stack so critical alerts go to Discord and warnings go to email. Show me the Alertmanager config.",
     "expected_output": "Configure alertmanager.yml with a route that groups by alertname and job, sets group_wait: 30s, group_interval: 5m, and repeat_interval: 4h, with a default receiver of discord. Add a child route matching severity: critical to the discord receiver and severity: warning to the email receiver. The discord receiver uses discord_configs with a webhook_url (reference $DISCORD_WEBHOOK_URL from the environment). The email receiver uses email_configs with smarthost, auth_username, and auth_password. Never commit the webhook URL or SMTP password — use .env file substitution or a Kubernetes Secret mounted via webhook_url_file.",
     "files": [],

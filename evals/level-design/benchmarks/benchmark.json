@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "level-design",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "doorway-camping-arena-pressure",
+      "scripted-encounter-no-replayability",
+      "oversized-symmetric-boss-arena"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "doorway-camping-arena-pressure",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -31,7 +35,7 @@
         {
           "text": "Names Arena Pressure or Push-Forward Design as the governing concept, not just 'make it harder'",
           "passed": true,
-          "evidence": "'The problem is Arena Pressure failure.' and 'Push-Forward Design: violated.' — both concepts named explicitly."
+          "evidence": "'The problem is Arena Pressure failure.' and 'Push-Forward Design: violated.' \u2014 both concepts named explicitly."
         },
         {
           "text": "Recommends replacing full-wall cover with half-walls specifically because full walls stop movement and reward camping",
@@ -41,13 +45,13 @@
         {
           "text": "Avoids recommending adding more enemies or increasing enemy health as the primary fix",
           "passed": true,
-          "evidence": "All fixes are spatial/mechanical (doorway, health drops, cover type, arena size) — no recommendation to add enemies or increase health."
+          "evidence": "All fixes are spatial/mechanical (doorway, health drops, cover type, arena size) \u2014 no recommendation to add enemies or increase health."
         }
       ]
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "doorway-camping-arena-pressure",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -65,7 +69,7 @@
         {
           "text": "Recommends tying health drops to enemy kills (glory kill / kill-drop model) rather than removing pickups entirely",
           "passed": false,
-          "evidence": "Baseline recommends 'Relocate the health pickup' to reward forward movement — no kill-drop or glory-kill mechanic mentioned."
+          "evidence": "Baseline recommends 'Relocate the health pickup' to reward forward movement \u2014 no kill-drop or glory-kill mechanic mentioned."
         },
         {
           "text": "Names Arena Pressure or Push-Forward Design as the governing concept, not just 'make it harder'",
@@ -75,18 +79,18 @@
         {
           "text": "Recommends replacing full-wall cover with half-walls specifically because full walls stop movement and reward camping",
           "passed": false,
-          "evidence": "Baseline says 'Replace the full-wall cover with partial cover (half-walls, pillars)' but gives no reasoning about full walls stopping movement — the 'specifically because' reasoning is absent."
+          "evidence": "Baseline says 'Replace the full-wall cover with partial cover (half-walls, pillars)' but gives no reasoning about full walls stopping movement \u2014 the 'specifically because' reasoning is absent."
         },
         {
           "text": "Avoids recommending adding more enemies or increasing enemy health as the primary fix",
           "passed": true,
-          "evidence": "Baseline fixes are spatial (sightlines, spawns, cover placement, health pickup location) — no recommendation to add enemies or increase health."
+          "evidence": "Baseline fixes are spatial (sightlines, spawns, cover placement, health pickup location) \u2014 no recommendation to add enemies or increase health."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "scripted-encounter-no-replayability",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -99,12 +103,12 @@
         {
           "text": "Names the Checkpoint Test by name and applies it as the diagnostic tool (die, replay, ask whether patterns rearrange)",
           "passed": true,
-          "evidence": "'Run the Checkpoint Test: die and restart. Does the configuration feel like a new puzzle? If the same script dominates — if the player doesn't need to reassess priorities — the encounter still lacks meaningful prioritization choice.'"
+          "evidence": "'Run the Checkpoint Test: die and restart. Does the configuration feel like a new puzzle? If the same script dominates \u2014 if the player doesn't need to reassess priorities \u2014 the encounter still lacks meaningful prioritization choice.'"
         },
         {
           "text": "Identifies authoritative scripting / fixed-wave spawning as the anti-pattern causing the problem",
           "passed": true,
-          "evidence": "'Spawns are fully predetermined. Use percentage-based reinforcements — trigger new enemies when the current wave reaches a health/count threshold, not on a fixed timer or death count.'"
+          "evidence": "'Spawns are fully predetermined. Use percentage-based reinforcements \u2014 trigger new enemies when the current wave reaches a health/count threshold, not on a fixed timer or death count.'"
         },
         {
           "text": "Recommends encounter composition using orthogonally differentiated archetypes, not just 'add variety'",
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "scripted-encounter-no-replayability",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -143,7 +147,7 @@
         {
           "text": "Identifies authoritative scripting / fixed-wave spawning as the anti-pattern causing the problem",
           "passed": true,
-          "evidence": "'Static enemy placements with no variation' and 'Predictable spawn timing tied to player position triggers' — correctly identifies fixed scripting as the problem."
+          "evidence": "'Static enemy placements with no variation' and 'Predictable spawn timing tied to player position triggers' \u2014 correctly identifies fixed scripting as the problem."
         },
         {
           "text": "Recommends encounter composition using orthogonally differentiated archetypes, not just 'add variety'",
@@ -158,13 +162,13 @@
         {
           "text": "Avoids recommending randomizing enemy positions as the sole fix without addressing archetype differentiation",
           "passed": false,
-          "evidence": "Baseline's fix #1 is 'Randomize spawn positions within a budget' — position randomization is the primary recommendation without archetype differentiation."
+          "evidence": "Baseline's fix #1 is 'Randomize spawn positions within a budget' \u2014 position randomization is the primary recommendation without archetype differentiation."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "oversized-symmetric-boss-arena",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -177,12 +181,12 @@
         {
           "text": "Identifies the circular symmetric shape as a specific anti-pattern, not just 'too big'",
           "passed": true,
-          "evidence": "'Symmetric: A circle has no clear navigation landmarks. Every direction is equivalent, so routing decisions don't exist.' — circular symmetry named as a distinct anti-pattern."
+          "evidence": "'Symmetric: A circle has no clear navigation landmarks. Every direction is equivalent, so routing decisions don't exist.' \u2014 circular symmetry named as a distinct anti-pattern."
         },
         {
           "text": "Explains Right-Sized Arena by name: the arena should make traversal feel like weaving through traffic, not crossing a field",
           "passed": true,
-          "evidence": "'The problem is Right-Sized Arena violation' and 'the player floats in empty space — there's no geometry to weave through, no sense of speed.'"
+          "evidence": "'The problem is Right-Sized Arena violation' and 'the player floats in empty space \u2014 there's no geometry to weave through, no sense of speed.'"
         },
         {
           "text": "Recommends Asymmetric Layout with distinct navigation landmarks to create clear binary routing choices",
@@ -195,7 +199,7 @@
           "evidence": "'Add half-walls and vaultable cover that break line-of-sight without stopping movement. These create the weaving through traffic feel.'"
         },
         {
-          "text": "Explains that large arenas make combat feel slower and more disconnected, not more epic — the counter-intuitive failure mode",
+          "text": "Explains that large arenas make combat feel slower and more disconnected, not more epic \u2014 the counter-intuitive failure mode",
           "passed": true,
           "evidence": "'An oversized arena dissipates the feeling of speed because the player floats across open ground rather than weaving through geometry; the boss's aggression doesn't matter if the player can simply run away.'"
         }
@@ -203,7 +207,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "oversized-symmetric-boss-arena",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -226,17 +230,17 @@
         {
           "text": "Recommends Asymmetric Layout with distinct navigation landmarks to create clear binary routing choices",
           "passed": false,
-          "evidence": "Baseline recommends 'concentric rings of interest' — a symmetric ring structure — not an asymmetric layout with navigation landmarks."
+          "evidence": "Baseline recommends 'concentric rings of interest' \u2014 a symmetric ring structure \u2014 not an asymmetric layout with navigation landmarks."
         },
         {
           "text": "Recommends half-walls specifically as the arena element that creates line-of-sight breaks without stopping movement",
           "passed": false,
-          "evidence": "Baseline recommends 'pillars/cover that the boss can destroy' — not half-walls specifically, and no mention of line-of-sight breaks without stopping movement."
+          "evidence": "Baseline recommends 'pillars/cover that the boss can destroy' \u2014 not half-walls specifically, and no mention of line-of-sight breaks without stopping movement."
         },
         {
-          "text": "Explains that large arenas make combat feel slower and more disconnected, not more epic — the counter-intuitive failure mode",
+          "text": "Explains that large arenas make combat feel slower and more disconnected, not more epic \u2014 the counter-intuitive failure mode",
           "passed": true,
-          "evidence": "'the player spends most of their time walking toward the fight, not in the fight' — captures the counter-intuitive slowness of large arenas."
+          "evidence": "'the player spends most of their time walking toward the fight, not in the fight' \u2014 captures the counter-intuitive slowness of large arenas."
         }
       ]
     }

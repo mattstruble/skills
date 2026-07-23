@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 0,
+      "name": "flat-profile",
       "eval_name": "flat-profile",
       "prompt": "I profiled my game and there's no single hotspot — everything is around 0.5%. What should I do now?",
       "expected_output": "Recognizes the flat profile as the mature case, advises accepting it or making an architectural change rather than grinding many tiny items for a big win, and mentions measuring work-per-unit-time rather than raw throughput.",

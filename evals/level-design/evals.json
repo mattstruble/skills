@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "doorway-camping-arena-pressure",
       "prompt": "Players in my action shooter keep retreating to the doorway they entered from and sniping enemies from there. The arena has a health pickup in the corner and plenty of full-wall cover. How do I fix this?",
       "expected_output": "The doorway camping and sniping are classic arena pressure failures. Remove static health pickups from the combat space and tie health drops to enemy kills so the player must close distance to restore health. Replace full-wall cover with half-walls that redirect movement without stopping it, and ensure no geometry creates a safe stationary position — push-forward design is spatial, not just mechanical.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "scripted-encounter-no-replayability",
       "prompt": "My combat encounters feel like scripted set pieces — players learn the script after one death and just execute it on the next attempt. There's no sense of re-engaging with the encounter as a puzzle. What's wrong and how do I fix it?",
       "expected_output": "The encounter is failing the Checkpoint Test: replaying after death produces the same dominant script rather than a rearranged configuration. The fix is to replace fixed-wave scripting with encounter composition built from orthogonally differentiated enemy archetypes — one hitscan ranged unit, one slow charger, one fast flanker — whose combination creates a configuration with no single dominant approach. Prioritization choice requires that no script dominates all replays.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "oversized-symmetric-boss-arena",
       "prompt": "I'm designing a large boss arena — it's a wide open circle about 80 meters across. Playtesters say the boss fight feels slow and disconnected even though the boss is aggressive. What's going wrong spatially?",
       "expected_output": "The arena is too large and symmetric — both are anti-patterns for push-forward combat. An oversized arena dissipates the feeling of speed because the player floats across open ground rather than weaving through geometry; the boss's aggression doesn't matter if the player can simply run away. Redesign with a smaller footprint so traversal feels like weaving through traffic, make the layout asymmetric with distinct navigation landmarks (a raised platform, a chokepoint, open center), and use half-walls as line-of-sight breaks that can be cleared in a single jump without stopping movement.",
       "files": [],

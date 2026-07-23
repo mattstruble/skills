@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 0,
+      "name": "serialization-and-events",
       "eval_name": "serialization-and-events",
       "prompt": "How should I design save-game serialization and level loading? I was going to just use JSON. Also, should I build an event system / Observer to decouple my game logic?",
       "expected_output": "Explains parsing as read+validate (validate fully at load, no downstream uncertainty) with custom-binary-vs-JSON tradeoffs, gives concrete level-loading guidance (packed binary, load whole file then parse, parallelize, profile first), and offers an event-system counterpoint (queues often overrated; prefer sequential code, a thread, or deliberate polling) — framing the skepticism as Jonathan Blow's stance while keeping the durable kernels.",

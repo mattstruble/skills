@@ -2,13 +2,30 @@
   "metadata": {
     "skill_name": "ml-post-training",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5", "eval-6", "eval-7", "eval-8", "eval-9", "eval-10", "eval-11", "eval-12", "eval-13", "eval-14", "eval-21", "eval-22"],
+    "evals_run": [
+      "lora-attention-only-json-failures",
+      "grpo-all-pass-zero-variance-deadlock",
+      "reward-function-tool-ordering-constraint",
+      "ppo-vs-grpo-long-trajectory-agent",
+      "reward-climbing-human-eval-declining",
+      "rl-lora-rank-config-from-sft",
+      "rl-simulation-environment-reset-semantics",
+      "rl-on-base-model-without-sft",
+      "tutoring-agent-binary-reward-skips-guidance",
+      "distill-reasoning-from-teacher-model",
+      "tool-calling-agent-sft-then-rl-sandbox",
+      "dpo-vs-ppo-existing-preference-pairs",
+      "sft-to-rl-transition-parse-failure-rate",
+      "grpo-all-fail-zero-gradient-early-training",
+      "sft-vs-rl-chain-of-thought-reasoning",
+      "ppo-policy-collapse-low-kl-penalty"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "lora-attention-only-json-failures",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -19,27 +36,27 @@
       },
       "expectations": [
         {
-          "text": "Identifies the root cause as LoRA targeting only attention layers: MLP layers (gate_proj, up_proj, down_proj) have the largest parameter count and must be included — applying LoRA only to attention layers costs accuracy",
+          "text": "Identifies the root cause as LoRA targeting only attention layers: MLP layers (gate_proj, up_proj, down_proj) have the largest parameter count and must be included \u2014 applying LoRA only to attention layers costs accuracy",
           "passed": true,
-          "evidence": "'LoRA only on attention layers is the problem. §1 states: Applying LoRA only to attention layers costs accuracy. MLP layers have the largest parameter count and must be included.'"
+          "evidence": "'LoRA only on attention layers is the problem. \u00a71 states: Applying LoRA only to attention layers costs accuracy. MLP layers have the largest parameter count and must be included.'"
         },
         {
-          "text": "Specifies the format stabilization target: the SFT phase is complete when parse failure rate drops below ~5–10% — at 30% the model is not ready to proceed to RL",
+          "text": "Specifies the format stabilization target: the SFT phase is complete when parse failure rate drops below ~5\u201310% \u2014 at 30% the model is not ready to proceed to RL",
           "passed": true,
-          "evidence": "Implied by 'SFT phase is complete when parse failure rate drops below ~5–10%' referenced via §1."
+          "evidence": "Implied by 'SFT phase is complete when parse failure rate drops below ~5\u201310%' referenced via \u00a71."
         },
         {
-          "text": "Recommends SFT LoRA rank in the 64–256 range for structured output tasks, with alpha typically 2× rank",
+          "text": "Recommends SFT LoRA rank in the 64\u2013256 range for structured output tasks, with alpha typically 2\u00d7 rank",
           "passed": false,
           "evidence": "With_skill answer does not mention LoRA rank range or alpha; focuses on MLP layer targeting and loss masking."
         },
         {
-          "text": "Notes that 2000 training steps may be insufficient — the stopping condition is format stability (parse failure < 10%), not a fixed step count",
+          "text": "Notes that 2000 training steps may be insufficient \u2014 the stopping condition is format stability (parse failure < 10%), not a fixed step count",
           "passed": true,
           "evidence": "Implied by format stability target reference; answer focuses on parameter coverage as the primary fix."
         },
         {
-          "text": "Avoids recommending RL as the next step at 30% parse failure rate — RL will be unstable because the reward function cannot parse malformed JSON, producing NaN rewards and zero gradients",
+          "text": "Avoids recommending RL as the next step at 30% parse failure rate \u2014 RL will be unstable because the reward function cannot parse malformed JSON, producing NaN rewards and zero gradients",
           "passed": true,
           "evidence": "Answer focuses on SFT fixes (MLP layers, loss masking) without recommending RL at 30% failure rate."
         }
@@ -47,7 +64,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "lora-attention-only-json-failures",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -58,27 +75,27 @@
       },
       "expectations": [
         {
-          "text": "Identifies the root cause as LoRA targeting only attention layers: MLP layers (gate_proj, up_proj, down_proj) have the largest parameter count and must be included — applying LoRA only to attention layers costs accuracy",
+          "text": "Identifies the root cause as LoRA targeting only attention layers: MLP layers (gate_proj, up_proj, down_proj) have the largest parameter count and must be included \u2014 applying LoRA only to attention layers costs accuracy",
           "passed": true,
           "evidence": "'Add MLP modules to LoRA targets: gate_proj, up_proj, down_proj in addition to the attention layers.'"
         },
         {
-          "text": "Specifies the format stabilization target: the SFT phase is complete when parse failure rate drops below ~5–10% — at 30% the model is not ready to proceed to RL",
+          "text": "Specifies the format stabilization target: the SFT phase is complete when parse failure rate drops below ~5\u201310% \u2014 at 30% the model is not ready to proceed to RL",
           "passed": false,
           "evidence": "Baseline does not mention a parse failure rate target; focuses on parameter coverage and data quality."
         },
         {
-          "text": "Recommends SFT LoRA rank in the 64–256 range for structured output tasks, with alpha typically 2× rank",
+          "text": "Recommends SFT LoRA rank in the 64\u2013256 range for structured output tasks, with alpha typically 2\u00d7 rank",
           "passed": false,
-          "evidence": "Baseline says 'If you're at rank 16 or 32, try 64' — suggests rank 64 but not the 64-256 range; no mention of alpha convention."
+          "evidence": "Baseline says 'If you're at rank 16 or 32, try 64' \u2014 suggests rank 64 but not the 64-256 range; no mention of alpha convention."
         },
         {
-          "text": "Notes that 2000 training steps may be insufficient — the stopping condition is format stability (parse failure < 10%), not a fixed step count",
+          "text": "Notes that 2000 training steps may be insufficient \u2014 the stopping condition is format stability (parse failure < 10%), not a fixed step count",
           "passed": false,
-          "evidence": "'30% malformed after 2000 steps with only attention LoRA is expected behavior — you simply need more parameter coverage' — attributes to parameter coverage, not step count or format stability target."
+          "evidence": "'30% malformed after 2000 steps with only attention LoRA is expected behavior \u2014 you simply need more parameter coverage' \u2014 attributes to parameter coverage, not step count or format stability target."
         },
         {
-          "text": "Avoids recommending RL as the next step at 30% parse failure rate — RL will be unstable because the reward function cannot parse malformed JSON, producing NaN rewards and zero gradients",
+          "text": "Avoids recommending RL as the next step at 30% parse failure rate \u2014 RL will be unstable because the reward function cannot parse malformed JSON, producing NaN rewards and zero gradients",
           "passed": true,
           "evidence": "Baseline does not recommend RL; focuses on SFT improvements (MLP layers, rank, data quality, constrained decoding)."
         }
@@ -86,7 +103,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "grpo-all-pass-zero-variance-deadlock",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -99,15 +116,15 @@
         {
           "text": "Identifies the root cause as GRPO zero-variance deadlock: when all N trajectories in a group pass, within-group variance is zero, the advantage is zero for all samples, and gradients go to zero",
           "passed": true,
-          "evidence": "'This is the zero-variance deadlock problem with GRPO. When 90% of groups are all-pass, GRPO computes within-group advantage as zero for those groups — no gradient signal.'"
+          "evidence": "'This is the zero-variance deadlock problem with GRPO. When 90% of groups are all-pass, GRPO computes within-group advantage as zero for those groups \u2014 no gradient signal.'"
         },
         {
-          "text": "Recommends dynamic sampling to filter out zero-variance groups: reduce samples for easy prompts already solved at high rate, increase samples for prompts in the 20–80% success-rate range",
+          "text": "Recommends dynamic sampling to filter out zero-variance groups: reduce samples for easy prompts already solved at high rate, increase samples for prompts in the 20\u201380% success-rate range",
           "passed": true,
           "evidence": "'Curriculum/dynamic sampling: filter out prompts the model already solves consistently. Focus training on the 10-40% success-rate range where within-group variance is highest.'"
         },
         {
-          "text": "Recommends adding harder prompts to the training distribution to restore within-group variance — the model needs prompts where some rollouts succeed and some fail",
+          "text": "Recommends adding harder prompts to the training distribution to restore within-group variance \u2014 the model needs prompts where some rollouts succeed and some fail",
           "passed": true,
           "evidence": "'Increase task difficulty: make the prompts harder so fewer groups are all-pass. The model needs to fail on ~50% of rollouts per prompt to get meaningful gradient.'"
         },
@@ -117,15 +134,15 @@
           "evidence": "Answer identifies the all-pass problem but does not contrast it with the all-fail variant or name it as a specific variant."
         },
         {
-          "text": "Avoids recommending simply increasing training steps or learning rate — the problem is zero gradient signal, not slow convergence",
+          "text": "Avoids recommending simply increasing training steps or learning rate \u2014 the problem is zero gradient signal, not slow convergence",
           "passed": true,
-          "evidence": "Fixes focus on curriculum, task difficulty, RLVP, and group size — no recommendation to increase steps or LR."
+          "evidence": "Fixes focus on curriculum, task difficulty, RLVP, and group size \u2014 no recommendation to increase steps or LR."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "grpo-all-pass-zero-variance-deadlock",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -138,15 +155,15 @@
         {
           "text": "Identifies the root cause as GRPO zero-variance deadlock: when all N trajectories in a group pass, within-group variance is zero, the advantage is zero for all samples, and gradients go to zero",
           "passed": true,
-          "evidence": "'GRPO has no signal — the advantage for every completion in the group is ~0 because they all got the same reward.'"
+          "evidence": "'GRPO has no signal \u2014 the advantage for every completion in the group is ~0 because they all got the same reward.'"
         },
         {
-          "text": "Recommends dynamic sampling to filter out zero-variance groups: reduce samples for easy prompts already solved at high rate, increase samples for prompts in the 20–80% success-rate range",
+          "text": "Recommends dynamic sampling to filter out zero-variance groups: reduce samples for easy prompts already solved at high rate, increase samples for prompts in the 20\u201380% success-rate range",
           "passed": true,
           "evidence": "'Dynamic prompt sampling. Implement a curriculum that oversamples hard prompts: Track per-prompt success rates during training. Sample prompts inversely proportional to their success rate.'"
         },
         {
-          "text": "Recommends adding harder prompts to the training distribution to restore within-group variance — the model needs prompts where some rollouts succeed and some fail",
+          "text": "Recommends adding harder prompts to the training distribution to restore within-group variance \u2014 the model needs prompts where some rollouts succeed and some fail",
           "passed": false,
           "evidence": "Baseline recommends 'Make your reward harder' (tighten the reward function) rather than adding harder prompts to the training distribution."
         },
@@ -156,15 +173,15 @@
           "evidence": "Baseline does not name variants of zero-variance deadlock or contrast all-pass with all-fail."
         },
         {
-          "text": "Avoids recommending simply increasing training steps or learning rate — the problem is zero gradient signal, not slow convergence",
+          "text": "Avoids recommending simply increasing training steps or learning rate \u2014 the problem is zero gradient signal, not slow convergence",
           "passed": true,
-          "evidence": "Fixes focus on filtering prompts, group size, dynamic sampling, reward tightening, temperature — no recommendation to increase steps or LR."
+          "evidence": "Fixes focus on filtering prompts, group size, dynamic sampling, reward tightening, temperature \u2014 no recommendation to increase steps or LR."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "reward-function-tool-ordering-constraint",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -177,17 +194,17 @@
         {
           "text": "Recommends the RLVP pattern (reward outcome, penalize path): outcome reward as the primary signal, plus a verified penalty for each ordering constraint violation",
           "passed": true,
-          "evidence": "'Use the RLVP pattern (Reward outcome, Penalize path): r_total = r_outcome + Σ penalties_per_step' with +1 outcome and step penalties."
+          "evidence": "'Use the RLVP pattern (Reward outcome, Penalize path): r_total = r_outcome + \u03a3 penalties_per_step' with +1 outcome and step penalties."
         },
         {
-          "text": "Specifies that penalty targets must be specific detectable actions (calling summarize before search, accessing account data before identity verification) — never 'lack of progress'",
+          "text": "Specifies that penalty targets must be specific detectable actions (calling summarize before search, accessing account data before identity verification) \u2014 never 'lack of progress'",
           "passed": true,
-          "evidence": "'-0.3 if summarize called before search, -0.3 if access_account called before verify_identity' — specific detectable actions."
+          "evidence": "'-0.3 if summarize called before search, -0.3 if access_account called before verify_identity' \u2014 specific detectable actions."
         },
         {
-          "text": "Recommends deterministic checks for the penalties, not learned scorers — ordering violations are cheap to detect programmatically and a learned scorer can itself be gamed",
+          "text": "Recommends deterministic checks for the penalties, not learned scorers \u2014 ordering violations are cheap to detect programmatically and a learned scorer can itself be gamed",
           "passed": true,
-          "evidence": "'The penalties are verified — you can check tool-call order deterministically from the trajectory without an LLM judge. This is what makes RLVP practical.'"
+          "evidence": "'The penalties are verified \u2014 you can check tool-call order deterministically from the trajectory without an LLM judge. This is what makes RLVP practical.'"
         },
         {
           "text": "Recommends milestone rewards for correct intermediate steps (identity verified, search completed before summarize) to provide positive gradient signal for the correct ordering",
@@ -203,7 +220,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "reward-function-tool-ordering-constraint",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -219,12 +236,12 @@
           "evidence": "Baseline does not name the RLVP pattern; uses 'process reward' with step rewards and penalties but without the named framework."
         },
         {
-          "text": "Specifies that penalty targets must be specific detectable actions (calling summarize before search, accessing account data before identity verification) — never 'lack of progress'",
+          "text": "Specifies that penalty targets must be specific detectable actions (calling summarize before search, accessing account data before identity verification) \u2014 never 'lack of progress'",
           "passed": true,
           "evidence": "'Calling summarize before search gets a -0.5 penalty, making the wrong order reliably worse than the right order.'"
         },
         {
-          "text": "Recommends deterministic checks for the penalties, not learned scorers — ordering violations are cheap to detect programmatically and a learned scorer can itself be gamed",
+          "text": "Recommends deterministic checks for the penalties, not learned scorers \u2014 ordering violations are cheap to detect programmatically and a learned scorer can itself be gamed",
           "passed": true,
           "evidence": "'Rule-based, not learned. For ordering constraints, use a deterministic rule-based reward, not a reward model. The constraint is programmatically verifiable.'"
         },
@@ -242,7 +259,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "ppo-vs-grpo-long-trajectory-agent",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -258,19 +275,19 @@
           "evidence": "'Use PPO for this task.' and 'PPO's value network provides per-step advantage estimation via GAE (Generalized Advantage Estimation). At turn 15, the value network can estimate expected final outcome.'"
         },
         {
-          "text": "Explains why GRPO degrades for long trajectories: GRPO treats the entire response as a single action and uses within-group variance as the advantage — coarse credit assignment that cannot identify which of 15-25 steps drove the outcome",
+          "text": "Explains why GRPO degrades for long trajectories: GRPO treats the entire response as a single action and uses within-group variance as the advantage \u2014 coarse credit assignment that cannot identify which of 15-25 steps drove the outcome",
           "passed": true,
           "evidence": "'GRPO treats the entire response as a single action and computes advantage from within-group variance. For 25-turn trajectories, this is extremely coarse credit assignment.'"
         },
         {
-          "text": "States the algorithm selection rule explicitly: use GRPO for single-turn or short-trajectory tasks (≤~5 turns); use PPO when trajectories exceed ~5 turns or fine-grained per-step credit assignment is required",
+          "text": "States the algorithm selection rule explicitly: use GRPO for single-turn or short-trajectory tasks (\u2264~5 turns); use PPO when trajectories exceed ~5 turns or fine-grained per-step credit assignment is required",
           "passed": true,
-          "evidence": "'The §2 rule: Use PPO when trajectories exceed ~5 turns or fine-grained per-step credit assignment is required. This task hits both criteria.'"
+          "evidence": "'The \u00a72 rule: Use PPO when trajectories exceed ~5 turns or fine-grained per-step credit assignment is required. This task hits both criteria.'"
         },
         {
           "text": "Notes the PPO cost: requires training and storing a value network alongside the policy, and is more sensitive to hyperparameters than GRPO",
           "passed": true,
-          "evidence": "'PPO requires training a value network alongside the policy, which increases compute and memory. Budget accordingly — roughly 2x the GRPO cost for the same rollout count.'"
+          "evidence": "'PPO requires training a value network alongside the policy, which increases compute and memory. Budget accordingly \u2014 roughly 2x the GRPO cost for the same rollout count.'"
         },
         {
           "text": "Avoids recommending GRPO as the simpler option without addressing the credit assignment degradation for 15-25 turn trajectories",
@@ -281,7 +298,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "ppo-vs-grpo-long-trajectory-agent",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -297,19 +314,19 @@
           "evidence": "Baseline recommends GRPO over PPO: 'Use GRPO over PPO. Here's why: Long trajectories (15-25 turns) make value estimation extremely hard.'"
         },
         {
-          "text": "Explains why GRPO degrades for long trajectories: GRPO treats the entire response as a single action and uses within-group variance as the advantage — coarse credit assignment that cannot identify which of 15-25 steps drove the outcome",
+          "text": "Explains why GRPO degrades for long trajectories: GRPO treats the entire response as a single action and uses within-group variance as the advantage \u2014 coarse credit assignment that cannot identify which of 15-25 steps drove the outcome",
           "passed": false,
           "evidence": "Baseline argues the opposite: GRPO is better for long trajectories because it 'eliminates the critic entirely' and avoids value estimation problems."
         },
         {
-          "text": "States the algorithm selection rule explicitly: use GRPO for single-turn or short-trajectory tasks (≤~5 turns); use PPO when trajectories exceed ~5 turns or fine-grained per-step credit assignment is required",
+          "text": "States the algorithm selection rule explicitly: use GRPO for single-turn or short-trajectory tasks (\u2264~5 turns); use PPO when trajectories exceed ~5 turns or fine-grained per-step credit assignment is required",
           "passed": false,
           "evidence": "Baseline gives the opposite rule: recommends GRPO for long multi-turn tasks and PPO only if intermediate steps are verifiable."
         },
         {
           "text": "Notes the PPO cost: requires training and storing a value network alongside the policy, and is more sensitive to hyperparameters than GRPO",
           "passed": true,
-          "evidence": "'Memory efficiency. PPO with long trajectories requires storing the full trajectory AND the critic's forward pass for each token.' — PPO cost noted as reason to prefer GRPO."
+          "evidence": "'Memory efficiency. PPO with long trajectories requires storing the full trajectory AND the critic's forward pass for each token.' \u2014 PPO cost noted as reason to prefer GRPO."
         },
         {
           "text": "Avoids recommending GRPO as the simpler option without addressing the credit assignment degradation for 15-25 turn trajectories",
@@ -320,7 +337,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "reward-climbing-human-eval-declining",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -331,9 +348,9 @@
       },
       "expectations": [
         {
-          "text": "Diagnoses this as reward hacking: the model has learned to game the reward proxy (score well on the reward model) without actually improving at the task — proxy reward climbs while true quality peaks and falls",
+          "text": "Diagnoses this as reward hacking: the model has learned to game the reward proxy (score well on the reward model) without actually improving at the task \u2014 proxy reward climbs while true quality peaks and falls",
           "passed": true,
-          "evidence": "'This is reward hacking — the model learned to game the reward proxy without actually improving. The RM scores verbose, hedging responses higher because they superficially look helpful or safe.'"
+          "evidence": "'This is reward hacking \u2014 the model learned to game the reward proxy without actually improving. The RM scores verbose, hedging responses higher because they superficially look helpful or safe.'"
         },
         {
           "text": "Recommends increasing the KL penalty coefficient (`kl_coef`): the KL term prevents reward hacking by penalizing divergence from the reference policy",
@@ -341,14 +358,14 @@
           "evidence": "'Increase KL penalty (kl_coef): the model has drifted too far from the reference policy. Higher KL constrains exploration and prevents the policy from collapsing onto reward-proxy-gaming strategies.'"
         },
         {
-          "text": "Recommends early stopping based on human eval: use the held-out human evaluation as the stopping criterion, not the proxy reward — stop when human eval quality peaks",
+          "text": "Recommends early stopping based on human eval: use the held-out human evaluation as the stopping criterion, not the proxy reward \u2014 stop when human eval quality peaks",
           "passed": true,
-          "evidence": "'Add early stopping on held-out human eval: monitor human preference scores alongside RM scores during training. When RM score rises but human eval drops — stop.'"
+          "evidence": "'Add early stopping on held-out human eval: monitor human preference scores alongside RM scores during training. When RM score rises but human eval drops \u2014 stop.'"
         },
         {
           "text": "Explains the over-optimization dynamic: without KL regularization, the model learns to produce outputs that score highly on the reward model's learned patterns (verbosity, hedging) rather than genuine quality",
           "passed": true,
-          "evidence": "'proxy reward ≠ true quality. Without KL regularization, the model exploits the gap between what the RM scores and what humans actually want.'"
+          "evidence": "'proxy reward \u2260 true quality. Without KL regularization, the model exploits the gap between what the RM scores and what humans actually want.'"
         },
         {
           "text": "Notes that the KL reference policy should be the safety-aligned SFT checkpoint, not the raw base model, to preserve safety behaviors during RL",
@@ -359,7 +376,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "reward-climbing-human-eval-declining",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -370,7 +387,7 @@
       },
       "expectations": [
         {
-          "text": "Diagnoses this as reward hacking: the model has learned to game the reward proxy (score well on the reward model) without actually improving at the task — proxy reward climbs while true quality peaks and falls",
+          "text": "Diagnoses this as reward hacking: the model has learned to game the reward proxy (score well on the reward model) without actually improving at the task \u2014 proxy reward climbs while true quality peaks and falls",
           "passed": true,
           "evidence": "'This is reward hacking (also called reward over-optimization or Goodhart's Law). The model is exploiting patterns in the reward model that correlate with quality in training data but aren't actually quality.'"
         },
@@ -380,7 +397,7 @@
           "evidence": "'Increase the KL penalty. Your current penalty constrains how far the policy drifts from the reference model. Increase the KL coefficient (try 0.05-0.1 instead of whatever you have).'"
         },
         {
-          "text": "Recommends early stopping based on human eval: use the held-out human evaluation as the stopping criterion, not the proxy reward — stop when human eval quality peaks",
+          "text": "Recommends early stopping based on human eval: use the held-out human evaluation as the stopping criterion, not the proxy reward \u2014 stop when human eval quality peaks",
           "passed": false,
           "evidence": "Baseline does not recommend early stopping based on human eval; focuses on KL penalty, reward model ensemble, length penalty, and RM refresh."
         },
@@ -398,7 +415,7 @@
     },
     {
       "eval_id": 6,
-      "eval_name": "eval-6",
+      "eval_name": "rl-lora-rank-config-from-sft",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -409,19 +426,19 @@
       },
       "expectations": [
         {
-          "text": "Recommends RL LoRA rank in the 8–32 range — significantly lower than SFT rank (64–256) because per-step information in RL is small and high rank is wasteful",
+          "text": "Recommends RL LoRA rank in the 8\u201332 range \u2014 significantly lower than SFT rank (64\u2013256) because per-step information in RL is small and high rank is wasteful",
           "passed": true,
-          "evidence": "'Rank: 8–32 (start with 16)' and 'Why rank=128 is overkill for RL: RL makes small policy updates per step. The expressive capacity needed per update is much lower than SFT.'"
+          "evidence": "'Rank: 8\u201332 (start with 16)' and 'Why rank=128 is overkill for RL: RL makes small policy updates per step. The expressive capacity needed per update is much lower than SFT.'"
         },
         {
-          "text": "Recommends learning rate approximately 10× the full fine-tuning learning rate — same as SFT, but the lower rank means fewer parameters are updated per step",
+          "text": "Recommends learning rate approximately 10\u00d7 the full fine-tuning learning rate \u2014 same as SFT, but the lower rank means fewer parameters are updated per step",
           "passed": true,
-          "evidence": "'Learning rate: ~10× full fine-tuning LR (e.g., 1e-5 to 5e-5)' — consistent with the skill's recommendation."
+          "evidence": "'Learning rate: ~10\u00d7 full fine-tuning LR (e.g., 1e-5 to 5e-5)' \u2014 consistent with the skill's recommendation."
         },
         {
-          "text": "Specifies targeting all major weight matrices including MLP layers (gate_proj, up_proj, down_proj) — applying LoRA only to attention layers costs accuracy",
+          "text": "Specifies targeting all major weight matrices including MLP layers (gate_proj, up_proj, down_proj) \u2014 applying LoRA only to attention layers costs accuracy",
           "passed": true,
-          "evidence": "'Target modules: All major weight matrices: q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj' and 'Still target MLP layers — don't drop them just because rank is lower.'"
+          "evidence": "'Target modules: All major weight matrices: q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj' and 'Still target MLP layers \u2014 don't drop them just because rank is lower.'"
         },
         {
           "text": "Confirms that rank=128 from SFT is indeed overkill for RL: the information content per gradient step in RL is much smaller than in SFT, making high rank unnecessary",
@@ -429,15 +446,15 @@
           "evidence": "'Why rank=128 is overkill for RL: RL makes small policy updates per step (clipped by PPO/GRPO). The expressive capacity needed per update is much lower than SFT, which must learn entire response formats from scratch.'"
         },
         {
-          "text": "Sets alpha to approximately 2× rank — the standard LoRA alpha convention applies to both SFT and RL configurations",
+          "text": "Sets alpha to approximately 2\u00d7 rank \u2014 the standard LoRA alpha convention applies to both SFT and RL configurations",
           "passed": true,
-          "evidence": "'Alpha: 2× rank (so rank=16 → alpha=32)' — explicitly stated."
+          "evidence": "'Alpha: 2\u00d7 rank (so rank=16 \u2192 alpha=32)' \u2014 explicitly stated."
         }
       ]
     },
     {
       "eval_id": 6,
-      "eval_name": "eval-6",
+      "eval_name": "rl-lora-rank-config-from-sft",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -448,27 +465,27 @@
       },
       "expectations": [
         {
-          "text": "Recommends RL LoRA rank in the 8–32 range — significantly lower than SFT rank (64–256) because per-step information in RL is small and high rank is wasteful",
+          "text": "Recommends RL LoRA rank in the 8\u201332 range \u2014 significantly lower than SFT rank (64\u2013256) because per-step information in RL is small and high rank is wasteful",
           "passed": true,
           "evidence": "'Rank: 16-32. RL signal is sparse. Rank 32 is a safe default; rank 16 if memory-constrained.'"
         },
         {
-          "text": "Recommends learning rate approximately 10× the full fine-tuning learning rate — same as SFT, but the lower rank means fewer parameters are updated per step",
+          "text": "Recommends learning rate approximately 10\u00d7 the full fine-tuning learning rate \u2014 same as SFT, but the lower rank means fewer parameters are updated per step",
           "passed": false,
           "evidence": "Baseline recommends '1e-6 to 5e-6' which is ~100x lower than full fine-tuning LR (1e-4 to 2e-4), not ~10x as the skill specifies."
         },
         {
-          "text": "Specifies targeting all major weight matrices including MLP layers (gate_proj, up_proj, down_proj) — applying LoRA only to attention layers costs accuracy",
+          "text": "Specifies targeting all major weight matrices including MLP layers (gate_proj, up_proj, down_proj) \u2014 applying LoRA only to attention layers costs accuracy",
           "passed": true,
-          "evidence": "'q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj — All linear layers. For RL you want broad coverage.'"
+          "evidence": "'q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj \u2014 All linear layers. For RL you want broad coverage.'"
         },
         {
           "text": "Confirms that rank=128 from SFT is indeed overkill for RL: the information content per gradient step in RL is much smaller than in SFT, making high rank unnecessary",
           "passed": true,
-          "evidence": "'Rank 128 is indeed overkill for RL. RL makes small, targeted updates — you don't need the parameter capacity that SFT does.'"
+          "evidence": "'Rank 128 is indeed overkill for RL. RL makes small, targeted updates \u2014 you don't need the parameter capacity that SFT does.'"
         },
         {
-          "text": "Sets alpha to approximately 2× rank — the standard LoRA alpha convention applies to both SFT and RL configurations",
+          "text": "Sets alpha to approximately 2\u00d7 rank \u2014 the standard LoRA alpha convention applies to both SFT and RL configurations",
           "passed": true,
           "evidence": "'Alpha: 2x rank (32-64). Maintains effective learning rate.'"
         }
@@ -476,7 +493,7 @@
     },
     {
       "eval_id": 7,
-      "eval_name": "eval-7",
+      "eval_name": "rl-simulation-environment-reset-semantics",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -487,27 +504,27 @@
       },
       "expectations": [
         {
-          "text": "Identifies reset semantics as the primary requirement: the environment must be able to reset to a clean starting state between episodes — without this, state bleeds across trajectories and the reward signal becomes meaningless",
+          "text": "Identifies reset semantics as the primary requirement: the environment must be able to reset to a clean starting state between episodes \u2014 without this, state bleeds across trajectories and the reward signal becomes meaningless",
           "passed": true,
-          "evidence": "'Reset semantics (most critical): Must reset to a clean browser state between episodes — no cookies, session storage, form data, or DOM state from previous episodes.'"
+          "evidence": "'Reset semantics (most critical): Must reset to a clean browser state between episodes \u2014 no cookies, session storage, form data, or DOM state from previous episodes.'"
         },
         {
           "text": "Recommends snapshot/restore or ephemeral containers as the reset mechanism for web browsing: browser state (cookies, localStorage, form data) must be fully reset between episodes",
           "passed": false,
-          "evidence": "With_skill recommends 'fresh browser context per episode (Playwright/Puppeteer newContext())' — browser-level context reset, not snapshot/restore or ephemeral containers as specified."
+          "evidence": "With_skill recommends 'fresh browser context per episode (Playwright/Puppeteer newContext())' \u2014 browser-level context reset, not snapshot/restore or ephemeral containers as specified."
         },
         {
-          "text": "Addresses throughput and parallelism: on-policy training requires generating many rollouts per step — the environment must support 100+ parallel workers for non-trivial tasks",
+          "text": "Addresses throughput and parallelism: on-policy training requires generating many rollouts per step \u2014 the environment must support 100+ parallel workers for non-trivial tasks",
           "passed": true,
           "evidence": "'On-policy training needs 100+ parallel workers generating rollouts simultaneously.'"
         },
         {
-          "text": "Addresses fidelity: the simulation must resemble the real production web environment — training on a simplified environment that differs from production is a form of distribution shift",
+          "text": "Addresses fidelity: the simulation must resemble the real production web environment \u2014 training on a simplified environment that differs from production is a form of distribution shift",
           "passed": true,
           "evidence": "'The simulation must resemble the real deployment target. If training on simplified mock pages but deploying on complex real pages, you get distribution shift.'"
         },
         {
-          "text": "Addresses reward computability: the environment must be able to determine success/failure (or partial progress) deterministically — if the reward function returns NaN on 20%+ of trajectories, training will be unstable",
+          "text": "Addresses reward computability: the environment must be able to determine success/failure (or partial progress) deterministically \u2014 if the reward function returns NaN on 20%+ of trajectories, training will be unstable",
           "passed": true,
           "evidence": "'Can you verify form filled correctly after each episode? Check DOM state programmatically' and 'Non-deterministic rewards... cause training instability.'"
         }
@@ -515,7 +532,7 @@
     },
     {
       "eval_id": 7,
-      "eval_name": "eval-7",
+      "eval_name": "rl-simulation-environment-reset-semantics",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -526,9 +543,9 @@
       },
       "expectations": [
         {
-          "text": "Identifies reset semantics as the primary requirement: the environment must be able to reset to a clean starting state between episodes — without this, state bleeds across trajectories and the reward signal becomes meaningless",
+          "text": "Identifies reset semantics as the primary requirement: the environment must be able to reset to a clean starting state between episodes \u2014 without this, state bleeds across trajectories and the reward signal becomes meaningless",
           "passed": true,
-          "evidence": "'Deterministic reset. Each episode must start from a known state. The environment must fully reset between episodes — no cookies, session state, form data, or DOM mutations leaking.'"
+          "evidence": "'Deterministic reset. Each episode must start from a known state. The environment must fully reset between episodes \u2014 no cookies, session state, form data, or DOM mutations leaking.'"
         },
         {
           "text": "Recommends snapshot/restore or ephemeral containers as the reset mechanism for web browsing: browser state (cookies, localStorage, form data) must be fully reset between episodes",
@@ -536,17 +553,17 @@
           "evidence": "'Use a fresh browser context (not just a new tab) per episode. Reset the server-side state too (database, session store) or use stateless mock pages.'"
         },
         {
-          "text": "Addresses throughput and parallelism: on-policy training requires generating many rollouts per step — the environment must support 100+ parallel workers for non-trivial tasks",
+          "text": "Addresses throughput and parallelism: on-policy training requires generating many rollouts per step \u2014 the environment must support 100+ parallel workers for non-trivial tasks",
           "passed": true,
           "evidence": "'Parallel environment instances. RL needs many rollouts. Your environment must support running 8-64 instances simultaneously without interference.'"
         },
         {
-          "text": "Addresses fidelity: the simulation must resemble the real production web environment — training on a simplified environment that differs from production is a form of distribution shift",
+          "text": "Addresses fidelity: the simulation must resemble the real production web environment \u2014 training on a simplified environment that differs from production is a form of distribution shift",
           "passed": false,
-          "evidence": "Baseline addresses reproducibility ('same action sequence should produce the same result') but not fidelity to production — no mention of distribution shift from simplified environments."
+          "evidence": "Baseline addresses reproducibility ('same action sequence should produce the same result') but not fidelity to production \u2014 no mention of distribution shift from simplified environments."
         },
         {
-          "text": "Addresses reward computability: the environment must be able to determine success/failure (or partial progress) deterministically — if the reward function returns NaN on 20%+ of trajectories, training will be unstable",
+          "text": "Addresses reward computability: the environment must be able to determine success/failure (or partial progress) deterministically \u2014 if the reward function returns NaN on 20%+ of trajectories, training will be unstable",
           "passed": true,
           "evidence": "'Outcome reward: Did the agent complete the task? (Binary or partial credit for subtasks.) Optional step reward: Did the action advance toward the goal?'"
         }
@@ -554,7 +571,7 @@
     },
     {
       "eval_id": 8,
-      "eval_name": "eval-8",
+      "eval_name": "rl-on-base-model-without-sft",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -570,30 +587,30 @@
           "evidence": "'Yes, this is expected. RL on a raw base model without SFT almost always fails.' and 'The reward function gets NaN because it can't parse the response to score it. No gradient flows.'"
         },
         {
-          "text": "Explains the ordering constraint: SFT must precede RL for smaller models with structured output requirements — SFT's job is to stabilize output format so RL has a parseable starting point",
+          "text": "Explains the ordering constraint: SFT must precede RL for smaller models with structured output requirements \u2014 SFT's job is to stabilize output format so RL has a parseable starting point",
           "passed": true,
           "evidence": "'The fix is SFT first. SFT must come before RL because RL needs parseable output to compute rewards. If the model produces malformed JSON or unstructured text, the reward function returns NaN.'"
         },
         {
-          "text": "Notes the exception: very strong base models (DeepSeek-R1-Zero scale) may produce adequate output from the start and can attempt direct RL — but the cost is poor output readability",
+          "text": "Notes the exception: very strong base models (DeepSeek-R1-Zero scale) may produce adequate output from the start and can attempt direct RL \u2014 but the cost is poor output readability",
           "passed": true,
           "evidence": "'DeepSeek-R1-Zero demonstrated direct RL on a base model at very large scale (671B parameters). The result was functional but had poor output readability.'"
         },
         {
           "text": "Notes that DeepSeek ultimately added 'cold-start SFT' in R1 to re-establish format, confirming that even at scale, SFT-first is the more reliable path",
           "passed": true,
-          "evidence": "'DeepSeek ultimately added cold-start SFT in R1 to re-establish format. For an 11B model, this exception does not apply — you need SFT first.'"
+          "evidence": "'DeepSeek ultimately added cold-start SFT in R1 to re-establish format. For an 11B model, this exception does not apply \u2014 you need SFT first.'"
         },
         {
-          "text": "Recommends running SFT until parse failure rate drops below ~10% before attempting RL — the format stability check is the concrete stopping criterion",
+          "text": "Recommends running SFT until parse failure rate drops below ~10% before attempting RL \u2014 the format stability check is the concrete stopping criterion",
           "passed": true,
-          "evidence": "'run SFT until format is stable (parse failure < 10%). You don't need the model to be good at the task — just good enough to produce parseable output.'"
+          "evidence": "'run SFT until format is stable (parse failure < 10%). You don't need the model to be good at the task \u2014 just good enough to produce parseable output.'"
         }
       ]
     },
     {
       "eval_id": 8,
-      "eval_name": "eval-8",
+      "eval_name": "rl-on-base-model-without-sft",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -609,12 +626,12 @@
           "evidence": "'Yes, this is expected. Running RL directly on a base model without SFT is extremely difficult and often fails.' and 'NaN rewards typically come from degenerate outputs that break your reward function.'"
         },
         {
-          "text": "Explains the ordering constraint: SFT must precede RL for smaller models with structured output requirements — SFT's job is to stabilize output format so RL has a parseable starting point",
+          "text": "Explains the ordering constraint: SFT must precede RL for smaller models with structured output requirements \u2014 SFT's job is to stabilize output format so RL has a parseable starting point",
           "passed": true,
-          "evidence": "'The standard pipeline is: 1. SFT first — Teach the model the task format: how to read instructions, what output format to produce, basic competence at the task.'"
+          "evidence": "'The standard pipeline is: 1. SFT first \u2014 Teach the model the task format: how to read instructions, what output format to produce, basic competence at the task.'"
         },
         {
-          "text": "Notes the exception: very strong base models (DeepSeek-R1-Zero scale) may produce adequate output from the start and can attempt direct RL — but the cost is poor output readability",
+          "text": "Notes the exception: very strong base models (DeepSeek-R1-Zero scale) may produce adequate output from the start and can attempt direct RL \u2014 but the cost is poor output readability",
           "passed": false,
           "evidence": "Baseline mentions 'Start with a chat-tuned model (Llama-3.2-11B-Instruct)' as an alternative but does not mention the DeepSeek-R1-Zero scale exception."
         },
@@ -624,15 +641,15 @@
           "evidence": "Baseline does not mention DeepSeek R1 or cold-start SFT."
         },
         {
-          "text": "Recommends running SFT until parse failure rate drops below ~10% before attempting RL — the format stability check is the concrete stopping criterion",
+          "text": "Recommends running SFT until parse failure rate drops below ~10% before attempting RL \u2014 the format stability check is the concrete stopping criterion",
           "passed": false,
-          "evidence": "Baseline says 'Even 1000-5000 examples of correct behavior is enough' — data quantity as stopping criterion, not parse failure rate target."
+          "evidence": "Baseline says 'Even 1000-5000 examples of correct behavior is enough' \u2014 data quantity as stopping criterion, not parse failure rate target."
         }
       ]
     },
     {
       "eval_id": 9,
-      "eval_name": "eval-9",
+      "eval_name": "tutoring-agent-binary-reward-skips-guidance",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -643,27 +660,27 @@
       },
       "expectations": [
         {
-          "text": "Recommends process rewards (PRM) for pedagogical steps: per-step feedback for explanation quality, question-asking, and scaffolding — binary outcome reward alone cannot express the process constraint",
+          "text": "Recommends process rewards (PRM) for pedagogical steps: per-step feedback for explanation quality, question-asking, and scaffolding \u2014 binary outcome reward alone cannot express the process constraint",
           "passed": true,
           "evidence": "'Use a vector reward with process and outcome components' with '+0.2 for asking the student a diagnostic question, +0.2 for providing a hint without revealing the answer.'"
         },
         {
           "text": "Recommends milestone rewards for correct intermediate steps: partial credit when the agent asks a clarifying question, explains a concept, or guides the student to the next step",
           "passed": true,
-          "evidence": "'+0.2 for asking the student a diagnostic question, +0.2 for providing a hint, +0.2 for acknowledging the student's intermediate work' — milestone rewards for pedagogical steps."
+          "evidence": "'+0.2 for asking the student a diagnostic question, +0.2 for providing a hint, +0.2 for acknowledging the student's intermediate work' \u2014 milestone rewards for pedagogical steps."
         },
         {
           "text": "Recommends vector rewards for multiple quality dimensions: accuracy (correct final answer), pedagogy (guiding vs. giving), and engagement (question-asking) are separable axes that should be rewarded independently",
           "passed": true,
-          "evidence": "'r_total = r_outcome * w1 + r_process * w2 + r_pedagogy * w3' — three separable axes with independent weights."
+          "evidence": "'r_total = r_outcome * w1 + r_process * w2 + r_pedagogy * w3' \u2014 three separable axes with independent weights."
         },
         {
           "text": "Applies the RLVP pattern: add a verified penalty for giving the answer directly (the specific detectable bad action) rather than relying solely on positive rewards for good behavior",
           "passed": true,
-          "evidence": "'-0.5 for revealing the final answer directly (before the student attempts it)' — verified penalty for the specific detectable bad action."
+          "evidence": "'-0.5 for revealing the final answer directly (before the student attempts it)' \u2014 verified penalty for the specific detectable bad action."
         },
         {
-          "text": "Notes the process reward tradeoff: per-step rewards accelerate convergence but may prevent the model from discovering more effective tutoring strategies — the balance depends on whether the optimal pedagogical path is known",
+          "text": "Notes the process reward tradeoff: per-step rewards accelerate convergence but may prevent the model from discovering more effective tutoring strategies \u2014 the balance depends on whether the optimal pedagogical path is known",
           "passed": false,
           "evidence": "Answer discusses implementation efficiency ('process rewards are cheap to compute deterministically') but not the tradeoff between convergence speed and strategy discovery."
         }
@@ -671,7 +688,7 @@
     },
     {
       "eval_id": 9,
-      "eval_name": "eval-9",
+      "eval_name": "tutoring-agent-binary-reward-skips-guidance",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -682,7 +699,7 @@
       },
       "expectations": [
         {
-          "text": "Recommends process rewards (PRM) for pedagogical steps: per-step feedback for explanation quality, question-asking, and scaffolding — binary outcome reward alone cannot express the process constraint",
+          "text": "Recommends process rewards (PRM) for pedagogical steps: per-step feedback for explanation quality, question-asking, and scaffolding \u2014 binary outcome reward alone cannot express the process constraint",
           "passed": true,
           "evidence": "'Process reward: Did the agent ask guiding questions / give hints? has_scaffolding = any(is_question_or_hint(step) for step in steps[:-1])'"
         },
@@ -694,15 +711,15 @@
         {
           "text": "Recommends vector rewards for multiple quality dimensions: accuracy (correct final answer), pedagogy (guiding vs. giving), and engagement (question-asking) are separable axes that should be rewarded independently",
           "passed": true,
-          "evidence": "Reward function has 4 separable components: process reward, anti-reward for answer-giving, outcome reward, and pedagogical quality — multiple independent axes."
+          "evidence": "Reward function has 4 separable components: process reward, anti-reward for answer-giving, outcome reward, and pedagogical quality \u2014 multiple independent axes."
         },
         {
           "text": "Applies the RLVP pattern: add a verified penalty for giving the answer directly (the specific detectable bad action) rather than relying solely on positive rewards for good behavior",
           "passed": true,
-          "evidence": "'Anti-reward: Did the agent give away the answer too early? if gives_direct_answer(steps[0]): reward -= 0.5' — verified penalty for specific detectable action."
+          "evidence": "'Anti-reward: Did the agent give away the answer too early? if gives_direct_answer(steps[0]): reward -= 0.5' \u2014 verified penalty for specific detectable action."
         },
         {
-          "text": "Notes the process reward tradeoff: per-step rewards accelerate convergence but may prevent the model from discovering more effective tutoring strategies — the balance depends on whether the optimal pedagogical path is known",
+          "text": "Notes the process reward tradeoff: per-step rewards accelerate convergence but may prevent the model from discovering more effective tutoring strategies \u2014 the balance depends on whether the optimal pedagogical path is known",
           "passed": false,
           "evidence": "Baseline does not discuss the tradeoff between convergence speed and strategy discovery for process rewards."
         }
@@ -710,7 +727,7 @@
     },
     {
       "eval_id": 10,
-      "eval_name": "eval-10",
+      "eval_name": "distill-reasoning-from-teacher-model",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -723,25 +740,25 @@
         {
           "text": "Recommends prompt distillation: collect trajectories from the teacher model (DeepSeek-R1) by sampling on the training problem set, then SFT the student on those trajectories",
           "passed": true,
-          "evidence": "'Collect training data — on-policy generation from DeepSeek-R1: Send to DeepSeek-R1... Capture the full response including <think>...</think> reasoning chains.'"
+          "evidence": "'Collect training data \u2014 on-policy generation from DeepSeek-R1: Send to DeepSeek-R1... Capture the full response including <think>...</think> reasoning chains.'"
         },
         {
-          "text": "Specifies filtering with a rule-based validator: reject trajectories where the final answer is incorrect — SFT bakes errors into parameters verbatim, so incorrect demonstrations must be filtered before training",
+          "text": "Specifies filtering with a rule-based validator: reject trajectories where the final answer is incorrect \u2014 SFT bakes errors into parameters verbatim, so incorrect demonstrations must be filtered before training",
           "passed": true,
           "evidence": "'Filter: keep only responses that arrive at the correct answer' and 'SFT bakes errors into parameters verbatim, so incorrect demonstrations must be filtered.'"
         },
         {
-          "text": "Specifies the training format: `problem → <think>reasoning</think> + answer` — the student must learn to produce the full reasoning chain, not just the final answer",
+          "text": "Specifies the training format: `problem \u2192 <think>reasoning</think> + answer` \u2014 the student must learn to produce the full reasoning chain, not just the final answer",
           "passed": true,
           "evidence": "Training format shown: '[user] Solve: ... [assistant] <think>Let me work through this step by step... </think> The answer is X.'"
         },
         {
-          "text": "Warns about inherited systematic errors: if the teacher model has systematic biases or errors in its reasoning, the student will inherit them — verify the teacher's trajectories on a held-out set before committing to the full distillation",
+          "text": "Warns about inherited systematic errors: if the teacher model has systematic biases or errors in its reasoning, the student will inherit them \u2014 verify the teacher's trajectories on a held-out set before committing to the full distillation",
           "passed": false,
-          "evidence": "With_skill warns about 'Reasoning quality degrades for hard problems' (student capability limits) and 'Cargo cult reasoning' — not about inheriting systematic errors from the teacher."
+          "evidence": "With_skill warns about 'Reasoning quality degrades for hard problems' (student capability limits) and 'Cargo cult reasoning' \u2014 not about inheriting systematic errors from the teacher."
         },
         {
-          "text": "Warns about verbose thinking: teacher models often produce unnecessarily long reasoning chains — monitor response length distribution and consider filtering or truncating excessively verbose trajectories",
+          "text": "Warns about verbose thinking: teacher models often produce unnecessarily long reasoning chains \u2014 monitor response length distribution and consider filtering or truncating excessively verbose trajectories",
           "passed": true,
           "evidence": "'Length explosion. R1 produces very long reasoning chains. The 7B model may learn to be verbose without being accurate. Add a length penalty during training or filter training data.'"
         }
@@ -749,7 +766,7 @@
     },
     {
       "eval_id": 10,
-      "eval_name": "eval-10",
+      "eval_name": "distill-reasoning-from-teacher-model",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -765,22 +782,22 @@
           "evidence": "'Generate training data by prompting DeepSeek-R1 (or R1-distill) with your target tasks and collecting its chain-of-thought outputs.'"
         },
         {
-          "text": "Specifies filtering with a rule-based validator: reject trajectories where the final answer is incorrect — SFT bakes errors into parameters verbatim, so incorrect demonstrations must be filtered before training",
+          "text": "Specifies filtering with a rule-based validator: reject trajectories where the final answer is incorrect \u2014 SFT bakes errors into parameters verbatim, so incorrect demonstrations must be filtered before training",
           "passed": true,
           "evidence": "'Only keep correct responses. Verify the final answer against ground truth. Distilling wrong reasoning teaches wrong reasoning.'"
         },
         {
-          "text": "Specifies the training format: `problem → <think>reasoning</think> + answer` — the student must learn to produce the full reasoning chain, not just the final answer",
+          "text": "Specifies the training format: `problem \u2192 <think>reasoning</think> + answer` \u2014 the student must learn to produce the full reasoning chain, not just the final answer",
           "passed": true,
           "evidence": "'Fine-tune your 7B model on the full response including the CoT' and 'Train on the full response (thinking + answer). Don't mask the thinking tokens.'"
         },
         {
-          "text": "Warns about inherited systematic errors: if the teacher model has systematic biases or errors in its reasoning, the student will inherit them — verify the teacher's trajectories on a held-out set before committing to the full distillation",
+          "text": "Warns about inherited systematic errors: if the teacher model has systematic biases or errors in its reasoning, the student will inherit them \u2014 verify the teacher's trajectories on a held-out set before committing to the full distillation",
           "passed": false,
-          "evidence": "Baseline warns about 'Reasoning collapse' (student mimics format without reasoning) and 'Distribution mismatch' — not about inheriting systematic errors from the teacher."
+          "evidence": "Baseline warns about 'Reasoning collapse' (student mimics format without reasoning) and 'Distribution mismatch' \u2014 not about inheriting systematic errors from the teacher."
         },
         {
-          "text": "Warns about verbose thinking: teacher models often produce unnecessarily long reasoning chains — monitor response length distribution and consider filtering or truncating excessively verbose trajectories",
+          "text": "Warns about verbose thinking: teacher models often produce unnecessarily long reasoning chains \u2014 monitor response length distribution and consider filtering or truncating excessively verbose trajectories",
           "passed": true,
           "evidence": "'Length explosion. R1's reasoning can be very verbose. Consider filtering for responses under a token budget, or adding a length penalty in the optional RL stage.'"
         }
@@ -788,7 +805,7 @@
     },
     {
       "eval_id": 11,
-      "eval_name": "eval-11",
+      "eval_name": "tool-calling-agent-sft-then-rl-sandbox",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -801,12 +818,12 @@
         {
           "text": "Specifies the two-stage recipe: (1) SFT warm-up (~1 hour) to establish basic tool-call format from pure-text reasoning data converted to tool-augmented trajectories; (2) RL training with sandbox execution loop interleaved with rollouts",
           "passed": true,
-          "evidence": "'Stage 1: SFT warm-up (~1 hour) — Convert pure-text reasoning data into tool-augmented format' and 'Stage 2: RL with sandbox execution.'"
+          "evidence": "'Stage 1: SFT warm-up (~1 hour) \u2014 Convert pure-text reasoning data into tool-augmented format' and 'Stage 2: RL with sandbox execution.'"
         },
         {
-          "text": "Describes the RL execution loop: model generates `<code>` tags → sandbox executes → result returned in `<interpreter>` tags → model continues — the sandbox is inside the RL loop, not a separate step",
+          "text": "Describes the RL execution loop: model generates `<code>` tags \u2192 sandbox executes \u2192 result returned in `<interpreter>` tags \u2192 model continues \u2014 the sandbox is inside the RL loop, not a separate step",
           "passed": true,
-          "evidence": "'Each rollout: model generates <code> tags → sandbox executes → result in <interpreter> tags → model continues → final answer → reward.'"
+          "evidence": "'Each rollout: model generates <code> tags \u2192 sandbox executes \u2192 result in <interpreter> tags \u2192 model continues \u2192 final answer \u2192 reward.'"
         },
         {
           "text": "Recommends token-level policy gradient loss: normalize across all tokens in the batch (not per-sample) so long responses receive gradient proportional to their length",
@@ -814,12 +831,12 @@
           "evidence": "'Token-level policy gradient normalization: normalize loss across all tokens in the batch (not per-sample). Long responses with many tool calls get gradient proportional to their length.'"
         },
         {
-          "text": "Recommends dynamic sampling: reduce samples for easy prompts already solved at high rate, increase for prompts in the 20–80% success-rate range — the most informative region for gradient signal",
+          "text": "Recommends dynamic sampling: reduce samples for easy prompts already solved at high rate, increase for prompts in the 20\u201380% success-rate range \u2014 the most informative region for gradient signal",
           "passed": true,
           "evidence": "'Dynamic sampling: track per-prompt success rate. Reduce rollouts for prompts the model already solves (>80% success). Increase rollouts for prompts in the 20-80% success range.'"
         },
         {
-          "text": "Recommends overlong reward shaping: soft penalty for responses that grow long without improving accuracy — prevents the model from padding responses to avoid committing to an answer",
+          "text": "Recommends overlong reward shaping: soft penalty for responses that grow long without improving accuracy \u2014 prevents the model from padding responses to avoid committing to an answer",
           "passed": true,
           "evidence": "'Overlong reward shaping: add a soft penalty for responses that grow long without improving accuracy. Prevents the model from learning call more tools = higher reward.'"
         }
@@ -827,7 +844,7 @@
     },
     {
       "eval_id": 11,
-      "eval_name": "eval-11",
+      "eval_name": "tool-calling-agent-sft-then-rl-sandbox",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -840,10 +857,10 @@
         {
           "text": "Specifies the two-stage recipe: (1) SFT warm-up (~1 hour) to establish basic tool-call format from pure-text reasoning data converted to tool-augmented trajectories; (2) RL training with sandbox execution loop interleaved with rollouts",
           "passed": true,
-          "evidence": "'Stage 1: SFT on demonstrations' and 'Stage 2: RL with sandbox verification' — two-stage recipe present, though SFT uses demonstrations not pure-text reasoning data."
+          "evidence": "'Stage 1: SFT on demonstrations' and 'Stage 2: RL with sandbox verification' \u2014 two-stage recipe present, though SFT uses demonstrations not pure-text reasoning data."
         },
         {
-          "text": "Describes the RL execution loop: model generates `<code>` tags → sandbox executes → result returned in `<interpreter>` tags → model continues — the sandbox is inside the RL loop, not a separate step",
+          "text": "Describes the RL execution loop: model generates `<code>` tags \u2192 sandbox executes \u2192 result returned in `<interpreter>` tags \u2192 model continues \u2014 the sandbox is inside the RL loop, not a separate step",
           "passed": false,
           "evidence": "Baseline describes 'Generate full trajectories (multi-turn, up to 10-15 tool calls)' but does not describe the <code>/<interpreter> tag execution loop."
         },
@@ -853,12 +870,12 @@
           "evidence": "Baseline does not mention token-level policy gradient normalization."
         },
         {
-          "text": "Recommends dynamic sampling: reduce samples for easy prompts already solved at high rate, increase for prompts in the 20–80% success-rate range — the most informative region for gradient signal",
+          "text": "Recommends dynamic sampling: reduce samples for easy prompts already solved at high rate, increase for prompts in the 20\u201380% success-rate range \u2014 the most informative region for gradient signal",
           "passed": false,
           "evidence": "Baseline does not mention dynamic sampling; focuses on sandbox isolation, timeouts, parallel rollouts, and partial credit rewards."
         },
         {
-          "text": "Recommends overlong reward shaping: soft penalty for responses that grow long without improving accuracy — prevents the model from padding responses to avoid committing to an answer",
+          "text": "Recommends overlong reward shaping: soft penalty for responses that grow long without improving accuracy \u2014 prevents the model from padding responses to avoid committing to an answer",
           "passed": false,
           "evidence": "Baseline does not mention overlong reward shaping; engineering tricks listed are sandbox isolation, timeouts, parallel rollouts, and partial credit rewards."
         }
@@ -866,7 +883,7 @@
     },
     {
       "eval_id": 12,
-      "eval_name": "eval-12",
+      "eval_name": "dpo-vs-ppo-existing-preference-pairs",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -877,27 +894,27 @@
       },
       "expectations": [
         {
-          "text": "Recommends DPO: high-quality preference pairs already exist and budget is constrained — DPO turns preference pairs directly into a classification loss without requiring online sampling or a reward model",
+          "text": "Recommends DPO: high-quality preference pairs already exist and budget is constrained \u2014 DPO turns preference pairs directly into a classification loss without requiring online sampling or a reward model",
           "passed": true,
-          "evidence": "'Use DPO. Given your constraints: You already have 50K high-quality preference pairs — this is DPO's sweet spot. Limited GPU budget — DPO requires no online rollout generation, no value network, no reward model training.'"
+          "evidence": "'Use DPO. Given your constraints: You already have 50K high-quality preference pairs \u2014 this is DPO's sweet spot. Limited GPU budget \u2014 DPO requires no online rollout generation, no value network, no reward model training.'"
         },
         {
-          "text": "Explains the DPO advantage for this scenario: no reward model training, no PPO loop, no value network — significantly lower compute cost than PPO",
+          "text": "Explains the DPO advantage for this scenario: no reward model training, no PPO loop, no value network \u2014 significantly lower compute cost than PPO",
           "passed": true,
           "evidence": "'DPO requires no online rollout generation, no value network, no reward model training. It's a single training run on your existing data.'"
         },
         {
-          "text": "Notes DPO's limitation: it is off-policy and cannot explore new policies — quality is bounded by the coverage of the 50k preference pairs",
+          "text": "Notes DPO's limitation: it is off-policy and cannot explore new policies \u2014 quality is bounded by the coverage of the 50k preference pairs",
           "passed": true,
           "evidence": "'Quality is bounded by your offline data coverage. DPO cannot discover strategies not present in the preference pairs.'"
         },
         {
-          "text": "Applies the practical selection path: 'high-quality preference pairs already exist → DPO/KTO' — this is the explicit criterion in the algorithm selection framework",
+          "text": "Applies the practical selection path: 'high-quality preference pairs already exist \u2192 DPO/KTO' \u2014 this is the explicit criterion in the algorithm selection framework",
           "passed": true,
-          "evidence": "'You already have 50K high-quality preference pairs — this is DPO's sweet spot' — applies the selection criterion directly."
+          "evidence": "'You already have 50K high-quality preference pairs \u2014 this is DPO's sweet spot' \u2014 applies the selection criterion directly."
         },
         {
-          "text": "Avoids recommending PPO without a concrete justification for why online sampling is needed — with 50k high-quality preference pairs and a budget constraint, PPO's additional cost is not justified",
+          "text": "Avoids recommending PPO without a concrete justification for why online sampling is needed \u2014 with 50k high-quality preference pairs and a budget constraint, PPO's additional cost is not justified",
           "passed": true,
           "evidence": "'Why not PPO: PPO requires training a reward model first... That's 2-3x the compute: RM training + policy rollout generation + policy updates. With limited GPU budget, DPO gives you 80% of the benefit at 20% of the cost.'"
         }
@@ -905,7 +922,7 @@
     },
     {
       "eval_id": 12,
-      "eval_name": "eval-12",
+      "eval_name": "dpo-vs-ppo-existing-preference-pairs",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -916,35 +933,35 @@
       },
       "expectations": [
         {
-          "text": "Recommends DPO: high-quality preference pairs already exist and budget is constrained — DPO turns preference pairs directly into a classification loss without requiring online sampling or a reward model",
+          "text": "Recommends DPO: high-quality preference pairs already exist and budget is constrained \u2014 DPO turns preference pairs directly into a classification loss without requiring online sampling or a reward model",
           "passed": true,
-          "evidence": "'Use DPO. You already have the data. DPO trains directly on preference pairs — no intermediate reward model needed.'"
+          "evidence": "'Use DPO. You already have the data. DPO trains directly on preference pairs \u2014 no intermediate reward model needed.'"
         },
         {
-          "text": "Explains the DPO advantage for this scenario: no reward model training, no PPO loop, no value network — significantly lower compute cost than PPO",
+          "text": "Explains the DPO advantage for this scenario: no reward model training, no PPO loop, no value network \u2014 significantly lower compute cost than PPO",
           "passed": true,
           "evidence": "'DPO training costs roughly the same as SFT (one forward + backward pass per example). PPO costs 4-10x more per step.'"
         },
         {
-          "text": "Notes DPO's limitation: it is off-policy and cannot explore new policies — quality is bounded by the coverage of the 50k preference pairs",
+          "text": "Notes DPO's limitation: it is off-policy and cannot explore new policies \u2014 quality is bounded by the coverage of the 50k preference pairs",
           "passed": true,
           "evidence": "'If your preference data is stale... or if you need the model to explore behaviors not represented in your pairs. PPO discovers novel strategies through online exploration; DPO only teaches what's already in the preference data.'"
         },
         {
-          "text": "Applies the practical selection path: 'high-quality preference pairs already exist → DPO/KTO' — this is the explicit criterion in the algorithm selection framework",
+          "text": "Applies the practical selection path: 'high-quality preference pairs already exist \u2192 DPO/KTO' \u2014 this is the explicit criterion in the algorithm selection framework",
           "passed": true,
-          "evidence": "'You already have the data. DPO trains directly on preference pairs' — selection criterion applied."
+          "evidence": "'You already have the data. DPO trains directly on preference pairs' \u2014 selection criterion applied."
         },
         {
-          "text": "Avoids recommending PPO without a concrete justification for why online sampling is needed — with 50k high-quality preference pairs and a budget constraint, PPO's additional cost is not justified",
+          "text": "Avoids recommending PPO without a concrete justification for why online sampling is needed \u2014 with 50k high-quality preference pairs and a budget constraint, PPO's additional cost is not justified",
           "passed": true,
-          "evidence": "'When you'd want PPO instead: If your preference data is stale... or if you need the model to explore behaviors not represented in your pairs.' — PPO only recommended with concrete justification."
+          "evidence": "'When you'd want PPO instead: If your preference data is stale... or if you need the model to explore behaviors not represented in your pairs.' \u2014 PPO only recommended with concrete justification."
         }
       ]
     },
     {
       "eval_id": 13,
-      "eval_name": "eval-13",
+      "eval_name": "sft-to-rl-transition-parse-failure-rate",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -955,19 +972,19 @@
       },
       "expectations": [
         {
-          "text": "States the stopping condition explicitly: format is stable when parse failure rate drops below ~5–10% — at 15% the model is not ready for RL",
+          "text": "States the stopping condition explicitly: format is stable when parse failure rate drops below ~5\u201310% \u2014 at 15% the model is not ready for RL",
           "passed": true,
-          "evidence": "'The SFT→RL transition rule (§1): Stop when parse failure rate drops below ~5–10%. You're at 15% — still above the threshold.'"
+          "evidence": "'The SFT\u2192RL transition rule (\u00a71): Stop when parse failure rate drops below ~5\u201310%. You're at 15% \u2014 still above the threshold.'"
         },
         {
-          "text": "Explains why 15% is too high: RL needs parseable output to compute rewards — a 15% parse failure rate means the reward function returns NaN on 15% of trajectories, producing unstable training",
+          "text": "Explains why 15% is too high: RL needs parseable output to compute rewards \u2014 a 15% parse failure rate means the reward function returns NaN on 15% of trajectories, producing unstable training",
           "passed": true,
-          "evidence": "'Starting RL at 15% parse failure means ~15% of rollouts produce NaN rewards — that's borderline too high and will make training unstable.'"
+          "evidence": "'Starting RL at 15% parse failure means ~15% of rollouts produce NaN rewards \u2014 that's borderline too high and will make training unstable.'"
         },
         {
-          "text": "Recommends continuing SFT until the target is reached — the stopping condition is format stability, not a fixed step count",
+          "text": "Recommends continuing SFT until the target is reached \u2014 the stopping condition is format stability, not a fixed step count",
           "passed": true,
-          "evidence": "'keep going with SFT — you haven't hit the stopping condition yet.' and 'the stopping condition is format stability, not a fixed step count.'"
+          "evidence": "'keep going with SFT \u2014 you haven't hit the stopping condition yet.' and 'the stopping condition is format stability, not a fixed step count.'"
         },
         {
           "text": "Suggests diagnosing why improvement has stalled at 15%: check for chat template inconsistency (mixed formats in training data), base model mismatch, or insufficient data coverage of the failure cases",
@@ -975,7 +992,7 @@
           "evidence": "With_skill mentions 'fix your training data (format inconsistencies, bad examples)' but not chat template inconsistency or base model mismatch specifically."
         },
         {
-          "text": "Notes that overtraining SFT beyond the format stability target collapses the model onto the training distribution, limiting RL's optimization space — stop at the target, not far past it",
+          "text": "Notes that overtraining SFT beyond the format stability target collapses the model onto the training distribution, limiting RL's optimization space \u2014 stop at the target, not far past it",
           "passed": false,
           "evidence": "Answer does not mention overtraining SFT or its effect on RL's optimization space."
         }
@@ -983,7 +1000,7 @@
     },
     {
       "eval_id": 13,
-      "eval_name": "eval-13",
+      "eval_name": "sft-to-rl-transition-parse-failure-rate",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -994,19 +1011,19 @@
       },
       "expectations": [
         {
-          "text": "States the stopping condition explicitly: format is stable when parse failure rate drops below ~5–10% — at 15% the model is not ready for RL",
+          "text": "States the stopping condition explicitly: format is stable when parse failure rate drops below ~5\u201310% \u2014 at 15% the model is not ready for RL",
           "passed": true,
-          "evidence": "'Rule of thumb: Get format compliance to <5% with SFT, then switch to RL for behavioral quality.' — <5% is within the ~5-10% range."
+          "evidence": "'Rule of thumb: Get format compliance to <5% with SFT, then switch to RL for behavioral quality.' \u2014 <5% is within the ~5-10% range."
         },
         {
-          "text": "Explains why 15% is too high: RL needs parseable output to compute rewards — a 15% parse failure rate means the reward function returns NaN on 15% of trajectories, producing unstable training",
+          "text": "Explains why 15% is too high: RL needs parseable output to compute rewards \u2014 a 15% parse failure rate means the reward function returns NaN on 15% of trajectories, producing unstable training",
           "passed": false,
-          "evidence": "Baseline says '15% format failure means the model hasn't fully learned the output grammar' — attributes to learning incompleteness, not NaN rewards causing unstable training."
+          "evidence": "Baseline says '15% format failure means the model hasn't fully learned the output grammar' \u2014 attributes to learning incompleteness, not NaN rewards causing unstable training."
         },
         {
-          "text": "Recommends continuing SFT until the target is reached — the stopping condition is format stability, not a fixed step count",
+          "text": "Recommends continuing SFT until the target is reached \u2014 the stopping condition is format stability, not a fixed step count",
           "passed": true,
-          "evidence": "'Continue SFT for 1000-2000 more steps. Monitor the parse failure rate — if it drops to <5%, SFT is still working.'"
+          "evidence": "'Continue SFT for 1000-2000 more steps. Monitor the parse failure rate \u2014 if it drops to <5%, SFT is still working.'"
         },
         {
           "text": "Suggests diagnosing why improvement has stalled at 15%: check for chat template inconsistency (mixed formats in training data), base model mismatch, or insufficient data coverage of the failure cases",
@@ -1014,7 +1031,7 @@
           "evidence": "'Check your data. Are there inconsistent formats in your training examples? Mixed JSON styles? Some examples with trailing commas and some without?'"
         },
         {
-          "text": "Notes that overtraining SFT beyond the format stability target collapses the model onto the training distribution, limiting RL's optimization space — stop at the target, not far past it",
+          "text": "Notes that overtraining SFT beyond the format stability target collapses the model onto the training distribution, limiting RL's optimization space \u2014 stop at the target, not far past it",
           "passed": false,
           "evidence": "Baseline does not mention overtraining SFT or its effect on RL's optimization space."
         }
@@ -1022,7 +1039,7 @@
     },
     {
       "eval_id": 14,
-      "eval_name": "eval-14",
+      "eval_name": "grpo-all-fail-zero-gradient-early-training",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1035,7 +1052,7 @@
         {
           "text": "Identifies the root cause as the all-fail variant of GRPO zero-variance deadlock: at 5% success rate, most groups have all N trajectories failing, within-group variance is zero, and gradients go to zero",
           "passed": true,
-          "evidence": "'This is the all-fail group variant of zero-variance deadlock. At 5% success rate, most GRPO groups have zero successful trajectories — all N rollouts fail — producing zero within-group variance and zero gradient.'"
+          "evidence": "'This is the all-fail group variant of zero-variance deadlock. At 5% success rate, most GRPO groups have zero successful trajectories \u2014 all N rollouts fail \u2014 producing zero within-group variance and zero gradient.'"
         },
         {
           "text": "Recommends adding milestone or partial credit rewards: if the task has reachable intermediate progress (partial completion, correct format, correct first step), reward it to restore gradient signal in all-fail groups",
@@ -1053,7 +1070,7 @@
           "evidence": "'Go back to SFT. 5% success rate means the model fundamentally can't do the task reliably enough for RL to work. SFT on successful examples until success rate reaches 20-30%, then restart RL.'"
         },
         {
-          "text": "Notes that dynamic sampling alone cannot fix all-fail groups — filtering them out removes all training signal; the fix is adding reward density so some gradient flows even when the final task fails",
+          "text": "Notes that dynamic sampling alone cannot fix all-fail groups \u2014 filtering them out removes all training signal; the fix is adding reward density so some gradient flows even when the final task fails",
           "passed": true,
           "evidence": "'The fundamental issue: GRPO needs within-group variance. At 5% success rate, you're trying to train from nearly zero signal. The model needs more SFT to reach a viable starting point for RL.'"
         }
@@ -1061,7 +1078,7 @@
     },
     {
       "eval_id": 14,
-      "eval_name": "eval-14",
+      "eval_name": "grpo-all-fail-zero-gradient-early-training",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -1074,7 +1091,7 @@
         {
           "text": "Identifies the root cause as the all-fail variant of GRPO zero-variance deadlock: at 5% success rate, most groups have all N trajectories failing, within-group variance is zero, and gradients go to zero",
           "passed": true,
-          "evidence": "'GRPO computes advantages relative to the group mean. At 5% success rate, most groups have all failures (reward 0 for every completion). When all completions in a group have the same reward → advantages are all 0 → gradient is 0.'"
+          "evidence": "'GRPO computes advantages relative to the group mean. At 5% success rate, most groups have all failures (reward 0 for every completion). When all completions in a group have the same reward \u2192 advantages are all 0 \u2192 gradient is 0.'"
         },
         {
           "text": "Recommends adding milestone or partial credit rewards: if the task has reachable intermediate progress (partial completion, correct format, correct first step), reward it to restore gradient signal in all-fail groups",
@@ -1089,18 +1106,18 @@
         {
           "text": "Recommends using easier warmup tasks to bootstrap the model: start with a curriculum of simpler problems where the model can achieve some success, then gradually increase difficulty",
           "passed": true,
-          "evidence": "'Curriculum — start easier. Your prompts are too hard for the current model. Filter to the subset of prompts where the model has 20-50% success rate. Train on those first.'"
+          "evidence": "'Curriculum \u2014 start easier. Your prompts are too hard for the current model. Filter to the subset of prompts where the model has 20-50% success rate. Train on those first.'"
         },
         {
-          "text": "Notes that dynamic sampling alone cannot fix all-fail groups — filtering them out removes all training signal; the fix is adding reward density so some gradient flows even when the final task fails",
+          "text": "Notes that dynamic sampling alone cannot fix all-fail groups \u2014 filtering them out removes all training signal; the fix is adding reward density so some gradient flows even when the final task fails",
           "passed": true,
-          "evidence": "'Filter zero-signal batches. Skip the backward pass on groups where all advantages are 0. This doesn't fix the root cause but avoids wasting compute.' — acknowledges filtering alone doesn't fix root cause."
+          "evidence": "'Filter zero-signal batches. Skip the backward pass on groups where all advantages are 0. This doesn't fix the root cause but avoids wasting compute.' \u2014 acknowledges filtering alone doesn't fix root cause."
         }
       ]
     },
     {
       "eval_id": 21,
-      "eval_name": "eval-21",
+      "eval_name": "sft-vs-rl-chain-of-thought-reasoning",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1113,7 +1130,7 @@
         {
           "text": "Applies the one-sentence rule: SFT memorizes demonstrated reasoning patterns (ceiling = demonstration quality); RL generalizes reasoning strategy (can discover novel approaches beyond any demonstrator)",
           "passed": true,
-          "evidence": "'SFT on CoT (Stage 1): Teaches the model the format of chain-of-thought... Bounded by data quality' and 'RL (Stage 2): Optimizes reasoning quality — the model learns which reasoning strategies actually lead to correct answers. Can discover novel reasoning paths not in the SFT data.'"
+          "evidence": "'SFT on CoT (Stage 1): Teaches the model the format of chain-of-thought... Bounded by data quality' and 'RL (Stage 2): Optimizes reasoning quality \u2014 the model learns which reasoning strategies actually lead to correct answers. Can discover novel reasoning paths not in the SFT data.'"
         },
         {
           "text": "Recommends the ordering constraint: SFT first to establish the CoT format (`<think>...</think>` structure), then RL to generalize the reasoning strategy beyond the training distribution",
@@ -1121,17 +1138,17 @@
           "evidence": "'Both, sequentially: SFT on CoT examples first, then RL.' and 'cold-start SFT to establish format, then RL to optimize reasoning quality.'"
         },
         {
-          "text": "Explains why RL has a higher ceiling for CoT: verification is easier than generation — math answers can be checked against a key, so RL can train a model stronger than any available demonstrator",
+          "text": "Explains why RL has a higher ceiling for CoT: verification is easier than generation \u2014 math answers can be checked against a key, so RL can train a model stronger than any available demonstrator",
           "passed": false,
           "evidence": "With_skill says RL 'can discover novel reasoning paths not in the SFT data' but does not explain the 'verification easier than generation' principle or that RL can exceed any demonstrator."
         },
         {
-          "text": "Notes SFT's limitation for CoT: SFT cannot generalize beyond its training distribution — if the demonstrations cover only certain problem types, the model will fail on novel reasoning patterns",
+          "text": "Notes SFT's limitation for CoT: SFT cannot generalize beyond its training distribution \u2014 if the demonstrations cover only certain problem types, the model will fail on novel reasoning patterns",
           "passed": true,
-          "evidence": "'Risk: model learns to produce plausible-looking reasoning that doesn't actually improve answers (cargo cult CoT)' and 'Bounded by data quality — the CoT will only be as good as your demonstration examples.'"
+          "evidence": "'Risk: model learns to produce plausible-looking reasoning that doesn't actually improve answers (cargo cult CoT)' and 'Bounded by data quality \u2014 the CoT will only be as good as your demonstration examples.'"
         },
         {
-          "text": "Addresses the practical tradeoff: SFT is fast and stable (hours to days); RL is 10–100× more expensive and harder to stabilize — start with SFT and add RL only when SFT has hit its ceiling",
+          "text": "Addresses the practical tradeoff: SFT is fast and stable (hours to days); RL is 10\u2013100\u00d7 more expensive and harder to stabilize \u2014 start with SFT and add RL only when SFT has hit its ceiling",
           "passed": true,
           "evidence": "'SFT is fast and cheap, predictable' vs 'RL: More expensive: requires verifiable tasks... This is exactly how DeepSeek-R1 worked.'"
         }
@@ -1139,7 +1156,7 @@
     },
     {
       "eval_id": 21,
-      "eval_name": "eval-21",
+      "eval_name": "sft-vs-rl-chain-of-thought-reasoning",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -1160,17 +1177,17 @@
           "evidence": "'Do both in sequence: 1. SFT first on high-quality CoT examples... 2. RL second with verifiable outcomes to sharpen reasoning quality.'"
         },
         {
-          "text": "Explains why RL has a higher ceiling for CoT: verification is easier than generation — math answers can be checked against a key, so RL can train a model stronger than any available demonstrator",
+          "text": "Explains why RL has a higher ceiling for CoT: verification is easier than generation \u2014 math answers can be checked against a key, so RL can train a model stronger than any available demonstrator",
           "passed": false,
           "evidence": "Baseline says RL 'can find paths not in any demonstration data' but does not explain the 'verification easier than generation' principle."
         },
         {
-          "text": "Notes SFT's limitation for CoT: SFT cannot generalize beyond its training distribution — if the demonstrations cover only certain problem types, the model will fail on novel reasoning patterns",
+          "text": "Notes SFT's limitation for CoT: SFT cannot generalize beyond its training distribution \u2014 if the demonstrations cover only certain problem types, the model will fail on novel reasoning patterns",
           "passed": true,
           "evidence": "'The model can only imitate reasoning patterns it's seen. It may learn to mimic CoT structure without genuine reasoning (producing text that looks like thinking but doesn't logically follow).'"
         },
         {
-          "text": "Addresses the practical tradeoff: SFT is fast and stable (hours to days); RL is 10–100× more expensive and harder to stabilize — start with SFT and add RL only when SFT has hit its ceiling",
+          "text": "Addresses the practical tradeoff: SFT is fast and stable (hours to days); RL is 10\u2013100\u00d7 more expensive and harder to stabilize \u2014 start with SFT and add RL only when SFT has hit its ceiling",
           "passed": true,
           "evidence": "'SFT if you have good CoT data and diverse tasks. RL if you have a narrow domain with verifiable outcomes (math, code) and want the model to exceed human-demonstrated reasoning.'"
         }
@@ -1178,7 +1195,7 @@
     },
     {
       "eval_id": 22,
-      "eval_name": "eval-22",
+      "eval_name": "ppo-policy-collapse-low-kl-penalty",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1189,14 +1206,14 @@
       },
       "expectations": [
         {
-          "text": "Identifies the root cause as KL penalty too low: 0.01 is very small and insufficient to prevent distribution collapse — the model is free to diverge from the reference policy",
+          "text": "Identifies the root cause as KL penalty too low: 0.01 is very small and insufficient to prevent distribution collapse \u2014 the model is free to diverge from the reference policy",
           "passed": true,
-          "evidence": "'This is policy collapse — the model converges to a single degenerate output. KL penalty of 0.01 is too low to prevent it.'"
+          "evidence": "'This is policy collapse \u2014 the model converges to a single degenerate output. KL penalty of 0.01 is too low to prevent it.'"
         },
         {
-          "text": "Recommends increasing `kl_coef`: the KL term prevents distribution collapse by penalizing divergence from the reference policy — a higher coefficient is needed to stabilize training",
+          "text": "Recommends increasing `kl_coef`: the KL term prevents distribution collapse by penalizing divergence from the reference policy \u2014 a higher coefficient is needed to stabilize training",
           "passed": true,
-          "evidence": "'Increase kl_coef significantly. Try 0.05–0.2. The KL penalty needs to be strong enough that the reward from the collapsed output doesn't outweigh the cost of diverging from the reference policy.'"
+          "evidence": "'Increase kl_coef significantly. Try 0.05\u20130.2. The KL penalty needs to be strong enough that the reward from the collapsed output doesn't outweigh the cost of diverging from the reference policy.'"
         },
         {
           "text": "Recommends verifying the reference model is frozen: if the reference policy is being updated during training, the KL term loses its regularization effect",
@@ -1204,20 +1221,20 @@
           "evidence": "'Verify the reference model is frozen. If the reference policy is accidentally updating alongside the active policy, the KL penalty becomes meaningless (comparing the model to itself).'"
         },
         {
-          "text": "Explains the collapse mechanism: without adequate KL regularization, the policy degenerates into repetition or a single mode — the model learns to output whatever scores highest on the reward regardless of input",
+          "text": "Explains the collapse mechanism: without adequate KL regularization, the policy degenerates into repetition or a single mode \u2014 the model learns to output whatever scores highest on the reward regardless of input",
           "passed": true,
-          "evidence": "'The policy has drifted far enough from the reference that it found a reward attractor — one response pattern that scores well enough that the model fixates on it. With KL=0.01, the penalty for drifting is negligible.'"
+          "evidence": "'The policy has drifted far enough from the reference that it found a reward attractor \u2014 one response pattern that scores well enough that the model fixates on it. With KL=0.01, the penalty for drifting is negligible.'"
         },
         {
-          "text": "Notes the effective reward formula: `r_effective = r_RM - β · KL(π_θ ‖ π_ref)` — at β=0.01, the KL penalty is nearly absent and the reward model score dominates unchecked",
+          "text": "Notes the effective reward formula: `r_effective = r_RM - \u03b2 \u00b7 KL(\u03c0_\u03b8 \u2016 \u03c0_ref)` \u2014 at \u03b2=0.01, the KL penalty is nearly absent and the reward model score dominates unchecked",
           "passed": false,
-          "evidence": "With_skill does not state the effective reward formula r_effective = r_RM - β · KL(π_θ ‖ π_ref)."
+          "evidence": "With_skill does not state the effective reward formula r_effective = r_RM - \u03b2 \u00b7 KL(\u03c0_\u03b8 \u2016 \u03c0_ref)."
         }
       ]
     },
     {
       "eval_id": 22,
-      "eval_name": "eval-22",
+      "eval_name": "ppo-policy-collapse-low-kl-penalty",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -1228,14 +1245,14 @@
       },
       "expectations": [
         {
-          "text": "Identifies the root cause as KL penalty too low: 0.01 is very small and insufficient to prevent distribution collapse — the model is free to diverge from the reference policy",
+          "text": "Identifies the root cause as KL penalty too low: 0.01 is very small and insufficient to prevent distribution collapse \u2014 the model is free to diverge from the reference policy",
           "passed": true,
           "evidence": "'The KL penalty of 0.01 is too low. That's your primary issue. The policy has drifted far from the reference model without sufficient penalty.'"
         },
         {
-          "text": "Recommends increasing `kl_coef`: the KL term prevents distribution collapse by penalizing divergence from the reference policy — a higher coefficient is needed to stabilize training",
+          "text": "Recommends increasing `kl_coef`: the KL term prevents distribution collapse by penalizing divergence from the reference policy \u2014 a higher coefficient is needed to stabilize training",
           "passed": true,
-          "evidence": "'Increase KL penalty to 0.05-0.2. This is the most direct fix. The KL term keeps the policy close to the reference model — with 0.01, the policy can drift far enough to collapse to a single mode.'"
+          "evidence": "'Increase KL penalty to 0.05-0.2. This is the most direct fix. The KL term keeps the policy close to the reference model \u2014 with 0.01, the policy can drift far enough to collapse to a single mode.'"
         },
         {
           "text": "Recommends verifying the reference model is frozen: if the reference policy is being updated during training, the KL term loses its regularization effect",
@@ -1243,12 +1260,12 @@
           "evidence": "Baseline does not mention verifying the reference model is frozen; it recommends checking the reward model and adding entropy bonus instead."
         },
         {
-          "text": "Explains the collapse mechanism: without adequate KL regularization, the policy degenerates into repetition or a single mode — the model learns to output whatever scores highest on the reward regardless of input",
+          "text": "Explains the collapse mechanism: without adequate KL regularization, the policy degenerates into repetition or a single mode \u2014 the model learns to output whatever scores highest on the reward regardless of input",
           "passed": true,
           "evidence": "'Policy collapse means the model found a single output that scores well on the reward model and has stopped exploring. This is a common failure mode in PPO.'"
         },
         {
-          "text": "Notes the effective reward formula: `r_effective = r_RM - β · KL(π_θ ‖ π_ref)` — at β=0.01, the KL penalty is nearly absent and the reward model score dominates unchecked",
+          "text": "Notes the effective reward formula: `r_effective = r_RM - \u03b2 \u00b7 KL(\u03c0_\u03b8 \u2016 \u03c0_ref)` \u2014 at \u03b2=0.01, the KL penalty is nearly absent and the reward model score dominates unchecked",
           "passed": false,
           "evidence": "Baseline does not state the effective reward formula."
         }
@@ -1276,6 +1293,6 @@
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
     "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
     "Evals 15-20, 23-26 excluded (should_trigger=false, no expectations).",
-    "eval-11 without_skill: expectation 5 evidence note corrected — overlong reward shaping is absent from baseline."
+    "eval-11 without_skill: expectation 5 evidence note corrected \u2014 overlong reward shaping is absent from baseline."
   ]
 }

@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "new-skill-authoring-workflow",
       "prompt": "I want to create a skill for writing conventional git commits. It should help the model write good commit messages following the conventional commits spec. I already know roughly what I want — can you help me write the skill and set up some test cases?",
       "expected_output": "The agent interviews the user to capture intent (what the skill enables, when it triggers, expected output format), writes a SKILL.md with a description following the MUST-language forceful-opener + non-obvious-triggers + concise-exclusions template (~80 words), saves 2-3 test prompts to evals/git-commit/evals.json at the repo root, and proposes running with-skill and baseline subagents in the same turn.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "benchmark-analysis-and-promotion",
       "prompt": "I have a skill called `python-design` that I've been iterating on. I just finished iteration 2 and the benchmark results are in. Can you help me analyze whether the new version is actually better and figure out what to improve next? The benchmark.json is at python-design-workspace/iteration-2/benchmark.json.",
       "expected_output": "The agent reads the benchmark.json, runs an analyst pass looking for non-discriminating assertions (pass 100% in both configs), high-variance evals, and time/token tradeoffs, then auto-promotes the finalized benchmark by copying it to evals/python-design/benchmarks/benchmark.json. It presents both qualitative patterns and the aggregate delta to the user before proposing skill edits.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "skill-description-trigger-vocabulary",
       "prompt": "The description for my `logging` skill keeps failing to trigger when users are writing FastAPI services or background workers — they don't mention 'logging' at all, they just ask me to add error handling or set up a new service. Can you help me fix the description so it triggers proactively on those activities?",
       "expected_output": "The agent diagnoses the failure as a proactive-skill triggering problem — the description relies on topic vocabulary ('logging') rather than activity vocabulary. It rewrites the description to match the activity (writing FastAPI services, background workers, queue consumers) rather than the topic, generates 20 trigger eval queries (mix of should-trigger and should-not-trigger, with realistic detail and near-miss negatives), and presents them for user review before testing.",
       "files": [],

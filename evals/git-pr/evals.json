@@ -3,44 +3,47 @@
   "evals": [
     {
       "id": 1,
+      "name": "single-commit-pr-no-body",
       "prompt": "I just committed a fix for the token parser crash on empty input. Create a PR for it.",
       "expected_output": "Single-line PR title matching the commit subject, no body, presented for confirmation before creation",
       "files": [],
       "context": "Branch has exactly one commit ahead of main: 'fix(parser): handle empty input without panic'. No PR template in repo.",
       "expectations": [
-        "Title matches the commit subject exactly: 'fix(parser): handle empty input without panic' — single-commit PRs use the commit subject verbatim",
-        "No body is included — single-commit PRs do not get a body; the title says it all",
+        "Title matches the commit subject exactly: 'fix(parser): handle empty input without panic' \u2014 single-commit PRs use the commit subject verbatim",
+        "No body is included \u2014 single-commit PRs do not get a body; the title says it all",
         "Checks for a PR template before composing (runs the detection step even when the answer is 'no template found')",
-        "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms",
-        "Avoids adding a body, bullet-point summary, or 'Changes made' section — these are anti-rationalization patterns the skill explicitly prohibits"
+        "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms",
+        "Avoids adding a body, bullet-point summary, or 'Changes made' section \u2014 these are anti-rationalization patterns the skill explicitly prohibits"
       ]
     },
     {
       "id": 2,
+      "name": "multi-commit-oauth-pr-body",
       "prompt": "Open a PR for this branch. I've been working on adding OAuth support.",
       "expected_output": "Conventional commit title summarizing the overall change, 2-4 sentence motivation paragraph in body, Closes #312 footer, presented for confirmation",
       "files": [],
       "context": "Branch 'feat/312-oauth-support' has 4 commits: 'feat(auth): add OAuth provider config', 'feat(auth): implement token exchange middleware', 'feat(auth): add refresh token rotation', 'test(auth): add OAuth flow integration tests'. No PR template.",
       "expectations": [
-        "Title summarizes the overall intent at commit-subject granularity — not a list of commits, not 'and'-joined, under 72 characters in conventional commit format",
-        "Body is 2-4 sentences explaining the *why* (what problem this solves, what context a reviewer needs) — not what was done, not a list of commits, not a list of files changed",
+        "Title summarizes the overall intent at commit-subject granularity \u2014 not a list of commits, not 'and'-joined, under 72 characters in conventional commit format",
+        "Body is 2-4 sentences explaining the *why* (what problem this solves, what context a reviewer needs) \u2014 not what was done, not a list of commits, not a list of files changed",
         "Appends 'Closes #312' footer derived from the branch name 'feat/312-oauth-support'",
-        "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms",
-        "Avoids listing what each commit does in the body — the Commits tab exists for that; the body explains why, not how"
+        "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms",
+        "Avoids listing what each commit does in the body \u2014 the Commits tab exists for that; the body explains why, not how"
       ]
     },
     {
       "id": 3,
+      "name": "pr-template-backend-no-screenshots",
       "prompt": "Create a PR for my changes.",
       "expected_output": "Conventional commit title, template used as skeleton with empty sections removed (Screenshots removed for backend-only change), minimal content in remaining sections, presented for confirmation",
       "files": [],
       "context": "Branch has 2 commits: 'refactor(api): extract validation into middleware' and 'feat(api): add rate limiting to public endpoints'. Repo has .github/PULL_REQUEST_TEMPLATE.md with sections: ## Description, ## Testing, ## Screenshots, ## Breaking Changes.",
       "expectations": [
-        "Uses the PR template as the skeleton — template takes priority over skill defaults when a .github/PULL_REQUEST_TEMPLATE.md exists",
-        "Removes the Screenshots section entirely since this is a backend-only change — does not write 'N/A' or filler, removes sections with nothing genuine to say",
+        "Uses the PR template as the skeleton \u2014 template takes priority over skill defaults when a .github/PULL_REQUEST_TEMPLATE.md exists",
+        "Removes the Screenshots section entirely since this is a backend-only change \u2014 does not write 'N/A' or filler, removes sections with nothing genuine to say",
         "Title summarizes the overall intent of both commits at commit-subject granularity in conventional commit format",
-        "Fills template sections minimally — one or two sentences per section, not exhaustive prose",
-        "Presents the proposed PR for confirmation and stops — does not run `gh pr create` until the user confirms"
+        "Fills template sections minimally \u2014 one or two sentences per section, not exhaustive prose",
+        "Presents the proposed PR for confirmation and stops \u2014 does not run `gh pr create` until the user confirms"
       ]
     }
   ]

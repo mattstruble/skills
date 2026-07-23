@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "gpu-rendering-architecture",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "indirect-draw-barrier-count-reset",
+      "bindless-material-id-nonuniform-index",
+      "tbdr-mobile-blend-state-gbuffer-ops"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "indirect-draw-barrier-count-reset",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -21,12 +25,12 @@
         {
           "text": "Identifies the missing HAZARD_DRAW_ARGUMENTS hazard flag as a root cause, not just a generic 'missing barrier'",
           "passed": true,
-          "evidence": "'Missing HAZARD_DRAW_ARGUMENTS barrier between culling compute and indirect draw' — specifically names the hazard flag."
+          "evidence": "'Missing HAZARD_DRAW_ARGUMENTS barrier between culling compute and indirect draw' \u2014 specifically names the hazard flag."
         },
         {
-          "text": "Specifies that the barrier destination stage must be STAGE_DRAW_INDIRECT (or VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT), not STAGE_COMPUTE — using STAGE_COMPUTE as dst does not synchronize the command processor argument prefetch",
+          "text": "Specifies that the barrier destination stage must be STAGE_DRAW_INDIRECT (or VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT), not STAGE_COMPUTE \u2014 using STAGE_COMPUTE as dst does not synchronize the command processor argument prefetch",
           "passed": true,
-          "evidence": "'gpuBarrier(cmd, STAGE_COMPUTE, STAGE_DRAW_INDIRECT, HAZARD_DRAW_ARGUMENTS)' — uses STAGE_DRAW_INDIRECT as destination."
+          "evidence": "'gpuBarrier(cmd, STAGE_COMPUTE, STAGE_DRAW_INDIRECT, HAZARD_DRAW_ARGUMENTS)' \u2014 uses STAGE_DRAW_INDIRECT as destination."
         },
         {
           "text": "Identifies the draw count buffer not being zeroed before each frame's culling dispatch as a distinct second cause (InterlockedAdd accumulates across frames)",
@@ -47,7 +51,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "indirect-draw-barrier-count-reset",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -60,12 +64,12 @@
         {
           "text": "Identifies the missing HAZARD_DRAW_ARGUMENTS hazard flag as a root cause, not just a generic 'missing barrier'",
           "passed": false,
-          "evidence": "Describes 'missing execution barrier' generically — uses VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT but does not mention HAZARD_DRAW_ARGUMENTS or the hazard flag concept."
+          "evidence": "Describes 'missing execution barrier' generically \u2014 uses VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT but does not mention HAZARD_DRAW_ARGUMENTS or the hazard flag concept."
         },
         {
-          "text": "Specifies that the barrier destination stage must be STAGE_DRAW_INDIRECT (or VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT), not STAGE_COMPUTE — using STAGE_COMPUTE as dst does not synchronize the command processor argument prefetch",
+          "text": "Specifies that the barrier destination stage must be STAGE_DRAW_INDIRECT (or VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT), not STAGE_COMPUTE \u2014 using STAGE_COMPUTE as dst does not synchronize the command processor argument prefetch",
           "passed": true,
-          "evidence": "Barrier uses 'dstStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT' — correct destination stage."
+          "evidence": "Barrier uses 'dstStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT' \u2014 correct destination stage."
         },
         {
           "text": "Identifies the draw count buffer not being zeroed before each frame's culling dispatch as a distinct second cause (InterlockedAdd accumulates across frames)",
@@ -86,7 +90,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "bindless-material-id-nonuniform-index",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -99,7 +103,7 @@
         {
           "text": "Identifies the missing NonUniformResourceIndex() (HLSL) or nonuniformEXT() (GLSL) annotation as the direct cause of wrong pixels and potential GPU crash on AMD",
           "passed": true,
-          "evidence": "'Cause: Missing NonUniformResourceIndex on the material-ID-derived heap index' — directly identified as the cause."
+          "evidence": "'Cause: Missing NonUniformResourceIndex on the material-ID-derived heap index' \u2014 directly identified as the cause."
         },
         {
           "text": "Explains why the annotation is required specifically in the lighting pass: per-pixel material IDs make the heap index non-uniform across lanes in a wave (deferred shading pattern), which AMD handles via a scalarization loop that requires the annotation to emit",
@@ -107,14 +111,14 @@
           "evidence": "'Different pixels (different lanes in the same wave) sample different textures. This is non-uniform access... Without NonUniformResourceIndex, the hardware assumes all lanes in a wave access the same descriptor.'"
         },
         {
-          "text": "States that NonUniformResourceIndex is NOT needed for buffer pointer arithmetic — only when indexing the texture descriptor heap",
+          "text": "States that NonUniformResourceIndex is NOT needed for buffer pointer arithmetic \u2014 only when indexing the texture descriptor heap",
           "passed": false,
-          "evidence": "Does not distinguish between buffer pointer arithmetic and texture descriptor heap indexing — the scope of NonUniformResourceIndex is not addressed."
+          "evidence": "Does not distinguish between buffer pointer arithmetic and texture descriptor heap indexing \u2014 the scope of NonUniformResourceIndex is not addressed."
         },
         {
           "text": "Specifies the inter-pass barrier must use STAGE_RASTER_COLOR_OUT as the producer stage (not STAGE_PIXEL_SHADER), because the G-buffer writes happen in the ROP output stage",
           "passed": true,
-          "evidence": "'STAGE_RASTER_COLOR_OUT (not STAGE_PIXEL_SHADER) is the correct producer stage — it's the rasterizer output that wrote the G-buffer attachments.'"
+          "evidence": "'STAGE_RASTER_COLOR_OUT (not STAGE_PIXEL_SHADER) is the correct producer stage \u2014 it's the rasterizer output that wrote the G-buffer attachments.'"
         },
         {
           "text": "Notes that HAZARD_DESCRIPTORS must be added to the barrier if the descriptor heap was written (e.g., streaming new textures) between the G-buffer and lighting passes, to invalidate the sampler's internal descriptor cache",
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "bindless-material-id-nonuniform-index",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -138,7 +142,7 @@
         {
           "text": "Identifies the missing NonUniformResourceIndex() (HLSL) or nonuniformEXT() (GLSL) annotation as the direct cause of wrong pixels and potential GPU crash on AMD",
           "passed": true,
-          "evidence": "'non-uniform texture indices in texture() calls cause undefined behavior — some lanes read from the wrong descriptor' — identifies nonuniformEXT as the fix."
+          "evidence": "'non-uniform texture indices in texture() calls cause undefined behavior \u2014 some lanes read from the wrong descriptor' \u2014 identifies nonuniformEXT as the fix."
         },
         {
           "text": "Explains why the annotation is required specifically in the lighting pass: per-pixel material IDs make the heap index non-uniform across lanes in a wave (deferred shading pattern), which AMD handles via a scalarization loop that requires the annotation to emit",
@@ -146,25 +150,25 @@
           "evidence": "'When the material ID varies across an invocation group (wavefront/warp), the index used to access the bindless texture heap becomes non-uniform.'"
         },
         {
-          "text": "States that NonUniformResourceIndex is NOT needed for buffer pointer arithmetic — only when indexing the texture descriptor heap",
+          "text": "States that NonUniformResourceIndex is NOT needed for buffer pointer arithmetic \u2014 only when indexing the texture descriptor heap",
           "passed": false,
           "evidence": "Does not distinguish between buffer pointer arithmetic and texture descriptor heap indexing."
         },
         {
           "text": "Specifies the inter-pass barrier must use STAGE_RASTER_COLOR_OUT as the producer stage (not STAGE_PIXEL_SHADER), because the G-buffer writes happen in the ROP output stage",
           "passed": true,
-          "evidence": "Barrier uses 'srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT' — the color attachment output stage is the correct producer stage equivalent to STAGE_RASTER_COLOR_OUT."
+          "evidence": "Barrier uses 'srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT' \u2014 the color attachment output stage is the correct producer stage equivalent to STAGE_RASTER_COLOR_OUT."
         },
         {
           "text": "Notes that HAZARD_DESCRIPTORS must be added to the barrier if the descriptor heap was written (e.g., streaming new textures) between the G-buffer and lighting passes, to invalidate the sampler's internal descriptor cache",
           "passed": false,
-          "evidence": "Barrier uses VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT → VK_ACCESS_2_SHADER_SAMPLED_READ_BIT but does not mention HAZARD_DESCRIPTORS or descriptor cache invalidation."
+          "evidence": "Barrier uses VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT \u2192 VK_ACCESS_2_SHADER_SAMPLED_READ_BIT but does not mention HAZARD_DESCRIPTORS or descriptor cache invalidation."
         }
       ]
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "tbdr-mobile-blend-state-gbuffer-ops",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -175,24 +179,24 @@
       },
       "expectations": [
         {
-          "text": "Identifies that blend state must be baked into the PSO on Mali and Adreno (TBDR architectures) because the driver appends blend instructions to the pixel shader microcode — dynamic blend state does not work correctly on these GPUs",
+          "text": "Identifies that blend state must be baked into the PSO on Mali and Adreno (TBDR architectures) because the driver appends blend instructions to the pixel shader microcode \u2014 dynamic blend state does not work correctly on these GPUs",
           "passed": true,
-          "evidence": "'On mobile TBDR, the driver appends blend logic to the pixel shader microcode — it's part of the compiled shader. Dynamic blend state either falls back to a slow path or produces incorrect results.'"
+          "evidence": "'On mobile TBDR, the driver appends blend logic to the pixel shader microcode \u2014 it's part of the compiled shader. Dynamic blend state either falls back to a slow path or produces incorrect results.'"
         },
         {
-          "text": "Flags the storeOp=DONT_CARE on the depth attachment as incorrect if the lighting pass needs depth for depth testing — DONT_CARE discards tile data before VRAM write, so the downstream pass reads garbage or undefined values",
+          "text": "Flags the storeOp=DONT_CARE on the depth attachment as incorrect if the lighting pass needs depth for depth testing \u2014 DONT_CARE discards tile data before VRAM write, so the downstream pass reads garbage or undefined values",
           "passed": true,
           "evidence": "'If your lighting pass then reads that depth attachment for depth testing, the data may not be there.' Fix: 'set storeOp=STORE on the geometry pass depth attachment.'"
         },
         {
           "text": "Recommends loadOp=DONT_CARE for G-buffer color attachments that are fully overwritten each geometry pass, explaining this allows the TBDR to skip the tile load from VRAM (zero bandwidth cost for that attachment)",
           "passed": false,
-          "evidence": "loadOp=DONT_CARE for G-buffer color attachments is not mentioned — the answer focuses on storeOp and tile memory pressure."
+          "evidence": "loadOp=DONT_CARE for G-buffer color attachments is not mentioned \u2014 the answer focuses on storeOp and tile memory pressure."
         },
         {
-          "text": "Avoids recommending Vulkan subpasses as the solution — the skill explicitly states Vulkan 1.3 dynamic rendering + VK_EXT_shader_tile_image is the correct model, not subpasses",
+          "text": "Avoids recommending Vulkan subpasses as the solution \u2014 the skill explicitly states Vulkan 1.3 dynamic rendering + VK_EXT_shader_tile_image is the correct model, not subpasses",
           "passed": false,
-          "evidence": "Recommends 'use a subpass/render pass dependency that keeps depth in tile memory' — explicitly recommends subpasses as the preferred solution."
+          "evidence": "Recommends 'use a subpass/render pass dependency that keeps depth in tile memory' \u2014 explicitly recommends subpasses as the preferred solution."
         },
         {
           "text": "Notes that Apple Silicon Macs (M1/M2/M3) are also TBDR and require the same baked-blend-in-PSO treatment, not just ARM Mali and Adreno",
@@ -203,7 +207,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "tbdr-mobile-blend-state-gbuffer-ops",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -214,12 +218,12 @@
       },
       "expectations": [
         {
-          "text": "Identifies that blend state must be baked into the PSO on Mali and Adreno (TBDR architectures) because the driver appends blend instructions to the pixel shader microcode — dynamic blend state does not work correctly on these GPUs",
+          "text": "Identifies that blend state must be baked into the PSO on Mali and Adreno (TBDR architectures) because the driver appends blend instructions to the pixel shader microcode \u2014 dynamic blend state does not work correctly on these GPUs",
           "passed": true,
           "evidence": "'Using vkCmdSetColorBlendEquationEXT... is fine on desktop but problematic on mobile where the driver may not handle dynamic state as efficiently.' Recommends 'Pre-bake commonly used states.'"
         },
         {
-          "text": "Flags the storeOp=DONT_CARE on the depth attachment as incorrect if the lighting pass needs depth for depth testing — DONT_CARE discards tile data before VRAM write, so the downstream pass reads garbage or undefined values",
+          "text": "Flags the storeOp=DONT_CARE on the depth attachment as incorrect if the lighting pass needs depth for depth testing \u2014 DONT_CARE discards tile data before VRAM write, so the downstream pass reads garbage or undefined values",
           "passed": true,
           "evidence": "'storeOp=DONT_CARE means the depth data is discarded from tile memory and never written to system memory. But you said you need the depth for the lighting pass's depth test... you MUST store depth to system memory.'"
         },
@@ -229,9 +233,9 @@
           "evidence": "loadOp=DONT_CARE for G-buffer color attachments is not mentioned."
         },
         {
-          "text": "Avoids recommending Vulkan subpasses as the solution — the skill explicitly states Vulkan 1.3 dynamic rendering + VK_EXT_shader_tile_image is the correct model, not subpasses",
+          "text": "Avoids recommending Vulkan subpasses as the solution \u2014 the skill explicitly states Vulkan 1.3 dynamic rendering + VK_EXT_shader_tile_image is the correct model, not subpasses",
           "passed": false,
-          "evidence": "Recommends 'merge the G-buffer and lighting passes into a single render pass using subpasses' as the primary optimization — explicitly recommends subpasses."
+          "evidence": "Recommends 'merge the G-buffer and lighting passes into a single render pass using subpasses' as the primary optimization \u2014 explicitly recommends subpasses."
         },
         {
           "text": "Notes that Apple Silicon Macs (M1/M2/M3) are also TBDR and require the same baked-blend-in-PSO treatment, not just ARM Mali and Adreno",

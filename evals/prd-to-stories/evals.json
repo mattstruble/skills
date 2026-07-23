@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "email-notifications-beads-present",
       "prompt": "Decompose this PRD into stories.\n\n---\n\n## Context\n\nProject directory: /tmp/test-project-with-beads\n\nThis project has `.beads/` initialized. When checking for `.beads/` existence, treat it as present.\n\n---\n\n## PRD\n\n# Product Requirements Document: User Notifications\n\n## Problem Statement\nUsers miss important events because the system has no notification mechanism.\n\n## Capability Group: Email Notifications\n\n### Behaviors\n- B1: System sends an email when a user's job completes\n- B2: System sends an email when a job fails with an error summary\n- B3: User can unsubscribe from email notifications per event type\n\n---\n\n## Instructions for this eval\n\nDo NOT actually run bd commands or write files to disk. Instead, describe exactly what commands you would run and what files you would create. Show the full `bd create` command strings you would execute for the epic and each task.",
       "expected_output": "The skill writes story markdown files for the Email Notifications capability group, then creates one beads epic for 'Email Notifications' and one beads task per story. The output includes explicit `bd create` command strings: one with `-t epic` for the capability group, and one or more with `-t task --parent <epic-id>` for the stories.",
       "files": [],
@@ -18,6 +19,7 @@
     },
     {
       "id": 2,
+      "name": "email-notifications-no-beads",
       "prompt": "Decompose this PRD into stories.\n\n---\n\n## Context\n\nProject directory: /tmp/test-project-no-beads\n\nThis project does NOT have `.beads/` initialized. When checking for `.beads/` existence, treat it as absent.\n\n---\n\n## PRD\n\n# Product Requirements Document: User Notifications\n\n## Problem Statement\nUsers miss important events because the system has no notification mechanism.\n\n## Capability Group: Email Notifications\n\n### Behaviors\n- B1: System sends an email when a user's job completes\n- B2: System sends an email when a job fails with an error summary\n- B3: User can unsubscribe from email notifications per event type\n\n---\n\n## Instructions for this eval\n\nDo NOT actually run bd commands or write files to disk. Instead, describe exactly what commands you would run and what files you would create. Show whether you would execute any `bd` commands.",
       "expected_output": "The skill writes story markdown files for the Email Notifications capability group and reports coverage. It does NOT execute any `bd create` or other `bd` commands. No beads epic or task creation is mentioned.",
       "files": [],
@@ -33,6 +35,7 @@
     },
     {
       "id": 3,
+      "name": "two-capability-groups-separate-epics",
       "prompt": "Decompose this PRD into stories.\n\n---\n\n## Context\n\nProject directory: /tmp/test-project-two-groups\n\nThis project has `.beads/` initialized. When checking for `.beads/` existence, treat it as present.\n\n---\n\n## PRD\n\n# Product Requirements Document: Search and Export\n\n## Problem Statement\nUsers cannot find content efficiently and cannot extract data for external use.\n\n## Capability Group: Search\n\n### Behaviors\n- B1: User can search items by keyword\n- B2: Search results are ranked by relevance\n\n## Capability Group: Export\n\n### Behaviors\n- B3: User can export search results as CSV\n- B4: Export respects the current search filters\n\n---\n\n## Instructions for this eval\n\nDecompose the entire PRD (both capability groups). Do NOT actually run bd commands or write files to disk. Instead, show the full `bd create` command strings you would execute.",
       "expected_output": "The skill creates two separate beads epics — one for 'Search' and one for 'Export' — each with their own `bd create -t epic` command. Tasks are created under the correct parent epic for each capability group.",
       "files": [],
@@ -48,6 +51,7 @@
     },
     {
       "id": 4,
+      "name": "auth-behaviors-grouped-three-stories",
       "prompt": "Decompose this PRD into stories.\n\n---\n\n## Context\n\nProject directory: /tmp/test-project-three-stories\n\nThis project has `.beads/` initialized. When checking for `.beads/` existence, treat it as present.\n\n---\n\n## PRD\n\n# Product Requirements Document: User Authentication\n\n## Problem Statement\nThe application has no authentication, allowing anyone to access any resource.\n\n## Capability Group: Authentication\n\n### Behaviors\n- B1: User can register with email and password\n- B2: User can log in and receive a session token\n- B3: User can log out and invalidate their session token\n- B4: Unauthenticated requests to protected endpoints return 401\n- B5: Passwords are stored as bcrypt hashes, never plaintext\n\n---\n\n## Instructions for this eval\n\nDecompose the Authentication capability group into exactly 3 stories (group related behaviors). Do NOT actually run bd commands or write files to disk. Show the full `bd create` command strings you would execute for the epic and all tasks.",
       "expected_output": "The skill creates one beads epic for 'Authentication' and exactly three `bd create -t task --parent <epic-id>` commands, one per story. Each task command includes --description and --acceptance populated from the story content.",
       "files": [],
@@ -63,6 +67,7 @@
     },
     {
       "id": 5,
+      "name": "password-reset-story-content-match",
       "prompt": "Decompose this PRD into stories.\n\n---\n\n## Context\n\nProject directory: /tmp/test-project-content-match\n\nThis project has `.beads/` initialized. When checking for `.beads/` existence, treat it as present.\n\n---\n\n## PRD\n\n# Product Requirements Document: Password Reset\n\n## Problem Statement\nUsers who forget their password have no self-service recovery path.\n\n## Capability Group: Password Reset\n\n### Behaviors\n- B1: User can request a password reset email by entering their registered email address\n- B2: Reset link expires after 1 hour\n- B3: User can set a new password using the reset link; old password is invalidated immediately\n\n---\n\n## Instructions for this eval\n\nDecompose the Password Reset capability group into stories. Do NOT actually run bd commands or write files to disk. Show:\n1. The markdown content you would write for each story file\n2. The full `bd create` command strings you would execute\n\nThe beads task --description must match the Summary section of the corresponding story file. The beads task --acceptance must match the Acceptance Criteria section of the corresponding story file (criteria text without checkbox syntax).",
       "expected_output": "For each story, the skill shows both the markdown file content and the corresponding `bd create` command. The --description value in each bd create command matches the Summary paragraph in the story markdown. The --acceptance value matches the Acceptance Criteria list items (stripped of '- [ ]' prefix).",
       "files": [],

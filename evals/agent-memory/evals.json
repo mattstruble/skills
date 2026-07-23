@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "personal-assistant-memory-format",
       "prompt": "I'm building a personal AI assistant that needs to remember user preferences, past conversations, and relationship context across sessions. What storage format should I use for the memory, and how should I structure it?",
       "expected_output": "Recommends the two-tier architecture: Advanced JSON Cards for resident structured facts (Tier 1, always in context) plus raw conversation storage for on-demand retrieval (Tier 2). Explains the tradeoffs of each format on the spectrum (Simple Notes -> Enhanced Notes -> JSON Cards -> Advanced JSON Cards -> Code). Highlights the backstory field in Advanced JSON Cards for disambiguation. Mentions the hybrid recommendation as the production default.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "conflicting-location-memory-resolution",
       "prompt": "My agent has stored that the user lives in San Francisco (from 3 months ago) and also that they live in Austin (from last week). How should my memory system handle this contradiction?",
       "expected_output": "Explains the three conflict resolution strategies: timestamp-based priority (most recent wins for mutable facts), source credibility (explicit correction outranks inferred fact), and contextual disambiguation (both may be correct in different contexts — work vs personal address). Recommends the Mem0 extract-compare-decide pipeline (ADD/UPDATE/DELETE/NOOP) for making conflict resolution explicit. Notes that the backstory field in Advanced JSON Cards enables disambiguation rather than treating both as a conflict.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "memory-system-evaluation-levels",
       "prompt": "How do I test whether my agent's memory system is actually good? What should I measure?",
       "expected_output": "Presents the three-level evaluation framework: Level 1 (basic recall — retrieve a fact from a single session), Level 2 (multi-session retrieval and disambiguation — reconcile facts across sessions), Level 3 (proactive service — synthesize memories to anticipate needs the user hasn't expressed). Notes that most systems plateau at Level 1 and that Level 3 requires the two-tier architecture. Provides concrete test scenario examples for each level.",
       "files": [],

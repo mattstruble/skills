@@ -2,13 +2,29 @@
   "metadata": {
     "skill_name": "agent-architecture",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5", "eval-6", "eval-7", "eval-8", "eval-9", "eval-10", "eval-21", "eval-22", "eval-23", "eval-24", "eval-25"],
+    "evals_run": [
+      "customer-support-refund-loop",
+      "github-triage-autonomy",
+      "coding-agent-filesystem-guardrails",
+      "research-agent-hallucination-fix",
+      "pdf-invoice-workflow-vs-agent",
+      "document-analysis-model-selection",
+      "planner-worker-verification-layer",
+      "ecommerce-returns-agent-architecture",
+      "web-browse-code-execute-risk",
+      "knowledge-base-agent-layering",
+      "content-moderation-pipeline-design",
+      "competitive-intel-agent-failures",
+      "sales-call-prep-agent-design",
+      "long-research-context-rot",
+      "long-corpus-harness-decomposition"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "customer-support-refund-loop",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -29,17 +45,17 @@
           "evidence": "'Stopping conditions for the autonomous layer: 1. Task-complete signal: refund processed OR escalation handed off. 2. Max iterations: cap at 10 reasoning cycles per conversation turn. 3. Unrecoverable error: 3 consecutive API failures.'"
         },
         {
-          "text": "Applies dynamic tool risk rating to the refund action — reversibility, permission level, or financial impact — and recommends a higher-risk gate for it",
+          "text": "Applies dynamic tool risk rating to the refund action \u2014 reversibility, permission level, or financial impact \u2014 and recommends a higher-risk gate for it",
           "passed": true,
           "evidence": "'Constrain: Cap refund amount at the original order total (execution-side constraint). Expose only query_order and process_refund as tools.' Dynamic risk applied to limit tool surface."
         },
         {
-          "text": "Addresses the Correct harness function: retry on transient failure, then escalate to human on persistent failure — not just 'add error handling'",
+          "text": "Addresses the Correct harness function: retry on transient failure, then escalate to human on persistent failure \u2014 not just 'add error handling'",
           "passed": true,
-          "evidence": "'Correct: On transient failure (timeout, 5xx), silent retry with exponential backoff (max 3 retries). On persistent failure (same error 3× consecutively), exit the loop via the unrecoverable-error stopping condition and escalate to human.'"
+          "evidence": "'Correct: On transient failure (timeout, 5xx), silent retry with exponential backoff (max 3 retries). On persistent failure (same error 3\u00d7 consecutively), exit the loop via the unrecoverable-error stopping condition and escalate to human.'"
         },
         {
-          "text": "Frames the refund API error as a Verify/Correct problem, not just an orchestration problem — the harness must detect and respond to the failure, not the LLM",
+          "text": "Frames the refund API error as a Verify/Correct problem, not just an orchestration problem \u2014 the harness must detect and respond to the failure, not the LLM",
           "passed": true,
           "evidence": "'Apply the Verify + Correct harness functions: Verify: After each process_refund call, check HTTP status and response body against expected schema. Correct: On transient failure... On persistent failure...'"
         }
@@ -47,7 +63,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "customer-support-refund-loop",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -60,7 +76,7 @@
         {
           "text": "Recommends a workflow (fixed code path) rather than a fully autonomous agent for the core refund flow, while allowing a bounded autonomous layer for conversational handling",
           "passed": true,
-          "evidence": "'Use a state-machine orchestration pattern with explicit states: greeting → identify_issue → lookup_order → attempt_resolution → escalate_or_close.' State machine = workflow pattern."
+          "evidence": "'Use a state-machine orchestration pattern with explicit states: greeting \u2192 identify_issue \u2192 lookup_order \u2192 attempt_resolution \u2192 escalate_or_close.' State machine = workflow pattern."
         },
         {
           "text": "Specifies all three mandatory stopping conditions: task-complete signal, max iterations cap, and unrecoverable-error exit",
@@ -68,25 +84,25 @@
           "evidence": "'Circuit breaker: Track consecutive failures per tool. After 3 failures... stop retrying.' 'Global step budget: Cap the total number of LLM calls per conversation.' 'Error classification: Distinguish retriable from permanent failures.'"
         },
         {
-          "text": "Applies dynamic tool risk rating to the refund action — reversibility, permission level, or financial impact — and recommends a higher-risk gate for it",
+          "text": "Applies dynamic tool risk rating to the refund action \u2014 reversibility, permission level, or financial impact \u2014 and recommends a higher-risk gate for it",
           "passed": false,
           "evidence": "Baseline uses circuit breakers and error classification but does not apply a dynamic tool risk rating framework (reversibility/permission/financial impact) to the refund action specifically."
         },
         {
-          "text": "Addresses the Correct harness function: retry on transient failure, then escalate to human on persistent failure — not just 'add error handling'",
+          "text": "Addresses the Correct harness function: retry on transient failure, then escalate to human on persistent failure \u2014 not just 'add error handling'",
           "passed": true,
-          "evidence": "'Exponential backoff with jitter: On transient errors, wait before retry — but only up to the circuit breaker limit.' 'After 3 failures of the same API call, stop retrying and transition to a fallback state.'"
+          "evidence": "'Exponential backoff with jitter: On transient errors, wait before retry \u2014 but only up to the circuit breaker limit.' 'After 3 failures of the same API call, stop retrying and transition to a fallback state.'"
         },
         {
-          "text": "Frames the refund API error as a Verify/Correct problem, not just an orchestration problem — the harness must detect and respond to the failure, not the LLM",
+          "text": "Frames the refund API error as a Verify/Correct problem, not just an orchestration problem \u2014 the harness must detect and respond to the failure, not the LLM",
           "passed": false,
-          "evidence": "Baseline addresses error handling via circuit breakers and state machine transitions but does not frame this as a Verify/Correct harness problem — the distinction between harness-level and LLM-level response is not made."
+          "evidence": "Baseline addresses error handling via circuit breakers and state machine transitions but does not frame this as a Verify/Correct harness problem \u2014 the distinction between harness-level and LLM-level response is not made."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "github-triage-autonomy",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -97,24 +113,24 @@
       },
       "expectations": [
         {
-          "text": "Applies the YAGNI ladder — questions whether a fully autonomous agent is needed and recommends a workflow or pipeline pattern for this fixed-sequence task",
+          "text": "Applies the YAGNI ladder \u2014 questions whether a fully autonomous agent is needed and recommends a workflow or pipeline pattern for this fixed-sequence task",
           "passed": true,
-          "evidence": "'Orchestration: Workflow. The execution path is fixed and known: fetch new issues → classify → label → assign → draft response. Each step is a deterministic code transition with an LLM running inside nodes.'"
+          "evidence": "'Orchestration: Workflow. The execution path is fixed and known: fetch new issues \u2192 classify \u2192 label \u2192 assign \u2192 draft response. Each step is a deterministic code transition with an LLM running inside nodes.'"
         },
         {
-          "text": "Rates labeling/assigning as lower-risk (reversible) and closing issues as high-risk (irreversible) — and recommends not exposing close_issue as a tool at all",
+          "text": "Rates labeling/assigning as lower-risk (reversible) and closing issues as high-risk (irreversible) \u2014 and recommends not exposing close_issue as a tool at all",
           "passed": true,
-          "evidence": "'add_label and assign are low-risk (reversible). close_issue is high-risk (irreversible in practice). Do not expose close_issue as a tool at all — if it's not in the tool set, it cannot be called.'"
+          "evidence": "'add_label and assign are low-risk (reversible). close_issue is high-risk (irreversible in practice). Do not expose close_issue as a tool at all \u2014 if it's not in the tool set, it cannot be called.'"
         },
         {
-          "text": "Distinguishes jailbreak from prompt injection as separate threats — issue content could contain adversarial instructions that redirect the agent",
+          "text": "Distinguishes jailbreak from prompt injection as separate threats \u2014 issue content could contain adversarial instructions that redirect the agent",
           "passed": false,
           "evidence": "Answer does not distinguish jailbreak from prompt injection as separate threats. It focuses on confidence thresholds and tool restrictions without addressing adversarial content in issue bodies."
         },
         {
           "text": "Recommends a reasoning model for the triage/classification step given the need to interpret nuanced issue descriptions",
           "passed": true,
-          "evidence": "'Apply the reasoning-required gate: this agent must triage, label, assign, and draft — all require reasoning about context. Use a reasoning model.'"
+          "evidence": "'Apply the reasoning-required gate: this agent must triage, label, assign, and draft \u2014 all require reasoning about context. Use a reasoning model.'"
         },
         {
           "text": "Specifies human-in-the-loop triggers: low-confidence triage, novel issue types that don't fit known categories, or batch anomalies",
@@ -125,7 +141,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "github-triage-autonomy",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -136,24 +152,24 @@
       },
       "expectations": [
         {
-          "text": "Applies the YAGNI ladder — questions whether a fully autonomous agent is needed and recommends a workflow or pipeline pattern for this fixed-sequence task",
+          "text": "Applies the YAGNI ladder \u2014 questions whether a fully autonomous agent is needed and recommends a workflow or pipeline pattern for this fixed-sequence task",
           "passed": false,
           "evidence": "Baseline recommends a pipeline pattern but does not apply the YAGNI ladder or explicitly question whether a fully autonomous agent is needed."
         },
         {
-          "text": "Rates labeling/assigning as lower-risk (reversible) and closing issues as high-risk (irreversible) — and recommends not exposing close_issue as a tool at all",
+          "text": "Rates labeling/assigning as lower-risk (reversible) and closing issues as high-risk (irreversible) \u2014 and recommends not exposing close_issue as a tool at all",
           "passed": true,
           "evidence": "'Read-only by default: The agent proposes changes but doesn't execute them.' 'Destructive actions (close, lock, delete) go to a review queue.' 'Denylist of actions: Never close issues, never remove labels, never force-push.'"
         },
         {
-          "text": "Distinguishes jailbreak from prompt injection as separate threats — issue content could contain adversarial instructions that redirect the agent",
+          "text": "Distinguishes jailbreak from prompt injection as separate threats \u2014 issue content could contain adversarial instructions that redirect the agent",
           "passed": false,
           "evidence": "Baseline does not distinguish jailbreak from prompt injection or address adversarial content in issue bodies as a threat vector."
         },
         {
           "text": "Recommends a reasoning model for the triage/classification step given the need to interpret nuanced issue descriptions",
           "passed": false,
-          "evidence": "'Use a smaller, cheaper model — GPT-4o-mini or Claude 3.5 Haiku. The tasks are structured and low-ambiguity. You don't need frontier reasoning for triage.' Explicitly recommends against a reasoning model."
+          "evidence": "'Use a smaller, cheaper model \u2014 GPT-4o-mini or Claude 3.5 Haiku. The tasks are structured and low-ambiguity. You don't need frontier reasoning for triage.' Explicitly recommends against a reasoning model."
         },
         {
           "text": "Specifies human-in-the-loop triggers: low-confidence triage, novel issue types that don't fit known categories, or batch anomalies",
@@ -164,7 +180,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "coding-agent-filesystem-guardrails",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -177,15 +193,15 @@
         {
           "text": "Applies the YAGNI ladder: the iterative test-fix loop requires the LLM to decide the execution path at runtime, which justifies an autonomous agent over a fixed workflow",
           "passed": true,
-          "evidence": "'Apply the YAGNI ladder: Can the execution path be known in advance? Partially... The iteration loop — where the agent decides what to fix based on test output — requires runtime decision-making. Answer: Autonomous agent.'"
+          "evidence": "'Apply the YAGNI ladder: Can the execution path be known in advance? Partially... The iteration loop \u2014 where the agent decides what to fix based on test output \u2014 requires runtime decision-making. Answer: Autonomous agent.'"
         },
         {
           "text": "Specifies all three stopping conditions for the autonomous loop: task-complete (tests pass), max iterations, and unrecoverable-error exit",
           "passed": true,
-          "evidence": "'Stopping conditions (mandatory): 1. Task-complete: all specified tests pass. 2. Max iterations: cap at 15–20 edit-test cycles. 3. Unrecoverable error: 3 consecutive identical failures (agent is stuck).'"
+          "evidence": "'Stopping conditions (mandatory): 1. Task-complete: all specified tests pass. 2. Max iterations: cap at 15\u201320 edit-test cycles. 3. Unrecoverable error: 3 consecutive identical failures (agent is stuck).'"
         },
         {
-          "text": "Applies dynamic tool risk rating to file system access — reading is low-risk, writing is medium/high depending on path, bash is high-risk by default",
+          "text": "Applies dynamic tool risk rating to file system access \u2014 reading is low-risk, writing is medium/high depending on path, bash is high-risk by default",
           "passed": true,
           "evidence": "Table: 'read_file: Low (read-only) / Low always. write_file: Medium / High if path matches system files. bash: High / Depends on command semantics.' Dynamic risk rating applied."
         },
@@ -203,7 +219,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "coding-agent-filesystem-guardrails",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -224,7 +240,7 @@
           "evidence": "'Step budget: Cap at 20 iterations. If tests still fail after 20 attempts, stop and report what it tried.' Task-complete implied by 'iterate until tests pass'. Two of three stopping conditions present."
         },
         {
-          "text": "Applies dynamic tool risk rating to file system access — reading is low-risk, writing is medium/high depending on path, bash is high-risk by default",
+          "text": "Applies dynamic tool risk rating to file system access \u2014 reading is low-risk, writing is medium/high depending on path, bash is high-risk by default",
           "passed": false,
           "evidence": "Baseline uses path allowlists and command allowlists but does not apply a dynamic tool risk rating framework (reversibility/permission/financial impact) to file system tools."
         },
@@ -242,7 +258,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "research-agent-hallucination-fix",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -253,19 +269,19 @@
       },
       "expectations": [
         {
-          "text": "Diagnoses the infinite loop as a missing stopping condition — the agent lacks a max-iterations cap and an unrecoverable-error exit path",
+          "text": "Diagnoses the infinite loop as a missing stopping condition \u2014 the agent lacks a max-iterations cap and an unrecoverable-error exit path",
           "passed": true,
-          "evidence": "'Loops forever on ambiguous queries → Missing stopping conditions (§1). The agent has no max-iterations cap and no unrecoverable-error exit path.'"
+          "evidence": "'Loops forever on ambiguous queries \u2192 Missing stopping conditions (\u00a71). The agent has no max-iterations cap and no unrecoverable-error exit path.'"
         },
         {
-          "text": "Diagnoses hallucinated citations as a Verify gap — the harness has no output validation step that checks citations against actual retrieved sources",
+          "text": "Diagnoses hallucinated citations as a Verify gap \u2014 the harness has no output validation step that checks citations against actual retrieved sources",
           "passed": true,
-          "evidence": "'Hallucinating citations → Missing Verify function in the harness. The agent generates citations without checking them against actual search results. No output-side validation exists.'"
+          "evidence": "'Hallucinating citations \u2192 Missing Verify function in the harness. The agent generates citations without checking them against actual search results. No output-side validation exists.'"
         },
         {
           "text": "Names context rot as a contributing factor: accumulated raw search results push the model out-of-distribution over long sessions",
           "passed": true,
-          "evidence": "'Context rot (why it's getting worse): This is likely the growing-trajectory problem... A long trajectory accumulates noise — earlier search results get buried by later ones.'"
+          "evidence": "'Context rot (why it's getting worse): This is likely the growing-trajectory problem... A long trajectory accumulates noise \u2014 earlier search results get buried by later ones.'"
         },
         {
           "text": "Recommends the Correct harness function for the loop: explicit exit on max search cycles, repeated-call detection, or similar",
@@ -273,7 +289,7 @@
           "evidence": "'Add all three stopping conditions: task-complete signal... max iterations (cap at 20 search cycles), unrecoverable error (3 consecutive searches returning no relevant results).' 'Add a repeated-call fingerprint detector.'"
         },
         {
-          "text": "Recommends isolation over compression for the search results — delegating retrieval to a sub-agent that returns only conclusions, not raw content",
+          "text": "Recommends isolation over compression for the search results \u2014 delegating retrieval to a sub-agent that returns only conclusions, not raw content",
           "passed": true,
           "evidence": "'Consider isolation over compression: delegate search to a sub-agent that returns only conclusions, keeping the main synthesis context clean.'"
         }
@@ -281,7 +297,7 @@
     },
     {
       "eval_id": 4,
-      "eval_name": "eval-4",
+      "eval_name": "research-agent-hallucination-fix",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -292,12 +308,12 @@
       },
       "expectations": [
         {
-          "text": "Diagnoses the infinite loop as a missing stopping condition — the agent lacks a max-iterations cap and an unrecoverable-error exit path",
+          "text": "Diagnoses the infinite loop as a missing stopping condition \u2014 the agent lacks a max-iterations cap and an unrecoverable-error exit path",
           "passed": true,
           "evidence": "'Loop budget + ambiguity detection: Set a maximum search iterations (e.g., 5). If after 5 searches the agent hasn't found sufficient evidence, it should output \"insufficient evidence found\".'"
         },
         {
-          "text": "Diagnoses hallucinated citations as a Verify gap — the harness has no output validation step that checks citations against actual retrieved sources",
+          "text": "Diagnoses hallucinated citations as a Verify gap \u2014 the harness has no output validation step that checks citations against actual retrieved sources",
           "passed": true,
           "evidence": "'Citation verification: After synthesis, run a verification pass that checks each citation against the actual retrieved URLs. Strip any citation that doesn't match a real source.'"
         },
@@ -309,10 +325,10 @@
         {
           "text": "Recommends the Correct harness function for the loop: explicit exit on max search cycles, repeated-call detection, or similar",
           "passed": true,
-          "evidence": "'Loop budget + ambiguity detection: Set a maximum search iterations (e.g., 5)... output \"insufficient evidence found\" with what it did find — not keep searching.'"
+          "evidence": "'Loop budget + ambiguity detection: Set a maximum search iterations (e.g., 5)... output \"insufficient evidence found\" with what it did find \u2014 not keep searching.'"
         },
         {
-          "text": "Recommends isolation over compression for the search results — delegating retrieval to a sub-agent that returns only conclusions, not raw content",
+          "text": "Recommends isolation over compression for the search results \u2014 delegating retrieval to a sub-agent that returns only conclusions, not raw content",
           "passed": false,
           "evidence": "Baseline recommends 'Separate retrieval from synthesis' (two-phase architecture) but not sub-agent isolation where raw tokens die with the sub-agent's context."
         }
@@ -320,7 +336,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "pdf-invoice-workflow-vs-agent",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -331,9 +347,9 @@
       },
       "expectations": [
         {
-          "text": "Applies the YAGNI ladder explicitly: the execution path is fixed in advance (extract → lookup → compare → report), so a workflow is sufficient",
+          "text": "Applies the YAGNI ladder explicitly: the execution path is fixed in advance (extract \u2192 lookup \u2192 compare \u2192 report), so a workflow is sufficient",
           "passed": true,
-          "evidence": "'Apply the YAGNI ladder: 1. Single LLM call? — No... 2. Workflow? — Is the execution path fixed? Yes: extract line items → look up each item in catalog → flag discrepancies → return results. Answer: Workflow.'"
+          "evidence": "'Apply the YAGNI ladder: 1. Single LLM call? \u2014 No... 2. Workflow? \u2014 Is the execution path fixed? Yes: extract line items \u2192 look up each item in catalog \u2192 flag discrepancies \u2192 return results. Answer: Workflow.'"
         },
         {
           "text": "Identifies the decision criterion: does the LLM need to decide what happens next at runtime, or is the execution path known in advance?",
@@ -348,7 +364,7 @@
         {
           "text": "Recommends a single LLM call or a short fixed workflow rather than a ReAct loop, and explains why",
           "passed": true,
-          "evidence": "'Answer: Workflow. You do not need an agent.' Four-node workflow described: LLM extraction → code catalog lookup → code comparison → code formatting."
+          "evidence": "'Answer: Workflow. You do not need an agent.' Four-node workflow described: LLM extraction \u2192 code catalog lookup \u2192 code comparison \u2192 code formatting."
         },
         {
           "text": "Avoids recommending an autonomous agent without a concrete justification for why the execution path cannot be known in advance",
@@ -359,7 +375,7 @@
     },
     {
       "eval_id": 5,
-      "eval_name": "eval-5",
+      "eval_name": "pdf-invoice-workflow-vs-agent",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -370,9 +386,9 @@
       },
       "expectations": [
         {
-          "text": "Applies the YAGNI ladder explicitly: the execution path is fixed in advance (extract → lookup → compare → report), so a workflow is sufficient",
+          "text": "Applies the YAGNI ladder explicitly: the execution path is fixed in advance (extract \u2192 lookup \u2192 compare \u2192 report), so a workflow is sufficient",
           "passed": true,
-          "evidence": "'You don't need an agent. Use a fixed pipeline. Why: Every step is deterministic and well-defined. There's no ambiguity in \"extract line items from PDF\" → \"match against catalog\" → \"flag discrepancies.\"'"
+          "evidence": "'You don't need an agent. Use a fixed pipeline. Why: Every step is deterministic and well-defined. There's no ambiguity in \"extract line items from PDF\" \u2192 \"match against catalog\" \u2192 \"flag discrepancies.\"'"
         },
         {
           "text": "Identifies the decision criterion: does the LLM need to decide what happens next at runtime, or is the execution path known in advance?",
@@ -387,7 +403,7 @@
         {
           "text": "Recommends a single LLM call or a short fixed workflow rather than a ReAct loop, and explains why",
           "passed": true,
-          "evidence": "Four-step pipeline: PDF extraction → catalog lookup → validation → output. 'This is a database query, not an LLM task' for catalog lookup."
+          "evidence": "Four-step pipeline: PDF extraction \u2192 catalog lookup \u2192 validation \u2192 output. 'This is a database query, not an LLM task' for catalog lookup."
         },
         {
           "text": "Avoids recommending an autonomous agent without a concrete justification for why the execution path cannot be known in advance",
@@ -398,7 +414,7 @@
     },
     {
       "eval_id": 6,
-      "eval_name": "eval-6",
+      "eval_name": "document-analysis-model-selection",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -409,9 +425,9 @@
       },
       "expectations": [
         {
-          "text": "Applies the four durable model-selection axes — reasoning requirement, output speed, multimodal need, open vs closed — rather than naming specific models as the answer",
+          "text": "Applies the four durable model-selection axes \u2014 reasoning requirement, output speed, multimodal need, open vs closed \u2014 rather than naming specific models as the answer",
           "passed": true,
-          "evidence": "'Apply §2 — Model Selection axes: 1. Reasoning-required gate: Yes. 2. Output speed: You said latency doesn't matter. 3. Multimodal: Hard requirement. 4. Open vs closed: Accuracy matters most → closed frontier models.'"
+          "evidence": "'Apply \u00a72 \u2014 Model Selection axes: 1. Reasoning-required gate: Yes. 2. Output speed: You said latency doesn't matter. 3. Multimodal: Hard requirement. 4. Open vs closed: Accuracy matters most \u2192 closed frontier models.'"
         },
         {
           "text": "Identifies multimodal as a hard requirement given charts and tables in PDFs, not just a nice-to-have",
@@ -421,7 +437,7 @@
         {
           "text": "Identifies the reasoning-required gate: reasoning across inconsistencies across 50-page documents requires a reasoning model, not a fast/cheap model",
           "passed": true,
-          "evidence": "'Reasoning-required gate: Yes — reasoning about inconsistencies across 50-page documents requires multi-step reasoning. Must use a reasoning model.'"
+          "evidence": "'Reasoning-required gate: Yes \u2014 reasoning about inconsistencies across 50-page documents requires multi-step reasoning. Must use a reasoning model.'"
         },
         {
           "text": "Notes the durability caveat: specific model versions iterate faster than any recommendation, so the answer should be durable criteria rather than named models",
@@ -437,7 +453,7 @@
     },
     {
       "eval_id": 6,
-      "eval_name": "eval-6",
+      "eval_name": "document-analysis-model-selection",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -448,7 +464,7 @@
       },
       "expectations": [
         {
-          "text": "Applies the four durable model-selection axes — reasoning requirement, output speed, multimodal need, open vs closed — rather than naming specific models as the answer",
+          "text": "Applies the four durable model-selection axes \u2014 reasoning requirement, output speed, multimodal need, open vs closed \u2014 rather than naming specific models as the answer",
           "passed": false,
           "evidence": "Baseline gives detailed comparisons of GPT-4o, Claude 3.5 Sonnet, and Gemini 1.5 Pro with specific strengths/weaknesses. Does not apply the four durable axes framework."
         },
@@ -470,13 +486,13 @@
         {
           "text": "Recommends evaluating on the actual task rather than relying on benchmarks, since benchmark performance doesn't transfer to domain-specific tasks",
           "passed": true,
-          "evidence": "'Regardless of model, use a structured output schema and a validation pass. Don't rely solely on the model to produce valid JSON — parse and retry on failure.' Implies task-specific validation over benchmark trust."
+          "evidence": "'Regardless of model, use a structured output schema and a validation pass. Don't rely solely on the model to produce valid JSON \u2014 parse and retry on failure.' Implies task-specific validation over benchmark trust."
         }
       ]
     },
     {
       "eval_id": 7,
-      "eval_name": "eval-7",
+      "eval_name": "planner-worker-verification-layer",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -492,12 +508,12 @@
           "evidence": "'Verify function (between worker output and planner consumption): Format verification, Completeness verification, Consistency verification.' Explicit Verify harness function at the interface."
         },
         {
-          "text": "Recommends structured output contracts between planner and workers — the ACI principle applied to multi-agent communication",
+          "text": "Recommends structured output contracts between planner and workers \u2014 the ACI principle applied to multi-agent communication",
           "passed": true,
           "evidence": "'Contract-based output schema: The planner defines a strict output schema for each worker task. Workers must return results conforming to this schema. Schema violations are immediate failures.'"
         },
         {
-          "text": "Addresses the Correct function: what the planner does when a worker output fails validation — re-dispatch with error feedback, not silent failure",
+          "text": "Addresses the Correct function: what the planner does when a worker output fails validation \u2014 re-dispatch with error feedback, not silent failure",
           "passed": true,
           "evidence": "'Correct function: On schema failure: reject and re-dispatch with explicit error feedback. On completeness failure: re-dispatch with missing requirements highlighted. On consistency conflict: planner resolves by re-dispatching.'"
         },
@@ -507,15 +523,15 @@
           "evidence": "'Output isolation: Workers return results to the planner; they do not write to shared state directly. The planner is the single writer to the final output.'"
         },
         {
-          "text": "Notes that each worker should receive a locally in-distribution task description — narrow scope, minimal tools, clear boundaries",
+          "text": "Notes that each worker should receive a locally in-distribution task description \u2014 narrow scope, minimal tools, clear boundaries",
           "passed": true,
-          "evidence": "'Constrain: Each worker receives a narrow, self-contained task description with explicit boundaries (\"Do X. Do NOT do Y.\"). Minimize the tool set per worker — only the tools needed for that specific subtask.'"
+          "evidence": "'Constrain: Each worker receives a narrow, self-contained task description with explicit boundaries (\"Do X. Do NOT do Y.\"). Minimize the tool set per worker \u2014 only the tools needed for that specific subtask.'"
         }
       ]
     },
     {
       "eval_id": 7,
-      "eval_name": "eval-7",
+      "eval_name": "planner-worker-verification-layer",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -531,22 +547,22 @@
           "evidence": "'Worker output validation (pre-reconciliation): Schema validation, Constraint checking, Consistency check.' Explicit validation before planner consumption."
         },
         {
-          "text": "Recommends structured output contracts between planner and workers — the ACI principle applied to multi-agent communication",
+          "text": "Recommends structured output contracts between planner and workers \u2014 the ACI principle applied to multi-agent communication",
           "passed": true,
           "evidence": "'Typed contracts between planner and workers: Define explicit input/output schemas for each task type. The planner emits a structured task spec (goal, constraints, expected output format, success criteria).'"
         },
         {
-          "text": "Addresses the Correct function: what the planner does when a worker output fails validation — re-dispatch with error feedback, not silent failure",
+          "text": "Addresses the Correct function: what the planner does when a worker output fails validation \u2014 re-dispatch with error feedback, not silent failure",
           "passed": true,
           "evidence": "'Retry with variation: If a worker's output fails validation, retry with a modified prompt (e.g., add the validation error as feedback). Max 2 retries before escalating to the planner as a failed subtask.'"
         },
         {
           "text": "Recommends isolation: worker contexts should be self-contained so raw intermediate tokens don't flow back into the planner's context",
           "passed": true,
-          "evidence": "'Worker sandboxing: Each worker gets only the context it needs — not the full plan. This prevents scope creep. Workers cannot communicate with each other directly.'"
+          "evidence": "'Worker sandboxing: Each worker gets only the context it needs \u2014 not the full plan. This prevents scope creep. Workers cannot communicate with each other directly.'"
         },
         {
-          "text": "Notes that each worker should receive a locally in-distribution task description — narrow scope, minimal tools, clear boundaries",
+          "text": "Notes that each worker should receive a locally in-distribution task description \u2014 narrow scope, minimal tools, clear boundaries",
           "passed": false,
           "evidence": "Baseline recommends narrow context per worker but does not frame this as the locally-in-distribution criterion or mention minimal tool sets per worker."
         }
@@ -554,7 +570,7 @@
     },
     {
       "eval_id": 8,
-      "eval_name": "eval-8",
+      "eval_name": "ecommerce-returns-agent-architecture",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -567,7 +583,7 @@
         {
           "text": "Applies the YAGNI ladder: the return flow has mostly fixed steps (check eligibility, initiate return, send email), so a mixed workflow+autonomous pattern is appropriate",
           "passed": true,
-          "evidence": "'§1 — Orchestration: Mixed pattern. Critical/compliance steps as workflow (identity verification, eligibility check, OMS write, email send). Conversational dialogue as bounded autonomous.'"
+          "evidence": "'\u00a71 \u2014 Orchestration: Mixed pattern. Critical/compliance steps as workflow (identity verification, eligibility check, OMS write, email send). Conversational dialogue as bounded autonomous.'"
         },
         {
           "text": "Rates OMS write and database write as high-risk operations requiring explicit confirmation before execution",
@@ -587,13 +603,13 @@
         {
           "text": "Distinguishes the agent architecture concerns (orchestration, guardrails, tool risk) from the application architecture concerns (database schema, auth, API design)",
           "passed": true,
-          "evidence": "Answer focuses on orchestration pattern, model selection, guardrails, and stopping conditions — agent architecture concerns. Does not conflate with database schema or auth implementation details."
+          "evidence": "Answer focuses on orchestration pattern, model selection, guardrails, and stopping conditions \u2014 agent architecture concerns. Does not conflate with database schema or auth implementation details."
         }
       ]
     },
     {
       "eval_id": 8,
-      "eval_name": "eval-8",
+      "eval_name": "ecommerce-returns-agent-architecture",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -616,7 +632,7 @@
         {
           "text": "Specifies all three stopping conditions for any autonomous loop: task-complete signal, max iterations, and unrecoverable-error exit",
           "passed": false,
-          "evidence": "Baseline describes state machine states (greeting → collect_info → ... → close) but does not specify explicit stopping conditions (task-complete signal, max iterations, unrecoverable-error exit)."
+          "evidence": "Baseline describes state machine states (greeting \u2192 collect_info \u2192 ... \u2192 close) but does not specify explicit stopping conditions (task-complete signal, max iterations, unrecoverable-error exit)."
         },
         {
           "text": "Addresses human-in-the-loop triggers: eligibility edge cases, customer disputes, or agent reaching max iterations without resolution",
@@ -632,7 +648,7 @@
     },
     {
       "eval_id": 9,
-      "eval_name": "eval-9",
+      "eval_name": "web-browse-code-execute-risk",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -671,7 +687,7 @@
     },
     {
       "eval_id": 9,
-      "eval_name": "eval-9",
+      "eval_name": "web-browse-code-execute-risk",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -684,7 +700,7 @@
         {
           "text": "Applies the three-axis dynamic tool risk rating: reversibility (web browsing is reversible, code execution is not), permission level, and financial/security impact",
           "passed": false,
-          "evidence": "Baseline uses a tier table (Read-only/Write-limited/Dangerous) but not the three-axis dynamic risk rating (reversibility × permission × financial/security impact)."
+          "evidence": "Baseline uses a tier table (Read-only/Write-limited/Dangerous) but not the three-axis dynamic risk rating (reversibility \u00d7 permission \u00d7 financial/security impact)."
         },
         {
           "text": "Emphasizes that risk is parameter-dependent, not per-tool: execute_script(read_file) is low-risk, execute_script(curl exfiltrate) is high-risk",
@@ -710,7 +726,7 @@
     },
     {
       "eval_id": 10,
-      "eval_name": "eval-10",
+      "eval_name": "knowledge-base-agent-layering",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -721,9 +737,9 @@
       },
       "expectations": [
         {
-          "text": "Identifies this as primarily a read-only agent (retrieval + synthesis), which simplifies the risk profile significantly — no write-back to production systems",
+          "text": "Identifies this as primarily a read-only agent (retrieval + synthesis), which simplifies the risk profile significantly \u2014 no write-back to production systems",
           "passed": true,
-          "evidence": "'The vector store is a tool the agent calls, not an implicit retrieval step.' and 'The agent's tools operate with pre-scoped permissions — query_knowledge_base(user_id, question) already filters by what that user can access.'"
+          "evidence": "'The vector store is a tool the agent calls, not an implicit retrieval step.' and 'The agent's tools operate with pre-scoped permissions \u2014 query_knowledge_base(user_id, question) already filters by what that user can access.'"
         },
         {
           "text": "Applies the YAGNI ladder: a single LLM call with retrieval context may suffice; a ReAct loop is only warranted if the agent needs to decide what to retrieve based on intermediate results",
@@ -731,9 +747,9 @@
           "evidence": "Answer describes a ReAct loop architecture without applying the YAGNI ladder to question whether a simpler approach (single LLM call with retrieval) would suffice."
         },
         {
-          "text": "Addresses the transparency principle: the agent logic must be visible and debuggable — the vector store query should appear in the trajectory, not happen implicitly",
+          "text": "Addresses the transparency principle: the agent logic must be visible and debuggable \u2014 the vector store query should appear in the trajectory, not happen implicitly",
           "passed": true,
-          "evidence": "'Key architectural decision: The vector store is a tool the agent calls, not an implicit retrieval step. This keeps the agent transparent — you can see in the trajectory when it decided to search and what it searched for.'"
+          "evidence": "'Key architectural decision: The vector store is a tool the agent calls, not an implicit retrieval step. This keeps the agent transparent \u2014 you can see in the trajectory when it decided to search and what it searched for.'"
         },
         {
           "text": "Notes that auth is an input-side Constrain concern: the agent should never see data it's not authorized to access, enforced at the tool layer not the prompt layer",
@@ -749,7 +765,7 @@
     },
     {
       "eval_id": 10,
-      "eval_name": "eval-10",
+      "eval_name": "knowledge-base-agent-layering",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -760,7 +776,7 @@
       },
       "expectations": [
         {
-          "text": "Identifies this as primarily a read-only agent (retrieval + synthesis), which simplifies the risk profile significantly — no write-back to production systems",
+          "text": "Identifies this as primarily a read-only agent (retrieval + synthesis), which simplifies the risk profile significantly \u2014 no write-back to production systems",
           "passed": false,
           "evidence": "Baseline describes the architecture layers but does not identify this as a read-only agent or note that the read-only nature simplifies the risk profile."
         },
@@ -770,7 +786,7 @@
           "evidence": "Baseline describes a full orchestration layer without applying the YAGNI ladder or questioning whether a simpler approach would suffice."
         },
         {
-          "text": "Addresses the transparency principle: the agent logic must be visible and debuggable — the vector store query should appear in the trajectory, not happen implicitly",
+          "text": "Addresses the transparency principle: the agent logic must be visible and debuggable \u2014 the vector store query should appear in the trajectory, not happen implicitly",
           "passed": false,
           "evidence": "Baseline does not address the transparency principle or the distinction between explicit tool calls (visible in trajectory) vs. implicit retrieval steps."
         },
@@ -782,13 +798,13 @@
         {
           "text": "Distinguishes the agent architecture concerns (orchestration, guardrails) from the application architecture concerns (database schema, API design, auth middleware)",
           "passed": true,
-          "evidence": "Baseline uses a layered architecture diagram separating REST API layer, Agent Orchestration layer, Service layer, and Data layer — implicitly distinguishing agent concerns from application concerns."
+          "evidence": "Baseline uses a layered architecture diagram separating REST API layer, Agent Orchestration layer, Service layer, and Data layer \u2014 implicitly distinguishing agent concerns from application concerns."
         }
       ]
     },
     {
       "eval_id": 21,
-      "eval_name": "eval-21",
+      "eval_name": "content-moderation-pipeline-design",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -799,9 +815,9 @@
       },
       "expectations": [
         {
-          "text": "Applies the YAGNI ladder: content moderation with fixed policy rules is a strong workflow candidate — the execution path is known in advance",
+          "text": "Applies the YAGNI ladder: content moderation with fixed policy rules is a strong workflow candidate \u2014 the execution path is known in advance",
           "passed": true,
-          "evidence": "'§1 — Orchestration: Workflow. The execution path is fixed and known: receive post → classify against policy → decide → if escalating, draft summary. No runtime decision about what to do next.'"
+          "evidence": "'\u00a71 \u2014 Orchestration: Workflow. The execution path is fixed and known: receive post \u2192 classify against policy \u2192 decide \u2192 if escalating, draft summary. No runtime decision about what to do next.'"
         },
         {
           "text": "Applies dynamic tool risk rating: reading posts is low-risk, approve/reject writes are medium/high-risk depending on reversibility",
@@ -821,13 +837,13 @@
         {
           "text": "Addresses model selection using the four durable axes: output speed matters at 10k/day, reasoning is required for nuanced policy interpretation",
           "passed": true,
-          "evidence": "'§2 — Model selection: Reasoning gate: Classification against nuanced policy rules requires reasoning. Use a reasoning model. Output speed: At 10k/day (~7 posts/minute), latency tolerance is moderate. Cost consideration: cascade.'"
+          "evidence": "'\u00a72 \u2014 Model selection: Reasoning gate: Classification against nuanced policy rules requires reasoning. Use a reasoning model. Output speed: At 10k/day (~7 posts/minute), latency tolerance is moderate. Cost consideration: cascade.'"
         }
       ]
     },
     {
       "eval_id": 21,
-      "eval_name": "eval-21",
+      "eval_name": "content-moderation-pipeline-design",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -838,9 +854,9 @@
       },
       "expectations": [
         {
-          "text": "Applies the YAGNI ladder: content moderation with fixed policy rules is a strong workflow candidate — the execution path is known in advance",
+          "text": "Applies the YAGNI ladder: content moderation with fixed policy rules is a strong workflow candidate \u2014 the execution path is known in advance",
           "passed": true,
-          "evidence": "'Pipeline with branching. Not a ReAct agent — moderation is a classification task, not open-ended reasoning. Each post goes through: extract_content → classify_against_policy → decide → (optional) generate_summary.'"
+          "evidence": "'Pipeline with branching. Not a ReAct agent \u2014 moderation is a classification task, not open-ended reasoning. Each post goes through: extract_content \u2192 classify_against_policy \u2192 decide \u2192 (optional) generate_summary.'"
         },
         {
           "text": "Applies dynamic tool risk rating: reading posts is low-risk, approve/reject writes are medium/high-risk depending on reversibility",
@@ -866,7 +882,7 @@
     },
     {
       "eval_id": 22,
-      "eval_name": "eval-22",
+      "eval_name": "competitive-intel-agent-failures",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -877,19 +893,19 @@
       },
       "expectations": [
         {
-          "text": "Diagnoses the infinite loop as a missing stopping condition — specifically the absence of a max-API-calls cap and a repeated-query detector",
+          "text": "Diagnoses the infinite loop as a missing stopping condition \u2014 specifically the absence of a max-API-calls cap and a repeated-query detector",
           "passed": true,
-          "evidence": "'Problem 3: Hundreds of API calls (looping) → Missing stopping conditions. Max iterations: Hard ceiling of 30 API calls per report generation run. Repeated-call detection: If the same query is issued twice, force reformulation.'"
+          "evidence": "'Problem 3: Hundreds of API calls (looping) \u2192 Missing stopping conditions. Max iterations: Hard ceiling of 30 API calls per report generation run. Repeated-call detection: If the same query is issued twice, force reformulation.'"
         },
         {
           "text": "Diagnoses hallucinated citations as a Verify gap: the harness has no output validation step that traces each claim back to a real retrieved source",
           "passed": true,
-          "evidence": "'Problem 1: Hallucinated pricing data → Missing Verify function. After extraction, run a verification pass: for every price point in the report, trace it back to a specific URL + extracted text in the trajectory.'"
+          "evidence": "'Problem 1: Hallucinated pricing data \u2192 Missing Verify function. After extraction, run a verification pass: for every price point in the report, trace it back to a specific URL + extracted text in the trajectory.'"
         },
         {
-          "text": "Names context rot as a contributing factor to the over-refusal and degrading quality — the growing trajectory pushes the model out-of-distribution",
+          "text": "Names context rot as a contributing factor to the over-refusal and degrading quality \u2014 the growing trajectory pushes the model out-of-distribution",
           "passed": true,
-          "evidence": "'Problem 2: \"I could not find the information\" for everything → Missing Correct function + likely context rot. After 3 months of running, if the trajectory grows long... earlier findings get buried.'"
+          "evidence": "'Problem 2: \"I could not find the information\" for everything \u2192 Missing Correct function + likely context rot. After 3 months of running, if the trajectory grows long... earlier findings get buried.'"
         },
         {
           "text": "Applies the ACI principle to the search tool: it should return structured results (source, claim, evidence) rather than raw web content",
@@ -897,15 +913,15 @@
           "evidence": "Answer recommends 'source-attribution requirement to the extraction tool: every data point must carry its source URL' but does not apply the ACI principle to the search tool's return format."
         },
         {
-          "text": "Recommends isolation over compression for intermediate search results — delegating each competitor's research to a sub-agent that returns only a structured summary",
+          "text": "Recommends isolation over compression for intermediate search results \u2014 delegating each competitor's research to a sub-agent that returns only a structured summary",
           "passed": true,
-          "evidence": "'Solution: use isolation — delegate each competitor's research to a sub-agent that returns only a structured summary.' Explicit isolation over compression recommendation."
+          "evidence": "'Solution: use isolation \u2014 delegate each competitor's research to a sub-agent that returns only a structured summary.' Explicit isolation over compression recommendation."
         }
       ]
     },
     {
       "eval_id": 22,
-      "eval_name": "eval-22",
+      "eval_name": "competitive-intel-agent-failures",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -916,17 +932,17 @@
       },
       "expectations": [
         {
-          "text": "Diagnoses the infinite loop as a missing stopping condition — specifically the absence of a max-API-calls cap and a repeated-query detector",
+          "text": "Diagnoses the infinite loop as a missing stopping condition \u2014 specifically the absence of a max-API-calls cap and a repeated-query detector",
           "passed": true,
           "evidence": "'Search budget: Max 5 search attempts per data point. After 5, mark as \"unavailable this cycle\" and move on. Global cap of 100 API calls per report.'"
         },
         {
           "text": "Diagnoses hallucinated citations as a Verify gap: the harness has no output validation step that traces each claim back to a real retrieved source",
           "passed": true,
-          "evidence": "'Strict evidence attribution: Every data point in the report must cite a URL + extracted text snippet. The synthesis prompt receives only retrieved snippets — never its own prior reports.'"
+          "evidence": "'Strict evidence attribution: Every data point in the report must cite a URL + extracted text snippet. The synthesis prompt receives only retrieved snippets \u2014 never its own prior reports.'"
         },
         {
-          "text": "Names context rot as a contributing factor to the over-refusal and degrading quality — the growing trajectory pushes the model out-of-distribution",
+          "text": "Names context rot as a contributing factor to the over-refusal and degrading quality \u2014 the growing trajectory pushes the model out-of-distribution",
           "passed": false,
           "evidence": "Baseline identifies that 'competitors change their sites' and 'search queries have drifted' as causes, but does not name context rot or the growing-trajectory out-of-distribution problem."
         },
@@ -936,7 +952,7 @@
           "evidence": "Baseline uses query templates and source health validation but does not apply the ACI principle to the search tool's return format."
         },
         {
-          "text": "Recommends isolation over compression for intermediate search results — delegating each competitor's research to a sub-agent that returns only a structured summary",
+          "text": "Recommends isolation over compression for intermediate search results \u2014 delegating each competitor's research to a sub-agent that returns only a structured summary",
           "passed": false,
           "evidence": "Baseline uses query templates and regression testing but does not recommend sub-agent isolation. It keeps all processing in a single agent with structured output requirements."
         }
@@ -944,7 +960,7 @@
     },
     {
       "eval_id": 23,
-      "eval_name": "eval-23",
+      "eval_name": "sales-call-prep-agent-design",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -957,7 +973,7 @@
         {
           "text": "Applies the YAGNI ladder: the task is well-defined with a fixed output format, making a workflow the right choice over a ReAct loop",
           "passed": true,
-          "evidence": "'§1 — Orchestration: Workflow. The execution path is completely known: pull deal history → research company → identify talking points → flag risks → produce briefing. No runtime decision-making about what to do next.'"
+          "evidence": "'\u00a71 \u2014 Orchestration: Workflow. The execution path is completely known: pull deal history \u2192 research company \u2192 identify talking points \u2192 flag risks \u2192 produce briefing. No runtime decision-making about what to do next.'"
         },
         {
           "text": "Identifies this as a read-heavy agent with no write-back to production systems, which simplifies the guardrail design",
@@ -977,13 +993,13 @@
         {
           "text": "Addresses failure modes specific to this use case: stale CRM data, web search returning irrelevant results, or Salesforce being unavailable",
           "passed": true,
-          "evidence": "'Stopping conditions: No unrecoverable error needed — if Salesforce is down, report it immediately.' 'PII filter — the briefing should contain business information, not personal data about the contact.'"
+          "evidence": "'Stopping conditions: No unrecoverable error needed \u2014 if Salesforce is down, report it immediately.' 'PII filter \u2014 the briefing should contain business information, not personal data about the contact.'"
         }
       ]
     },
     {
       "eval_id": 23,
-      "eval_name": "eval-23",
+      "eval_name": "sales-call-prep-agent-design",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -996,7 +1012,7 @@
         {
           "text": "Applies the YAGNI ladder: the task is well-defined with a fixed output format, making a workflow the right choice over a ReAct loop",
           "passed": true,
-          "evidence": "'Plan-then-execute. The task is predictable: always the same 4 steps in order. No need for a ReAct loop — there's no branching or iteration based on uncertain results.'"
+          "evidence": "'Plan-then-execute. The task is predictable: always the same 4 steps in order. No need for a ReAct loop \u2014 there's no branching or iteration based on uncertain results.'"
         },
         {
           "text": "Identifies this as a read-heavy agent with no write-back to production systems, which simplifies the guardrail design",
@@ -1006,7 +1022,7 @@
         {
           "text": "Recommends parallel tool execution for Salesforce lookup and web research since they're independent operations",
           "passed": false,
-          "evidence": "Baseline describes sequential steps (Salesforce pull → web research → analysis → document generation) without recommending parallel execution for independent operations."
+          "evidence": "Baseline describes sequential steps (Salesforce pull \u2192 web research \u2192 analysis \u2192 document generation) without recommending parallel execution for independent operations."
         },
         {
           "text": "Applies the output-side Verify function: the briefing doc should have a fixed schema and be validated before delivery",
@@ -1022,7 +1038,7 @@
     },
     {
       "eval_id": 24,
-      "eval_name": "eval-24",
+      "eval_name": "long-research-context-rot",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1033,7 +1049,7 @@
       },
       "expectations": [
         {
-          "text": "Names the root cause as context rot — the append-everything harness design pushes the root LM out-of-distribution over a long horizon",
+          "text": "Names the root cause as context rot \u2014 the append-everything harness design pushes the root LM out-of-distribution over a long horizon",
           "passed": true,
           "evidence": "'Diagnosis: Context rot. This is the exact failure mode described in the harness-inductive-bias framework. The agent appends every search result and its own reasoning to one growing conversation.'"
         },
@@ -1045,7 +1061,7 @@
         {
           "text": "Frames the fix using the LID (locally in-distribution) criterion: each LM call should see an observation that resembles training data",
           "passed": true,
-          "evidence": "'The main agent's context grows only by structured summaries (~100 tokens each), not by raw search results (~5000 tokens each)... Each new LLM call sees a longer, more unusual input — performance degrades because the observation is no longer locally in-distribution.'"
+          "evidence": "'The main agent's context grows only by structured summaries (~100 tokens each), not by raw search results (~5000 tokens each)... Each new LLM call sees a longer, more unusual input \u2014 performance degrades because the observation is no longer locally in-distribution.'"
         },
         {
           "text": "Addresses fabricated sources separately as a Verify gap: the harness needs an output validation step that cross-references claims against source URLs",
@@ -1053,15 +1069,15 @@
           "evidence": "'Fabricated sources emerge because the model loses precise access to what it actually found vs. what it reasoned about.' The hub-and-spoke architecture prevents this by keeping only structured summaries in the main context."
         },
         {
-          "text": "Avoids recommending simple summarization as the primary fix — isolation (keeping raw content out of the root context entirely) is preferred over compression",
+          "text": "Avoids recommending simple summarization as the primary fix \u2014 isolation (keeping raw content out of the root context entirely) is preferred over compression",
           "passed": true,
-          "evidence": "'Architectural fix — isolation over compression.' 'Periodic synthesis' is listed as an additional mitigation, not the primary fix. Isolation via sub-agents is the primary recommendation."
+          "evidence": "'Architectural fix \u2014 isolation over compression.' 'Periodic synthesis' is listed as an additional mitigation, not the primary fix. Isolation via sub-agents is the primary recommendation."
         }
       ]
     },
     {
       "eval_id": 24,
-      "eval_name": "eval-24",
+      "eval_name": "long-research-context-rot",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -1072,14 +1088,14 @@
       },
       "expectations": [
         {
-          "text": "Names the root cause as context rot — the append-everything harness design pushes the root LM out-of-distribution over a long horizon",
+          "text": "Names the root cause as context rot \u2014 the append-everything harness design pushes the root LM out-of-distribution over a long horizon",
           "passed": true,
           "evidence": "'Root cause: The single-conversation architecture means the context window fills with raw search results, intermediate reasoning, and stale findings. The model's attention degrades.'"
         },
         {
           "text": "Recommends programmatic sub-agent calling as the fix: offload task-specific tokens to sub-agents whose raw outputs do not flow back into the root context",
           "passed": true,
-          "evidence": "'Sub-task decomposition: Break the research question into sub-questions upfront. Handle each sub-question in a separate, short context window. A coordinator agent assembles the final report from sub-question results — it never sees the raw search data.'"
+          "evidence": "'Sub-task decomposition: Break the research question into sub-questions upfront. Handle each sub-question in a separate, short context window. A coordinator agent assembles the final report from sub-question results \u2014 it never sees the raw search data.'"
         },
         {
           "text": "Frames the fix using the LID (locally in-distribution) criterion: each LM call should see an observation that resembles training data",
@@ -1092,7 +1108,7 @@
           "evidence": "'Source verification at synthesis time: The final report is generated from the findings ledger only. Each claim must trace to a ledger entry with a real source. This eliminates fabrication.'"
         },
         {
-          "text": "Avoids recommending simple summarization as the primary fix — isolation (keeping raw content out of the root context entirely) is preferred over compression",
+          "text": "Avoids recommending simple summarization as the primary fix \u2014 isolation (keeping raw content out of the root context entirely) is preferred over compression",
           "passed": true,
           "evidence": "'Periodic summarization' is listed as one of four components, not the primary fix. Sub-task decomposition with separate context windows is the primary architectural recommendation."
         }
@@ -1100,7 +1116,7 @@
     },
     {
       "eval_id": 25,
-      "eval_name": "eval-25",
+      "eval_name": "long-corpus-harness-decomposition",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1123,10 +1139,10 @@
         {
           "text": "Notes the length-generalization property: the root model's view stays roughly constant regardless of corpus size, so the harness scales without retraining or a larger context window",
           "passed": true,
-          "evidence": "'The harness carries the compositional structure — it decomposes the problem into sub-problems the model can handle individually.' The root model's context stays bounded regardless of corpus size."
+          "evidence": "'The harness carries the compositional structure \u2014 it decomposes the problem into sub-problems the model can handle individually.' The root model's context stays bounded regardless of corpus size."
         },
         {
-          "text": "Avoids treating RAG or a larger context model as the complete answer — retrieval may be a component, but the core fix is harness-level decomposition that keeps each call in-distribution",
+          "text": "Avoids treating RAG or a larger context model as the complete answer \u2014 retrieval may be a component, but the core fix is harness-level decomposition that keeps each call in-distribution",
           "passed": true,
           "evidence": "'Trade-off vs. long-context model: This approach trades latency (multiple sequential/parallel calls) for cost and reliability. A 500k-token single call is expensive and models degrade on very long contexts.'"
         },
@@ -1139,7 +1155,7 @@
     },
     {
       "eval_id": 25,
-      "eval_name": "eval-25",
+      "eval_name": "long-corpus-harness-decomposition",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -1165,7 +1181,7 @@
           "evidence": "'This avoids long-context models entirely and works with any model that handles 8-16k contexts.' The reduce step sees only extracted passages, not the full corpus."
         },
         {
-          "text": "Avoids treating RAG or a larger context model as the complete answer — retrieval may be a component, but the core fix is harness-level decomposition that keeps each call in-distribution",
+          "text": "Avoids treating RAG or a larger context model as the complete answer \u2014 retrieval may be a component, but the core fix is harness-level decomposition that keeps each call in-distribution",
           "passed": true,
           "evidence": "'This avoids long-context models entirely.' Optional index layer mentioned as an optimization, not the core solution. Map-reduce decomposition is the primary answer."
         },

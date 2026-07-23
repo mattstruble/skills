@@ -2,13 +2,13 @@
   "metadata": {
     "skill_name": "nix",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-0", "eval-1", "eval-2", "eval-3"],
+    "evals_run": ["poetry-devshell-direnv-setup", "nix-darwin-m4-home-manager", "nixpkgs-overlay-custom-package", "nixos-rebuild-infinite-recursion-debug"],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 0,
-      "eval_name": "eval-0",
+      "eval_name": "poetry-devshell-direnv-setup",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -47,7 +47,7 @@
     },
     {
       "eval_id": 0,
-      "eval_name": "eval-0",
+      "eval_name": "poetry-devshell-direnv-setup",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -86,7 +86,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "nix-darwin-m4-home-manager",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -135,7 +135,7 @@
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "nix-darwin-m4-home-manager",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -184,7 +184,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "nixpkgs-overlay-custom-package",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -223,7 +223,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "nixpkgs-overlay-custom-package",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -262,7 +262,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "nixos-rebuild-infinite-recursion-debug",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -296,7 +296,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "nixos-rebuild-infinite-recursion-debug",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {

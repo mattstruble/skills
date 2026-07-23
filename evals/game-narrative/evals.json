@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 0,
+      "name": "reactive-dialogue-and-coherence",
       "eval_name": "reactive-dialogue-and-coherence",
       "prompt": "How do I write dialogue lines that react to events (a character commenting on what just happened) without them feeling redundant or breaking immersion? Also, players aren't investing in my world — the setup feels thin.",
       "expected_output": "States the reactive-dialogue rule (a reaction line must reveal something new about world or character or be cut; cut out-of-character lines; keep lines short) and connects world coherence and concrete detail to earning audience investment.",

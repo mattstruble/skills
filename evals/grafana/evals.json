@@ -3,8 +3,9 @@
   "evals": [
     {
       "id": 1,
+      "name": "grafana-dashboard-crd-instance-selector",
       "prompt": "I'm authoring a GrafanaDashboard CRD for my k3s homelab. I applied the manifest but the dashboard never appears in Grafana. No error shows up when I kubectl describe the GrafanaDashboard. What's wrong and how do I fix it?",
-      "expected_output": "The most common cause is an instanceSelector mismatch: the GrafanaDashboard's spec.instanceSelector.matchLabels must match the labels on the Grafana CR itself. The Grafana Operator silently skips CRDs whose instanceSelector doesn't match — no error is emitted to the resource status. Verify with: kubectl get grafana -n monitoring --show-labels, and confirm the label dashboards: grafana is present on the Grafana CR. Then ensure the same matchLabels block appears in the GrafanaDashboard spec.",
+      "expected_output": "The most common cause is an instanceSelector mismatch: the GrafanaDashboard's spec.instanceSelector.matchLabels must match the labels on the Grafana CR itself. The Grafana Operator silently skips CRDs whose instanceSelector doesn't match \u2014 no error is emitted to the resource status. Verify with: kubectl get grafana -n monitoring --show-labels, and confirm the label dashboards: grafana is present on the Grafana CR. Then ensure the same matchLabels block appears in the GrafanaDashboard spec.",
       "files": [],
       "expectations": [
         "Identifies instanceSelector mismatch as the cause, not a generic 'check your YAML' answer",
@@ -16,8 +17,9 @@
     },
     {
       "id": 2,
+      "name": "prometheus-loki-template-variable-setup",
       "prompt": "I want to add a $container template variable to my Grafana dashboard so I can filter both Prometheus panels and Loki log panels by container name. How do I define the variable for each datasource?",
-      "expected_output": "For Prometheus, use a query variable with label_values(up, container) pointing at the Prometheus datasource (uid: ${DS_PROMETHEUS}). For Loki, the variable definition is different: use a query variable with the Loki datasource (uid: ${DS_LOKI}) and set the query field to {\"label\": \"container\", \"stream\": \"{}\"} — not label_values(), which is Prometheus-only. Set refresh: 2 on both so options update when the time range changes. In every panel query, include {container=\"$container\"} to respect the variable.",
+      "expected_output": "For Prometheus, use a query variable with label_values(up, container) pointing at the Prometheus datasource (uid: ${DS_PROMETHEUS}). For Loki, the variable definition is different: use a query variable with the Loki datasource (uid: ${DS_LOKI}) and set the query field to {\"label\": \"container\", \"stream\": \"{}\"} \u2014 not label_values(), which is Prometheus-only. Set refresh: 2 on both so options update when the time range changes. In every panel query, include {container=\"$container\"} to respect the variable.",
       "files": [],
       "expectations": [
         "Uses label_values() syntax for the Prometheus variable and explicitly rejects it for the Loki variable",
@@ -29,8 +31,9 @@
     },
     {
       "id": 3,
+      "name": "sonarr-alert-discord-crd-setup",
       "prompt": "I'm setting up Grafana alerting on my k3s homelab. I want an alert to fire when Sonarr has been unreachable for 2 minutes and notify me via Discord. Walk me through the full setup using the Grafana Operator CRD approach.",
-      "expected_output": "Create a GrafanaFolder CRD first — GrafanaAlertRuleGroup requires a folder to exist before it can be applied. In the GrafanaAlertRuleGroup, define two refIds: refId A with the PromQL expression up{job=\"sonarr\"} pointing at datasourceUid: prometheus (which must match the uid field set explicitly in your GrafanaDatasource), and refId C as a threshold expression using datasourceUid: __expr__ that fires when A < 1. Set for: 2m. For Discord, get the webhook URL from Server Settings → Integrations → Webhooks, store it in a Kubernetes Secret, and reference it via secureSettings in the contact point — never commit the raw URL. Finally, set the default notification policy's contact point to your Discord webhook; without this step, fired alerts go nowhere.",
+      "expected_output": "Create a GrafanaFolder CRD first \u2014 GrafanaAlertRuleGroup requires a folder to exist before it can be applied. In the GrafanaAlertRuleGroup, define two refIds: refId A with the PromQL expression up{job=\"sonarr\"} pointing at datasourceUid: prometheus (which must match the uid field set explicitly in your GrafanaDatasource), and refId C as a threshold expression using datasourceUid: __expr__ that fires when A < 1. Set for: 2m. For Discord, get the webhook URL from Server Settings \u2192 Integrations \u2192 Webhooks, store it in a Kubernetes Secret, and reference it via secureSettings in the contact point \u2014 never commit the raw URL. Finally, set the default notification policy's contact point to your Discord webhook; without this step, fired alerts go nowhere.",
       "files": [],
       "expectations": [
         "Requires creating a GrafanaFolder CRD before the GrafanaAlertRuleGroup (prerequisite ordering)",

@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "player-scene-component-state-machine",
       "prompt": "I'm building a 2D platformer in Godot 4.6 with GDScript. My player has health, a hurtbox, and several abilities (dash, double jump, fireball). Right now it's all in one 600-line player.gd and the scene is getting unwieldy. How should I restructure this? Show me the scene tree and the key GDScript patterns.",
       "expected_output": "Split the player into focused child-node components: a HealthComponent (Node) emitting typed signals like health_changed(new_health: int, max_health: int) and died, a HurtboxComponent (Area2D), and each ability as a child Node extending a base Ability class with a _execute() hook. The StateMachine node owns State child nodes (IdleState, RunState, JumpState) wired via @export — not a match block in _process. The player.gd connects to component signals in _ready using Callable syntax. Deep get_node path strings like get_node('../../HUD/HealthBar') are replaced with @export references or signals.",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "bullet-hell-pool-flyweight",
       "prompt": "My Godot 4.6 game has a bullet hell phase where I'm spawning and queue_free-ing hundreds of bullets per second. Performance is dropping. I also need to share bullet stats (damage, speed, sprite) across all bullets of the same type without duplicating data. Walk me through the right Godot patterns for both problems.",
       "expected_output": "Use an Object Pool: pre-instantiate bullets in _ready, set visible = false and process_mode = Node.PROCESS_MODE_DISABLED to deactivate them, and re-enable rather than instantiate/free. For shared stats, define a BulletData Resource subclass with @export fields (damage, speed, sprite_frames) and assign the same .tres file to all bullets of that type — this is the Flyweight pattern via Godot's resource system. Warn that modifying a shared Resource at runtime mutates it for all holders; use resource.duplicate() for per-instance overrides.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "coroutine-safety-timeout",
       "prompt": "I'm adding a coroutine in Godot 4.6 GDScript that plays a hurt animation, waits for it to finish, then plays a death animation, waits 0.5 seconds, and finally calls queue_free(). I also need a separate function that waits for the player to press a button within 5 seconds or times out. What are the correct patterns and what can go wrong?",
       "expected_output": "After every await, check is_instance_valid(self) before accessing nodes — the node can be freed externally (scene change, level reset) while the coroutine is suspended. The death sequence uses await $AnimationPlayer.animation_finished then await get_tree().create_timer(0.5).timeout before queue_free(). The timeout pattern cannot use Promise.race; instead use a responded flag set by both a CONNECT_ONE_SHOT signal connection and a timer, then poll with while not responded: await get_tree().process_frame, checking is_instance_valid(self) inside the loop.",
       "files": [],

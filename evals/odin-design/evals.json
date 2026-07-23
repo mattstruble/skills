@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "game-skeleton-entity-particle-world",
       "prompt": "Write an Odin game skeleton that has entities with positions and health, a world that manages them, and a particle system. Show the file structure and the key procedures. The game should have a main loop that updates and renders.",
       "expected_output": "Single package with multiple files (entity.odin, world.odin, particle.odin, game.odin). Prefixed procedure names (entity_create, particle_emit). Temp allocator for frame-scoped data. Proper naming conventions (Ada_Case types, snake_case procs). No method syntax. defer for cleanup.",
       "expectations": [
@@ -18,6 +19,7 @@
     },
     {
       "id": 2,
+      "name": "cyclic-package-dependency-restructure",
       "prompt": "I have an Odin project that's getting hard to manage. I split it into packages: game/, entity/, renderer/, physics/, ui/. Now I'm hitting cyclic dependency errors because the renderer needs to know about entities, and entities need physics types. How should I restructure this?",
       "expected_output": "Advises collapsing sub-packages back into one package. Explains that packages are for independent libraries, not internal organization. Suggests using file-level organization with prefixed names instead. May suggest keeping truly independent utilities as a package but putting game-specific code in one package.",
       "expectations": [
@@ -30,6 +32,7 @@
     },
     {
       "id": 3,
+      "name": "tilemap-loader-arena-allocator",
       "prompt": "Write an Odin procedure that loads a tilemap from a file, parses it into a grid of tiles, and returns it. Each tile has a type enum and collision flag. Handle errors properly and think about memory management - this tilemap lives for the duration of a level.",
       "expected_output": "Uses multiple return values for errors (or or_return). Uses a custom arena or explicit allocator for level-lifetime data. Defines Tile_Type as an enum with Ada_Case. Uses bit_set or bool for collision. Does NOT use exceptions. Uses defer for file handle cleanup. May suggest the caller pass an allocator.",
       "expectations": [
@@ -45,6 +48,7 @@
     },
     {
       "id": 4,
+      "name": "builtin-matrix-vector-types",
       "prompt": "I'm writing a 3D math module in Odin. Currently I have my own type `Matrix4x4 :: [4][4]f32` and a hand-rolled `mat4_mul` procedure with three nested loops. I'm about to add `mat4_transpose` and component-wise multiplication. Is there a more idiomatic way to do this in Odin, or should I keep going as I am? Also: what about a Vector3? I have `Vector3 :: struct { x, y, z: f32 }` with my own arithmetic procedures.",
       "expected_output": "Recommends Odin's built-in `matrix[R, C]T` type which provides matrix-matrix multiplication, transpose, hadamard_product (component-wise mul), and submatrix casting natively. Mentions stored column-major. Recommends `core:math/linalg` for ready-made Matrix4f32 / Vector3 types and matrix constructors (matrix4_look_at_f32, matrix4_perspective_f32, etc.) for production code. Strongly advises replacing the Vector3 struct with the array alias `Vector3 :: [3]f32` to inherit array programming (element-wise +/-/*, swizzle .xy/.xyz/.yzx, swizzle() builtin) for free. Explains the struct form gets none of these and is unidiomatic. May acknowledge hand-rolling has educational value but is not the production path.",
       "files": [],
@@ -59,6 +63,7 @@
     },
     {
       "id": 5,
+      "name": "per-frame-spall-profiling-workflow",
       "prompt": "I have an Odin app that drops to about 15 FPS in some scenes — clearly some part of my per-frame work is slow. How do I find what's slow? I'm not asking how to optimize, just how to measure. What's available in Odin's stdlib and what's the workflow?",
       "expected_output": "Recommends `core:prof/spall` from the standard library. Explains the two integration paths: manual scoping (explicit begin/end around code regions of interest) and automatic instrumentation (the `@(instrumentation_enter)` and `@(instrumentation_exit)` attribute-marked procedures the compiler inserts at every procedure boundary). Notes the output is a .spall trace file viewed in Spall-Web (browser viewer at gravitymoth.com/spall/spall-web). Discusses the hot vs cold code distinction — focus on what runs every frame. Notes traces grow fast, so capture only 1–2 seconds of representative workload. Discusses the workflow: capture, look at self time (not total), find top 1–3 self-time procedures, optimize those, re-profile. May mention auto-instrumentation has runtime overhead and the buffer setup must exist before any traced procedure runs.",
       "files": [],

@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "enemy-list-metatable-survive-reload",
       "prompt": "I'm making a fennel love2d game and I have an enemy spawner module. Every time I ,reload the module my enemy list gets wiped out and all the enemies disappear. The enemies are tables with a metatable that has :draw and :update methods. How do I fix this so the enemy list AND the metatable survive reloads?",
       "expected_output": "Should recommend the state module for the enemy list and the hot-table macro for the metatable. Should show the persist macro for the count, hot-table macro for the Enemy metatable, and accessing the enemy list from state.fnl. Should explain WHY metatables break on reload (new table reference).",
       "files": [],
@@ -16,6 +17,7 @@
     },
     {
       "id": 2,
+      "name": "new-project-setup-hot-reload",
       "prompt": "I want to start a new love2d game using fennel with interactive development. I've never used fennel before. Walk me through setting up the project from scratch and show me how to get a basic game loop running with hot-reloading.",
       "expected_output": "Should recommend the min-love2d-fennel template as the starting point. Should walk through cloning, customizing conf.lua/makefile, the project structure (main.lua, wrap.fnl, mode files), running with love ., using the REPL, and using ,reload to hot-reload modules.",
       "files": [],
@@ -29,6 +31,7 @@
     },
     {
       "id": 3,
+      "name": "pause-screen-mode-system",
       "prompt": "My fennel love2d game has gameplay working in mode-game.fnl. Now I need to add a pause screen that shows when the player hits escape, and lets them resume or quit. How should I structure this with the mode system?",
       "expected_output": "Should create a mode-pause.fnl that returns draw and update callbacks. Should show using set-mode to switch from mode-game to mode-pause on escape, and from mode-pause back to mode-game on resume. Should address state preservation (game state survives in state module while paused).",
       "files": [],

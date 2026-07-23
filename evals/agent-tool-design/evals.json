@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "name": "document-management-mcp-schemas",
       "prompt": "I'm building an MCP server for a document management system. I need tools for uploading documents, searching by content, and downloading. Design the tool schemas (names, descriptions, parameters) for these three tools. Include the full JSON schema for each tool's parameters and write the description field so an LLM agent will invoke each tool correctly.",
       "expected_output": "Three well-designed MCP tool schemas with: (1) names following verb_noun convention, (2) descriptions written as 'when to use' instructions (not 'what it does'), (3) parameter descriptions with concrete examples, (4) boundary/exclusion clauses in descriptions, (5) return value documentation. The descriptions should help an LLM agent distinguish between search vs download vs upload without confusion.",
       "files": [],
@@ -17,6 +18,7 @@
     },
     {
       "id": 2,
+      "name": "search-vs-read-tool-confusion",
       "prompt": "My agent keeps calling the wrong tool — it uses `search_files` when it should use `read_file`. Both tools exist. Here are their current descriptions: search_files: 'Search for files', read_file: 'Read a file'. What's wrong and how do I fix it? Give me the rewritten descriptions.",
       "expected_output": "Diagnosis that the descriptions are too vague and don't specify 'when to use' each tool. Rewritten descriptions that: (1) specify the decision condition for each tool, (2) include boundary clauses (search_files does NOT read content; read_file requires knowing the exact path), (3) are distinct enough that an agent mid-task can unambiguously choose the right one. Ideally includes the principle that descriptions are instructions, not labels.",
       "files": [],
@@ -30,6 +32,7 @@
     },
     {
       "id": 3,
+      "name": "jira-tool-proliferation-consolidation",
       "prompt": "I have 15 separate API tools for different Jira operations: create_issue, update_issue, delete_issue, list_issues, add_comment, update_comment, delete_comment, list_comments, get_issue, get_project, list_projects, assign_issue, set_priority, add_label, remove_label. My agent is struggling to pick the right one. Should I consolidate these? How? Give me a concrete consolidation plan.",
       "expected_output": "Analysis using granularity principles: identifies that 15 tools is approaching the ~100-tool confusion threshold and that many of these tools share the same logical object. Concrete consolidation plan that groups by: (1) CRUD on issues (create/read/update/delete), (2) CRUD on comments, (3) project operations, (4) issue metadata (assign/priority/labels). Recommends merging with an 'operation' parameter pattern. Explains the merge signal criteria (same logical object, always called in sequence, distinguishing requires domain knowledge). Final count should be 4-6 tools.",
       "files": [],

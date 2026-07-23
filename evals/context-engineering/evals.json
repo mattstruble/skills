@@ -3,36 +3,39 @@
   "evals": [
     {
       "id": 1,
+      "name": "agent-repeated-tool-calls-diagnosis",
       "prompt": "My coding agent keeps re-running tools it already used. It'll call `read_file` on the same path three times in a row, or search for the same symbol twice. The context window is only at 40% so it's not a truncation issue. What's going wrong and how do I fix it?",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
-        "Diagnoses the root cause as a context organization problem, not a context length problem — the agent cannot find prior tool results because they are buried in an unstructured dynamic trajectory",
+        "Diagnoses the root cause as a context organization problem, not a context length problem \u2014 the agent cannot find prior tool results because they are buried in an unstructured dynamic trajectory",
         "Recommends an agent status bar: explicit structured state appended to the trajectory that tracks what tools have been called and what was found, making prior results visible to the model",
         "Addresses the stable prefix / volatile suffix layout: tool results belong in the dynamic trajectory, not the static prefix, and should be structured so the model can scan them efficiently",
-        "Notes that the fix is context organization (making prior results findable), not compression — the context is only at 40% so there is no need to discard anything",
-        "Avoids recommending cross-session memory or RAG as the fix — this is an intra-session context organization problem, not a persistence problem"
+        "Notes that the fix is context organization (making prior results findable), not compression \u2014 the context is only at 40% so there is no need to discard anything",
+        "Avoids recommending cross-session memory or RAG as the fix \u2014 this is an intra-session context organization problem, not a persistence problem"
       ]
     },
     {
       "id": 2,
-      "prompt": "I'm designing the system prompt for a customer support agent. Right now it's a wall of bullet points — 47 rules covering tone, escalation criteria, what to never say, how to handle refunds, etc. The agent follows maybe 60% of them. The agent follows maybe 60% of them. How should I restructure this?",
+      "name": "rule-stacking-system-prompt-redesign",
+      "prompt": "I'm designing the system prompt for a customer support agent. Right now it's a wall of bullet points \u2014 47 rules covering tone, escalation criteria, what to never say, how to handle refunds, etc. The agent follows maybe 60% of them. The agent follows maybe 60% of them. How should I restructure this?",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
-        "Diagnoses the problem as rule-stacking: 47 rules pile up, contradict each other, and the model resolves contradictions poorly — the fix is restructuring as a process, not adding more rules",
+        "Diagnoses the problem as rule-stacking: 47 rules pile up, contradict each other, and the model resolves contradictions poorly \u2014 the fix is restructuring as a process, not adding more rules",
         "Recommends process-driven prompts: sequence the agent through steps ('first classify the issue type, then follow the relevant procedure') rather than listing rules the model must simultaneously satisfy",
-        "Addresses entropy control: a prompt maintained by many people decays into contradictions — recommend version-controlling the prompt as code and running periodic ablation tests to verify each section still improves outcomes",
-        "Recommends structured prompts with section headers and consistent formatting — structural boundaries are semantic signal, not cosmetic, and help the model process each section in its correct context",
-        "Applies the business-rule refinement principle: each rule should prevent a specific observed failure — rules without a corresponding failure case are dead weight that increase entropy without reducing errors"
+        "Addresses entropy control: a prompt maintained by many people decays into contradictions \u2014 recommend version-controlling the prompt as code and running periodic ablation tests to verify each section still improves outcomes",
+        "Recommends structured prompts with section headers and consistent formatting \u2014 structural boundaries are semantic signal, not cosmetic, and help the model process each section in its correct context",
+        "Applies the business-rule refinement principle: each rule should prevent a specific observed failure \u2014 rules without a corresponding failure case are dead weight that increase entropy without reducing errors"
       ]
     },
     {
       "id": 3,
+      "name": "kv-cache-hit-rate-inconsistency",
       "prompt": "We're seeing really inconsistent cache hit rates on our Claude API calls. Some requests are 10x cheaper than others for what looks like the same prompt. I think it's a KV-cache issue but I'm not sure what we're doing wrong.",
       "expected_output": "",
       "should_trigger": true,
@@ -40,15 +43,16 @@
       "files": [],
       "expectations": [
         "Identifies the root cause as an unstable prefix: any change to the system prompt or tool definitions between turns invalidates the cache from that point forward, forcing full recomputation",
-        "Applies the volatile-data-last principle: timestamps, counters, tool-list reordering, or any per-turn dynamic injection in the prefix busts the cache — these must move to the end of the context",
-        "Provides the worked example pattern: a timestamp embedded in the system prompt recomputes the entire prefix on every turn — moving it to a trailing user message restores cache hits",
-        "Explains the cache-cost awareness principle: every dynamic injection busts the cache from its insertion point forward — design context layout to maximize the stable portion",
-        "Distinguishes prompt-cache from KV-cache mechanics: the stable prefix is the cacheable unit — any mutation to it, however small, invalidates the entire cached computation"
+        "Applies the volatile-data-last principle: timestamps, counters, tool-list reordering, or any per-turn dynamic injection in the prefix busts the cache \u2014 these must move to the end of the context",
+        "Provides the worked example pattern: a timestamp embedded in the system prompt recomputes the entire prefix on every turn \u2014 moving it to a trailing user message restores cache hits",
+        "Explains the cache-cost awareness principle: every dynamic injection busts the cache from its insertion point forward \u2014 design context layout to maximize the stable portion",
+        "Distinguishes prompt-cache from KV-cache mechanics: the stable prefix is the cacheable unit \u2014 any mutation to it, however small, invalidates the entire cached computation"
       ]
     },
     {
       "id": 4,
-      "prompt": "Our research agent runs for 20-30 steps and by step 15 it starts ignoring instructions from the system prompt — like it forgets it's supposed to cite sources or stops using the structured output format we specified. The system prompt is fine at step 1. What's happening?",
+      "name": "long-run-instruction-fade",
+      "prompt": "Our research agent runs for 20-30 steps and by step 15 it starts ignoring instructions from the system prompt \u2014 like it forgets it's supposed to cite sources or stops using the structured output format we specified. The system prompt is fine at step 1. What's happening?",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
@@ -56,21 +60,24 @@
       "expectations": [
         "Diagnoses the root cause as instruction fade: as the dynamic trajectory grows, the system prompt instructions are buried under accumulated tool outputs and reasoning, reducing their effective attention weight",
         "Recommends an agent status bar: explicit structured state appended to the trajectory that restates the current task constraints (cite sources, use structured output) so they remain visible near the end of the context",
-        "Addresses the stable prefix principle: the system prompt is already in the static prefix, but the model's attention to it degrades as the dynamic trajectory grows — the fix is reinforcing key constraints in the trajectory itself",
-        "Notes that this is a context organization problem, not a prompt quality problem — the instructions are correct but their position relative to the growing trajectory reduces their influence",
-        "Recommends compression with retention priorities: architectural decisions and constraints should never be summarized away — they must be preserved exactly when the trajectory is compressed"
+        "Addresses the stable prefix principle: the system prompt is already in the static prefix, but the model's attention to it degrades as the dynamic trajectory grows \u2014 the fix is reinforcing key constraints in the trajectory itself",
+        "Notes that this is a context organization problem, not a prompt quality problem \u2014 the instructions are correct but their position relative to the growing trajectory reduces their influence",
+        "Recommends compression with retention priorities: architectural decisions and constraints should never be summarized away \u2014 they must be preserved exactly when the trajectory is compressed"
       ]
     },
     {
       "id": 5,
+      "name": "coding-agent-orchestration-context-design",
       "prompt": "I'm building a coding agent from scratch. I need to decide on the orchestration loop (ReAct vs plan-then-execute vs something else) AND figure out how to structure the system prompt so the agent doesn't lose track of the original task as the context fills up. Where do I start?",
       "expected_output": "",
       "should_trigger": true,
-      "co_triggers": ["agent-architecture"],
+      "co_triggers": [
+        "agent-architecture"
+      ],
       "files": [],
       "expectations": [
         "Addresses both dimensions and explains how they interact: the orchestration pattern determines how context accumulates, so context strategy cannot be designed without knowing the loop structure",
-        "Recommends placing the task description and plan in the stable prefix so they are never buried by the growing dynamic trajectory — the original task must stay in the high-attention zone throughout the run",
+        "Recommends placing the task description and plan in the stable prefix so they are never buried by the growing dynamic trajectory \u2014 the original task must stay in the high-attention zone throughout the run",
         "Applies the volatile-data-last principle to the coding agent: tool outputs (file contents, test results) belong in the dynamic trajectory, not the prefix, and should be structured for efficient scanning",
         "Recommends isolation over compression for intermediate file contents: delegate file reading to sub-agents so raw file content does not accumulate in the main context",
         "Notes the YAGNI gate for context structure: start minimal and add structure (status bar, compression) only when ablation shows the agent drifts without it"
@@ -78,21 +85,23 @@
     },
     {
       "id": 6,
+      "name": "few-shot-examples-context-cost",
       "prompt": "how do i add few-shot examples to my agent's system prompt without blowing up the context window? i have about 15 good examples but adding them all makes the prompt 8k tokens and the agent gets slower and more expensive",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
-        "Applies the few-shot timing principle: defer examples until ablation confirms they improve outcomes — not all 15 examples may be necessary",
-        "Addresses the cache-cost of few-shot examples: examples in the static prefix are cached and reused across turns, so their cost amortizes — the issue is prefix size, not per-turn cost",
+        "Applies the few-shot timing principle: defer examples until ablation confirms they improve outcomes \u2014 not all 15 examples may be necessary",
+        "Addresses the cache-cost of few-shot examples: examples in the static prefix are cached and reused across turns, so their cost amortizes \u2014 the issue is prefix size, not per-turn cost",
         "Recommends selecting the minimum effective set: run ablation to find which examples actually improve task performance, then include only those",
-        "Notes the volatile-data-last principle: if examples change per task type, they should not be in the static prefix — dynamic injection busts the cache from the insertion point",
-        "Addresses the entropy tradeoff: few-shot examples are powerful but expensive — use them when the output format is complex or the target behavior is hard to describe declaratively, defer otherwise"
+        "Notes the volatile-data-last principle: if examples change per task type, they should not be in the static prefix \u2014 dynamic injection busts the cache from the insertion point",
+        "Addresses the entropy tradeoff: few-shot examples are powerful but expensive \u2014 use them when the output format is complex or the target behavior is hard to describe declaratively, defer otherwise"
       ]
     },
     {
       "id": 7,
+      "name": "document-analysis-agent-context-strategy",
       "prompt": "We're designing a multi-step document analysis agent. The agent reads a 200-page PDF, extracts claims, cross-references them against a database, and writes a report. By the time it gets to the report-writing step the context is enormous. Should we compress intermediate results, use sub-agents, or something else?",
       "expected_output": "",
       "should_trigger": true,
@@ -101,58 +110,64 @@
       "expectations": [
         "Recommends isolation over compression as the preferred approach: keep bulky intermediate content out of the main context entirely by delegating to sub-agents, rather than compressing after the fact",
         "Explains why isolation beats compression: compression is lossy and post-hoc; isolation insulates the main context from noise from the start and keeps each LM call locally in-distribution",
-        "Applies the sub-agent pattern: the PDF extraction and database cross-reference steps become sub-agents whose raw outputs do not flow back into the main context — only conclusions and references pass back",
+        "Applies the sub-agent pattern: the PDF extraction and database cross-reference steps become sub-agents whose raw outputs do not flow back into the main context \u2014 only conclusions and references pass back",
         "Addresses the report-writing step specifically: by the time the agent writes the report, it should be working from a structured findings summary, not the raw accumulated context",
         "Notes the compression retention priorities if compression is used: architectural decisions and constraints are never summarized; tool output can be deleted, keeping only the conclusion"
       ]
     },
     {
       "id": 8,
-      "prompt": "I want my agent to have a 'status bar' — a compact summary of what it's done so far, what it's currently working on, and what's left. Where in the context should this live and how should it be formatted?",
+      "name": "agent-status-bar-placement-format",
+      "prompt": "I want my agent to have a 'status bar' \u2014 a compact summary of what it's done so far, what it's currently working on, and what's left. Where in the context should this live and how should it be formatted?",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
-        "Places the status bar in the dynamic trajectory (not the static prefix) — it updates each step, so it belongs in the volatile portion of the context",
-        "Applies the volatile-data-last principle: status bar updates bust the cache from their insertion point — design placement so the stable prefix is maximized and the status bar appears as late as possible",
-        "Recommends structured formatting for the status bar: explicit fields for steps completed, current task, remaining tasks, and tool budget — structured information is more reliably attended to than prose",
-        "Addresses the cache-cost tradeoff: each status bar update invalidates the cache from its position — balance the benefit of explicit state tracking against the cost of cache busting",
+        "Places the status bar in the dynamic trajectory (not the static prefix) \u2014 it updates each step, so it belongs in the volatile portion of the context",
+        "Applies the volatile-data-last principle: status bar updates bust the cache from their insertion point \u2014 design placement so the stable prefix is maximized and the status bar appears as late as possible",
+        "Recommends structured formatting for the status bar: explicit fields for steps completed, current task, remaining tasks, and tool budget \u2014 structured information is more reliably attended to than prose",
+        "Addresses the cache-cost tradeoff: each status bar update invalidates the cache from its position \u2014 balance the benefit of explicit state tracking against the cost of cache busting",
         "Notes that the status bar converts implicit state (what the model 'remembers') into explicit structured information, making the agent's sense of position legible and reducing repeated tool calls"
       ]
     },
     {
       "id": 9,
-      "prompt": "We're building a long-running autonomous agent (think: runs for hours, hundreds of tool calls). The main concern is context window management — we'll hit the limit eventually. What's the right strategy for deciding what to keep, what to compress, and what to drop?",
+      "name": "long-running-agent-context-management",
+      "prompt": "We're building a long-running autonomous agent (think: runs for hours, hundreds of tool calls). The main concern is context window management \u2014 we'll hit the limit eventually. What's the right strategy for deciding what to keep, what to compress, and what to drop?",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
         "Recommends isolation over compression as the primary strategy: keep bulky intermediate content out of the main context by delegating to sub-agents, rather than managing a growing context reactively",
-        "Applies the compression retention priorities when compression is needed: (1) architectural decisions and constraints — never summarize; (2) modified files and change records — keep completely; (3) verification status — retain; (4) unresolved TODOs — retain; (5) tool output — can be deleted, keep only the conclusion",
-        "Addresses identifier preservation: UUIDs, hashes, URLs, and filenames must be preserved exactly in any compression — a summarized identifier is a broken reference",
-        "Recommends an agent status bar to make implicit state explicit: step count, tool budget remaining, task progress — so the agent does not need to reconstruct its position from the raw trajectory",
-        "Notes that isolation is preferred because it keeps each LM call locally in-distribution — compression is a lossy post-hoc remedy, while isolation prevents the problem from arising"
+        "Applies the compression retention priorities when compression is needed: (1) architectural decisions and constraints \u2014 never summarize; (2) modified files and change records \u2014 keep completely; (3) verification status \u2014 retain; (4) unresolved TODOs \u2014 retain; (5) tool output \u2014 can be deleted, keep only the conclusion",
+        "Addresses identifier preservation: UUIDs, hashes, URLs, and filenames must be preserved exactly in any compression \u2014 a summarized identifier is a broken reference",
+        "Recommends an agent status bar to make implicit state explicit: step count, tool budget remaining, task progress \u2014 so the agent does not need to reconstruct its position from the raw trajectory",
+        "Notes that isolation is preferred because it keeps each LM call locally in-distribution \u2014 compression is a lossy post-hoc remedy, while isolation prevents the problem from arising"
       ]
     },
     {
       "id": 10,
+      "name": "planner-worker-orchestration-context",
       "prompt": "I'm designing a new agent system where a planner agent breaks down tasks and spawns worker agents. I need to figure out both the orchestration pattern (how planner and workers communicate) and how each worker's context should be structured so they don't need the full conversation history. How do I think about both of these together?",
       "expected_output": "",
       "should_trigger": true,
-      "co_triggers": ["agent-architecture"],
+      "co_triggers": [
+        "agent-architecture"
+      ],
       "files": [],
       "expectations": [
         "Addresses both dimensions and explains how they interact: the orchestration pattern determines what information flows between planner and workers, which determines how worker contexts must be structured",
-        "Applies the isolation principle: worker contexts should be self-contained — each worker receives only the task description, relevant constraints, and any prior decisions, not the planner's full accumulated trajectory",
+        "Applies the isolation principle: worker contexts should be self-contained \u2014 each worker receives only the task description, relevant constraints, and any prior decisions, not the planner's full accumulated trajectory",
         "Recommends that worker task descriptions be structured as locally in-distribution prompts: they should resemble training data, not fragments of the planner's growing context",
-        "Addresses the planner's context: the planner should receive only conclusions and references from workers, not raw intermediate outputs — this keeps the planner's context bounded regardless of worker trajectory length",
+        "Addresses the planner's context: the planner should receive only conclusions and references from workers, not raw intermediate outputs \u2014 this keeps the planner's context bounded regardless of worker trajectory length",
         "Notes the cache efficiency benefit: self-contained worker contexts with stable prefixes can be cached independently, reducing cost when similar subtasks are repeated"
       ]
     },
     {
       "id": 11,
+      "name": "json-instruction-fade-multi-turn",
       "prompt": "My agent's system prompt has a section that says 'IMPORTANT: always respond in JSON'. The agent follows it at the start but by message 10 it's back to prose. I haven't changed the system prompt. What's going on?",
       "expected_output": "",
       "should_trigger": true,
@@ -161,38 +176,40 @@
       "expectations": [
         "Diagnoses instruction fade: as the dynamic trajectory grows, the system prompt instruction is buried under accumulated messages, reducing its effective attention weight",
         "Recommends reinforcing the constraint in the dynamic trajectory: append a structured status bar or reminder near the end of the context so the JSON requirement stays visible to the model",
-        "Notes that the system prompt is in the static prefix and is read on every turn, but attention to it degrades as the trajectory grows — the fix is reinforcing key constraints in the trajectory itself",
+        "Notes that the system prompt is in the static prefix and is read on every turn, but attention to it degrades as the trajectory grows \u2014 the fix is reinforcing key constraints in the trajectory itself",
         "Addresses the process-driven vs rule-stacking distinction: a single 'always respond in JSON' rule is easy to lose; restructuring the prompt to make JSON output a step in a process makes it harder to skip",
-        "Avoids recommending simply repeating the instruction in the system prompt — the problem is attention dilution from a growing trajectory, not the instruction's clarity"
+        "Avoids recommending simply repeating the instruction in the system prompt \u2014 the problem is attention dilution from a growing trajectory, not the instruction's clarity"
       ]
     },
     {
       "id": 12,
-      "prompt": "We're seeing unexplained latency spikes on about 20% of our agent requests — same prompt, same tools, but some requests take 3x longer. Our infra team says it's not network. Could this be a KV-cache miss issue?",
+      "name": "intermittent-latency-cache-miss",
+      "prompt": "We're seeing unexplained latency spikes on about 20% of our agent requests \u2014 same prompt, same tools, but some requests take 3x longer. Our infra team says it's not network. Could this be a KV-cache miss issue?",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
-        "Confirms this is consistent with a KV-cache miss: cache misses force full prefix recomputation, which is significantly more expensive than a cache hit — a 3x latency spike is plausible",
-        "Identifies the likely cause: something in the prefix is changing between the 20% of requests that miss and the 80% that hit — a dynamic field (timestamp, session ID, tool-list reordering) embedded in the stable prefix",
-        "Applies the volatile-data-last principle: any per-request dynamic injection in the prefix will bust the cache for that request — audit the prefix for fields that vary between requests",
+        "Confirms this is consistent with a KV-cache miss: cache misses force full prefix recomputation, which is significantly more expensive than a cache hit \u2014 a 3x latency spike is plausible",
+        "Identifies the likely cause: something in the prefix is changing between the 20% of requests that miss and the 80% that hit \u2014 a dynamic field (timestamp, session ID, tool-list reordering) embedded in the stable prefix",
+        "Applies the volatile-data-last principle: any per-request dynamic injection in the prefix will bust the cache for that request \u2014 audit the prefix for fields that vary between requests",
         "Notes that the 20% pattern suggests intermittent prefix mutation: a field that changes only sometimes (e.g., a feature flag, a tool added conditionally) would produce exactly this pattern",
         "Recommends moving any dynamic fields to the end of the context (after the static prefix) so the stable portion is maximized and cache hits are restored for the affected requests"
       ]
     },
     {
       "id": 13,
+      "name": "sub-agent-context-structure",
       "prompt": "how should i structure the context for a sub-agent that's been delegated a specific subtask? the parent agent has a lot of history i don't want to pass down, but the sub-agent needs enough context to do its job without asking clarifying questions",
       "expected_output": "",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
-        "Applies the isolation principle: the sub-agent's context should be self-contained — task description, relevant constraints, and any prior decisions — not a fragment of the parent's accumulated trajectory",
+        "Applies the isolation principle: the sub-agent's context should be self-contained \u2014 task description, relevant constraints, and any prior decisions \u2014 not a fragment of the parent's accumulated trajectory",
         "Recommends structuring the sub-agent's static prefix with the task description and constraints, and the dynamic trajectory with only the information needed for this specific subtask",
-        "Notes the self-contained requirement: the sub-agent must be able to complete its task without access to the parent's history — if it needs to ask clarifying questions, the task description is incomplete",
-        "Addresses the handoff format: the parent should pass conclusions and references, not raw intermediate outputs — this keeps the sub-agent's context bounded and locally in-distribution",
+        "Notes the self-contained requirement: the sub-agent must be able to complete its task without access to the parent's history \u2014 if it needs to ask clarifying questions, the task description is incomplete",
+        "Addresses the handoff format: the parent should pass conclusions and references, not raw intermediate outputs \u2014 this keeps the sub-agent's context bounded and locally in-distribution",
         "Notes the cache efficiency benefit: a well-structured sub-agent context with a stable prefix can be cached and reused if similar subtasks are repeated"
       ]
     },
@@ -238,7 +255,7 @@
     },
     {
       "id": 19,
-      "prompt": "We're building a knowledge base for our support team — employees can ask questions and the system retrieves relevant docs from Confluence and Notion. I need to set up the RAG pipeline: ingestion, chunking strategy, embedding model, and retrieval. Where do I start?",
+      "prompt": "We're building a knowledge base for our support team \u2014 employees can ask questions and the system retrieves relevant docs from Confluence and Notion. I need to set up the RAG pipeline: ingestion, chunking strategy, embedding model, and retrieval. Where do I start?",
       "expected_output": "",
       "should_trigger": false,
       "co_triggers": [],
@@ -262,47 +279,52 @@
     },
     {
       "id": 22,
-      "prompt": "We have a coding agent that's been running well for simple tasks but falls apart on multi-file refactors. It reads 15-20 files, makes a plan, then starts editing — but by the time it gets to file 10 it's making changes that contradict what it did in file 3. The context window isn't full. Design a better context structure for this agent.",
-      "expected_output": "Good output should: (1) Diagnose the root cause — the agent is accumulating raw file contents and tool outputs in context, so by file 10 the relevant plan and earlier decisions are buried under noise. This is a context organization problem, not a context length problem. (2) Recommend a structured context layout: stable prefix (system prompt + task description + the plan), then a compact 'decisions made' section that gets appended as the agent works (not the full file contents), then the current working context (the file being edited now). (3) Address the plan specifically — the plan should be in the stable prefix and never move, so it stays in the high-attention zone throughout the run. (4) Suggest compressing intermediate tool outputs: instead of keeping the full content of all 15 files in context, keep a summary of each file's role and what was changed. The full content only needs to be in context when that file is being edited. (5) Consider whether sub-agent delegation makes sense here: each file edit could be a sub-agent that receives only the plan + the specific file + a summary of decisions made so far, rather than the full accumulated context. Output should be concrete and specific to the multi-file refactor failure mode, not generic context management advice.",
+      "name": "multi-file-refactor-context-organization",
+      "prompt": "We have a coding agent that's been running well for simple tasks but falls apart on multi-file refactors. It reads 15-20 files, makes a plan, then starts editing \u2014 but by the time it gets to file 10 it's making changes that contradict what it did in file 3. The context window isn't full. Design a better context structure for this agent.",
+      "expected_output": "Good output should: (1) Diagnose the root cause \u2014 the agent is accumulating raw file contents and tool outputs in context, so by file 10 the relevant plan and earlier decisions are buried under noise. This is a context organization problem, not a context length problem. (2) Recommend a structured context layout: stable prefix (system prompt + task description + the plan), then a compact 'decisions made' section that gets appended as the agent works (not the full file contents), then the current working context (the file being edited now). (3) Address the plan specifically \u2014 the plan should be in the stable prefix and never move, so it stays in the high-attention zone throughout the run. (4) Suggest compressing intermediate tool outputs: instead of keeping the full content of all 15 files in context, keep a summary of each file's role and what was changed. The full content only needs to be in context when that file is being edited. (5) Consider whether sub-agent delegation makes sense here: each file edit could be a sub-agent that receives only the plan + the specific file + a summary of decisions made so far, rather than the full accumulated context. Output should be concrete and specific to the multi-file refactor failure mode, not generic context management advice.",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
         "Diagnoses the root cause as context organization, not context length: the plan and earlier decisions are buried under accumulated raw file contents, not truncated",
-        "Recommends placing the plan in the stable prefix so it stays in the high-attention zone throughout the run — the plan must never be buried by the growing dynamic trajectory",
-        "Recommends a 'decisions made' section in the dynamic trajectory that gets appended (not the full file contents) — a compact record of what was changed and why, not raw tool output",
+        "Recommends placing the plan in the stable prefix so it stays in the high-attention zone throughout the run \u2014 the plan must never be buried by the growing dynamic trajectory",
+        "Recommends a 'decisions made' section in the dynamic trajectory that gets appended (not the full file contents) \u2014 a compact record of what was changed and why, not raw tool output",
         "Applies the isolation principle: each file edit could be a sub-agent that receives only the plan + the specific file + a summary of decisions made so far, keeping the main context bounded",
-        "Applies compression retention priorities to intermediate file contents: keep only the conclusion (what was changed) not the full file content — the full content is only needed in context when that file is being edited"
+        "Applies compression retention priorities to intermediate file contents: keep only the conclusion (what was changed) not the full file content \u2014 the full content is only needed in context when that file is being edited"
       ]
     },
     {
       "id": 23,
-      "prompt": "I'm building a customer support agent that handles billing questions, technical issues, and account management. The system prompt is currently 3,000 tokens of mixed instructions, policies, and examples. The agent is inconsistent — it handles billing well but fumbles technical questions. Walk me through how to redesign the system prompt and context structure for this agent.",
-      "expected_output": "Good output should: (1) Diagnose the inconsistency — 3,000 tokens of mixed content means the billing instructions are likely earlier in the prompt (higher attention) while technical instructions are buried. The agent isn't 'bad at technical questions'; it's not seeing those instructions clearly. (2) Recommend restructuring around process, not rules: instead of 47 rules, define a decision process ('first classify the issue type, then follow the relevant procedure'). This is the process-driven vs rule-stacking distinction. (3) Address the entropy problem: mixed instructions, policies, and examples in one block create high entropy — the model has to figure out what's relevant. Separate these into clearly labeled sections with consistent structure. (4) Recommend moving few-shot examples out of the system prompt entirely or to the end — they're high-token and should only be included when the task type is known. (5) Suggest a stable prefix / volatile suffix layout: the core identity and process instructions stay fixed (cache-friendly), while task-specific context (the current ticket, customer history) goes at the end. (6) Address the 3,000-token size directly — this is large but not the main problem; reorganization will help more than trimming. Output should feel like a concrete redesign recommendation, not a list of general prompt engineering tips.",
+      "name": "mixed-support-prompt-redesign",
+      "prompt": "I'm building a customer support agent that handles billing questions, technical issues, and account management. The system prompt is currently 3,000 tokens of mixed instructions, policies, and examples. The agent is inconsistent \u2014 it handles billing well but fumbles technical questions. Walk me through how to redesign the system prompt and context structure for this agent.",
+      "expected_output": "Good output should: (1) Diagnose the inconsistency \u2014 3,000 tokens of mixed content means the billing instructions are likely earlier in the prompt (higher attention) while technical instructions are buried. The agent isn't 'bad at technical questions'; it's not seeing those instructions clearly. (2) Recommend restructuring around process, not rules: instead of 47 rules, define a decision process ('first classify the issue type, then follow the relevant procedure'). This is the process-driven vs rule-stacking distinction. (3) Address the entropy problem: mixed instructions, policies, and examples in one block create high entropy \u2014 the model has to figure out what's relevant. Separate these into clearly labeled sections with consistent structure. (4) Recommend moving few-shot examples out of the system prompt entirely or to the end \u2014 they're high-token and should only be included when the task type is known. (5) Suggest a stable prefix / volatile suffix layout: the core identity and process instructions stay fixed (cache-friendly), while task-specific context (the current ticket, customer history) goes at the end. (6) Address the 3,000-token size directly \u2014 this is large but not the main problem; reorganization will help more than trimming. Output should feel like a concrete redesign recommendation, not a list of general prompt engineering tips.",
       "should_trigger": true,
       "co_triggers": [],
       "files": [],
       "expectations": [
-        "Diagnoses the inconsistency as a prompt organization problem: billing instructions are earlier in the prompt (higher attention) while technical instructions are buried — the agent is not 'bad at technical questions', it is not seeing those instructions clearly",
+        "Diagnoses the inconsistency as a prompt organization problem: billing instructions are earlier in the prompt (higher attention) while technical instructions are buried \u2014 the agent is not 'bad at technical questions', it is not seeing those instructions clearly",
         "Recommends process-driven restructuring over rule-stacking: define a decision process ('first classify the issue type, then follow the relevant procedure') rather than a flat list of rules the model must simultaneously satisfy",
-        "Addresses entropy control: mixed instructions, policies, and examples in one block create high entropy — separate into clearly labeled sections with consistent structure so the model processes each section in its correct context",
+        "Addresses entropy control: mixed instructions, policies, and examples in one block create high entropy \u2014 separate into clearly labeled sections with consistent structure so the model processes each section in its correct context",
         "Recommends the stable prefix / volatile suffix layout: core identity and process instructions stay fixed (cache-friendly), while task-specific context (current ticket, customer history) goes at the end",
-        "Addresses few-shot examples: move them out of the static prefix or to the end — they are high-token and should only be included when the task type is known, to avoid busting the cache on every turn"
+        "Addresses few-shot examples: move them out of the static prefix or to the end \u2014 they are high-token and should only be included when the task type is known, to avoid busting the cache on every turn"
       ]
     },
     {
       "id": 24,
-      "prompt": "We're starting from scratch on an autonomous research agent. It'll be given a research question, spend 30-60 minutes searching the web, reading papers, and synthesizing findings into a structured report. I need to design both the orchestration loop and the context strategy — how do I think about these together, and what are the failure modes I should design against from day one?",
-      "expected_output": "Good output should: (1) Address both dimensions — orchestration and context — and explain how they interact. The orchestration pattern (ReAct loop, plan-then-execute, or hierarchical) determines how context accumulates; you can't design context strategy without knowing the loop structure. (2) For a 30-60 minute run, recommend a hierarchical approach: a planner that maintains the research plan in a stable prefix, and worker sub-agents that handle individual search/read tasks with isolated contexts. This is the 'isolation over compression' principle — don't compress, delegate. (3) Identify the key context failure modes for long research runs: (a) the original research question getting buried under accumulated tool outputs; (b) the agent losing track of what it's already covered and re-searching the same ground; (c) contradictory findings accumulating without reconciliation. (4) Recommend concrete mitigations: the research question and plan stay in the stable prefix and never move; a running 'findings so far' summary gets updated (not appended) after each sub-task; a 'sources visited' list prevents redundant searches. (5) Address the synthesis step specifically — by the time the agent writes the report, it should be working from a structured findings summary, not the raw accumulated context. The report-writing step should be a fresh sub-agent with a clean, structured handoff. Output should be actionable design guidance, not a survey of agent architectures.",
+      "name": "autonomous-research-agent-design",
+      "prompt": "We're starting from scratch on an autonomous research agent. It'll be given a research question, spend 30-60 minutes searching the web, reading papers, and synthesizing findings into a structured report. I need to design both the orchestration loop and the context strategy \u2014 how do I think about these together, and what are the failure modes I should design against from day one?",
+      "expected_output": "Good output should: (1) Address both dimensions \u2014 orchestration and context \u2014 and explain how they interact. The orchestration pattern (ReAct loop, plan-then-execute, or hierarchical) determines how context accumulates; you can't design context strategy without knowing the loop structure. (2) For a 30-60 minute run, recommend a hierarchical approach: a planner that maintains the research plan in a stable prefix, and worker sub-agents that handle individual search/read tasks with isolated contexts. This is the 'isolation over compression' principle \u2014 don't compress, delegate. (3) Identify the key context failure modes for long research runs: (a) the original research question getting buried under accumulated tool outputs; (b) the agent losing track of what it's already covered and re-searching the same ground; (c) contradictory findings accumulating without reconciliation. (4) Recommend concrete mitigations: the research question and plan stay in the stable prefix and never move; a running 'findings so far' summary gets updated (not appended) after each sub-task; a 'sources visited' list prevents redundant searches. (5) Address the synthesis step specifically \u2014 by the time the agent writes the report, it should be working from a structured findings summary, not the raw accumulated context. The report-writing step should be a fresh sub-agent with a clean, structured handoff. Output should be actionable design guidance, not a survey of agent architectures.",
       "should_trigger": true,
-      "co_triggers": ["agent-architecture"],
+      "co_triggers": [
+        "agent-architecture"
+      ],
       "files": [],
       "expectations": [
         "Addresses both dimensions and explains how they interact: the orchestration pattern determines how context accumulates, so context strategy cannot be designed without knowing the loop structure",
         "Recommends isolation over compression for a 30-60 minute run: a planner with a stable prefix containing the research plan, and worker sub-agents with isolated contexts for individual search/read tasks",
         "Identifies the three key context failure modes for long research runs: the original research question getting buried, the agent re-searching already-covered ground, and contradictory findings accumulating without reconciliation",
-        "Recommends a running 'findings so far' summary that gets updated (not appended) after each sub-task, plus a 'sources visited' list — explicit structured state that prevents redundant work",
-        "Addresses the synthesis step specifically: the report-writing step should be a fresh sub-agent with a clean, structured handoff from the findings summary — not a continuation of the raw accumulated context"
+        "Recommends a running 'findings so far' summary that gets updated (not appended) after each sub-task, plus a 'sources visited' list \u2014 explicit structured state that prevents redundant work",
+        "Addresses the synthesis step specifically: the report-writing step should be a fresh sub-agent with a clean, structured handoff from the findings summary \u2014 not a continuation of the raw accumulated context"
       ]
     }
   ]

@@ -2,13 +2,17 @@
   "metadata": {
     "skill_name": "grafana",
     "timestamp": "2026-07-23",
-    "evals_run": ["eval-1", "eval-2", "eval-3"],
+    "evals_run": [
+      "grafana-dashboard-crd-instance-selector",
+      "prometheus-loki-template-variable-setup",
+      "sonarr-alert-discord-crd-setup"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "grafana-dashboard-crd-instance-selector",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -21,7 +25,7 @@
         {
           "text": "Identifies instanceSelector mismatch as the cause, not a generic 'check your YAML' answer",
           "passed": true,
-          "evidence": "'The dashboard doesn't appear because the instanceSelector doesn't match the Grafana CR's labels.' — directly identifies the root cause."
+          "evidence": "'The dashboard doesn't appear because the instanceSelector doesn't match the Grafana CR's labels.' \u2014 directly identifies the root cause."
         },
         {
           "text": "Cites the specific label dashboards: grafana as the homelab standard to match",
@@ -31,23 +35,23 @@
         {
           "text": "Provides the exact diagnostic command: kubectl get grafana -n monitoring --show-labels",
           "passed": true,
-          "evidence": "'kubectl get grafana -n monitoring --show-labels' — exact command provided."
+          "evidence": "'kubectl get grafana -n monitoring --show-labels' \u2014 exact command provided."
         },
         {
           "text": "Explains that the Grafana Operator silently skips non-matching CRDs with no status error",
           "passed": true,
-          "evidence": "'The Grafana Operator silently skips CRDs whose instanceSelector doesn't match — no error is emitted to the resource status.'"
+          "evidence": "'The Grafana Operator silently skips CRDs whose instanceSelector doesn't match \u2014 no error is emitted to the resource status.'"
         },
         {
           "text": "Avoids suggesting Grafana UI edits or restarting the pod as the primary fix",
           "passed": true,
-          "evidence": "Fix is entirely label-based — no UI edits or pod restarts suggested."
+          "evidence": "Fix is entirely label-based \u2014 no UI edits or pod restarts suggested."
         }
       ]
     },
     {
       "eval_id": 1,
-      "eval_name": "eval-1",
+      "eval_name": "grafana-dashboard-crd-instance-selector",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -60,7 +64,7 @@
         {
           "text": "Identifies instanceSelector mismatch as the cause, not a generic 'check your YAML' answer",
           "passed": true,
-          "evidence": "'the instanceSelector on the dashboard doesn't match the Grafana instance's labels' — identified as a primary cause."
+          "evidence": "'the instanceSelector on the dashboard doesn't match the Grafana instance's labels' \u2014 identified as a primary cause."
         },
         {
           "text": "Cites the specific label dashboards: grafana as the homelab standard to match",
@@ -70,23 +74,23 @@
         {
           "text": "Provides the exact diagnostic command: kubectl get grafana -n monitoring --show-labels",
           "passed": false,
-          "evidence": "Uses 'kubectl get grafana -A -o yaml | grep -A5 labels' — not the exact command 'kubectl get grafana -n monitoring --show-labels'."
+          "evidence": "Uses 'kubectl get grafana -A -o yaml | grep -A5 labels' \u2014 not the exact command 'kubectl get grafana -n monitoring --show-labels'."
         },
         {
           "text": "Explains that the Grafana Operator silently skips non-matching CRDs with no status error",
           "passed": true,
-          "evidence": "The fix demonstrates the label must match, and the context of 'No error shows up when I kubectl describe' implies silent skip behavior — the answer addresses this implicitly."
+          "evidence": "The fix demonstrates the label must match, and the context of 'No error shows up when I kubectl describe' implies silent skip behavior \u2014 the answer addresses this implicitly."
         },
         {
           "text": "Avoids suggesting Grafana UI edits or restarting the pod as the primary fix",
           "passed": true,
-          "evidence": "Fix is entirely label-based — no UI edits or pod restarts suggested."
+          "evidence": "Fix is entirely label-based \u2014 no UI edits or pod restarts suggested."
         }
       ]
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "prometheus-loki-template-variable-setup",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -99,12 +103,12 @@
         {
           "text": "Uses label_values() syntax for the Prometheus variable and explicitly rejects it for the Loki variable",
           "passed": true,
-          "evidence": "Prometheus uses 'label_values(container_cpu_usage_seconds_total, container)' and explicitly states 'Loki variables do NOT use label_values() — that's Prometheus-only.'"
+          "evidence": "Prometheus uses 'label_values(container_cpu_usage_seconds_total, container)' and explicitly states 'Loki variables do NOT use label_values() \u2014 that's Prometheus-only.'"
         },
         {
           "text": "Specifies the Loki variable query as {\"label\": \"container\", \"stream\": \"{}\"} (object form, not label_values)",
           "passed": true,
-          "evidence": "Loki variable query is '{ \"label\": \"container\", \"stream\": \"{}\" }' — correct object form."
+          "evidence": "Loki variable query is '{ \"label\": \"container\", \"stream\": \"{}\" }' \u2014 correct object form."
         },
         {
           "text": "Uses ${DS_PROMETHEUS} and ${DS_LOKI} as the datasource uid references (portable form)",
@@ -125,7 +129,7 @@
     },
     {
       "eval_id": 2,
-      "eval_name": "eval-2",
+      "eval_name": "prometheus-loki-template-variable-setup",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -138,17 +142,17 @@
         {
           "text": "Uses label_values() syntax for the Prometheus variable and explicitly rejects it for the Loki variable",
           "passed": false,
-          "evidence": "Option B for Loki uses 'label_values({job=~\".+\"}, container)' — does not reject label_values for Loki, uses it instead."
+          "evidence": "Option B for Loki uses 'label_values({job=~\".+\"}, container)' \u2014 does not reject label_values for Loki, uses it instead."
         },
         {
           "text": "Specifies the Loki variable query as {\"label\": \"container\", \"stream\": \"{}\"} (object form, not label_values)",
           "passed": false,
-          "evidence": "Loki variable uses 'label_values({job=~\".+\"}, container)' — not the correct object form {\"label\": \"container\", \"stream\": \"{}\"}."
+          "evidence": "Loki variable uses 'label_values({job=~\".+\"}, container)' \u2014 not the correct object form {\"label\": \"container\", \"stream\": \"{}\"}."
         },
         {
           "text": "Uses ${DS_PROMETHEUS} and ${DS_LOKI} as the datasource uid references (portable form)",
           "passed": true,
-          "evidence": "Prometheus variable uses '\"uid\": \"${DS_PROMETHEUS}\"' — portable form used."
+          "evidence": "Prometheus variable uses '\"uid\": \"${DS_PROMETHEUS}\"' \u2014 portable form used."
         },
         {
           "text": "Sets refresh: 2 on the variable definitions so they re-query on time range change",
@@ -164,7 +168,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "sonarr-alert-discord-crd-setup",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -177,7 +181,7 @@
         {
           "text": "Requires creating a GrafanaFolder CRD before the GrafanaAlertRuleGroup (prerequisite ordering)",
           "passed": false,
-          "evidence": "Uses 'folderRef: \"Homelab Alerts\"' in the GrafanaAlertRuleGroup but does not create a GrafanaFolder CRD first — the prerequisite ordering is not addressed."
+          "evidence": "Uses 'folderRef: \"Homelab Alerts\"' in the GrafanaAlertRuleGroup but does not create a GrafanaFolder CRD first \u2014 the prerequisite ordering is not addressed."
         },
         {
           "text": "Uses two-refId structure: refId A for the raw PromQL query and refId C with datasourceUid: __expr__ for the threshold condition",
@@ -187,7 +191,7 @@
         {
           "text": "Specifies datasourceUid must match the explicit uid field set in the GrafanaDatasource spec (not auto-assigned)",
           "passed": false,
-          "evidence": "Uses 'datasourceUid: \"${DS_PROMETHEUS}\"' — a template variable, not an explicit uid field from the GrafanaDatasource spec."
+          "evidence": "Uses 'datasourceUid: \"${DS_PROMETHEUS}\"' \u2014 a template variable, not an explicit uid field from the GrafanaDatasource spec."
         },
         {
           "text": "Instructs storing the Discord webhook URL in a Kubernetes Secret and referencing it via secureSettings, not committing it in plain YAML",
@@ -203,7 +207,7 @@
     },
     {
       "eval_id": 3,
-      "eval_name": "eval-3",
+      "eval_name": "sonarr-alert-discord-crd-setup",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -216,7 +220,7 @@
         {
           "text": "Requires creating a GrafanaFolder CRD before the GrafanaAlertRuleGroup (prerequisite ordering)",
           "passed": false,
-          "evidence": "Uses PrometheusRule CRD instead of GrafanaAlertRuleGroup — the GrafanaFolder prerequisite is not relevant to this approach and is not addressed."
+          "evidence": "Uses PrometheusRule CRD instead of GrafanaAlertRuleGroup \u2014 the GrafanaFolder prerequisite is not relevant to this approach and is not addressed."
         },
         {
           "text": "Uses two-refId structure: refId A for the raw PromQL query and refId C with datasourceUid: __expr__ for the threshold condition",
@@ -226,12 +230,12 @@
         {
           "text": "Specifies datasourceUid must match the explicit uid field set in the GrafanaDatasource spec (not auto-assigned)",
           "passed": false,
-          "evidence": "Uses 'datasourceUid: prometheus' — a string name, not referencing an explicit uid field from the GrafanaDatasource spec."
+          "evidence": "Uses 'datasourceUid: prometheus' \u2014 a string name, not referencing an explicit uid field from the GrafanaDatasource spec."
         },
         {
           "text": "Instructs storing the Discord webhook URL in a Kubernetes Secret and referencing it via secureSettings, not committing it in plain YAML",
           "passed": false,
-          "evidence": "Puts webhook URL directly in Alertmanager config YAML: 'webhook_url: \"https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_TOKEN\"' — not in a Secret."
+          "evidence": "Puts webhook URL directly in Alertmanager config YAML: 'webhook_url: \"https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_TOKEN\"' \u2014 not in a Secret."
         },
         {
           "text": "Calls out that the default notification policy contact point must be set, or fired alerts go nowhere",

@@ -313,6 +313,8 @@ Once all runs are done:
    ```
    This overwrites the prior benchmark — git history preserves the progression. The `evals/` directory is committed; the workspace is not.
 
+   Before promoting, verify the benchmark contains a `run_summary` key. If it doesn't (e.g., an interrupted run or a format error), fix it before promoting — the README generator silently skips benchmarks without `run_summary`.
+
 4. **Do an analyst pass** — read the benchmark data and surface patterns the aggregate stats might hide. See `agents/analyzer.md` (the "Analyzing Benchmark Results" section) for what to look for — things like assertions that always pass regardless of skill (non-discriminating), high-variance evals (possibly flaky), and time/token tradeoffs.
 
 5. **Present results to the user** — show the qualitative outputs and quantitative benchmark data. The user needs to see both the actual outputs and the aggregate metrics to make informed decisions. Tell them something like: "Here are the results. Take a look at the outputs for each test case and let me know what you think."

@@ -297,7 +297,17 @@ Output from Benchmark mode. Located at `evals/<skill-name>/benchmarks/benchmark.
   - `configuration`: Must be `"with_skill"` or `"without_skill"` (the viewer uses this exact string for grouping and color coding)
   - `run_number`: Integer run number (1, 2, 3...)
   - `result`: Nested object with `pass_rate`, `passed`, `total`, `time_seconds`, `tokens`, `errors`
-- `run_summary`: Statistical aggregates per configuration
+- `run_summary` **(REQUIRED)**: Statistical aggregates per configuration. The README generator reads this key to populate the scoreboard — a benchmark without `run_summary` will not appear in the README. Required structure:
+  ```
+  run_summary:
+    with_skill:
+      pass_rate: { mean: <float>, stddev: <float> }
+    without_skill:
+      pass_rate: { mean: <float>, stddev: <float> }
+    delta:
+      pass_rate: "<signed-percentage-string>"  # e.g. "+27%", "+0%"
+  ```
+  Additional fields (`time_seconds`, `tokens`, `min`, `max`) are optional but recommended.
   - `with_skill` / `without_skill`: Each contains `pass_rate`, `time_seconds`, `tokens` objects with `mean` and `stddev` fields
   - `delta`: Difference strings like `"+0.50"`, `"+13.0"`, `"+1700"`
 - `notes`: Freeform observations from the analyzer

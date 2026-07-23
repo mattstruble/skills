@@ -2,9 +2,501 @@
   "metadata": {
     "skill_name": "odin-design",
     "timestamp": "2026-07-23",
-    "evals_run": 5,
+    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8
+      },
+      "expectations": [
+        {
+          "text": "All game code is in one package (no sub-packages for entity/world/particle)",
+          "passed": true,
+          "evidence": "All files declare `package game` and are in the same directory — no sub-packages."
+        },
+        {
+          "text": "No method/receiver syntax (no entity.update() or self.x patterns)",
+          "passed": true,
+          "evidence": "All procedures are free functions: `entity_update(e: ^Entity, dt: f32)`, `world_update(w: ^World, dt: f32)`, etc. No method syntax."
+        },
+        {
+          "text": "Types use Ada_Case (Entity, World, Particle, etc.)",
+          "passed": true,
+          "evidence": "Types are named `Entity`, `World`, `Particle`, `Particle_System` — all Ada_Case."
+        },
+        {
+          "text": "Procedures use snake_case",
+          "passed": true,
+          "evidence": "Procedures are named `entity_update`, `world_init`, `particle_system_emit`, `world_add_entity` — all snake_case."
+        },
+        {
+          "text": "Related procedures are prefixed with their concept (entity_create, particle_emit, etc.)",
+          "passed": true,
+          "evidence": "Procedures are prefixed: `entity_update`, `entity_draw`, `world_init`, `world_update`, `particle_system_init`, `particle_system_emit`, etc."
+        },
+        {
+          "text": "Uses temp_allocator or context.temp_allocator for frame-scoped allocations",
+          "passed": true,
+          "evidence": "The main loop includes `free_all(context.temp_allocator)` at the end of each frame."
+        },
+        {
+          "text": "Uses defer for resource cleanup",
+          "passed": true,
+          "evidence": "main.odin uses `defer rl.CloseWindow()` and `defer world_destroy(&world)` for cleanup."
+        },
+        {
+          "text": "No try/catch/throw or exception-based error handling",
+          "passed": true,
+          "evidence": "No exception-based error handling anywhere in the code. Errors would be handled via return values."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8
+      },
+      "expectations": [
+        {
+          "text": "All game code is in one package (no sub-packages for entity/world/particle)",
+          "passed": true,
+          "evidence": "All files declare `package game` and are in the same directory."
+        },
+        {
+          "text": "No method/receiver syntax (no entity.update() or self.x patterns)",
+          "passed": true,
+          "evidence": "All procedures are free functions: `world_create()`, `world_spawn(w: ^World, e: Entity)`, etc. No method syntax."
+        },
+        {
+          "text": "Types use Ada_Case (Entity, World, Particle, etc.)",
+          "passed": true,
+          "evidence": "Types are named `Entity`, `World`, `Particle`, `Particle_System` — all Ada_Case."
+        },
+        {
+          "text": "Procedures use snake_case",
+          "passed": true,
+          "evidence": "Procedures are named `world_create`, `world_spawn`, `particle_system_emit`, etc. — all snake_case."
+        },
+        {
+          "text": "Related procedures are prefixed with their concept (entity_create, particle_emit, etc.)",
+          "passed": true,
+          "evidence": "Procedures are prefixed: `world_create`, `world_spawn`, `world_update`, `particle_system_create`, `particle_system_emit`, etc."
+        },
+        {
+          "text": "Uses temp_allocator or context.temp_allocator for frame-scoped allocations",
+          "passed": false,
+          "evidence": "The baseline main loop does not include `free_all(context.temp_allocator)` or any temp_allocator usage. The particle system uses a pre-allocated pool instead."
+        },
+        {
+          "text": "Uses defer for resource cleanup",
+          "passed": true,
+          "evidence": "main.odin uses `defer world_destroy(&world)` and `defer particle_system_destroy(&particles)` for cleanup."
+        },
+        {
+          "text": "No try/catch/throw or exception-based error handling",
+          "passed": true,
+          "evidence": "No exception-based error handling anywhere in the code."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends consolidating into fewer packages (ideally one main package)",
+          "passed": true,
+          "evidence": "The response states: 'The fix: **collapse into one package** and use files for organization.'"
+        },
+        {
+          "text": "Explains that packages are for independent libraries, not code organization",
+          "passed": true,
+          "evidence": "The response states: 'A game is not a library ecosystem. Internal packages that need to cross-reference each other should not be separate packages.' and 'When packages ARE appropriate: if you have a genuinely independent library...'"
+        },
+        {
+          "text": "Suggests using separate files within one package for logical grouping",
+          "passed": true,
+          "evidence": "The response shows a `game/` directory with `entity.odin`, `physics.odin`, `renderer.odin`, `ui.odin` — all `package game`."
+        },
+        {
+          "text": "Explains that cyclic dependencies are not allowed between packages",
+          "passed": true,
+          "evidence": "The response states: 'Cyclic dependency errors mean your packages need to reference each other — which Odin forbids.'"
+        },
+        {
+          "text": "Suggests prefixed procedure names as the alternative to package namespacing",
+          "passed": false,
+          "evidence": "The response does not explicitly suggest prefixed procedure names as the alternative to package namespacing. It focuses on file organization within one package but doesn't mention prefixed names as the namespacing substitute."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends consolidating into fewer packages (ideally one main package)",
+          "passed": false,
+          "evidence": "The baseline's primary recommendation is a shared types package (still 5 packages). The one-package approach is only mentioned as an 'Alternative (simpler for smaller projects)' — not the main recommendation."
+        },
+        {
+          "text": "Explains that packages are for independent libraries, not code organization",
+          "passed": false,
+          "evidence": "The baseline does not explain that packages are for independent libraries. It focuses on the shared-types pattern as the solution to cyclic dependencies."
+        },
+        {
+          "text": "Suggests using separate files within one package for logical grouping",
+          "passed": true,
+          "evidence": "The alternative section shows `game/` with `main.odin`, `entity.odin`, `physics.odin`, `renderer.odin`, `ui.odin` — all `package game`."
+        },
+        {
+          "text": "Explains that cyclic dependencies are not allowed between packages",
+          "passed": true,
+          "evidence": "The response states: 'The cyclic dependency is a design problem, not an Odin limitation. Odin (correctly) disallows package cycles.'"
+        },
+        {
+          "text": "Suggests prefixed procedure names as the alternative to package namespacing",
+          "passed": false,
+          "evidence": "The baseline does not suggest prefixed procedure names as an alternative to package namespacing."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8
+      },
+      "expectations": [
+        {
+          "text": "Uses multiple return values or or_return for error handling (not exceptions)",
+          "passed": true,
+          "evidence": "`tilemap_load` returns `(Tilemap, Load_Error)` and uses multiple return values for error handling."
+        },
+        {
+          "text": "Considers allocator choice — either accepts an allocator parameter, uses an arena, or discusses lifetime",
+          "passed": true,
+          "evidence": "The response uses a dedicated `mem.Arena` embedded in the Tilemap struct and discusses the memory strategy explicitly."
+        },
+        {
+          "text": "Enum type uses Ada_Case (Tile_Type or similar)",
+          "passed": true,
+          "evidence": "`Tile_Type :: enum` with values `Empty`, `Floor`, `Wall`, `Water` — Ada_Case."
+        },
+        {
+          "text": "Uses defer for resource cleanup (allocated memory, file handles, or arena destruction)",
+          "passed": false,
+          "evidence": "`tilemap_load` does not use `defer` for cleanup on error paths — it returns early with `{}` without deferring cleanup. The `tilemap_destroy` function exists but is not called via defer within the load function."
+        },
+        {
+          "text": "Uses an arena or accepts an explicit allocator parameter for level-lifetime data (not just default allocator with scattered frees)",
+          "passed": true,
+          "evidence": "The Tilemap struct embeds a `mem.Arena` and `_backing: []byte`. All tile data lives in the arena, freed in one operation by `tilemap_destroy`."
+        },
+        {
+          "text": "No constructor pattern (no new Tilemap() or Tilemap.load())",
+          "passed": true,
+          "evidence": "`tilemap_load` is a free function, not a constructor or method."
+        },
+        {
+          "text": "Procedure names use snake_case",
+          "passed": true,
+          "evidence": "Procedures are named `tilemap_load`, `tilemap_destroy` — snake_case."
+        },
+        {
+          "text": "Uses os.read_entire_file or similar bulk read rather than manual open/read/close loop",
+          "passed": true,
+          "evidence": "The response uses `os.read_entire_file(path, context.temp_allocator)` for bulk file reading."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8
+      },
+      "expectations": [
+        {
+          "text": "Uses multiple return values or or_return for error handling (not exceptions)",
+          "passed": true,
+          "evidence": "`tilemap_load` returns `(Tilemap, Tilemap_Error)` and uses multiple return values for error handling."
+        },
+        {
+          "text": "Considers allocator choice — either accepts an allocator parameter, uses an arena, or discusses lifetime",
+          "passed": true,
+          "evidence": "The baseline accepts `allocator := context.allocator` parameter and discusses: 'The `tiles` slice uses the passed-in `allocator`, which should be the level's arena allocator.'"
+        },
+        {
+          "text": "Enum type uses Ada_Case (Tile_Type or similar)",
+          "passed": true,
+          "evidence": "`Tile_Type :: enum u8` with values `Empty`, `Floor`, `Wall`, `Water`, `Lava` — Ada_Case."
+        },
+        {
+          "text": "Uses defer for resource cleanup (allocated memory, file handles, or arena destruction)",
+          "passed": false,
+          "evidence": "`tilemap_load` does not use `defer` for cleanup. Error paths call `delete(tiles, allocator)` explicitly before returning, but no `defer` is used."
+        },
+        {
+          "text": "Uses an arena or accepts an explicit allocator parameter for level-lifetime data (not just default allocator with scattered frees)",
+          "passed": true,
+          "evidence": "The baseline accepts an explicit `allocator` parameter and notes: 'The `tiles` slice uses the passed-in `allocator`, which should be the level's arena allocator.'"
+        },
+        {
+          "text": "No constructor pattern (no new Tilemap() or Tilemap.load())",
+          "passed": true,
+          "evidence": "`tilemap_load` is a free function, not a constructor or method."
+        },
+        {
+          "text": "Procedure names use snake_case",
+          "passed": true,
+          "evidence": "Procedures are named `tilemap_load`, `tilemap_destroy`, `tilemap_get`, `tile_from_id` — snake_case."
+        },
+        {
+          "text": "Uses os.read_entire_file or similar bulk read rather than manual open/read/close loop",
+          "passed": true,
+          "evidence": "The baseline uses `os.read_entire_file(path, context.temp_allocator)` for bulk file reading."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Recommends Odin's built-in `matrix[R, C]T` type as the alternative to nested-array Matrix4x4",
+          "passed": true,
+          "evidence": "The response states: 'use `matrix[4, 4]f32`' and shows `Matrix4x4 :: matrix[4, 4]f32`."
+        },
+        {
+          "text": "Mentions at least two built-in operations on `matrix[R,C]T`: matrix-matrix `*`, `transpose`, `hadamard_product`, or scalar-as-identity",
+          "passed": true,
+          "evidence": "The response shows `result := m1 * m2` (matrix multiply) and `t := transpose(m1)` (built-in transpose)."
+        },
+        {
+          "text": "Recommends replacing `Vector3 :: struct { x, y, z: f32 }` with the array alias `Vector3 :: [3]f32`",
+          "passed": true,
+          "evidence": "The response states: 'Your Vector3 and Matrix4x4 are already in the language: `Vector3 :: [3]f32`' and lists `Vector3 :: struct { x, y, z: f32 }` under 'What to delete'."
+        },
+        {
+          "text": "Mentions concrete benefits the array alias unlocks (element-wise arithmetic operators, swizzle access like .xy/.xyz/.yzx, the swizzle() builtin)",
+          "passed": true,
+          "evidence": "The response shows `c := a + b`, `d := a * 2.0` (element-wise ops) and `dot := a.x*b.x + a.y*b.y + a.z*b.z` (swizzle access), noting 'swizzle access' explicitly."
+        },
+        {
+          "text": "Mentions `core:math/linalg` as the standard-library option for ready-made vector/matrix types and constructors",
+          "passed": true,
+          "evidence": "The response states: 'check `core:math/linalg` — it has common operations (cross product, normalize, look_at, perspective projection)'."
+        },
+        {
+          "text": "Advises against continuing to hand-roll for production code (acknowledging it may be fine for educational purposes)",
+          "passed": true,
+          "evidence": "The response lists 'What to delete' for all hand-rolled items and says 'Don't fabricate API names though — verify at https://pkg.odin-lang.org/'. The entire response advises replacing hand-rolled code."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Recommends Odin's built-in `matrix[R, C]T` type as the alternative to nested-array Matrix4x4",
+          "passed": true,
+          "evidence": "The response states: '`linalg.Matrix4x4f32` (which is `matrix[4, 4]f32`, Odin's built-in matrix type). Multiplication is `m1 * m2` with the `*` operator'."
+        },
+        {
+          "text": "Mentions at least two built-in operations on `matrix[R,C]T`: matrix-matrix `*`, `transpose`, `hadamard_product`, or scalar-as-identity",
+          "passed": true,
+          "evidence": "The response mentions `m1 * m2` (matrix multiply) and `linalg.transpose(m)` (transpose)."
+        },
+        {
+          "text": "Recommends replacing `Vector3 :: struct { x, y, z: f32 }` with the array alias `Vector3 :: [3]f32`",
+          "passed": true,
+          "evidence": "The response states: 'Your `Vector3 :: struct { x, y, z: f32 }` with hand-rolled arithmetic is reinventing what `[3]f32` gives you for free with better syntax.'"
+        },
+        {
+          "text": "Mentions concrete benefits the array alias unlocks (element-wise arithmetic operators, swizzle access like .xy/.xyz/.yzx, the swizzle() builtin)",
+          "passed": false,
+          "evidence": "The response shows element-wise arithmetic (`a + b`, `a * 2.0`, `a * b`) but does NOT mention swizzle access (.xy/.xyz/.yzx) or the swizzle() builtin."
+        },
+        {
+          "text": "Mentions `core:math/linalg` as the standard-library option for ready-made vector/matrix types and constructors",
+          "passed": true,
+          "evidence": "The response opens with: '**Stop. Odin has `core:math/linalg` in the standard library.**' and shows linalg operations."
+        },
+        {
+          "text": "Advises against continuing to hand-roll for production code (acknowledging it may be fine for educational purposes)",
+          "passed": true,
+          "evidence": "The response states: '**Delete your custom math module** and replace with...' — clearly advising against hand-rolling."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.625,
+        "passed": 5,
+        "failed": 3,
+        "total": 8
+      },
+      "expectations": [
+        {
+          "text": "Names `core:prof/spall` from the standard library as the profiling tool",
+          "passed": true,
+          "evidence": "The response states: 'The profiling infrastructure is in `core:prof/spall`'."
+        },
+        {
+          "text": "Mentions manual scoping (explicit begin/end or SCOPED_EVENT around code regions)",
+          "passed": true,
+          "evidence": "The response shows `spall.SCOPED_EVENT(ctx, buf, \"my_section\")` as manual scoped instrumentation."
+        },
+        {
+          "text": "Mentions automatic instrumentation via `@(instrumentation_enter)` / `@(instrumentation_exit)` compiler attributes",
+          "passed": false,
+          "evidence": "The response shows `@(instrumentation=\"enter\", instrumentation_type=\"spall\")` — a different syntax than the expected `@(instrumentation_enter)` / `@(instrumentation_exit)` attributes."
+        },
+        {
+          "text": "Mentions the .spall trace file output and the Spall-Web browser viewer",
+          "passed": true,
+          "evidence": "The response states: 'Run the game — produces a `.spall` file' and 'Open in the Spall viewer (https://gravitymoth.com/spall/)'."
+        },
+        {
+          "text": "Distinguishes hot code (per-frame) from cold code (init/shutdown) and recommends focusing on hot",
+          "passed": true,
+          "evidence": "The response states: 'The Spall integration gives you frame-by-frame timing with nested scopes' and 'What to measure first: Wrap your `update` and `draw` calls in the main loop' — focusing on per-frame hot code."
+        },
+        {
+          "text": "Recommends looking at self time (per-procedure exclusive) rather than total time when finding bottlenecks",
+          "passed": false,
+          "evidence": "The response does not mention self time vs total time as a distinction when analyzing profiling results."
+        },
+        {
+          "text": "Notes that .spall trace files grow very fast and recommends capturing only 1–2 seconds of representative workload",
+          "passed": false,
+          "evidence": "The response does not mention that .spall trace files grow fast or recommend limiting capture duration."
+        },
+        {
+          "text": "Describes an iterative workflow: profile, identify top hot spots, optimize, re-profile",
+          "passed": true,
+          "evidence": "The response describes: 'Start with `time.since()` on suspected hot paths. Once you've narrowed it down, add `@(instrumentation)` to the hot functions... open `.spall` file. The flame chart shows exactly which procedures consume time per frame.' This describes an iterative profiling workflow."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.375,
+        "passed": 3,
+        "failed": 5,
+        "total": 8
+      },
+      "expectations": [
+        {
+          "text": "Names `core:prof/spall` from the standard library as the profiling tool",
+          "passed": true,
+          "evidence": "The response states: 'Odin has `core:prof` — an instrumentation profiler built into the standard library. Specifically, Odin integrates with the Spall profiler via `core:prof`'."
+        },
+        {
+          "text": "Mentions manual scoping (explicit begin/end or SCOPED_EVENT around code regions)",
+          "passed": true,
+          "evidence": "The response shows `prof.scope_begin(\"render_frame\")` / `defer prof.scope_end()` as manual scoped instrumentation."
+        },
+        {
+          "text": "Mentions automatic instrumentation via `@(instrumentation_enter)` / `@(instrumentation_exit)` compiler attributes",
+          "passed": false,
+          "evidence": "The response does not mention `@(instrumentation_enter)` / `@(instrumentation_exit)` compiler attributes for automatic instrumentation."
+        },
+        {
+          "text": "Mentions the .spall trace file output and the Spall-Web browser viewer",
+          "passed": true,
+          "evidence": "The response states: 'Open `profile.spall` in the Spall viewer (https://gravitymoth.com/spall/)' — gives you a flame chart."
+        },
+        {
+          "text": "Distinguishes hot code (per-frame) from cold code (init/shutdown) and recommends focusing on hot",
+          "passed": false,
+          "evidence": "The response says 'Wrap your `update` and `draw` calls in the main loop' but does not explicitly distinguish hot (per-frame) from cold (init/shutdown) code or explain why to focus on per-frame."
+        },
+        {
+          "text": "Recommends looking at self time (per-procedure exclusive) rather than total time when finding bottlenecks",
+          "passed": false,
+          "evidence": "The response does not mention self time vs total time as a distinction when analyzing profiling results."
+        },
+        {
+          "text": "Notes that .spall trace files grow very fast and recommends capturing only 1–2 seconds of representative workload",
+          "passed": false,
+          "evidence": "The response does not mention that .spall trace files grow fast or recommend limiting capture duration."
+        },
+        {
+          "text": "Describes an iterative workflow: profile, identify top hot spots, optimize, re-profile",
+          "passed": false,
+          "evidence": "The response describes profiling and identifying hotspots but does not explicitly describe an iterative optimize-and-re-profile loop."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +516,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

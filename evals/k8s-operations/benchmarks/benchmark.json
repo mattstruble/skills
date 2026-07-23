@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "k8s-operations",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the missing readinessProbe (not liveness alone) as the direct cause of traffic routing to unready pods",
+          "passed": true,
+          "evidence": "\"Liveness probe alone only tells Kubernetes 'restart this pod if it's dead.' It does NOT control traffic routing. Without a readiness probe, a pod receives traffic the moment its container starts.\""
+        },
+        {
+          "text": "Recommends readinessProbe with failureThreshold: 1 to remove pods from endpoints immediately on failure, not a higher threshold",
+          "passed": true,
+          "evidence": "Shows `failureThreshold: 1` on readinessProbe with comment \"remove from endpoints immediately on failure\"."
+        },
+        {
+          "text": "Recommends maxUnavailable: 0 (not maxUnavailable: 1) with the explicit reasoning that 1 drops capacity to 2/3 and risks downtime if another pod fails simultaneously",
+          "passed": true,
+          "evidence": "Shows `maxUnavailable: 0` with comment \"NEVER drop below replica count\" in the rolling update strategy."
+        },
+        {
+          "text": "Sets livenessProbe.failureThreshold higher than readinessProbe.failureThreshold so the pod gets a recovery window before restart",
+          "passed": true,
+          "evidence": "readinessProbe failureThreshold=1, livenessProbe failureThreshold=3 with note \"give the pod a chance to recover (stop receiving traffic) before being killed and restarted\"."
+        },
+        {
+          "text": "Avoids recommending livenessProbe alone as a substitute for readinessProbe",
+          "passed": true,
+          "evidence": "Explicitly distinguishes liveness (restart control) from readiness (traffic routing) and adds readiness as the fix."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the missing readinessProbe (not liveness alone) as the direct cause of traffic routing to unready pods",
+          "passed": true,
+          "evidence": "\"Without a readiness probe, Kubernetes adds the pod to the Service endpoints immediately when it enters Running state — before your application is actually ready to serve traffic.\""
+        },
+        {
+          "text": "Recommends readinessProbe with failureThreshold: 1 to remove pods from endpoints immediately on failure, not a higher threshold",
+          "passed": false,
+          "evidence": "Shows `failureThreshold: 3` for readinessProbe — not the immediate-removal threshold of 1."
+        },
+        {
+          "text": "Recommends maxUnavailable: 0 (not maxUnavailable: 1) with the explicit reasoning that 1 drops capacity to 2/3 and risks downtime if another pod fails simultaneously",
+          "passed": true,
+          "evidence": "Shows `maxUnavailable: 0` with \"Zero-downtime: never reduce below desired replicas\" via minReadySeconds."
+        },
+        {
+          "text": "Sets livenessProbe.failureThreshold higher than readinessProbe.failureThreshold so the pod gets a recovery window before restart",
+          "passed": false,
+          "evidence": "Both readinessProbe and livenessProbe have `failureThreshold: 3` — equal values, not liveness higher than readiness."
+        },
+        {
+          "text": "Avoids recommending livenessProbe alone as a substitute for readinessProbe",
+          "passed": true,
+          "evidence": "Adds readiness probe as the fix; does not suggest liveness alone is sufficient."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Provides the exact drain flags --delete-emptydir-data=true --ignore-daemonsets --timeout=360s, not a bare kubectl drain",
+          "passed": true,
+          "evidence": "Shows `kubectl drain <node-name> --delete-emptydir-data=true --ignore-daemonsets --timeout=360s`."
+        },
+        {
+          "text": "Explains that --ignore-daemonsets is required because DaemonSet pods cannot be moved and would otherwise block the drain",
+          "passed": false,
+          "evidence": "Uses --ignore-daemonsets but does not explain that DaemonSet pods cannot be moved and would block the drain without this flag."
+        },
+        {
+          "text": "Includes kubectl uncordon <node> as the post-maintenance step to re-enable scheduling",
+          "passed": true,
+          "evidence": "Shows `kubectl uncordon <node-name>` as step 6 after the node returns."
+        },
+        {
+          "text": "Specifically warns that draining a single-node cluster evicts CoreDNS and causes a DNS outage",
+          "passed": false,
+          "evidence": "Warns about single-node drain causing pods to enter Pending state and workloads going down, but does not specifically name CoreDNS or DNS outage."
+        },
+        {
+          "text": "Avoids recommending kubectl cordon alone (without drain) as sufficient preparation before a reboot",
+          "passed": true,
+          "evidence": "Provides full drain procedure; cordon is step 1 of a multi-step process, not presented as sufficient alone."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Provides the exact drain flags --delete-emptydir-data=true --ignore-daemonsets --timeout=360s, not a bare kubectl drain",
+          "passed": false,
+          "evidence": "Shows `--ignore-daemonsets --delete-emptydir-data --grace-period=60` — missing --timeout=360s and uses --grace-period instead."
+        },
+        {
+          "text": "Explains that --ignore-daemonsets is required because DaemonSet pods cannot be moved and would otherwise block the drain",
+          "passed": false,
+          "evidence": "\"DaemonSets are ignored by --ignore-daemonsets (they'll restart automatically after reboot)\" — explains behavior after reboot but not why the flag is required to prevent blocking."
+        },
+        {
+          "text": "Includes kubectl uncordon <node> as the post-maintenance step to re-enable scheduling",
+          "passed": true,
+          "evidence": "Shows `kubectl uncordon <node-name>` as step 5."
+        },
+        {
+          "text": "Specifically warns that draining a single-node cluster evicts CoreDNS and causes a DNS outage",
+          "passed": false,
+          "evidence": "Warns about single-node downtime and PDB issues but does not specifically mention CoreDNS eviction causing DNS outage."
+        },
+        {
+          "text": "Avoids recommending kubectl cordon alone (without drain) as sufficient preparation before a reboot",
+          "passed": true,
+          "evidence": "Provides full drain procedure; cordon is step 1 of a multi-step process."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies resourceVersion as the optimistic concurrency token causing the conflict, not a generic 'race condition'",
+          "passed": true,
+          "evidence": "\"the resourceVersion may have changed between your fetch and apply — Kubernetes rejects the stale version with a conflict error\" — identifies resourceVersion as the specific cause."
+        },
+        {
+          "text": "Distinguishes the two valid approaches: delete resourceVersion for single-writer CI vs. keep it and retry the read-patch-apply loop when GitOps or HPA is active",
+          "passed": false,
+          "evidence": "Recommends kubectl set image as the primary fix; does not discuss the two-approach distinction (delete resourceVersion vs keep+retry)."
+        },
+        {
+          "text": "Explicitly names ArgoCD and HPA as the multi-writer scenario that makes unconditional apply dangerous (reconciliation fight)",
+          "passed": true,
+          "evidence": "\"No conflict with HPA or ArgoCD because you're not replacing the entire spec\" — names both controllers explicitly."
+        },
+        {
+          "text": "Recommends looking up containers and env vars by name (not by index) because order in the containers array can change",
+          "passed": false,
+          "evidence": "No mention of name vs index lookup for containers or env vars."
+        },
+        {
+          "text": "Avoids recommending kubectl set image as a universal fix, since it does not update annotations like kubernetes.io/change-cause or env vars used for version tracing",
+          "passed": false,
+          "evidence": "Recommends `kubectl set image` as the primary fix without noting its limitations for annotations or env var updates."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies resourceVersion as the optimistic concurrency token causing the conflict, not a generic 'race condition'",
+          "passed": true,
+          "evidence": "\"The conflict error is 409 Conflict — Kubernetes' optimistic concurrency control rejecting your write because the resourceVersion changed between your GET and your APPLY.\""
+        },
+        {
+          "text": "Distinguishes the two valid approaches: delete resourceVersion for single-writer CI vs. keep it and retry the read-patch-apply loop when GitOps or HPA is active",
+          "passed": false,
+          "evidence": "Recommends kubectl set image, server-side patch, or server-side apply — does not discuss the delete-resourceVersion vs keep+retry distinction."
+        },
+        {
+          "text": "Explicitly names ArgoCD and HPA as the multi-writer scenario that makes unconditional apply dangerous (reconciliation fight)",
+          "passed": true,
+          "evidence": "\"This races with other controllers that also modify the same Deployment (HPA scaling replicas, ArgoCD syncing spec).\""
+        },
+        {
+          "text": "Recommends looking up containers and env vars by name (not by index) because order in the containers array can change",
+          "passed": false,
+          "evidence": "No mention of name vs index lookup for containers or env vars."
+        },
+        {
+          "text": "Avoids recommending kubectl set image as a universal fix, since it does not update annotations like kubernetes.io/change-cause or env vars used for version tracing",
+          "passed": false,
+          "evidence": "Recommends `kubectl set image` as Option 1 (simplest) without noting its limitations."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT NOTE: Re-graded with_skill mean=0.667 vs committed 0.600 (diff=0.067 > 0.02); re-graded without_skill mean=0.467 vs committed 0.400 (diff=0.067 > 0.02). Committed run_summary values preserved. Discrepancy driven by eval-1 and eval-2 grading differences."
   ]
 }

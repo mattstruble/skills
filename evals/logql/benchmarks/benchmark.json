@@ -2,19 +2,255 @@
   "metadata": {
     "skill_name": "logql",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies __error__ labels as the signal that parser failures are silently dropping lines from downstream filters",
+          "passed": true,
+          "evidence": "'lines that fail | json parsing produce __error__ labels and are excluded from downstream label filters, so the response_time > 2s filter sees nothing.'"
+        },
+        {
+          "text": "Recommends `| __error__ != \"\"` as the diagnostic step to inspect failing lines",
+          "passed": true,
+          "evidence": "'Check for parser failures: {container=\"sonarr\"} | json | __error__ != \"\" — this shows lines that failed to parse.'"
+        },
+        {
+          "text": "Recommends adding `|= \"{\"` as a line filter before `| json` to exclude non-JSON lines (startup banners, mixed formats)",
+          "passed": true,
+          "evidence": "Fixed query shows `|= \"{\"` as the first pipeline stage before `| json response_time`, with explanation 'line filter BEFORE the parser. Cheaply eliminates non-JSON lines.'"
+        },
+        {
+          "text": "Recommends extracting only the needed field with `| json response_time` rather than bare `| json`",
+          "passed": true,
+          "evidence": "'| json response_time — extract only the field you need, not everything. Faster and avoids label cardinality explosion.'"
+        },
+        {
+          "text": "Places the line filter (`|= \"{\"`) before the parser, not after, consistent with the skill's pipeline ordering rule",
+          "passed": true,
+          "evidence": "Query is `{container=\"sonarr\"} |= \"{\" | json response_time | response_time > 2s` — line filter precedes parser."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies __error__ labels as the signal that parser failures are silently dropping lines from downstream filters",
+          "passed": false,
+          "evidence": "Baseline misdiagnoses: '__error__ labels appear because the comparison fails during the filter stage' — attributes to comparison failure, not parser failures silently dropping lines."
+        },
+        {
+          "text": "Recommends `| __error__ != \"\"` as the diagnostic step to inspect failing lines",
+          "passed": false,
+          "evidence": "Baseline recommends `__error__=\"\"` (filter OUT errors) not `__error__ != \"\"` (filter TO show errors) — opposite direction."
+        },
+        {
+          "text": "Recommends adding `|= \"{\"` as a line filter before `| json` to exclude non-JSON lines (startup banners, mixed formats)",
+          "passed": false,
+          "evidence": "Baseline does not recommend `|= \"{\"` as a pre-filter; it only suggests `__error__=\"\"` after the parser."
+        },
+        {
+          "text": "Recommends extracting only the needed field with `| json response_time` rather than bare `| json`",
+          "passed": false,
+          "evidence": "Baseline uses bare `| json` in all suggested queries, never recommending field-specific extraction."
+        },
+        {
+          "text": "Places the line filter (`|= \"{\"`) before the parser, not after, consistent with the skill's pipeline ordering rule",
+          "passed": false,
+          "evidence": "Baseline does not recommend any line filter before the parser; the `__error__` filter is placed after `| json`."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Places `|= \"error\"` as a line filter before any parser stage, not after, citing that line filters are the cheapest distributed grep",
+          "passed": true,
+          "evidence": "Query shows `{host=\"homelab\"} |= \"error\" [1m]` with no parser; explanation: 'No parser needed here since we're just counting lines containing error.'"
+        },
+        {
+          "text": "Uses `topk(5, ...)` wrapping `sum by (container)` matching the skill's example pattern exactly",
+          "passed": true,
+          "evidence": "Query is `topk(5, sum by (container) (rate({host=\"homelab\"} |= \"error\" [1m])))` — exact pattern match."
+        },
+        {
+          "text": "Includes at least one exact-match label in the stream selector and explains this is the primary index lookup",
+          "passed": true,
+          "evidence": "'Narrow stream selector with exact-match label (host=\"homelab\") — this is the primary index lookup and has the highest performance impact.'"
+        },
+        {
+          "text": "Warns against grouping by high-cardinality labels (IPs, user IDs, request IDs) as a timeout/performance cause",
+          "passed": true,
+          "evidence": "'Avoid by(high-cardinality-label) like request IDs or IPs. container is acceptable here.'"
+        },
+        {
+          "text": "Mentions recording rules as the fix for frequently-loaded dashboard panels",
+          "passed": true,
+          "evidence": "'consider a recording rule (requires Loki ruler configuration — see homelab-monitoring skill)' for frequently-loaded dashboard panels."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Places `|= \"error\"` as a line filter before any parser stage, not after, citing that line filters are the cheapest distributed grep",
+          "passed": true,
+          "evidence": "Baseline shows `{host=\"myhomelab\"} |= \"error\" | json | level=\"error\"` — line filter before parser, and notes it's 'fast (substring match on raw bytes).'"
+        },
+        {
+          "text": "Uses `topk(5, ...)` wrapping `sum by (container)` matching the skill's example pattern exactly",
+          "passed": true,
+          "evidence": "Baseline query is `topk(5, sum by (container) (rate({host=\"myhomelab\"} | logfmt | level=\"error\" [1m])))` — correct wrapping pattern."
+        },
+        {
+          "text": "Includes at least one exact-match label in the stream selector and explains this is the primary index lookup",
+          "passed": true,
+          "evidence": "'Use a label that Loki indexes — host, job, or namespace. The stream selector runs on the index; everything after | runs on the raw log chunks.'"
+        },
+        {
+          "text": "Warns against grouping by high-cardinality labels (IPs, user IDs, request IDs) as a timeout/performance cause",
+          "passed": false,
+          "evidence": "Baseline warns about stream selector cardinality ('full scan') but does not warn against grouping by high-cardinality labels like IPs or user IDs."
+        },
+        {
+          "text": "Mentions recording rules as the fix for frequently-loaded dashboard panels",
+          "passed": false,
+          "evidence": "Baseline suggests reducing dashboard time range or narrowing the stream selector — no mention of recording rules."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Explicitly names the lack of OpenTelemetry instrumentation in off-the-shelf containers as the reason standard distributed tracing is unavailable",
+          "passed": false,
+          "evidence": "Answer says 'off-the-shelf containers can't inject trace IDs' but does not explicitly name OpenTelemetry as the missing instrumentation standard."
+        },
+        {
+          "text": "Recommends correlating by shared domain identifiers (TMDB ID, download hash, NZB ID) as the homelab substitute for distributed traces",
+          "passed": true,
+          "evidence": "'correlate across Sonarr/Prowlarr/qBittorrent using shared domain identifiers that naturally appear in all three services' logs. This is the homelab equivalent of a distributed trace.'"
+        },
+        {
+          "text": "Uses `container=~\"radarr|prowlarr|qbittorrent\"` with a regex stream selector to span multiple services in one query",
+          "passed": true,
+          "evidence": "Combined correlation query shows `{container=~\"radarr|prowlarr|qbittorrent\"} |~ \"(?i)movie-title-or-hash\"`."
+        },
+        {
+          "text": "Prefers `|=` exact-match line filter on an ID over `|~` regex for performance, explaining `|~` is slower",
+          "passed": true,
+          "evidence": "'Use |~ with case-insensitive regex for titles, |= with exact match for hashes/IDs.' and 'The |~ operator... is slower — prefer an exact |= match on an ID when available.'"
+        },
+        {
+          "text": "Avoids recommending OpenTelemetry instrumentation or trace injection as a solution for these containers",
+          "passed": true,
+          "evidence": "Answer focuses entirely on log-based correlation using shared identifiers; no OTel instrumentation recommended."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Explicitly names the lack of OpenTelemetry instrumentation in off-the-shelf containers as the reason standard distributed tracing is unavailable",
+          "passed": false,
+          "evidence": "Baseline says 'Without distributed tracing' but does not name OpenTelemetry or explain why off-the-shelf containers lack it."
+        },
+        {
+          "text": "Recommends correlating by shared domain identifiers (TMDB ID, download hash, NZB ID) as the homelab substitute for distributed traces",
+          "passed": false,
+          "evidence": "Baseline's primary approach is time-window correlation ('note the timestamp, then search the other services within a narrow window'). Shared identifiers are mentioned only as a 'for the future' improvement."
+        },
+        {
+          "text": "Uses `container=~\"radarr|prowlarr|qbittorrent\"` with a regex stream selector to span multiple services in one query",
+          "passed": true,
+          "evidence": "Baseline shows `{container=~\"radarr|prowlarr|qbittorrent\"} |= \"movie-tmdb-id-12345\"` at the end of the answer."
+        },
+        {
+          "text": "Prefers `|=` exact-match line filter on an ID over `|~` regex for performance, explaining `|~` is slower",
+          "passed": false,
+          "evidence": "Baseline uses both `|=` and `|~` without stating a preference or explaining that `|~` is slower."
+        },
+        {
+          "text": "Avoids recommending OpenTelemetry instrumentation or trace injection as a solution for these containers",
+          "passed": true,
+          "evidence": "Baseline focuses on log-based correlation and Grafana dashboard panels; no OTel instrumentation recommended."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
-        "mean": 0.93,
+        "mean": 0.933,
         "stddev": 0.0
       }
     },
     "without_skill": {
       "pass_rate": {
-        "mean": 0.33,
+        "mean": 0.333,
         "stddev": 0.0
       }
     },
@@ -24,6 +260,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

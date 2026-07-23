@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "skill-creator",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The generated description uses MUST language ('You MUST use this skill when...' or 'You MUST consult this skill when...') rather than soft 'Use when' phrasing",
+          "passed": false,
+          "evidence": "No SKILL.md or description generated; the response asks clarifying questions instead of writing the skill."
+        },
+        {
+          "text": "The description includes explicit NOT-for exclusions that name adjacent skills or contexts where the skill should not trigger",
+          "passed": false,
+          "evidence": "No description written; response is entirely clarifying questions."
+        },
+        {
+          "text": "Test prompts are saved to evals/git-commit/evals.json (repo-root evals/ directory), not inside the skill directory or a workspace folder",
+          "passed": false,
+          "evidence": "No evals.json saved; response describes a plan but does not execute it."
+        },
+        {
+          "text": "The agent proposes spawning both a with-skill run and a baseline (without-skill) run in the same turn, not sequentially",
+          "passed": false,
+          "evidence": "No proposal to spawn runs; response ends with a clarifying question."
+        },
+        {
+          "text": "The description does not summarize the skill's workflow steps (e.g., does not say 'parses staged diff, formats message, validates spec') — it describes only triggering conditions",
+          "passed": false,
+          "evidence": "No description written to evaluate."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The generated description uses MUST language ('You MUST use this skill when...' or 'You MUST consult this skill when...') rather than soft 'Use when' phrasing",
+          "passed": false,
+          "evidence": "SKILL.md structure shown uses 'When to Use' section — soft phrasing, not MUST language."
+        },
+        {
+          "text": "The description includes explicit NOT-for exclusions that name adjacent skills or contexts where the skill should not trigger",
+          "passed": false,
+          "evidence": "No NOT-for exclusions in the SKILL.md structure shown."
+        },
+        {
+          "text": "Test prompts are saved to evals/git-commit/evals.json (repo-root evals/ directory), not inside the skill directory or a workspace folder",
+          "passed": false,
+          "evidence": "Shows `git-commit/iteration-1/evals.json` path — inside the skill directory, not the repo-root evals/ directory."
+        },
+        {
+          "text": "The agent proposes spawning both a with-skill run and a baseline (without-skill) run in the same turn, not sequentially",
+          "passed": false,
+          "evidence": "No proposal to spawn runs mentioned."
+        },
+        {
+          "text": "The description does not summarize the skill's workflow steps (e.g., does not say 'parses staged diff, formats message, validates spec') — it describes only triggering conditions",
+          "passed": false,
+          "evidence": "SKILL.md shown includes 'Rules' section with detailed workflow steps (format, types, guidelines, anti-patterns)."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent copies the finalized benchmark to evals/python-design/benchmarks/benchmark.json (not to python-design/benchmarks/ or any path inside the skill directory)",
+          "passed": false,
+          "evidence": "Does not copy anything; says 'I need to see the benchmark data to analyze it properly' and asks for the file."
+        },
+        {
+          "text": "The analyst pass explicitly checks for assertions that pass at 100% in both with-skill and without-skill configurations and flags them as potentially non-discriminating",
+          "passed": true,
+          "evidence": "'Non-discriminating assertions — any assertions that pass 100% in BOTH the skill and baseline runs? Those aren't testing anything the skill adds.'"
+        },
+        {
+          "text": "The agent checks for high-variance evals (large stddev relative to mean pass_rate) and surfaces them as potentially flaky",
+          "passed": true,
+          "evidence": "'Variance — if an eval shows high variance (50% pass rate with stddev of 40%), it's probably flaky or poorly specified, not a real signal.'"
+        },
+        {
+          "text": "The agent presents both the aggregate pass_rate delta and qualitative patterns from the runs — not just the summary numbers — before asking the user what to change",
+          "passed": false,
+          "evidence": "Does not present any analysis; asks for the benchmark.json file first before doing any analysis."
+        },
+        {
+          "text": "Iteration artifacts (grading.json, run directories) remain in python-design-workspace/, not in the tracked evals/ directory",
+          "passed": false,
+          "evidence": "Cannot verify since no file operations performed; response is entirely conditional on receiving the data."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent copies the finalized benchmark to evals/python-design/benchmarks/benchmark.json (not to python-design/benchmarks/ or any path inside the skill directory)",
+          "passed": false,
+          "evidence": "Does not copy anything; says 'I'd need to read the `python-design-workspace/iteration-2/benchmark.json` file to analyze the results.'"
+        },
+        {
+          "text": "The analyst pass explicitly checks for assertions that pass at 100% in both with-skill and without-skill configurations and flags them as potentially non-discriminating",
+          "passed": false,
+          "evidence": "Does not mention non-discriminating assertions; analysis framework focuses on per-eval comparison, variance, and ceiling analysis."
+        },
+        {
+          "text": "The agent checks for high-variance evals (large stddev relative to mean pass_rate) and surfaces them as potentially flaky",
+          "passed": true,
+          "evidence": "'Check variance. If scores are inconsistent across runs of the same eval, the skill instructions may be ambiguous — the model interprets them differently each time.'"
+        },
+        {
+          "text": "The agent presents both the aggregate pass_rate delta and qualitative patterns from the runs — not just the summary numbers — before asking the user what to change",
+          "passed": false,
+          "evidence": "Does not present any analysis; asks for benchmark.json before doing anything."
+        },
+        {
+          "text": "Iteration artifacts (grading.json, run directories) remain in python-design-workspace/, not in the tracked evals/ directory",
+          "passed": false,
+          "evidence": "Cannot verify since no file operations performed."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent identifies the root cause as topic-vocabulary vs activity-vocabulary mismatch and rewrites the description to trigger on activity patterns ('when writing FastAPI services, background workers, queue consumers') rather than on the word 'logging'",
+          "passed": true,
+          "evidence": "'The description is failing because it triggers on the topic (\"logging\") rather than the activity... It rewrites the description to match the activity (writing FastAPI services, background workers, queue consumers).'"
+        },
+        {
+          "text": "The rewritten description follows the ~80-word template: forceful opener (~15 words) + non-obvious triggers (~30 words) + concise exclusions (~25 words)",
+          "passed": true,
+          "evidence": "Rewritten description shown follows the template with MUST language opener, activity-based triggers, and NOT-for exclusions — approximately 80 words."
+        },
+        {
+          "text": "The agent generates 20 trigger eval queries with a mix of should-trigger and should-not-trigger entries, where the should-not-trigger cases are near-misses (adjacent domain or ambiguous phrasing) rather than obviously irrelevant queries",
+          "passed": false,
+          "evidence": "Does not generate any eval queries; response ends after rewriting the description."
+        },
+        {
+          "text": "The eval queries are concrete and specific — include realistic detail like file paths, framework names, or user context — not abstract requests like 'add error handling'",
+          "passed": false,
+          "evidence": "No eval queries generated."
+        },
+        {
+          "text": "The agent does not list keyword variants in the description (e.g., does not enumerate 'logging', 'log this', 'add logs', 'set up logging') and instead uses a broad opener that catches those naturally",
+          "passed": true,
+          "evidence": "Rewritten description uses activity-based triggers without listing keyword variants like 'logging', 'log this', etc."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent identifies the root cause as topic-vocabulary vs activity-vocabulary mismatch and rewrites the description to trigger on activity patterns ('when writing FastAPI services, background workers, queue consumers') rather than on the word 'logging'",
+          "passed": true,
+          "evidence": "'The problem: the description triggers on the keyword \"logging\" but the skill should trigger on the activity of writing production code, not the word \"logging.\"'"
+        },
+        {
+          "text": "The rewritten description follows the ~80-word template: forceful opener (~15 words) + non-obvious triggers (~30 words) + concise exclusions (~25 words)",
+          "passed": true,
+          "evidence": "Rewritten description shown follows the template with MUST language, activity triggers, and NOT-for exclusions — approximately 80 words."
+        },
+        {
+          "text": "The agent generates 20 trigger eval queries with a mix of should-trigger and should-not-trigger entries, where the should-not-trigger cases are near-misses (adjacent domain or ambiguous phrasing) rather than obviously irrelevant queries",
+          "passed": false,
+          "evidence": "Does not generate any eval queries; response ends after rewriting the description."
+        },
+        {
+          "text": "The eval queries are concrete and specific — include realistic detail like file paths, framework names, or user context — not abstract requests like 'add error handling'",
+          "passed": false,
+          "evidence": "No eval queries generated."
+        },
+        {
+          "text": "The agent does not list keyword variants in the description (e.g., does not enumerate 'logging', 'log this', 'add logs', 'set up logging') and instead uses a broad opener that catches those naturally",
+          "passed": true,
+          "evidence": "Rewritten description uses activity-based triggers without listing keyword variants."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -23,7 +259,8 @@
     }
   },
   "notes": [
-    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak. NEGATIVE delta \u2014 likely an eval-quality issue (expectations too easy for baseline or misaligned); flag for eval rework.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak. NEGATIVE delta — likely an eval-quality issue (expectations too easy for baseline or misaligned); flag for eval rework.",
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded with_skill mean was 0.333 (committed: 0.267, diff: 0.066 > 0.02) and without_skill mean was 0.267 (committed: 0.333, diff: 0.066 > 0.02). Committed run_summary values preserved per drift guard rule. Note: re-grading shows positive delta (with_skill > without_skill) while committed shows negative delta — likely due to grading judgment differences on eval-1 and eval-2."
   ]
 }

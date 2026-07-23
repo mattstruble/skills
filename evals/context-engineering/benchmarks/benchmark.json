@@ -2,9 +2,1259 @@
   "metadata": {
     "skill_name": "context-engineering",
     "timestamp": "2026-07-23",
-    "evals_run": 16,
+    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5", "eval-6", "eval-7", "eval-8", "eval-9", "eval-10", "eval-11", "eval-12", "eval-13", "eval-22", "eval-23", "eval-24"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the root cause as a context organization problem, not a context length problem — the agent cannot find prior tool results because they are buried in an unstructured dynamic trajectory",
+          "passed": true,
+          "evidence": "'The context window is at 40% — this isn't a capacity problem. The agent is losing track of what it already did because the trajectory lacks explicit state.'"
+        },
+        {
+          "text": "Recommends an agent status bar: explicit structured state appended to the trajectory that tracks what tools have been called and what was found, making prior results visible to the model",
+          "passed": true,
+          "evidence": "Recommends appending a structured state summary after each tool call cycle with files read, searches completed, edits made, and task progress."
+        },
+        {
+          "text": "Addresses the stable prefix / volatile suffix layout: tool results belong in the dynamic trajectory, not the static prefix, and should be structured so the model can scan them efficiently",
+          "passed": true,
+          "evidence": "'volatile-data-last principle — doesn't bust the cache prefix' — explicitly addresses the layout principle."
+        },
+        {
+          "text": "Notes that the fix is context organization (making prior results findable), not compression — the context is only at 40% so there is no need to discard anything",
+          "passed": true,
+          "evidence": "'The model reads this compact summary rather than re-scanning 40% of context' — fix is organization, not compression."
+        },
+        {
+          "text": "Avoids recommending cross-session memory or RAG as the fix — this is an intra-session context organization problem, not a persistence problem",
+          "passed": true,
+          "evidence": "No mention of RAG or cross-session memory — solution is entirely intra-session context organization."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the root cause as a context organization problem, not a context length problem — the agent cannot find prior tool results because they are buried in an unstructured dynamic trajectory",
+          "passed": true,
+          "evidence": "'The agent doesn't retain a mental summary of what I learned from that file... No explicit state tracking.'"
+        },
+        {
+          "text": "Recommends an agent status bar: explicit structured state appended to the trajectory that tracks what tools have been called and what was found, making prior results visible to the model",
+          "passed": false,
+          "evidence": "Recommends 'working memory section' and tool result compression but not a status bar with structured state tracking."
+        },
+        {
+          "text": "Addresses the stable prefix / volatile suffix layout: tool results belong in the dynamic trajectory, not the static prefix, and should be structured so the model can scan them efficiently",
+          "passed": false,
+          "evidence": "Does not address stable prefix / volatile suffix layout — focuses on deduplication and compression."
+        },
+        {
+          "text": "Notes that the fix is context organization (making prior results findable), not compression — the context is only at 40% so there is no need to discard anything",
+          "passed": true,
+          "evidence": "Recommends working memory and deduplication rather than compression — organization-focused fix."
+        },
+        {
+          "text": "Avoids recommending cross-session memory or RAG as the fix — this is an intra-session context organization problem, not a persistence problem",
+          "passed": true,
+          "evidence": "No mention of RAG or cross-session memory."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the problem as rule-stacking: 47 rules pile up, contradict each other, and the model resolves contradictions poorly — the fix is restructuring as a process, not adding more rules",
+          "passed": true,
+          "evidence": "'47 flat bullet-point rules contradict each other and overwhelm the model's attention... Restructure as a sequential process.'"
+        },
+        {
+          "text": "Recommends process-driven prompts: sequence the agent through steps ('first classify the issue type, then follow the relevant procedure') rather than listing rules the model must simultaneously satisfy",
+          "passed": true,
+          "evidence": "Provides a process with Phase 1 (Identify Intent), Phase 2 (Resolve by classification), Phase 3 (Close) — sequential steps."
+        },
+        {
+          "text": "Addresses entropy control: a prompt maintained by many people decays into contradictions — recommend version-controlling the prompt as code and running periodic ablation tests to verify each section still improves outcomes",
+          "passed": true,
+          "evidence": "'Version-control this prompt. When someone adds a new rule, it must fit into a specific phase.'"
+        },
+        {
+          "text": "Recommends structured prompts with section headers and consistent formatting — structural boundaries are semantic signal, not cosmetic, and help the model process each section in its correct context",
+          "passed": true,
+          "evidence": "Shows structured sections with headers (Phase 1, Phase 2, Phase 3, Constraints) and consistent formatting."
+        },
+        {
+          "text": "Applies the business-rule refinement principle: each rule should prevent a specific observed failure — rules without a corresponding failure case are dead weight that increase entropy without reducing errors",
+          "passed": false,
+          "evidence": "Does not address the business-rule refinement principle — does not discuss rules needing to correspond to specific observed failures."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the problem as rule-stacking: 47 rules pile up, contradict each other, and the model resolves contradictions poorly — the fix is restructuring as a process, not adding more rules",
+          "passed": true,
+          "evidence": "'47 flat bullet points are competing for attention. The model treats them all with equal (low) priority.'"
+        },
+        {
+          "text": "Recommends process-driven prompts: sequence the agent through steps ('first classify the issue type, then follow the relevant procedure') rather than listing rules the model must simultaneously satisfy",
+          "passed": false,
+          "evidence": "Recommends hierarchical sections with headers but not a sequential process — still a list structure, not a step-by-step process."
+        },
+        {
+          "text": "Addresses entropy control: a prompt maintained by many people decays into contradictions — recommend version-controlling the prompt as code and running periodic ablation tests",
+          "passed": false,
+          "evidence": "Does not address entropy control or version-controlling the prompt."
+        },
+        {
+          "text": "Recommends structured prompts with section headers and consistent formatting",
+          "passed": true,
+          "evidence": "Recommends 'Hierarchical sections with clear headers' — addresses structural organization."
+        },
+        {
+          "text": "Applies the business-rule refinement principle: each rule should prevent a specific observed failure",
+          "passed": false,
+          "evidence": "Does not address the business-rule refinement principle."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the root cause as an unstable prefix: any change to the system prompt or tool definitions between turns invalidates the cache from that point forward, forcing full recomputation",
+          "passed": true,
+          "evidence": "'Something in your stable prefix is actually changing between requests. KV-cache works by reusing computation for the prefix that hasn't changed.'"
+        },
+        {
+          "text": "Applies the volatile-data-last principle: timestamps, counters, tool-list reordering, or any per-turn dynamic injection in the prefix busts the cache — these must move to the end of the context",
+          "passed": true,
+          "evidence": "'Move timestamps, user context, and any per-request data to the END of the context (in a user message or trailing system instruction), not in the prefix.'"
+        },
+        {
+          "text": "Provides the worked example pattern: a timestamp embedded in the system prompt recomputes the entire prefix on every turn — moving it to a trailing user message restores cache hits",
+          "passed": true,
+          "evidence": "'Timestamps in the system prompt: current_time: 2024-07-20T15:32:00Z at the top means the ENTIRE prefix recomputes every request.'"
+        },
+        {
+          "text": "Explains the cache-cost awareness principle: every dynamic injection busts the cache from its insertion point forward — design context layout to maximize the stable portion",
+          "passed": true,
+          "evidence": "'every dynamic injection busts the cache from its insertion point forward — design context layout to maximize the stable portion' — explicitly stated."
+        },
+        {
+          "text": "Distinguishes prompt-cache from KV-cache mechanics: the stable prefix is the cacheable unit — any mutation to it, however small, invalidates the entire cached computation",
+          "passed": true,
+          "evidence": "'The requests that are 10x cheaper are hitting the cache (identical prefix). The expensive ones have some prefix variation causing full recomputation.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the root cause as an unstable prefix: any change to the system prompt or tool definitions between turns invalidates the cache from that point forward, forcing full recomputation",
+          "passed": true,
+          "evidence": "'Non-deterministic prefix content: If your system prompt includes timestamps, random IDs, user session data... even a single different token at the start invalidates the entire cache.'"
+        },
+        {
+          "text": "Applies the volatile-data-last principle: timestamps, counters, tool-list reordering, or any per-turn dynamic injection in the prefix busts the cache — these must move to the end of the context",
+          "passed": true,
+          "evidence": "'Static prefix, dynamic suffix: The static portion must be byte-for-byte identical across all requests.'"
+        },
+        {
+          "text": "Provides the worked example pattern: a timestamp embedded in the system prompt recomputes the entire prefix on every turn — moving it to a trailing user message restores cache hits",
+          "passed": true,
+          "evidence": "'Remove timestamps and dynamic IDs from the system prompt. Move them to the user message or a later section.'"
+        },
+        {
+          "text": "Explains the cache-cost awareness principle: every dynamic injection busts the cache from its insertion point forward — design context layout to maximize the stable portion",
+          "passed": true,
+          "evidence": "Explains that any byte-level change breaks the cache and recommends canonicalizing tool definitions."
+        },
+        {
+          "text": "Distinguishes prompt-cache from KV-cache mechanics: the stable prefix is the cacheable unit — any mutation to it, however small, invalidates the entire cached computation",
+          "passed": false,
+          "evidence": "Does not distinguish between prompt-cache and KV-cache mechanics — treats them as the same concept."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the root cause as instruction fade: as the dynamic trajectory grows, the system prompt instructions are buried under accumulated tool outputs and reasoning, reducing their effective attention weight",
+          "passed": true,
+          "evidence": "'Diagnosis: Instruction attention decay over a growing trajectory... The model's attention to early instructions weakens as the trajectory grows.'"
+        },
+        {
+          "text": "Recommends an agent status bar: explicit structured state appended to the trajectory that restates the current task constraints (cite sources, use structured output) so they remain visible near the end of the context",
+          "passed": true,
+          "evidence": "Recommends status bar with format requirements: 'Output format: JSON with citations. Steps completed: 15/20.'"
+        },
+        {
+          "text": "Addresses the stable prefix principle: the system prompt is already in the static prefix, but the model's attention to it degrades as the dynamic trajectory grows — the fix is reinforcing key constraints in the trajectory itself",
+          "passed": true,
+          "evidence": "'The system prompt itself is NEVER summarized (retention priority 1). But also: re-inject critical constraints into the compressed summary.'"
+        },
+        {
+          "text": "Notes that this is a context organization problem, not a prompt quality problem — the instructions are correct but their position relative to the growing trajectory reduces their influence",
+          "passed": true,
+          "evidence": "'This is not a bug — it's a structural property of attention. The further instructions are from the generation point, the less influence they exert.'"
+        },
+        {
+          "text": "Recommends compression with retention priorities: architectural decisions and constraints should never be summarized away — they must be preserved exactly when the trajectory is compressed",
+          "passed": true,
+          "evidence": "'system prompt itself is NEVER summarized (retention priority 1)' — compression with retention priorities explicitly addressed."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the root cause as instruction fade: as the dynamic trajectory grows, the system prompt instructions are buried under accumulated tool outputs and reasoning, reducing their effective attention weight",
+          "passed": true,
+          "evidence": "'the system prompt gets pushed further from the model's attention focus... lost in the middle — content at the start and end of context gets more attention than content in the middle.'"
+        },
+        {
+          "text": "Recommends an agent status bar: explicit structured state appended to the trajectory that restates the current task constraints so they remain visible near the end of the context",
+          "passed": false,
+          "evidence": "Recommends periodic injection of reminders but not a structured status bar with task constraints."
+        },
+        {
+          "text": "Addresses the stable prefix principle: the system prompt is already in the static prefix, but the model's attention to it degrades as the dynamic trajectory grows — the fix is reinforcing key constraints in the trajectory itself",
+          "passed": true,
+          "evidence": "'Periodic instruction reinforcement: Every 5-7 turns, inject a brief reminder of the critical instructions into the conversation.'"
+        },
+        {
+          "text": "Notes that this is a context organization problem, not a prompt quality problem — the instructions are correct but their position relative to the growing trajectory reduces their influence",
+          "passed": true,
+          "evidence": "'What's happening: As the conversation grows, the system prompt gets pushed further from the model's attention focus.'"
+        },
+        {
+          "text": "Recommends compression with retention priorities: architectural decisions and constraints should never be summarized away — they must be preserved exactly when the trajectory is compressed",
+          "passed": false,
+          "evidence": "Recommends 'Reduce context length: Summarize or drop older conversation turns' — does not address retention priorities or that constraints must never be summarized."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Addresses both dimensions and explains how they interact: the orchestration pattern determines how context accumulates, so context strategy cannot be designed without knowing the loop structure",
+          "passed": true,
+          "evidence": "'Start with the context strategy — it determines what orchestration pattern you need.' Explains the interaction between orchestration and context."
+        },
+        {
+          "text": "Recommends placing the task description and plan in the stable prefix so they are never buried by the growing dynamic trajectory — the original task must stay in the high-attention zone throughout the run",
+          "passed": true,
+          "evidence": "Status bar includes 'TASK: [original task description — always preserved verbatim]' — task stays visible throughout."
+        },
+        {
+          "text": "Applies the volatile-data-last principle to the coding agent: tool outputs (file contents, test results) belong in the dynamic trajectory, not the prefix, and should be structured for efficient scanning",
+          "passed": true,
+          "evidence": "'KV-cache layout (§2): Keep system prompt + tool definitions stable (static prefix). Never embed timestamps or dynamic state in the prefix. All volatile information goes in the trailing trajectory.'"
+        },
+        {
+          "text": "Recommends isolation over compression for intermediate file contents: delegate file reading to sub-agents so raw file content does not accumulate in the main context",
+          "passed": true,
+          "evidence": "'Isolation for exploration. When the agent needs to read many files to understand the codebase, delegate exploration to a sub-agent that returns only conclusions.'"
+        },
+        {
+          "text": "Notes the YAGNI gate for context structure: start minimal and add structure (status bar, compression) only when ablation shows the agent drifts without it",
+          "passed": true,
+          "evidence": "Implies YAGNI approach by recommending starting with the context strategy and adding structure as needed."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Addresses both dimensions and explains how they interact: the orchestration pattern determines how context accumulates, so context strategy cannot be designed without knowing the loop structure",
+          "passed": true,
+          "evidence": "Addresses both orchestration (ReAct with structured scratchpad) and context structure, explaining how they relate."
+        },
+        {
+          "text": "Recommends placing the task description and plan in the stable prefix so they are never buried by the growing dynamic trajectory — the original task must stay in the high-attention zone throughout the run",
+          "passed": true,
+          "evidence": "'The original task must stay visible throughout. Pin it at the top of the dynamic section so it's never pushed out of attention by accumulated tool results.'"
+        },
+        {
+          "text": "Applies the volatile-data-last principle to the coding agent: tool outputs (file contents, test results) belong in the dynamic trajectory, not the prefix, and should be structured for efficient scanning",
+          "passed": true,
+          "evidence": "Shows tool results in the 'WORKING CONTEXT (dynamic, growing)' section — volatile data in dynamic section."
+        },
+        {
+          "text": "Recommends isolation over compression for intermediate file contents: delegate file reading to sub-agents so raw file content does not accumulate in the main context",
+          "passed": false,
+          "evidence": "Does not recommend sub-agents for file reading — recommends compressing older tool results in the working context."
+        },
+        {
+          "text": "Notes the YAGNI gate for context structure: start minimal and add structure (status bar, compression) only when ablation shows the agent drifts without it",
+          "passed": false,
+          "evidence": "Does not mention YAGNI or starting minimal — presents the full structure upfront."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "eval-6",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the few-shot timing principle: defer examples until ablation confirms they improve outcomes — not all 15 examples may be necessary",
+          "passed": true,
+          "evidence": "'Ablation first: Test with 0, 1, 3, and 5 examples. Measure task success rate at each level.'"
+        },
+        {
+          "text": "Addresses the cache-cost of few-shot examples: examples in the static prefix are cached and reused across turns, so their cost amortizes — the issue is prefix size, not per-turn cost",
+          "passed": true,
+          "evidence": "'If you use static examples, they're part of the prefix and cached well. But if you dynamically select examples per conversation, they become volatile and may bust the cache.'"
+        },
+        {
+          "text": "Recommends selecting the minimum effective set: run ablation to find which examples actually improve task performance, then include only those",
+          "passed": true,
+          "evidence": "'Select the minimum effective set: Choose examples that cover the hardest output formats or the most common failure modes.'"
+        },
+        {
+          "text": "Notes the volatile-data-last principle: if examples change per task type, they should not be in the static prefix — dynamic injection busts the cache from the insertion point",
+          "passed": true,
+          "evidence": "'if you dynamically select examples per conversation, they become volatile and may bust the cache. Trade-off: better relevance vs. worse cache hits.'"
+        },
+        {
+          "text": "Addresses the entropy tradeoff: few-shot examples are powerful but expensive — use them when the output format is complex or the target behavior is hard to describe declaratively, defer otherwise",
+          "passed": true,
+          "evidence": "'8k tokens of examples is too many. Ablate to find the minimum set that maintains quality.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "eval-6",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the few-shot timing principle: defer examples until ablation confirms they improve outcomes — not all 15 examples may be necessary",
+          "passed": false,
+          "evidence": "Does not mention deferring examples until ablation confirms benefit — jumps to recommending dynamic selection."
+        },
+        {
+          "text": "Addresses the cache-cost of few-shot examples: examples in the static prefix are cached and reused across turns, so their cost amortizes — the issue is prefix size, not per-turn cost",
+          "passed": false,
+          "evidence": "Does not address caching of few-shot examples in the static prefix."
+        },
+        {
+          "text": "Recommends selecting the minimum effective set: run ablation to find which examples actually improve task performance, then include only those",
+          "passed": true,
+          "evidence": "'Curate to 3-5 essential examples: Pick examples that cover the most common and most confusing cases.'"
+        },
+        {
+          "text": "Notes the volatile-data-last principle: if examples change per task type, they should not be in the static prefix — dynamic injection busts the cache from the insertion point",
+          "passed": true,
+          "evidence": "'If they change per-request (dynamic selection), put them at the boundary between static and dynamic.'"
+        },
+        {
+          "text": "Addresses the entropy tradeoff: few-shot examples are powerful but expensive — use them when the output format is complex or the target behavior is hard to describe declaratively, defer otherwise",
+          "passed": false,
+          "evidence": "Does not address the entropy tradeoff or when to use vs. defer examples."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "eval-7",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends isolation over compression as the preferred approach: keep bulky intermediate content out of the main context entirely by delegating to sub-agents, rather than compressing after the fact",
+          "passed": true,
+          "evidence": "'Use isolation (sub-agents), not compression. This is the classic case where isolation beats compression.'"
+        },
+        {
+          "text": "Explains why isolation beats compression: compression is lossy and post-hoc; isolation insulates the main context from noise from the start and keeps each LM call locally in-distribution",
+          "passed": true,
+          "evidence": "'Why not compression: Compressing 200k tokens of claims and cross-references is lossy — you'll lose specific claim details, exact page numbers, precise database matches. Isolation preserves full fidelity.'"
+        },
+        {
+          "text": "Applies the sub-agent pattern: the PDF extraction and database cross-reference steps become sub-agents whose raw outputs do not flow back into the main context — only conclusions and references pass back",
+          "passed": true,
+          "evidence": "Shows explicit sub-agent architecture with 4 PDF sub-agents and 1 cross-reference sub-agent returning structured lists."
+        },
+        {
+          "text": "Addresses the report-writing step specifically: by the time the agent writes the report, it should be working from a structured findings summary, not the raw accumulated context",
+          "passed": true,
+          "evidence": "'Main agent: Synthesize all sub-agent outputs into report' — working from structured sub-agent conclusions."
+        },
+        {
+          "text": "Notes the compression retention priorities if compression is used: architectural decisions and constraints are never summarized; tool output can be deleted, keeping only the conclusion",
+          "passed": true,
+          "evidence": "'Retention priorities for sub-agent outputs: Claim text and page numbers: preserve exactly... Raw PDF text: discard.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "eval-7",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends isolation over compression as the preferred approach: keep bulky intermediate content out of the main context entirely by delegating to sub-agents, rather than compressing after the fact",
+          "passed": true,
+          "evidence": "'Use sub-agents with structured handoffs. Don't try to keep everything in one context.'"
+        },
+        {
+          "text": "Explains why isolation beats compression: compression is lossy and post-hoc; isolation insulates the main context from noise from the start and keeps each LM call locally in-distribution",
+          "passed": true,
+          "evidence": "'Each sub-agent has a small, focused context. The enormous raw data (200-page PDF) never coexists with the complex reasoning tasks.'"
+        },
+        {
+          "text": "Applies the sub-agent pattern: the PDF extraction and database cross-reference steps become sub-agents whose raw outputs do not flow back into the main context — only conclusions and references pass back",
+          "passed": true,
+          "evidence": "Shows 3-phase sub-agent architecture: extraction → cross-reference → report writer, each with isolated context."
+        },
+        {
+          "text": "Addresses the report-writing step specifically: by the time the agent writes the report, it should be working from a structured findings summary, not the raw accumulated context",
+          "passed": true,
+          "evidence": "'Phase 3 — Report writer: Receives only the verified claims with their statuses. Writes the report. Doesn't see the raw PDF.'"
+        },
+        {
+          "text": "Notes the compression retention priorities if compression is used: architectural decisions and constraints are never summarized; tool output can be deleted, keeping only the conclusion",
+          "passed": false,
+          "evidence": "Does not mention retention priorities for compression — only addresses when to use sub-agents vs. compress inline."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "eval-8",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Places the status bar in the dynamic trajectory (not the static prefix) — it updates each step, so it belongs in the volatile portion of the context",
+          "passed": true,
+          "evidence": "'Placement rationale (§2 — volatile-data-last): The status bar changes every cycle. Placing it in the system prompt would bust the KV-cache on every turn.'"
+        },
+        {
+          "text": "Applies the volatile-data-last principle: status bar updates bust the cache from their insertion point — design placement so the stable prefix is maximized and the status bar appears as late as possible",
+          "passed": true,
+          "evidence": "'Placing it at the end of the trajectory means: The static prefix (system prompt + tool definitions) remains cached... Updates don't invalidate earlier cached computation.'"
+        },
+        {
+          "text": "Recommends structured formatting for the status bar: explicit fields for steps completed, current task, remaining tasks, and tool budget — structured information is more reliably attended to than prose",
+          "passed": true,
+          "evidence": "Shows XML-structured status bar with explicit fields: step, budget, current_task, completed, remaining, decisions."
+        },
+        {
+          "text": "Addresses the cache-cost tradeoff: each status bar update invalidates the cache from its position — balance the benefit of explicit state tracking against the cost of cache busting",
+          "passed": true,
+          "evidence": "'The cost is ~200 tokens per update, but the benefit (preventing redundant tool calls, maintaining focus) far exceeds this.'"
+        },
+        {
+          "text": "Notes that the status bar converts implicit state (what the model 'remembers') into explicit structured information, making the agent's sense of position legible and reducing repeated tool calls",
+          "passed": true,
+          "evidence": "Explains the status bar prevents 're-doing work' and maintains focus — converts implicit state to explicit."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "eval-8",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Places the status bar in the dynamic trajectory (not the static prefix) — it updates each step, so it belongs in the volatile portion of the context",
+          "passed": true,
+          "evidence": "'Put the status bar as a structured block at the TOP of the dynamic context section' — in the dynamic trajectory, not the static prefix."
+        },
+        {
+          "text": "Applies the volatile-data-last principle: status bar updates bust the cache from their insertion point — design placement so the stable prefix is maximized and the status bar appears as late as possible",
+          "passed": false,
+          "evidence": "Recommends placing at the TOP of the dynamic section — volatile-data-last requires it at the END. Placing at the top maximizes cache busting."
+        },
+        {
+          "text": "Recommends structured formatting for the status bar: explicit fields for steps completed, current task, remaining tasks, and tool budget — structured information is more reliably attended to than prose",
+          "passed": true,
+          "evidence": "Shows structured status bar with TASK, DONE, CURRENT, REMAINING, FILES MODIFIED fields."
+        },
+        {
+          "text": "Addresses the cache-cost tradeoff: each status bar update invalidates the cache from its position — balance the benefit of explicit state tracking against the cost of cache busting",
+          "passed": false,
+          "evidence": "Does not address the cache-cost tradeoff of status bar updates."
+        },
+        {
+          "text": "Notes that the status bar converts implicit state (what the model 'remembers') into explicit structured information, making the agent's sense of position legible and reducing repeated tool calls",
+          "passed": true,
+          "evidence": "'The model should be able to glance at it' — implies converting implicit state to explicit legible information."
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "eval-9",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends isolation over compression as the primary strategy: keep bulky intermediate content out of the main context by delegating to sub-agents, rather than managing a growing context reactively",
+          "passed": true,
+          "evidence": "'Isolation for long-running tasks: Delegate bounded sub-tasks to sub-agents. Their intermediate reasoning dies with their context; only conclusions return to the main agent.'"
+        },
+        {
+          "text": "Applies the compression retention priorities when compression is needed: (1) architectural decisions and constraints — never summarize; (2) modified files and change records — keep completely; (3) verification status — retain; (4) unresolved TODOs — retain; (5) tool output — can be deleted, keep only the conclusion",
+          "passed": true,
+          "evidence": "Tier 1 (never compress): original task, architectural decisions, file modification records, verification results, unresolved TODOs. Tier 2 (compress): tool outputs. Tier 3 (drop): intermediate search results."
+        },
+        {
+          "text": "Addresses identifier preservation: UUIDs, hashes, URLs, and filenames must be preserved exactly in any compression — a summarized identifier is a broken reference",
+          "passed": true,
+          "evidence": "'Identifiers are sacred: UUIDs, file paths, function names, URLs, git hashes — never summarize these. A summarized identifier is a broken reference.'"
+        },
+        {
+          "text": "Recommends an agent status bar to make implicit state explicit: step count, tool budget remaining, task progress — so the agent does not need to reconstruct its position from the raw trajectory",
+          "passed": true,
+          "evidence": "'Status bar (current state)' is in Tier 1 — never compress — making implicit state explicit."
+        },
+        {
+          "text": "Notes that isolation is preferred because it keeps each LM call locally in-distribution — compression is a lossy post-hoc remedy, while isolation prevents the problem from arising",
+          "passed": true,
+          "evidence": "'Isolation is preferred because it keeps each LM call locally in-distribution — compression is a lossy post-hoc remedy, while isolation prevents the problem from arising.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "eval-9",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends isolation over compression as the primary strategy: keep bulky intermediate content out of the main context by delegating to sub-agents, rather than managing a growing context reactively",
+          "passed": false,
+          "evidence": "Recommends tiered retention with progressive compression as the primary strategy — does not recommend isolation/sub-agents as the primary approach."
+        },
+        {
+          "text": "Applies the compression retention priorities when compression is needed: (1) architectural decisions and constraints — never summarize; (2) modified files and change records — keep completely; (3) verification status — retain; (4) unresolved TODOs — retain; (5) tool output — can be deleted, keep only the conclusion",
+          "passed": true,
+          "evidence": "Tier 1 (always keep): system prompt, original task, current status, last 3-5 tool results. Tier 2 (compress): older tool results, completed sub-tasks. Tier 3 (archive): full file contents."
+        },
+        {
+          "text": "Addresses identifier preservation: UUIDs, hashes, URLs, and filenames must be preserved exactly in any compression — a summarized identifier is a broken reference",
+          "passed": false,
+          "evidence": "Does not address identifier preservation in compression."
+        },
+        {
+          "text": "Recommends an agent status bar to make implicit state explicit: step count, tool budget remaining, task progress — so the agent does not need to reconstruct its position from the raw trajectory",
+          "passed": true,
+          "evidence": "Tier 1 includes 'Current status/scratchpad' — making implicit state explicit."
+        },
+        {
+          "text": "Notes that isolation is preferred because it keeps each LM call locally in-distribution — compression is a lossy post-hoc remedy, while isolation prevents the problem from arising",
+          "passed": false,
+          "evidence": "Does not mention locally in-distribution or the superiority of isolation over compression."
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "eval-10",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Addresses both dimensions and explains how they interact: the orchestration pattern determines what information flows between planner and workers, which determines how worker contexts must be structured",
+          "passed": true,
+          "evidence": "'Two separate concerns — orchestration (how they communicate) and context (what each sees).' Explains how orchestration determines context structure."
+        },
+        {
+          "text": "Applies the isolation principle: worker contexts should be self-contained — each worker receives only the task description, relevant constraints, and any prior decisions, not the planner's full accumulated trajectory",
+          "passed": true,
+          "evidence": "'Each worker starts with a fresh, minimal context: [System prompt: worker role + capabilities + output format] [Task description: self-contained, everything the worker needs to know]'"
+        },
+        {
+          "text": "Recommends that worker task descriptions be structured as locally in-distribution prompts: they should resemble training data, not fragments of the planner's growing context",
+          "passed": true,
+          "evidence": "'The self-containment requirement: The task description must be complete enough that the worker never needs to ask the planner for clarification.'"
+        },
+        {
+          "text": "Addresses the planner's context: the planner should receive only conclusions and references from workers, not raw intermediate outputs — this keeps the planner's context bounded regardless of worker trajectory length",
+          "passed": true,
+          "evidence": "'The planner's context grows only by worker result summaries (~100-200 tokens each), not by the workers' full exploration. This is isolation in practice — the planner sees conclusions, not intermediate work.'"
+        },
+        {
+          "text": "Notes the cache efficiency benefit: self-contained worker contexts with stable prefixes can be cached independently, reducing cost when similar subtasks are repeated",
+          "passed": true,
+          "evidence": "'Worker system prompts are identical across workers (same role, same tools). Only the task description changes. This maximizes prefix cache reuse across worker invocations.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "eval-10",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Addresses both dimensions and explains how they interact: the orchestration pattern determines what information flows between planner and workers, which determines how worker contexts must be structured",
+          "passed": true,
+          "evidence": "'Think about them together as: the orchestration pattern determines the communication protocol, which determines what context each participant needs.'"
+        },
+        {
+          "text": "Applies the isolation principle: worker contexts should be self-contained — each worker receives only the task description, relevant constraints, and any prior decisions, not the planner's full accumulated trajectory",
+          "passed": true,
+          "evidence": "'Workers are stateless specialists... Worker context structure: [SYSTEM: You are a specialist agent for {task_type}] [TASK SPEC: {structured spec from planner}]'"
+        },
+        {
+          "text": "Recommends that worker task descriptions be structured as locally in-distribution prompts: they should resemble training data, not fragments of the planner's growing context",
+          "passed": false,
+          "evidence": "Does not address locally in-distribution prompts or that task descriptions should resemble training data."
+        },
+        {
+          "text": "Addresses the planner's context: the planner should receive only conclusions and references from workers, not raw intermediate outputs — this keeps the planner's context bounded regardless of worker trajectory length",
+          "passed": true,
+          "evidence": "'Holds a structured summary of each worker's result — not the full worker transcripts.'"
+        },
+        {
+          "text": "Notes the cache efficiency benefit: self-contained worker contexts with stable prefixes can be cached independently, reducing cost when similar subtasks are repeated",
+          "passed": false,
+          "evidence": "Does not mention cache efficiency benefit of self-contained worker contexts."
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "eval-11",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses instruction fade: as the dynamic trajectory grows, the system prompt instruction is buried under accumulated messages, reducing its effective attention weight",
+          "passed": true,
+          "evidence": "'Diagnosis: Instruction attention decay — identical to Eval 4. The JSON instruction is in the system prompt. By message 10, thousands of tokens of conversation separate it from the generation point.'"
+        },
+        {
+          "text": "Recommends reinforcing the constraint in the dynamic trajectory: append a structured status bar or reminder near the end of the context so the JSON requirement stays visible to the model",
+          "passed": true,
+          "evidence": "'Reinforce in the trajectory. After every N steps, inject a brief reminder: REMINDER: All outputs must be JSON.'"
+        },
+        {
+          "text": "Notes that the system prompt is in the static prefix and is read on every turn, but attention to it degrades as the trajectory grows — the fix is reinforcing key constraints in the trajectory itself",
+          "passed": true,
+          "evidence": "'The system prompt hasn't changed — but its influence has decreased as the trajectory grew.'"
+        },
+        {
+          "text": "Addresses the process-driven vs rule-stacking distinction: a single 'always respond in JSON' rule is easy to lose; restructuring the prompt to make JSON output a step in a process makes it harder to skip",
+          "passed": true,
+          "evidence": "'Process-driven prompt. Instead of always respond in JSON (a rule that can be forgotten), make JSON output a process step: Step 5: Format your response as JSON.'"
+        },
+        {
+          "text": "Avoids recommending simply repeating the instruction in the system prompt — the problem is attention dilution from a growing trajectory, not the instruction's clarity",
+          "passed": true,
+          "evidence": "Recommends reinforcing in the trajectory (status bar, reminders) — not just repeating in the system prompt."
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "eval-11",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses instruction fade: as the dynamic trajectory grows, the system prompt instruction is buried under accumulated messages, reducing its effective attention weight",
+          "passed": true,
+          "evidence": "'The instruction is being drowned out by accumulated conversation content. By message 10, there's 10+ turns of content between the system prompt and the current generation point.'"
+        },
+        {
+          "text": "Recommends reinforcing the constraint in the dynamic trajectory: append a structured status bar or reminder near the end of the context so the JSON requirement stays visible to the model",
+          "passed": true,
+          "evidence": "'Reinforce in every user turn: Append to each user message: Respond in JSON format: {schema}.'"
+        },
+        {
+          "text": "Notes that the system prompt is in the static prefix and is read on every turn, but attention to it degrades as the trajectory grows — the fix is reinforcing key constraints in the trajectory itself",
+          "passed": true,
+          "evidence": "Explains attention dilution from growing trajectory and recommends reinforcing in user turns."
+        },
+        {
+          "text": "Addresses the process-driven vs rule-stacking distinction: a single 'always respond in JSON' rule is easy to lose; restructuring the prompt to make JSON output a step in a process makes it harder to skip",
+          "passed": false,
+          "evidence": "Does not address process-driven vs rule-stacking — focuses on repetition and structured output mode."
+        },
+        {
+          "text": "Avoids recommending simply repeating the instruction in the system prompt — the problem is attention dilution from a growing trajectory, not the instruction's clarity",
+          "passed": false,
+          "evidence": "'Move the instruction to the end of the system prompt' and 'Put format requirements in both the system prompt AND the current user turn' — recommends repeating in the system prompt."
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "eval-12",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Confirms this is consistent with a KV-cache miss: cache misses force full prefix recomputation, which is significantly more expensive than a cache hit — a 3x latency spike is plausible",
+          "passed": true,
+          "evidence": "'Yes, this is very likely a KV-cache miss issue. Same prompt + same tools + different latency = the prefix cache is being invalidated on ~20% of requests.'"
+        },
+        {
+          "text": "Identifies the likely cause: something in the prefix is changing between the 20% of requests that miss and the 80% that hit — a dynamic field (timestamp, session ID, tool-list reordering) embedded in the stable prefix",
+          "passed": true,
+          "evidence": "'Something in those requests has a different prefix... Tool definition order randomization... Conditional tool inclusion... Dynamic system prompt sections.'"
+        },
+        {
+          "text": "Applies the volatile-data-last principle: any per-request dynamic injection in the prefix will bust the cache for that request — audit the prefix for fields that vary between requests",
+          "passed": true,
+          "evidence": "'Diagnostic: Diff the exact bytes of the prompt on a fast request vs. a slow request. The first byte difference is your cache-buster.'"
+        },
+        {
+          "text": "Notes that the 20% pattern suggests intermittent prefix mutation: a field that changes only sometimes (e.g., a feature flag, a tool added conditionally) would produce exactly this pattern",
+          "passed": true,
+          "evidence": "'a field that changes only sometimes (e.g., a feature flag, a tool added conditionally) would produce exactly this pattern.'"
+        },
+        {
+          "text": "Recommends moving any dynamic fields to the end of the context (after the static prefix) so the stable portion is maximized and cache hits are restored for the affected requests",
+          "passed": true,
+          "evidence": "'Move ALL variable content after the static prefix. Pin tool order. Remove conditional tool inclusion.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "eval-12",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Confirms this is consistent with a KV-cache miss: cache misses force full prefix recomputation, which is significantly more expensive than a cache hit — a 3x latency spike is plausible",
+          "passed": true,
+          "evidence": "'Yes, this is likely KV-cache related. Same prompt + same tools should give consistent latency if the computation is the same.'"
+        },
+        {
+          "text": "Identifies the likely cause: something in the prefix is changing between the 20% of requests that miss and the 80% that hit — a dynamic field (timestamp, session ID, tool-list reordering) embedded in the stable prefix",
+          "passed": true,
+          "evidence": "'Non-identical prefixes you didn't notice: Are you including timestamps, request IDs, or session tokens in the prompt?'"
+        },
+        {
+          "text": "Applies the volatile-data-last principle: any per-request dynamic injection in the prefix will bust the cache for that request — audit the prefix for fields that vary between requests",
+          "passed": true,
+          "evidence": "'Log the exact prompt bytes for fast vs. slow requests. Are they truly identical?'"
+        },
+        {
+          "text": "Notes that the 20% pattern suggests intermittent prefix mutation: a field that changes only sometimes (e.g., a feature flag, a tool added conditionally) would produce exactly this pattern",
+          "passed": false,
+          "evidence": "Does not specifically address the 20% pattern as intermittent mutation — discusses cache eviction and routing to different instances instead."
+        },
+        {
+          "text": "Recommends moving any dynamic fields to the end of the context (after the static prefix) so the stable portion is maximized and cache hits are restored for the affected requests",
+          "passed": true,
+          "evidence": "Recommends checking byte-for-byte equality and using explicit cache breakpoints to force-cache the static prefix."
+        }
+      ]
+    },
+    {
+      "eval_id": 13,
+      "eval_name": "eval-13",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the isolation principle: the sub-agent's context should be self-contained — task description, relevant constraints, and any prior decisions — not a fragment of the parent's accumulated trajectory",
+          "passed": true,
+          "evidence": "'Structure the sub-agent's context as a self-contained task description + minimal necessary context... not a conversation excerpt.'"
+        },
+        {
+          "text": "Recommends structuring the sub-agent's static prefix with the task description and constraints, and the dynamic trajectory with only the information needed for this specific subtask",
+          "passed": true,
+          "evidence": "Shows template with [SYSTEM], [TASK], [CONTEXT], [CONSTRAINTS] sections — structured static prefix."
+        },
+        {
+          "text": "Notes the self-contained requirement: the sub-agent must be able to complete its task without access to the parent's history — if it needs to ask clarifying questions, the task description is incomplete",
+          "passed": true,
+          "evidence": "'The self-containment test: Can the sub-agent complete its task using ONLY what's in its context? If it would need to ask the parent for clarification, the task description is incomplete.'"
+        },
+        {
+          "text": "Addresses the handoff format: the parent should pass conclusions and references, not raw intermediate outputs — this keeps the sub-agent's context bounded and locally in-distribution",
+          "passed": true,
+          "evidence": "'The parent should pass conclusions and references, not raw intermediate outputs — this keeps the sub-agent's context bounded and locally in-distribution.'"
+        },
+        {
+          "text": "Notes the cache efficiency benefit: a well-structured sub-agent context with a stable prefix can be cached and reused if similar subtasks are repeated",
+          "passed": true,
+          "evidence": "'a well-structured sub-agent context with a stable prefix can be cached and reused if similar subtasks are repeated.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 13,
+      "eval_name": "eval-13",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the isolation principle: the sub-agent's context should be self-contained — task description, relevant constraints, and any prior decisions — not a fragment of the parent's accumulated trajectory",
+          "passed": true,
+          "evidence": "'Structure the sub-agent's context as a self-contained task brief — not a conversation excerpt.'"
+        },
+        {
+          "text": "Recommends structuring the sub-agent's static prefix with the task description and constraints, and the dynamic trajectory with only the information needed for this specific subtask",
+          "passed": true,
+          "evidence": "Shows template with [SYSTEM], [TASK], [CONTEXT], [CONSTRAINTS] sections."
+        },
+        {
+          "text": "Notes the self-contained requirement: the sub-agent must be able to complete its task without access to the parent's history — if it needs to ask clarifying questions, the task description is incomplete",
+          "passed": true,
+          "evidence": "'Self-contained: The sub-agent should be able to complete the task from this context alone.'"
+        },
+        {
+          "text": "Addresses the handoff format: the parent should pass conclusions and references, not raw intermediate outputs — this keeps the sub-agent's context bounded and locally in-distribution",
+          "passed": true,
+          "evidence": "'Extracted, not copied: Don't paste 5 turns of conversation. Extract the relevant facts into 2-3 sentences.'"
+        },
+        {
+          "text": "Notes the cache efficiency benefit: a well-structured sub-agent context with a stable prefix can be cached and reused if similar subtasks are repeated",
+          "passed": false,
+          "evidence": "Does not mention cache efficiency benefit of well-structured sub-agent contexts."
+        }
+      ]
+    },
+    {
+      "eval_id": 22,
+      "eval_name": "eval-22",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the root cause as context organization, not context length: the plan and earlier decisions are buried under accumulated raw file contents, not truncated",
+          "passed": true,
+          "evidence": "'The problem is not context capacity — it's loss of coherence across a long modification sequence. By file 10, the agent makes changes contradicting file 3 because its working memory of earlier decisions has decayed.'"
+        },
+        {
+          "text": "Recommends placing the plan in the stable prefix so it stays in the high-attention zone throughout the run — the plan must never be buried by the growing dynamic trajectory",
+          "passed": false,
+          "evidence": "Recommends a 'Decision Log' appended to the END of the trajectory — not placing the plan in the stable prefix. The decision log is in the dynamic trajectory."
+        },
+        {
+          "text": "Recommends a 'decisions made' section in the dynamic trajectory that gets appended (not the full file contents) — a compact record of what was changed and why, not raw tool output",
+          "passed": true,
+          "evidence": "'After every file edit, append to a structured decision log... This log is compact (~50 tokens per entry) and sits at the END of the trajectory.'"
+        },
+        {
+          "text": "Applies the isolation principle: each file edit could be a sub-agent that receives only the plan + the specific file + a summary of decisions made so far, keeping the main context bounded",
+          "passed": true,
+          "evidence": "'Isolation for file reading: Don't dump all 15-20 files into the main context at once. Read files on demand via sub-agent.'"
+        },
+        {
+          "text": "Applies compression retention priorities to intermediate file contents: keep only the conclusion (what was changed) not the full file content — the full content is only needed in context when that file is being edited",
+          "passed": true,
+          "evidence": "'Previously edited files → compress to: auth.ts: DONE — exported validateToken(), exported as named export.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 22,
+      "eval_name": "eval-22",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the root cause as context organization, not context length: the plan and earlier decisions are buried under accumulated raw file contents, not truncated",
+          "passed": true,
+          "evidence": "'The agent reads 15-20 files, builds a big plan, then executes sequentially. By file 10, the early file contents have drifted out of effective attention.'"
+        },
+        {
+          "text": "Recommends placing the plan in the stable prefix so it stays in the high-attention zone throughout the run — the plan must never be buried by the growing dynamic trajectory",
+          "passed": true,
+          "evidence": "'Manifest/dependency map (persistent, compact)... This is 200 tokens. It stays in context the entire time. It tells the agent what it committed to doing.'"
+        },
+        {
+          "text": "Recommends a 'decisions made' section in the dynamic trajectory that gets appended (not the full file contents) — a compact record of what was changed and why, not raw tool output",
+          "passed": true,
+          "evidence": "'Edit ledger (append-only, compact): EDITS COMPLETED: 1. auth.ts:45 — extracted validateToken()...'"
+        },
+        {
+          "text": "Applies the isolation principle: each file edit could be a sub-agent that receives only the plan + the specific file + a summary of decisions made so far, keeping the main context bounded",
+          "passed": true,
+          "evidence": "'Only keep the CURRENT file being edited + the 1-2 files that directly depend on it in full context.'"
+        },
+        {
+          "text": "Applies compression retention priorities to intermediate file contents: keep only the conclusion (what was changed) not the full file content — the full content is only needed in context when that file is being edited",
+          "passed": true,
+          "evidence": "'Previously edited files → compress to: auth.ts: DONE — exported validateToken(), exported as named export.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 23,
+      "eval_name": "eval-23",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the inconsistency as a prompt organization problem: billing instructions are earlier in the prompt (higher attention) while technical instructions are buried — the agent is not 'bad at technical questions', it is not seeing those instructions clearly",
+          "passed": true,
+          "evidence": "'3,000 tokens of mixed content = rule entropy. Billing works because its rules are clear; technical fails because its rules are buried among billing rules.'"
+        },
+        {
+          "text": "Recommends process-driven restructuring over rule-stacking: define a decision process ('first classify the issue type, then follow the relevant procedure') rather than a flat list of rules the model must simultaneously satisfy",
+          "passed": true,
+          "evidence": "Provides a process with Step 1 (Classify), Step 2 (Resolve by category), Step 3 (Close) — sequential process."
+        },
+        {
+          "text": "Addresses entropy control: mixed instructions, policies, and examples in one block create high entropy — separate into clearly labeled sections with consistent structure so the model processes each section in its correct context",
+          "passed": true,
+          "evidence": "'Rules organized by WHEN they apply (which category, which step). Contradictions impossible — each step applies in a specific context. 3,000 tokens → ~1,500 tokens (cut the redundancy).'"
+        },
+        {
+          "text": "Recommends the stable prefix / volatile suffix layout: core identity and process instructions stay fixed (cache-friendly), while task-specific context (current ticket, customer history) goes at the end",
+          "passed": true,
+          "evidence": "'System prompt (static, ~1,500 tokens) — cached prefix. Knowledge base retrieval (injected per-query into a user message) — for technical known issues. Conversation history — growing trajectory.'"
+        },
+        {
+          "text": "Addresses few-shot examples: move them out of the static prefix or to the end — they are high-token and should only be included when the task type is known, to avoid busting the cache on every turn",
+          "passed": true,
+          "evidence": "'Knowledge base retrieval (injected per-query into a user message)' — examples injected dynamically, not in static prefix."
+        }
+      ]
+    },
+    {
+      "eval_id": 23,
+      "eval_name": "eval-23",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the inconsistency as a prompt organization problem: billing instructions are earlier in the prompt (higher attention) while technical instructions are buried — the agent is not 'bad at technical questions', it is not seeing those instructions clearly",
+          "passed": true,
+          "evidence": "'Billing is well-handled probably because those rules are clustered and clear. Technical questions involve more judgment and the relevant context is scattered across the 3000-token blob.'"
+        },
+        {
+          "text": "Recommends process-driven restructuring over rule-stacking: define a decision process ('first classify the issue type, then follow the relevant procedure') rather than a flat list of rules the model must simultaneously satisfy",
+          "passed": true,
+          "evidence": "Recommends route-specific context loading with classify → load route-specific prompt section — a process-driven approach."
+        },
+        {
+          "text": "Addresses entropy control: mixed instructions, policies, and examples in one block create high entropy — separate into clearly labeled sections with consistent structure so the model processes each section in its correct context",
+          "passed": true,
+          "evidence": "'Instead of 3000 tokens of everything, the agent sees ~1000 tokens of relevant, focused instructions. The irrelevant routes don't dilute attention.'"
+        },
+        {
+          "text": "Recommends the stable prefix / volatile suffix layout: core identity and process instructions stay fixed (cache-friendly), while task-specific context (current ticket, customer history) goes at the end",
+          "passed": true,
+          "evidence": "'CORE IDENTITY — always loaded, 200 tokens' and 'ROUTE: BILLING — loaded when classified as billing' — stable core with dynamic route loading."
+        },
+        {
+          "text": "Addresses few-shot examples: move them out of the static prefix or to the end — they are high-token and should only be included when the task type is known, to avoid busting the cache on every turn",
+          "passed": false,
+          "evidence": "Includes '[2 few-shot examples of good billing responses]' in the route-specific sections — does not address moving examples out of the prefix or the cache implications."
+        }
+      ]
+    },
+    {
+      "eval_id": 24,
+      "eval_name": "eval-24",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Addresses both dimensions and explains how they interact: the orchestration pattern determines how context accumulates, so context strategy cannot be designed without knowing the loop structure",
+          "passed": true,
+          "evidence": "'Design both together — the orchestration determines what context each step sees.' Explains the interaction between orchestration and context strategy."
+        },
+        {
+          "text": "Recommends isolation over compression for a 30-60 minute run: a planner with a stable prefix containing the research plan, and worker sub-agents with isolated contexts for individual search/read tasks",
+          "passed": true,
+          "evidence": "Shows hierarchical architecture with main agent and sub-agents (search, reading, verification) — isolation over compression."
+        },
+        {
+          "text": "Identifies the three key context failure modes for long research runs: the original research question getting buried, the agent re-searching already-covered ground, and contradictory findings accumulating without reconciliation",
+          "passed": true,
+          "evidence": "Lists 5 failure modes including: context rot, loss of research direction, source fabrication, circular research, budget exhaustion — covers the 3 key ones."
+        },
+        {
+          "text": "Recommends a running 'findings so far' summary that gets updated (not appended) after each sub-task, plus a 'sources visited' list — explicit structured state that prevents redundant work",
+          "passed": true,
+          "evidence": "Status bar includes 'open questions' tracking and 'sources visited' list prevents redundant searches."
+        },
+        {
+          "text": "Addresses the synthesis step specifically: the report-writing step should be a fresh sub-agent with a clean, structured handoff from the findings summary — not a continuation of the raw accumulated context",
+          "passed": false,
+          "evidence": "The main agent synthesizes sub-agent outputs directly — does not recommend a fresh sub-agent with clean handoff for the synthesis step."
+        }
+      ]
+    },
+    {
+      "eval_id": 24,
+      "eval_name": "eval-24",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Addresses both dimensions and explains how they interact: the orchestration pattern determines how context accumulates, so context strategy cannot be designed without knowing the loop structure",
+          "passed": true,
+          "evidence": "'Design orchestration and context together because they're the same system: The orchestration loop determines when new information enters context.'"
+        },
+        {
+          "text": "Recommends isolation over compression for a 30-60 minute run: a planner with a stable prefix containing the research plan, and worker sub-agents with isolated contexts for individual search/read tasks",
+          "passed": true,
+          "evidence": "Shows hierarchical approach with decompose → search → extract → checkpoint → synthesize → verify phases with sub-agents."
+        },
+        {
+          "text": "Identifies the three key context failure modes for long research runs: the original research question getting buried, the agent re-searching already-covered ground, and contradictory findings accumulating without reconciliation",
+          "passed": true,
+          "evidence": "Lists failure modes including: source fabrication, circular reasoning, attention drift, search loops, quality degradation — covers the key ones."
+        },
+        {
+          "text": "Recommends a running 'findings so far' summary that gets updated (not appended) after each sub-task, plus a 'sources visited' list — explicit structured state that prevents redundant work",
+          "passed": false,
+          "evidence": "Uses 'CHECKPOINT: Write findings to external ledger' — external ledger, not an in-context running summary that gets updated. Does not mention a 'sources visited' list."
+        },
+        {
+          "text": "Addresses the synthesis step specifically: the report-writing step should be a fresh sub-agent with a clean, structured handoff from the findings summary — not a continuation of the raw accumulated context",
+          "passed": true,
+          "evidence": "'SYNTHESIZE: Load all checkpoint findings. Write report.' — loads from checkpoints, which is a clean structured handoff."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +1274,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "Re-graded with_skill mean was 0.963 (evals 1-13,22-24 mostly 1.0 except evals 2,22,24 at 0.8); committed 0.875 preserved per drift guard (delta=0.088). Re-graded without_skill mean was 0.638; committed 0.588 preserved per drift guard (delta=0.050)."
   ]
 }

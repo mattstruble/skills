@@ -2,9 +2,247 @@
   "metadata": {
     "skill_name": "odin-gamedev",
     "timestamp": "2026-07-23",
-    "evals_run": 2,
+    "evals_run": ["eval-1", "eval-2"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.9,
+        "passed": 9,
+        "failed": 1,
+        "total": 10
+      },
+      "expectations": [
+        {
+          "text": "Identifies rl.DrawPixel as the bottleneck because each call goes through the GPU draw pipeline",
+          "passed": true,
+          "evidence": "The response states: 'The bottleneck is `rl.DrawPixel` — each call goes through the GPU pipeline individually.'"
+        },
+        {
+          "text": "Recommends the rl.Image (CPU framebuffer) pattern: write to image, upload once, blit",
+          "passed": true,
+          "evidence": "The response states: 'The idiomatic raylib pattern for CPU-side per-pixel rendering is the **framebuffer pattern**: write pixels to an `rl.Image` backing buffer, upload once per frame to a texture with `rl.UpdateTexture`, draw the texture once.'"
+        },
+        {
+          "text": "Uses rl.GenImageColor (or similar rl.Image-creating function) for the backing framebuffer",
+          "passed": true,
+          "evidence": "`fb_image := rl.GenImageColor(SCREEN_W, SCREEN_H, rl.BLACK)` creates the CPU-side framebuffer."
+        },
+        {
+          "text": "Uses rl.LoadTextureFromImage to create the GPU texture that mirrors the framebuffer",
+          "passed": true,
+          "evidence": "`fb_texture := rl.LoadTextureFromImage(fb_image)` creates the GPU texture."
+        },
+        {
+          "text": "Uses rl.ImageDrawPixel (or equivalent direct image-data writes) for per-pixel writes, NOT rl.DrawPixel",
+          "passed": true,
+          "evidence": "The response uses `cast([^]rl.Color)fb_image.data` to get a direct pointer and writes `pixels[y * SCREEN_W + x] = color` — direct memory writes, not rl.DrawPixel."
+        },
+        {
+          "text": "Uses rl.UpdateTexture once per frame to upload the framebuffer to the GPU texture",
+          "passed": true,
+          "evidence": "`rl.UpdateTexture(fb_texture, fb_image.data)` is called once per frame after the pixel loop."
+        },
+        {
+          "text": "Uses rl.DrawTexture to blit the texture to the screen each frame",
+          "passed": true,
+          "evidence": "`rl.DrawTexture(fb_texture, 0, 0, rl.WHITE)` blits the texture to the screen."
+        },
+        {
+          "text": "Mentions clearing the framebuffer each frame (rl.ImageClearBackground or equivalent)",
+          "passed": false,
+          "evidence": "The response does not call `rl.ImageClearBackground` or any explicit clear. The inner loop overwrites all pixels but no explicit clear call is shown."
+        },
+        {
+          "text": "Shows a complete main-loop structure from window init through cleanup",
+          "passed": true,
+          "evidence": "The response shows the full main loop: `rl.InitWindow`, framebuffer creation, main loop with update/render, and cleanup via defer."
+        },
+        {
+          "text": "Pairs allocations with defer for cleanup (rl.UnloadImage, rl.UnloadTexture, rl.CloseWindow)",
+          "passed": true,
+          "evidence": "The response uses `defer rl.CloseWindow()`, `defer rl.UnloadImage(fb_image)`, and `defer rl.UnloadTexture(fb_texture)`."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 8,
+        "failed": 2,
+        "total": 10
+      },
+      "expectations": [
+        {
+          "text": "Identifies rl.DrawPixel as the bottleneck because each call goes through the GPU draw pipeline",
+          "passed": true,
+          "evidence": "The baseline states: '`rl.DrawPixel` issues one draw call per pixel. At 800x600 that's 480,000 draw calls per frame — each one is a full GPU pipeline flush.'"
+        },
+        {
+          "text": "Recommends the rl.Image (CPU framebuffer) pattern: write to image, upload once, blit",
+          "passed": true,
+          "evidence": "The baseline states: 'The idiomatic raylib pattern: Render to a CPU buffer, upload as a texture once per frame.'"
+        },
+        {
+          "text": "Uses rl.GenImageColor (or similar rl.Image-creating function) for the backing framebuffer",
+          "passed": false,
+          "evidence": "The baseline uses `pixels: [WIDTH * HEIGHT]rl.Color` (a stack array) and constructs `rl.Image{ data = raw_data(&pixels), ... }` directly — NOT `rl.GenImageColor`."
+        },
+        {
+          "text": "Uses rl.LoadTextureFromImage to create the GPU texture that mirrors the framebuffer",
+          "passed": true,
+          "evidence": "`texture := rl.LoadTextureFromImage(image)` creates the GPU texture."
+        },
+        {
+          "text": "Uses rl.ImageDrawPixel (or equivalent direct image-data writes) for per-pixel writes, NOT rl.DrawPixel",
+          "passed": true,
+          "evidence": "The baseline writes `pixels[y * WIDTH + x] = color` directly to the stack array — direct memory writes, not rl.DrawPixel."
+        },
+        {
+          "text": "Uses rl.UpdateTexture once per frame to upload the framebuffer to the GPU texture",
+          "passed": true,
+          "evidence": "`rl.UpdateTexture(texture, raw_data(&pixels))` is called once per frame."
+        },
+        {
+          "text": "Uses rl.DrawTexture to blit the texture to the screen each frame",
+          "passed": true,
+          "evidence": "`rl.DrawTexture(texture, 0, 0, rl.WHITE)` blits the texture to the screen."
+        },
+        {
+          "text": "Mentions clearing the framebuffer each frame (rl.ImageClearBackground or equivalent)",
+          "passed": false,
+          "evidence": "The baseline does not call `rl.ImageClearBackground` or any explicit clear. The inner loop overwrites all pixels but no explicit clear call is shown."
+        },
+        {
+          "text": "Shows a complete main-loop structure from window init through cleanup",
+          "passed": true,
+          "evidence": "The baseline shows the full main loop: `rl.InitWindow`, pixel array and texture creation, main loop with update/render."
+        },
+        {
+          "text": "Pairs allocations with defer for cleanup (rl.UnloadImage, rl.UnloadTexture, rl.CloseWindow)",
+          "passed": true,
+          "evidence": "The baseline uses `defer rl.CloseWindow()` and `defer rl.UnloadTexture(texture)`. Note: no rl.UnloadImage since the image is stack-allocated."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8
+      },
+      "expectations": [
+        {
+          "text": "Uses rl.LoadImage to load the PNG into a CPU-side rl.Image",
+          "passed": true,
+          "evidence": "`img := rl.LoadImage(\"assets/texture.png\")` loads the PNG into CPU memory."
+        },
+        {
+          "text": "Uses rl.LoadImageColors (or a documented direct cast of img.data) to get an addressable pixel array",
+          "passed": true,
+          "evidence": "`pixels := rl.LoadImageColors(img)` extracts the pixel data as a `[^]rl.Color` array."
+        },
+        {
+          "text": "Identifies the pixel array type as `[^]rl.Color` — Odin's multi-pointer",
+          "passed": true,
+          "evidence": "The response states: 'Type of pixel array: `[^]rl.Color` — a multi-pointer (Odin's equivalent of `Color*` in C).'"
+        },
+        {
+          "text": "Notes that multi-pointers have no length tag and behave like C-style pointers (caller must track bounds)",
+          "passed": true,
+          "evidence": "The response states: 'it has no length tag, just the pointer' and 'No bounds checking on multi-pointers — ensure x < width and y < height.'"
+        },
+        {
+          "text": "Notes rl.Color is [4]u8 (or distinct [4]u8) — RGBA 8-bit per channel — and that .r/.g/.b/.a accessors work",
+          "passed": true,
+          "evidence": "The response states: '`rl.Color` is [4]u8 (or distinct [4]u8) so `.r/.g/.b/.a` accessors work.'"
+        },
+        {
+          "text": "Shows row-major indexing: pixels[y * width + x]",
+          "passed": true,
+          "evidence": "The `sample_pixel` procedure returns `pixels[y * width + x]`."
+        },
+        {
+          "text": "Notes raylib copies pixel data (or equivalent), so rl.UnloadImage is safe to call immediately after LoadImageColors",
+          "passed": false,
+          "evidence": "The response states 'raylib copies the pixel data' in the key points but does not explicitly say rl.UnloadImage is safe immediately after LoadImageColors. It says 'Both needed at shutdown' for UnloadImage and UnloadImageColors."
+        },
+        {
+          "text": "Uses rl.UnloadImageColors at shutdown to free the pixel array",
+          "passed": true,
+          "evidence": "`defer rl.UnloadImageColors(pixels)` is used at shutdown to free the pixel array."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.625,
+        "passed": 5,
+        "failed": 3,
+        "total": 8
+      },
+      "expectations": [
+        {
+          "text": "Uses rl.LoadImage to load the PNG into a CPU-side rl.Image",
+          "passed": true,
+          "evidence": "`image := rl.LoadImage(path)` loads the PNG into CPU memory."
+        },
+        {
+          "text": "Uses rl.LoadImageColors (or a documented direct cast of img.data) to get an addressable pixel array",
+          "passed": true,
+          "evidence": "The baseline uses `cast([^]rl.Color)image.data` after `rl.ImageFormat` — a documented direct cast of img.data."
+        },
+        {
+          "text": "Identifies the pixel array type as `[^]rl.Color` — Odin's multi-pointer",
+          "passed": true,
+          "evidence": "The baseline states: 'After `ImageFormat` to `UNCOMPRESSED_R8G8B8A8`, the data is `[^]rl.Color` — a pointer to contiguous `rl.Color` values.'"
+        },
+        {
+          "text": "Notes that multi-pointers have no length tag and behave like C-style pointers (caller must track bounds)",
+          "passed": false,
+          "evidence": "The baseline does not explicitly state that multi-pointers have no length tag or that the caller must track bounds."
+        },
+        {
+          "text": "Notes rl.Color is [4]u8 (or distinct [4]u8) — RGBA 8-bit per channel — and that .r/.g/.b/.a accessors work",
+          "passed": true,
+          "evidence": "The baseline states: 'each is `struct { r, g, b, a: u8 }`' and shows `.r`, `.g`, `.b`, `.a` accessors in the TraceLog call."
+        },
+        {
+          "text": "Shows row-major indexing: pixels[y * width + x]",
+          "passed": true,
+          "evidence": "`sample_pixel` returns `buf.pixels[y * buf.width + x]`."
+        },
+        {
+          "text": "Notes raylib copies pixel data (or equivalent), so rl.UnloadImage is safe to call immediately after LoadImageColors",
+          "passed": false,
+          "evidence": "The baseline says 'Raylib owns the memory (`rl.LoadImage` allocates it via raylib's allocator). Free with `rl.UnloadImage`.' It does not say UnloadImage is safe immediately after getting the pixel pointer."
+        },
+        {
+          "text": "Uses rl.UnloadImageColors at shutdown to free the pixel array",
+          "passed": false,
+          "evidence": "The baseline uses `rl.UnloadImage(buf.image)` in `unload_pixel_buffer` — NOT `rl.UnloadImageColors`. The pixel pointer is obtained via direct cast, not LoadImageColors, so UnloadImageColors is not used."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -14,16 +252,16 @@
     },
     "without_skill": {
       "pass_rate": {
-        "mean": 0.7,
+        "mean": 0.713,
         "stddev": 0.0
       }
     },
     "delta": {
-      "pass_rate": "+19%"
+      "pass_rate": "+18%"
     }
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

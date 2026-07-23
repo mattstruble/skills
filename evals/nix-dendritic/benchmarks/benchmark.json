@@ -2,9 +2,303 @@
   "metadata": {
     "skill_name": "nix-dendritic",
     "timestamp": "2026-07-23",
-    "evals_run": 4,
+    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The output includes a flake.nix with flake-parts, import-tree, home-manager, and nix-darwin inputs",
+          "passed": true,
+          "evidence": "flake.nix includes all four inputs: nixpkgs, nix-darwin, home-manager, flake-parts, and import-tree."
+        },
+        {
+          "text": "The output includes a flake-parts.nix that enables flake-parts modules and defines mkNixos, mkDarwin, and mkHome helpers",
+          "passed": false,
+          "evidence": "The response has `modules/nix/flake-parts.nix` which defines nixosConfigurations and darwinConfigurations directly, but does not define mkNixos, mkDarwin, or mkHome helper functions."
+        },
+        {
+          "text": "The output includes a system-default.nix with flake.modules blocks for nixos, darwin, and homeManager",
+          "passed": true,
+          "evidence": "`modules/system/system-types/system-default.nix` defines `flake.modules.nixos.system-default`, `flake.modules.darwin.system-default`, and `flake.modules.homeManager.user-default`."
+        },
+        {
+          "text": "The directory structure follows dendritic conventions (modules/ with programs/, services/, system/, etc.)",
+          "passed": true,
+          "evidence": "The response uses `modules/` with subdirectories `nix/`, `system/system-types/`, `hosts/` — following dendritic conventions."
+        },
+        {
+          "text": "The systems list is trimmed to only x86_64-linux and aarch64-darwin",
+          "passed": false,
+          "evidence": "The flake.nix uses `flake-parts.lib.mkFlake` with `import-tree` but does not include a `systems` list at all."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The output includes a flake.nix with flake-parts, import-tree, home-manager, and nix-darwin inputs",
+          "passed": false,
+          "evidence": "The baseline flake.nix includes flake-parts, darwin, and home-manager but does NOT include import-tree."
+        },
+        {
+          "text": "The output includes a flake-parts.nix that enables flake-parts modules and defines mkNixos, mkDarwin, and mkHome helpers",
+          "passed": false,
+          "evidence": "The baseline uses `flake-modules/hosts/desktop.nix` and `flake-modules/hosts/laptop.nix` with direct nixosConfigurations/darwinConfigurations — no flake-parts.nix with mkNixos/mkDarwin/mkHome helpers."
+        },
+        {
+          "text": "The output includes a system-default.nix with flake.modules blocks for nixos, darwin, and homeManager",
+          "passed": false,
+          "evidence": "The baseline has `flake-modules/nixos/base.nix` with `flake.modules.nixos.base` but no system-default.nix with all three module classes (nixos, darwin, homeManager) in one file."
+        },
+        {
+          "text": "The directory structure follows dendritic conventions (modules/ with programs/, services/, system/, etc.)",
+          "passed": false,
+          "evidence": "The baseline uses `flake-modules/` (not `modules/`) with `nixos/`, `darwin/`, `home/`, `hosts/` subdirectories — not the dendritic `modules/programs/`, `modules/services/`, `modules/system/` convention."
+        },
+        {
+          "text": "The systems list is trimmed to only x86_64-linux and aarch64-darwin",
+          "passed": true,
+          "evidence": "The baseline flake.nix includes `systems = [ \"x86_64-linux\" \"aarch64-darwin\" ]`."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The pattern is identified as Multi Context Aspect (system module that pulls in Home Manager config)",
+          "passed": true,
+          "evidence": "The response explicitly states 'To make the NixOS side automatically pull in the Home Manager config, use the **Multi Context Aspect** pattern'."
+        },
+        {
+          "text": "The module is placed in modules/services/ directory",
+          "passed": true,
+          "evidence": "The module is placed at `modules/services/printing.nix`."
+        },
+        {
+          "text": "The NixOS module uses home-manager.sharedModules to pull in the Home Manager module",
+          "passed": true,
+          "evidence": "The alternative approach shows `home-manager.sharedModules = [ inputs.self.modules.homeManager.printing ... ]` in the NixOS module."
+        },
+        {
+          "text": "Both NixOS and Home Manager configs live in the same file",
+          "passed": true,
+          "evidence": "Both `flake.modules.nixos.printing` and `flake.modules.homeManager.printing` are defined in the same `modules/services/printing.nix` file."
+        },
+        {
+          "text": "The Home Manager module is referenced via inputs.self.modules.homeManager",
+          "passed": true,
+          "evidence": "The alternative approach references `inputs.self.modules.homeManager.printing` when adding to sharedModules."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The pattern is identified as Multi Context Aspect (system module that pulls in Home Manager config)",
+          "passed": false,
+          "evidence": "The baseline does not identify or name the Multi Context Aspect pattern. It just describes two separate module files."
+        },
+        {
+          "text": "The module is placed in modules/services/ directory",
+          "passed": false,
+          "evidence": "The baseline places modules in `flake-modules/nixos/printing.nix` and `flake-modules/home/printing.nix` — not `modules/services/`."
+        },
+        {
+          "text": "The NixOS module uses home-manager.sharedModules to pull in the Home Manager module",
+          "passed": false,
+          "evidence": "The baseline uses `home-manager.users.myuser = { imports = [ inputs.self.modules.home.printing ]; }` — not `home-manager.sharedModules`."
+        },
+        {
+          "text": "Both NixOS and Home Manager configs live in the same file",
+          "passed": false,
+          "evidence": "The baseline splits the NixOS config into `flake-modules/nixos/printing.nix` and the Home Manager config into `flake-modules/home/printing.nix` — two separate files."
+        },
+        {
+          "text": "The Home Manager module is referenced via inputs.self.modules.homeManager",
+          "passed": false,
+          "evidence": "The baseline references `inputs.self.modules.home.printing` (using `home` not `homeManager` as the module class key)."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Correctly identifies the anti-pattern: lib.mkIf in imports does not work because Nix evaluates imports unconditionally",
+          "passed": true,
+          "evidence": "The response states: '`lib.mkIf` in `imports` does not work. This is the anti-pattern — Nix evaluates the `imports` list unconditionally. The condition is silently ignored.'"
+        },
+        {
+          "text": "Suggests the Conditional Aspect pattern (lib.mkMerge + lib.mkIf on config values) as an alternative",
+          "passed": true,
+          "evidence": "The response shows `config = lib.mkIf config.services.xserver.enable { ... }` inside the module — using lib.mkIf on config values as the alternative."
+        },
+        {
+          "text": "Does NOT suggest keeping lib.mkIf in imports with any workaround",
+          "passed": true,
+          "evidence": "The response does not suggest any workaround for lib.mkIf in imports; it clearly states it doesn't work and provides the correct alternative."
+        },
+        {
+          "text": "Suggests using imports as the enable toggle (add or remove the import) as the dendritic-idiomatic approach",
+          "passed": true,
+          "evidence": "The response states: 'This is how conditional features work in dendritic — the import is the toggle for availability, `mkIf` is the toggle for activation.' This explicitly identifies imports as the availability toggle."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Correctly identifies the anti-pattern: lib.mkIf in imports does not work because Nix evaluates imports unconditionally",
+          "passed": true,
+          "evidence": "The baseline states: '`imports` is evaluated unconditionally during module loading. `lib.mkIf` only affects *config values*, not the structural inclusion of modules.'"
+        },
+        {
+          "text": "Suggests the Conditional Aspect pattern (lib.mkMerge + lib.mkIf on config values) as an alternative",
+          "passed": true,
+          "evidence": "The baseline shows `config = lib.mkIf config.services.xserver.enable { environment.systemPackages = ... }` — using lib.mkIf on config values."
+        },
+        {
+          "text": "Does NOT suggest keeping lib.mkIf in imports with any workaround",
+          "passed": true,
+          "evidence": "The baseline does not suggest any workaround for lib.mkIf in imports; it clearly provides the correct alternative."
+        },
+        {
+          "text": "Suggests using imports as the enable toggle (add or remove the import) as the dendritic-idiomatic approach",
+          "passed": false,
+          "evidence": "The baseline says 'Import unconditionally, activate conditionally' — explicitly advising to always import and use mkIf inside. It does NOT suggest using imports as the toggle for enabling/disabling features."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "References or follows the migration guide steps (add flake-parts/import-tree, wrap with mkFlake, replace specialArgs, reorganize)",
+          "passed": true,
+          "evidence": "The response explicitly references `references/migration.md` and follows the steps: scaffold with flake-parts + import-tree, extract features, eliminate specialArgs with Constants Aspect."
+        },
+        {
+          "text": "Addresses the specialArgs issue specifically -- replace with let-bindings or Constants Aspect",
+          "passed": true,
+          "evidence": "Step 4 explicitly addresses: 'Eliminate `specialArgs`' and shows a Constants Aspect with `options.my.username = lib.mkOption { default = \"yourname\"; }`."
+        },
+        {
+          "text": "Suggests incremental migration (one feature at a time, not a full rewrite)",
+          "passed": true,
+          "evidence": "The response states: 'scaffold → extract one feature at a time → test after each extraction → remove specialArgs last.'"
+        },
+        {
+          "text": "The end-state structure organizes by feature (services/ssh.nix, services/printing.nix) not by host",
+          "passed": true,
+          "evidence": "The response shows the end-state with `modules/services/ssh.nix`, `modules/services/printing.nix`, `modules/users/username.nix` — organized by feature."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "References or follows the migration guide steps (add flake-parts/import-tree, wrap with mkFlake, replace specialArgs, reorganize)",
+          "passed": true,
+          "evidence": "The baseline follows the migration steps: set up flake-parts skeleton, migrate aspects one at a time, replace specialArgs, convert host files — covering all the key steps even without explicitly mentioning import-tree."
+        },
+        {
+          "text": "Addresses the specialArgs issue specifically -- replace with let-bindings or Constants Aspect",
+          "passed": true,
+          "evidence": "Step 3 explicitly addresses: 'Replace `specialArgs` with `inputs.self.modules` references' and shows a custom option `options.myConfig.username = lib.mkOption { ... }`."
+        },
+        {
+          "text": "Suggests incremental migration (one feature at a time, not a full rewrite)",
+          "passed": true,
+          "evidence": "The baseline states: 'Extract aspects incrementally, don't rewrite all at once' and 'Verify each extraction. After moving each aspect out, rebuild. One at a time.'"
+        },
+        {
+          "text": "The end-state structure organizes by feature (services/ssh.nix, services/printing.nix) not by host",
+          "passed": true,
+          "evidence": "The baseline shows end-state with `flake-modules/nixos/ssh.nix`, `flake-modules/nixos/printing.nix`, `flake-modules/nixos/desktop.nix` — organized by feature."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +318,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

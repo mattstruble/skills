@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "k8s-workloads",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Sets maxUnavailable: 0 in the rollingUpdate strategy and explains this prevents the replica count from dropping during rollout",
+          "passed": true,
+          "evidence": "Shows `maxUnavailable: 0` with comment \"NEVER drop below 3 pods during rollout\"."
+        },
+        {
+          "text": "Defines a readinessProbe (not just a livenessProbe or minReadySeconds alone) and states that without it traffic is routed to Pods that have started but may not yet be serving",
+          "passed": true,
+          "evidence": "Has readinessProbe with failureThreshold: 1. Key decisions: \"readinessProbe — prevents traffic to pods that haven't finished starting.\""
+        },
+        {
+          "text": "Sets minReadySeconds to a non-zero value (10-30s) and explains it reduces but does not eliminate the unready-traffic window",
+          "passed": true,
+          "evidence": "Shows `minReadySeconds: 15` with note \"new pod must stay ready for 15s before old pod is terminated\"."
+        },
+        {
+          "text": "Includes a kubernetes.io/change-cause annotation to populate rollout history",
+          "passed": true,
+          "evidence": "Shows `annotations: kubernetes.io/change-cause: v1.0.0` in the Deployment metadata."
+        },
+        {
+          "text": "Warns that with maxUnavailable: 0 a rollout hangs indefinitely if the new Pod never becomes ready, and recommends progressDeadlineSeconds plus kubectl rollout undo to recover",
+          "passed": false,
+          "evidence": "No mention of rollout hanging, progressDeadlineSeconds, or kubectl rollout undo as recovery mechanism."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Sets maxUnavailable: 0 in the rollingUpdate strategy and explains this prevents the replica count from dropping during rollout",
+          "passed": true,
+          "evidence": "Shows `maxUnavailable: 0` with \"Zero-downtime: never have fewer pods than desired during rollout\"."
+        },
+        {
+          "text": "Defines a readinessProbe (not just a livenessProbe or minReadySeconds alone) and states that without it traffic is routed to Pods that have started but may not yet be serving",
+          "passed": true,
+          "evidence": "Has readinessProbe. \"Readiness probe: Traffic isn't routed until the pod passes this check. Separated from liveness because 'ready to serve' ≠ 'process alive'.\""
+        },
+        {
+          "text": "Sets minReadySeconds to a non-zero value (10-30s) and explains it reduces but does not eliminate the unready-traffic window",
+          "passed": false,
+          "evidence": "No minReadySeconds field in the Deployment manifest."
+        },
+        {
+          "text": "Includes a kubernetes.io/change-cause annotation to populate rollout history",
+          "passed": false,
+          "evidence": "No kubernetes.io/change-cause annotation in the Deployment metadata."
+        },
+        {
+          "text": "Warns that with maxUnavailable: 0 a rollout hangs indefinitely if the new Pod never becomes ready, and recommends progressDeadlineSeconds plus kubectl rollout undo to recover",
+          "passed": false,
+          "evidence": "No mention of rollout hanging, progressDeadlineSeconds, or kubectl rollout undo."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends a Job (not a Deployment or init container) as the correct resource for a one-time task that runs to completion",
+          "passed": true,
+          "evidence": "\"Use a Job with restartPolicy: Never.\" Uses Job resource."
+        },
+        {
+          "text": "Sets restartPolicy: Never (not OnFailure) and explains that Never keeps the failed Pod for log inspection while OnFailure restarts in-place and may overwrite logs",
+          "passed": true,
+          "evidence": "\"With Never, a failed Pod stays around so you can inspect its logs. With OnFailure, the container restarts in-place and previous logs may be overwritten.\""
+        },
+        {
+          "text": "Sets ttlSecondsAfterFinished and explains that without it completed Jobs and their Pods accumulate until manually deleted",
+          "passed": true,
+          "evidence": "Shows `ttlSecondsAfterFinished: 86400`. \"Without it, completed Jobs and their Pods accumulate forever.\""
+        },
+        {
+          "text": "Sets backoffLimit to a low value (0 or 1) appropriate for a migration, not the default of 6",
+          "passed": true,
+          "evidence": "Shows `backoffLimit: 1` with explanation \"Migrations are often not idempotent — retrying a partially-completed migration can corrupt data.\""
+        },
+        {
+          "text": "Avoids recommending restartPolicy: Always, which is invalid for Jobs and only valid for Deployments",
+          "passed": true,
+          "evidence": "Uses restartPolicy: Never; no mention of Always."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends a Job (not a Deployment or init container) as the correct resource for a one-time task that runs to completion",
+          "passed": true,
+          "evidence": "Uses Job resource. \"Why Job over init container: Job pods persist after completion.\""
+        },
+        {
+          "text": "Sets restartPolicy: Never (not OnFailure) and explains that Never keeps the failed Pod for log inspection while OnFailure restarts in-place and may overwrite logs",
+          "passed": true,
+          "evidence": "\"With Never, each failure creates a new pod (preserving the failed pod's logs). With OnFailure, the same pod restarts (losing previous logs).\""
+        },
+        {
+          "text": "Sets ttlSecondsAfterFinished and explains that without it completed Jobs and their Pods accumulate until manually deleted",
+          "passed": true,
+          "evidence": "Shows `ttlSecondsAfterFinished: 86400` with \"Clean up after 24 hours (keeps logs available)\"."
+        },
+        {
+          "text": "Sets backoffLimit to a low value (0 or 1) appropriate for a migration, not the default of 6",
+          "passed": false,
+          "evidence": "Shows `backoffLimit: 3` — not a low value appropriate for a migration (default is 6, but 3 is still too high for an idempotency-sensitive migration)."
+        },
+        {
+          "text": "Avoids recommending restartPolicy: Always, which is invalid for Jobs and only valid for Deployments",
+          "passed": true,
+          "evidence": "Uses restartPolicy: Never; no mention of Always."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Sets concurrencyPolicy: Forbid (not Allow or Replace) and explains it skips the new Job if the previous is still running, which is correct for backups that must not overlap",
+          "passed": true,
+          "evidence": "Shows `concurrencyPolicy: Forbid` with \"if the previous Job is still running when the next schedule fires, the new Job is simply skipped. No overlap, no corruption.\""
+        },
+        {
+          "text": "Provides the exact kubectl create job --from=cronjob/<name> command to trigger a Job immediately without waiting for the schedule",
+          "passed": true,
+          "evidence": "Shows `kubectl create job --from=cronjob/backup backup-manual-test -n db`."
+        },
+        {
+          "text": "Increases failedJobsHistoryLimit above the default of 1 (recommends 10) to retain enough failed Job logs for inspection",
+          "passed": true,
+          "evidence": "Shows `failedJobsHistoryLimit: 10`."
+        },
+        {
+          "text": "Distinguishes concurrencyPolicy: Replace (kills the previous Job) from Forbid (skips the new one), explaining why Replace is wrong for backups",
+          "passed": false,
+          "evidence": "No mention of concurrencyPolicy: Replace. Only Forbid is discussed."
+        },
+        {
+          "text": "Avoids recommending a Deployment or any resource other than CronJob for the recurring scheduled task",
+          "passed": true,
+          "evidence": "Uses CronJob throughout; no alternative resource recommended."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Sets concurrencyPolicy: Forbid (not Allow or Replace) and explains it skips the new Job if the previous is still running, which is correct for backups that must not overlap",
+          "passed": true,
+          "evidence": "Shows `concurrencyPolicy: Forbid` with \"If the previous Job is still running when the next schedule fires, skip the new one entirely.\""
+        },
+        {
+          "text": "Provides the exact kubectl create job --from=cronjob/<name> command to trigger a Job immediately without waiting for the schedule",
+          "passed": true,
+          "evidence": "Shows `kubectl create job db-backup-manual --from=cronjob/db-backup -n production`."
+        },
+        {
+          "text": "Increases failedJobsHistoryLimit above the default of 1 (recommends 10) to retain enough failed Job logs for inspection",
+          "passed": false,
+          "evidence": "Shows `failedJobsHistoryLimit: 3` — above the default of 1 but not 10 as recommended."
+        },
+        {
+          "text": "Distinguishes concurrencyPolicy: Replace (kills the previous Job) from Forbid (skips the new one), explaining why Replace is wrong for backups",
+          "passed": true,
+          "evidence": "\"Replace: Kill the running Job and start a new one. Bad for backups (corrupts in-progress backup).\""
+        },
+        {
+          "text": "Avoids recommending a Deployment or any resource other than CronJob for the recurring scheduled task",
+          "passed": true,
+          "evidence": "Uses CronJob throughout; no alternative resource recommended."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT NOTE: Re-graded with_skill mean=0.867 vs committed 0.800 (diff=0.067 > 0.02). Committed run_summary values preserved. Discrepancy driven by eval-1 with_skill scoring (4/5=0.8 vs lower committed estimate)."
   ]
 }

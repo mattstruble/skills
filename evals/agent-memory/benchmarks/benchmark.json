@@ -2,9 +2,255 @@
   "metadata": {
     "skill_name": "agent-memory",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends Advanced JSON Cards (or the two-tier hybrid) as the primary format for resident structured facts",
+          "passed": true,
+          "evidence": "'Storage format: Advanced JSON Cards (Tier 1) + raw conversation storage (Tier 2).' The answer leads with Advanced JSON Cards as the primary resident format."
+        },
+        {
+          "text": "Explains the two-tier architecture: structured facts always in context (Tier 1) plus raw conversation retrieval on demand (Tier 2)",
+          "passed": true,
+          "evidence": "'Tier 1 (always in context, ~500 tokens) gives the agent overview for every response. Tier 2 (retrieved on demand) provides details when needed.' Injection pattern also described."
+        },
+        {
+          "text": "Covers at least 3 formats on the spectrum with their tradeoffs",
+          "passed": false,
+          "evidence": "Answer only discusses Advanced JSON Cards and raw conversation storage. It does not enumerate the spectrum (Simple Notes → Enhanced Notes → JSON Cards → Advanced JSON Cards → Code) or compare multiple formats."
+        },
+        {
+          "text": "Mentions the backstory field or contextual disambiguation capability of Advanced JSON Cards",
+          "passed": true,
+          "evidence": "'Advanced JSON Cards add backstory, person, relationship, and timestamp fields that enable disambiguation... The backstory field records why a fact was stored.' Multiple backstory examples shown."
+        },
+        {
+          "text": "Does NOT just say 'use a database' without addressing the format/structure question specific to agent memory",
+          "passed": true,
+          "evidence": "Answer provides a detailed JSON Card schema with specific fields (backstory, person, preferences, relationships, context) and explains the injection pattern — not a generic database recommendation."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends Advanced JSON Cards (or the two-tier hybrid) as the primary format for resident structured facts",
+          "passed": false,
+          "evidence": "Baseline recommends a generic typed memory schema with PostgreSQL+pgvector. No mention of Advanced JSON Cards or the two-tier hybrid architecture."
+        },
+        {
+          "text": "Explains the two-tier architecture: structured facts always in context (Tier 1) plus raw conversation retrieval on demand (Tier 2)",
+          "passed": false,
+          "evidence": "Baseline uses top-k semantic retrieval at query time — not a two-tier architecture where structured facts are always in context and raw conversations are retrieved on demand."
+        },
+        {
+          "text": "Covers at least 3 formats on the spectrum with their tradeoffs",
+          "passed": false,
+          "evidence": "Baseline presents only one schema (typed memory entries with id/type/content/source/confidence/timestamps/tags). No spectrum of formats is discussed."
+        },
+        {
+          "text": "Mentions the backstory field or contextual disambiguation capability of Advanced JSON Cards",
+          "passed": false,
+          "evidence": "Baseline has no backstory field or equivalent contextual disambiguation mechanism. It uses confidence scores and tags but not per-fact provenance context."
+        },
+        {
+          "text": "Does NOT just say 'use a database' without addressing the format/structure question specific to agent memory",
+          "passed": false,
+          "evidence": "Baseline is primarily a database architecture answer (PostgreSQL+JSONB+pgvector) without addressing agent-specific memory format concerns like what to keep always in context vs. retrieve on demand."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies timestamp-based priority as a resolution strategy (most recent explicit statement wins)",
+          "passed": true,
+          "evidence": "'Timestamp-based priority: Austin wins (1 week ago > 3 months ago). Update the Tier 1 JSON Card to reflect Austin as the current address.'"
+        },
+        {
+          "text": "Mentions contextual disambiguation — both addresses may be correct in different contexts (e.g., work vs personal)",
+          "passed": true,
+          "evidence": "'If the two addresses served different contexts (e.g., \"work address\" vs. \"home address\"), the backstory field would disambiguate and both would be retained as non-conflicting facts.'"
+        },
+        {
+          "text": "References the backstory field or similar mechanism for recording context of each stored fact",
+          "passed": true,
+          "evidence": "Answer shows a JSON example with backstory fields: 'User stated \"I moved to Austin\" in session 12' and 'Mentioned as home address in session 3, superseded by Austin move'."
+        },
+        {
+          "text": "Describes or implies a pipeline approach (compare new fact against existing, decide ADD/UPDATE/DELETE/NOOP)",
+          "passed": true,
+          "evidence": "'The Mem0 pattern applied: Extract candidate fact → Compare against existing → Decide: UPDATE (same fact type — home address — with new value)'"
+        },
+        {
+          "text": "Does NOT just say 'delete the older one' without considering that both may be valid in different contexts",
+          "passed": true,
+          "evidence": "'Don't delete San Francisco — demote it. The backstory field enables contextual disambiguation.' Explicitly rejects simple deletion."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies timestamp-based priority as a resolution strategy (most recent explicit statement wins)",
+          "passed": true,
+          "evidence": "'Default rule: More recent information wins. If the user said \"Austin\" last week and \"San Francisco\" 3 months ago, assume they moved. Update the memory entry for \"location\" to \"Austin\".'"
+        },
+        {
+          "text": "Mentions contextual disambiguation — both addresses may be correct in different contexts (e.g., work vs personal)",
+          "passed": true,
+          "evidence": "'Ambiguity detection: Before overwriting, check if the contradiction might be contextual rather than a correction: \"I live in SF\" vs \"I'm in Austin this week\" — one is permanent, one is temporary.'"
+        },
+        {
+          "text": "References the backstory field or similar mechanism for recording context of each stored fact",
+          "passed": false,
+          "evidence": "Baseline uses source field and superseded_by/supersedes links but has no backstory field or equivalent mechanism for recording the context/provenance of why a fact was stored."
+        },
+        {
+          "text": "Describes or implies a pipeline approach (compare new fact against existing, decide ADD/UPDATE/DELETE/NOOP)",
+          "passed": true,
+          "evidence": "'When writing a new memory that contradicts an existing one (same type + same semantic field), don't silently overwrite. Mark the old entry as status: superseded.' Implies a compare-then-decide pipeline."
+        },
+        {
+          "text": "Does NOT just say 'delete the older one' without considering that both may be valid in different contexts",
+          "passed": true,
+          "evidence": "'Never silently delete: Keep the history. The old memory might be useful context (\"user relocated from SF to Austin in March 2024\").' Also checks for contextual vs. correction ambiguity."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Presents a multi-level evaluation framework (at least 3 levels)",
+          "passed": true,
+          "evidence": "'Use the Three-Level Evaluation framework' with Level 1, Level 2, and Level 3 explicitly defined."
+        },
+        {
+          "text": "Level 1 covers basic single-session recall",
+          "passed": true,
+          "evidence": "'Level 1 — Basic Recall (storage and retrieval work): Store a fact in session 1. Query it in session 2. Does the agent return the correct value?'"
+        },
+        {
+          "text": "Level 2 covers multi-session retrieval and/or disambiguation across sessions",
+          "passed": true,
+          "evidence": "'Level 2 — Multi-Session Retrieval (aggregation and disambiguation): Store related facts across multiple sessions. Query something that requires reconciling them.'"
+        },
+        {
+          "text": "Level 3 covers proactive service — anticipating needs the user hasn't expressed",
+          "passed": true,
+          "evidence": "'Level 3 — Proactive Service (synthesis and anticipation): The agent connects facts from different sessions to surface information the user hasn't asked for.'"
+        },
+        {
+          "text": "Notes that most systems only reach Level 1 and that higher levels require deliberate design",
+          "passed": true,
+          "evidence": "'Most systems plateau at Level 1. If you're only testing basic recall, you have no visibility into whether your memory system actually provides value.'"
+        },
+        {
+          "text": "Provides at least one concrete test scenario example (not just abstract descriptions)",
+          "passed": true,
+          "evidence": "Multiple concrete examples: Level 1: 'My account number is 12345' → next session: 'What's my account number?'; Level 3: passport expiry + Tokyo trip → proactive renewal reminder."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 3,
+        "failed": 3,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Presents a multi-level evaluation framework (at least 3 levels)",
+          "passed": false,
+          "evidence": "Baseline presents 7 distinct metrics (recall, precision, freshness, contradiction, behavioral impact, write accuracy, latency) but not a leveled framework. These are parallel dimensions, not progressive levels."
+        },
+        {
+          "text": "Level 1 covers basic single-session recall",
+          "passed": true,
+          "evidence": "'Recall (retrieval accuracy): When a memory is relevant to the current conversation, does the system actually retrieve it?' This covers basic recall, though not framed as a level."
+        },
+        {
+          "text": "Level 2 covers multi-session retrieval and/or disambiguation across sessions",
+          "passed": false,
+          "evidence": "Baseline mentions 'Freshness correctness' (temporal updates) and 'Contradiction handling' but does not address multi-session retrieval or disambiguation across sessions as a distinct capability level."
+        },
+        {
+          "text": "Level 3 covers proactive service — anticipating needs the user hasn't expressed",
+          "passed": false,
+          "evidence": "Baseline has no concept of proactive service or anticipating unexpressed needs. The 'Behavioral impact' metric measures whether memory improves responses, not whether the agent proactively surfaces connections."
+        },
+        {
+          "text": "Notes that most systems only reach Level 1 and that higher levels require deliberate design",
+          "passed": false,
+          "evidence": "Baseline does not note that most systems plateau at basic recall or that higher-level capabilities require deliberate architectural design."
+        },
+        {
+          "text": "Provides at least one concrete test scenario example (not just abstract descriptions)",
+          "passed": true,
+          "evidence": "'Build a synthetic test suite with scripted multi-session conversations. Session 1 establishes facts. Session 2 (days later) tests retrieval. Session 3 introduces updates. Session 4 tests that updates are reflected.'"
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +270,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded without_skill mean=0.433 differs from committed 0.500 by 0.067 (>0.02 threshold). Committed without_skill run_summary value preserved. Re-graded with_skill mean=0.933 matches committed 0.933 exactly; used re-graded value. See DRIFT.md for details."
   ]
 }

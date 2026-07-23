@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "agent-evaluation",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends user-simulator paradigm for conversational/customer-service agents",
+          "passed": true,
+          "evidence": "Answer explicitly recommends: 'User simulator for end-to-end testing: For conversational flow evaluation, deploy a user-simulator that follows persona scripts with progressive information disclosure.'"
+        },
+        {
+          "text": "Covers rubric design principles including importance weights (Essential/Important/Optional/Pitfall)",
+          "passed": false,
+          "evidence": "Answer uses a 5/3/1 numerical scale but does not mention Essential/Important/Optional/Pitfall importance weight tiers from the skill's rubric design principles."
+        },
+        {
+          "text": "Addresses LLM-as-Judge for subjective conversations with calibration guidance",
+          "passed": true,
+          "evidence": "Answer covers 'LLM-as-Judge with calibrated rubric' with concrete scoring levels and calibration against human annotations: 'Calibrate against human annotations: Build a gold standard of 100-200 annotated conversations.'"
+        },
+        {
+          "text": "Mentions dual verification: state checks AND dialogue content analysis",
+          "passed": true,
+          "evidence": "Answer states: 'Dual coverage: Check BOTH the final state (DB record correct) AND the trajectory (did the agent verify identity before processing? did it confirm with the user?)'"
+        },
+        {
+          "text": "Addresses the mix of deterministic (refund processed) and subjective (tone, empathy) outcomes",
+          "passed": true,
+          "evidence": "Answer explicitly separates 'refund and account change tasks (deterministic)' from 'general inquiries (subjective)' with different evaluation approaches for each."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends user-simulator paradigm for conversational/customer-service agents",
+          "passed": false,
+          "evidence": "Baseline answer uses a Tier 1/2/3 framework with binary metrics, LLM-as-judge, and human review, but never mentions a user-simulator paradigm for conversational agents."
+        },
+        {
+          "text": "Covers rubric design principles including importance weights (Essential/Important/Optional/Pitfall)",
+          "passed": false,
+          "evidence": "Baseline uses a weighted formula (40%/30%/15%/15%) but does not cover Essential/Important/Optional/Pitfall importance weight tiers from the skill's rubric design principles."
+        },
+        {
+          "text": "Addresses LLM-as-Judge for subjective conversations with calibration guidance",
+          "passed": true,
+          "evidence": "Baseline covers 'LLM-as-judge metrics' for tone, efficiency, and explanation quality, and mentions calibration: 'Compare human vs LLM judge agreement. If they diverge >15%, recalibrate the judge prompt.'"
+        },
+        {
+          "text": "Mentions dual verification: state checks AND dialogue content analysis",
+          "passed": false,
+          "evidence": "Baseline checks task completion via system state (API calls, account records) but does not explicitly address dual verification combining state checks with dialogue content/trajectory analysis."
+        },
+        {
+          "text": "Addresses the mix of deterministic (refund processed) and subjective (tone, empathy) outcomes",
+          "passed": true,
+          "evidence": "Baseline explicitly separates Tier 1 binary/objective metrics (task completion, policy compliance) from Tier 2 LLM-as-judge metrics (tone, efficiency, explanation quality)."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Computes or references standard error formula sqrt(p(1-p)/n) for binomial",
+          "passed": true,
+          "evidence": "Answer explicitly computes: 'SE = √(0.72 × 0.28 / 100) = 0.045' and 'SE = √(0.78 × 0.22 / 100) = 0.041', directly applying the binomial SE formula."
+        },
+        {
+          "text": "Calculates that at n=100 the confidence interval is roughly ±9 percentage points",
+          "passed": true,
+          "evidence": "Answer states the 6-point difference 'is only slightly larger than the noise bandwidth (~4.5 points each direction)' and uses '√2 × 4.5 ≈ 6.4 points' to establish the noise floor."
+        },
+        {
+          "text": "Concludes the 6pp difference is within noise / not statistically significant",
+          "passed": true,
+          "evidence": "'The 6-point improvement (72% → 78%) is only slightly larger than the noise bandwidth... Your 6-point difference is right at the boundary — not clearly above the noise.'"
+        },
+        {
+          "text": "Recommends against deploying based on this data alone",
+          "passed": true,
+          "evidence": "'Recommendation: Do NOT deploy based on this single result. Run 3-5 more evaluations of each version.'"
+        },
+        {
+          "text": "Mentions paired analysis (McNemar's test) or increasing n as next steps",
+          "passed": true,
+          "evidence": "'Use paired analysis (McNemar's test). More sensitive than comparing independent success rates.' Also recommends expanding to 200+ cases."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Computes or references standard error formula sqrt(p(1-p)/n) for binomial",
+          "passed": false,
+          "evidence": "Baseline states '95% confidence interval for a proportion at n=100 is roughly ±9-10 percentage points' but does not show or reference the SE formula sqrt(p(1-p)/n)."
+        },
+        {
+          "text": "Calculates that at n=100 the confidence interval is roughly ±9 percentage points",
+          "passed": true,
+          "evidence": "'The 95% confidence interval for a proportion at n=100 is roughly ±9-10 percentage points. So v1 is 72% ± ~9% and v2 is 78% ± ~8%.'"
+        },
+        {
+          "text": "Concludes the 6pp difference is within noise / not statistically significant",
+          "passed": true,
+          "evidence": "'These intervals overlap substantially.' and 'At n=100, you need roughly a 12-15 point improvement to be confident at p<0.05.'"
+        },
+        {
+          "text": "Recommends against deploying based on this data alone",
+          "passed": true,
+          "evidence": "'You should not deploy based on this data alone.' and 'Before deploying: Run v2 on at least 300 more tasks.'"
+        },
+        {
+          "text": "Mentions paired analysis (McNemar's test) or increasing n as next steps",
+          "passed": true,
+          "evidence": "'Run a significance test: McNemar's test or a paired proportion test' and 'To reliably detect a 6-point improvement, you need n≈400-500 tasks.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends tool-calling verification / running tests as primary paradigm",
+          "passed": true,
+          "evidence": "'Primary: Tool-calling verification (tests pass/fail)... The coding agent's completion criterion is \"tests pass.\" This is a deterministic, verifiable outcome.'"
+        },
+        {
+          "text": "Explains Pass@k (capability ceiling) vs Pass^k (reliability) distinction",
+          "passed": true,
+          "evidence": "'Pass@k: Can the agent produce working code in k attempts? (Capability ceiling)' and 'Pass^k: Does it work on ALL k attempts? (Reliability — more important for production)'"
+        },
+        {
+          "text": "Addresses LLM-as-Judge as appropriate for code quality/style assessment",
+          "passed": true,
+          "evidence": "'Supplement: LLM-as-Judge for code quality... Tests passing doesn't mean the code is good. Add a secondary LLM-as-Judge evaluation for: Readability and maintainability, Adherence to project conventions.'"
+        },
+        {
+          "text": "Warns about reward hacking or gaming the metric (e.g., hardcoding test outputs)",
+          "passed": true,
+          "evidence": "'\"Did it but broke something else\": Agent makes the target test pass but breaks 3 other tests. Run the FULL test suite, not just the target test.' Also: 'Tests can be incomplete — the agent might \"cheat\" by hardcoding expected outputs.'"
+        },
+        {
+          "text": "Mentions dual coverage: execution trajectory AND final outcome",
+          "passed": true,
+          "evidence": "'Dual coverage matters here: \"Said it but didn't do it\": Agent claims it fixed the bug, but the test still fails. Tests catch this. \"Did it but broke something else\": Agent makes the target test pass but breaks 3 other tests.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends tool-calling verification / running tests as primary paradigm",
+          "passed": true,
+          "evidence": "'Primary: Functional correctness (run the tests)... Pass/fail rate: Does the generated code pass the provided test suite? This is your ground truth for \"does it work.\"'"
+        },
+        {
+          "text": "Explains Pass@k (capability ceiling) vs Pass^k (reliability) distinction",
+          "passed": false,
+          "evidence": "Baseline mentions 'Pass@k: Generate k solutions, report the fraction where at least one passes' but does not explain Pass^k (reliability/all-k-pass) as a distinct metric or contrast the two."
+        },
+        {
+          "text": "Addresses LLM-as-Judge as appropriate for code quality/style assessment",
+          "passed": true,
+          "evidence": "'Secondary: LLM-as-judge for code quality... Use an LLM judge to evaluate (on a 1-5 scale): Readability, Correctness beyond tests, Efficiency, Security.'"
+        },
+        {
+          "text": "Warns about reward hacking or gaming the metric (e.g., hardcoding test outputs)",
+          "passed": true,
+          "evidence": "'Tests can be incomplete — the agent might \"cheat\" by hardcoding expected outputs.' This directly warns about gaming the test-pass metric."
+        },
+        {
+          "text": "Mentions dual coverage: execution trajectory AND final outcome",
+          "passed": true,
+          "evidence": "Baseline covers both functional correctness (final outcome) and code quality/style (secondary signal), plus mentions 'Number of iterations' as a trajectory signal."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded with_skill mean=0.933 differs from committed 0.733 by 0.200 (>0.02 threshold). Re-graded without_skill mean=0.667 differs from committed 0.600 by 0.067 (>0.02 threshold). Committed run_summary values preserved. See DRIFT.md for details."
   ]
 }

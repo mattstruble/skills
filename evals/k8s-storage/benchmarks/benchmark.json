@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "k8s-storage",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses preferredDuringSchedulingIgnoredDuringExecution (soft) podAffinity, not requiredDuringSchedulingIgnoredDuringExecution (hard), and explains the first-deploy deadlock risk of the hard variant",
+          "passed": true,
+          "evidence": "Uses `preferredDuringSchedulingIgnoredDuringExecution` with explanation: \"Hard self-referential affinity deadlocks — no node has an app=my-app pod yet on first deploy, so all pods stay Pending forever.\""
+        },
+        {
+          "text": "Specifies topologyKey: kubernetes.io/hostname in the podAffinityTerm to co-locate Pods on the same node",
+          "passed": true,
+          "evidence": "Shows `topologyKey: kubernetes.io/hostname` in the podAffinityTerm."
+        },
+        {
+          "text": "Sets accessModes: ReadWriteOnce on the PVC because Hetzner Cloud Volumes do not support RWX",
+          "passed": true,
+          "evidence": "Shows `accessModes: - ReadWriteOnce` on the PVC with storageClassName: hcloud-volumes."
+        },
+        {
+          "text": "Mentions Longhorn as the alternative that enables RWX and allows Pods to spread across nodes without podAffinity",
+          "passed": true,
+          "evidence": "\"If you need pods spread across nodes (for fault tolerance), switch to Longhorn which supports RWX. Then drop the podAffinity entirely.\""
+        },
+        {
+          "text": "Avoids recommending ReadWriteMany on Hetzner Cloud Volumes, which does not support that access mode",
+          "passed": true,
+          "evidence": "Uses ReadWriteOnce with podAffinity for Hetzner; RWX only mentioned for Longhorn alternative."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses preferredDuringSchedulingIgnoredDuringExecution (soft) podAffinity, not requiredDuringSchedulingIgnoredDuringExecution (hard), and explains the first-deploy deadlock risk of the hard variant",
+          "passed": false,
+          "evidence": "No podAffinity at all. Recommends NFS or Longhorn with ReadWriteMany instead of RWO + podAffinity on Hetzner."
+        },
+        {
+          "text": "Specifies topologyKey: kubernetes.io/hostname in the podAffinityTerm to co-locate Pods on the same node",
+          "passed": false,
+          "evidence": "No podAffinity or topologyKey in the answer."
+        },
+        {
+          "text": "Sets accessModes: ReadWriteOnce on the PVC because Hetzner Cloud Volumes do not support RWX",
+          "passed": false,
+          "evidence": "Recommends ReadWriteMany on NFS or Longhorn. Says \"You cannot use Hetzner Cloud Volumes directly for this use case.\""
+        },
+        {
+          "text": "Mentions Longhorn as the alternative that enables RWX and allows Pods to spread across nodes without podAffinity",
+          "passed": true,
+          "evidence": "\"Option 2: Use Longhorn (distributed storage for k3s). Longhorn supports RWX volumes natively.\""
+        },
+        {
+          "text": "Avoids recommending ReadWriteMany on Hetzner Cloud Volumes, which does not support that access mode",
+          "passed": false,
+          "evidence": "Recommends NFS with ReadWriteMany as Option 1, and Longhorn with ReadWriteMany as Option 2. Does not use Hetzner with RWO + podAffinity."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends StatefulSet with volumeClaimTemplates, not Deployment + single shared PVC, because each DB replica needs independent state",
+          "passed": true,
+          "evidence": "Uses StatefulSet with volumeClaimTemplates. \"Why NOT a single PVC with a Deployment: A shared volume means all replicas write to the same directory — PostgreSQL requires exclusive access.\""
+        },
+        {
+          "text": "States that volumeClaimTemplates auto-names PVCs as <template-name>-<statefulset-name>-<ordinal> (e.g., data-cache-0)",
+          "passed": true,
+          "evidence": "\"This creates PVCs named data-postgres-0, data-postgres-1, data-postgres-2 — one per replica.\""
+        },
+        {
+          "text": "Explicitly warns that deleting the StatefulSet does NOT delete the PVCs and they must be deleted by name",
+          "passed": true,
+          "evidence": "\"kubectl delete statefulset postgres does NOT delete the PVCs. Delete them explicitly after verification: kubectl delete pvc data-postgres-0 data-postgres-1 data-postgres-2 -n db\""
+        },
+        {
+          "text": "Warns against kubectl delete pvc -l <label> because label-based bulk delete can hit unintended PVCs in the namespace",
+          "passed": false,
+          "evidence": "Shows explicit deletion by name but does not warn against label-based bulk deletion with kubectl delete pvc -l."
+        },
+        {
+          "text": "Notes that no podAffinity is needed because each Pod has its own PVC and can schedule on any node",
+          "passed": true,
+          "evidence": "\"Pods can schedule on different nodes (no affinity needed since each has its own RWO volume).\""
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends StatefulSet with volumeClaimTemplates, not Deployment + single shared PVC, because each DB replica needs independent state",
+          "passed": true,
+          "evidence": "Uses StatefulSet with volumeClaimTemplates. \"Why NOT a Deployment with a single PVC: A Deployment shares one PVC across all replicas — all 3 Postgres instances would write to the same volume. This causes data corruption.\""
+        },
+        {
+          "text": "States that volumeClaimTemplates auto-names PVCs as <template-name>-<statefulset-name>-<ordinal> (e.g., data-cache-0)",
+          "passed": true,
+          "evidence": "\"Creates one PVC per replica: postgres-data-postgres-0, postgres-data-postgres-1, postgres-data-postgres-2.\""
+        },
+        {
+          "text": "Explicitly warns that deleting the StatefulSet does NOT delete the PVCs and they must be deleted by name",
+          "passed": true,
+          "evidence": "\"PVCs persist even if the StatefulSet is deleted (you must delete them manually).\""
+        },
+        {
+          "text": "Warns against kubectl delete pvc -l <label> because label-based bulk delete can hit unintended PVCs in the namespace",
+          "passed": false,
+          "evidence": "No warning against label-based bulk PVC deletion."
+        },
+        {
+          "text": "Notes that no podAffinity is needed because each Pod has its own PVC and can schedule on any node",
+          "passed": false,
+          "evidence": "No mention that podAffinity is unnecessary because each pod has its own PVC."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Moves the credential from ConfigMap to Secret, citing that Secrets can be encrypted at rest while ConfigMaps cannot",
+          "passed": true,
+          "evidence": "\"ConfigMaps are not encrypted at rest and are designed for non-sensitive data. Database passwords belong in a Secret.\""
+        },
+        {
+          "text": "Recommends mounting the Secret as a volume with readOnly: true rather than envFrom, because env vars leak into crash dumps and /proc",
+          "passed": true,
+          "evidence": "Shows volume mount with `readOnly: true`. \"Volume mounts are preferred over envFrom because env vars are visible in crash dumps, /proc, and docker inspect.\""
+        },
+        {
+          "text": "Explains that envFrom env vars never update at runtime — they are set at container start — so a rollout restart is always required",
+          "passed": true,
+          "evidence": "\"Volume-mounted Secrets DO update eventually (~1 min, kubelet sync), but most apps don't re-read files at runtime.\" Implies env vars don't update at all."
+        },
+        {
+          "text": "Names at least one specific update strategy from the skill: kubectl rollout restart, Reloader controller, hash-based naming with --append-hash, or checksum/config Helm annotation",
+          "passed": true,
+          "evidence": "Names all three: `kubectl rollout restart deployment/my-app`, Reloader controller, and hash-based naming with --append-hash."
+        },
+        {
+          "text": "Avoids recommending ConfigMap for the database password",
+          "passed": true,
+          "evidence": "Explicitly moves from ConfigMap to Secret; no recommendation to use ConfigMap."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Moves the credential from ConfigMap to Secret, citing that Secrets can be encrypted at rest while ConfigMaps cannot",
+          "passed": true,
+          "evidence": "\"Move the password to a Kubernetes Secret (type Opaque)\" and \"ConfigMaps are not encrypted at rest, are visible in kubectl describe.\""
+        },
+        {
+          "text": "Recommends mounting the Secret as a volume with readOnly: true rather than envFrom, because env vars leak into crash dumps and /proc",
+          "passed": false,
+          "evidence": "Primary recommendation is `secretKeyRef` env var. Volume mount is presented as Option A in Step 3, not as the primary approach. Does not cite crash dump / /proc leakage."
+        },
+        {
+          "text": "Explains that envFrom env vars never update at runtime — they are set at container start — so a rollout restart is always required",
+          "passed": true,
+          "evidence": "\"Environment variables from Secrets are set at pod startup and do not auto-update.\""
+        },
+        {
+          "text": "Names at least one specific update strategy from the skill: kubectl rollout restart, Reloader controller, hash-based naming with --append-hash, or checksum/config Helm annotation",
+          "passed": true,
+          "evidence": "Names rollout restart (Option B) and Reloader (Option C)."
+        },
+        {
+          "text": "Avoids recommending ConfigMap for the database password",
+          "passed": true,
+          "evidence": "Moves to Secret; no recommendation to use ConfigMap."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT NOTE: Re-graded with_skill mean=0.933 vs committed 0.867 (diff=0.066 > 0.02); re-graded without_skill mean=0.533 vs committed 0.600 (diff=0.067 > 0.02). Committed run_summary values preserved. Discrepancy driven by eval-1 baseline scoring (0.2 vs higher committed estimate) and eval-1 with_skill scoring (1.0 vs lower committed estimate)."
   ]
 }

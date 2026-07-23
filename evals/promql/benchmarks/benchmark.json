@@ -2,9 +2,235 @@
   "metadata": {
     "skill_name": "promql",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Replaces the static threshold with `predict_linear(...[6h], 24*3600) < 0` and explains the `< 0` means projected full within 24h",
+          "passed": true,
+          "evidence": "Shows `predict_linear(node_filesystem_avail_bytes{mountpoint=\"/\"}[6h], 24*3600) < 0` with explanation: 'if the predicted value is negative, the disk will be full within 24h'."
+        },
+        {
+          "text": "Recommends a 6h–24h regression window for disk trends and explains why too-short windows produce noisy results",
+          "passed": true,
+          "evidence": "'Too short (1h): noisy — a brief spike in writes triggers the alert. Too long (48h): too smooth — misses recent acceleration. 6h is the standard starting point for disk trends.'"
+        },
+        {
+          "text": "Identifies the `for: 1h` duration as the cause of late firing and recommends shortening it (e.g., `for: 15m`)",
+          "passed": true,
+          "evidence": "Uses `for: 15m` in the rewritten rule and notes 'Keep `for:` much shorter than the prediction horizon'."
+        },
+        {
+          "text": "Explains that a long `for:` consumes the prediction lead time, leaving less than the intended horizon when the alert fires",
+          "passed": true,
+          "evidence": "'`for: 1h` with 24h prediction means the alert fires after 1 hour of consistent prediction, leaving 23h to act.'"
+        },
+        {
+          "text": "Avoids recommending a simple byte-threshold approach as the primary fix",
+          "passed": true,
+          "evidence": "Uses predict_linear as the primary fix; does not suggest adjusting the byte threshold."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Replaces the static threshold with `predict_linear(...[6h], 24*3600) < 0` and explains the `< 0` means projected full within 24h",
+          "passed": true,
+          "evidence": "Shows `predict_linear(node_filesystem_avail_bytes{mountpoint=\"/\"}[6h], 24*3600) < 0` with explanation that negative means disk will be full within 24h."
+        },
+        {
+          "text": "Recommends a 6h–24h regression window for disk trends and explains why too-short windows produce noisy results",
+          "passed": true,
+          "evidence": "'Too short (1h) and a temporary spike triggers false alerts. Too long (24h) and it's slow to react to recent acceleration.'"
+        },
+        {
+          "text": "Identifies the `for: 1h` duration as the cause of late firing and recommends shortening it (e.g., `for: 15m`)",
+          "passed": true,
+          "evidence": "Uses `for: 30m` (shortened from original 1h) in the rewritten rule."
+        },
+        {
+          "text": "Explains that a long `for:` consumes the prediction lead time, leaving less than the intended horizon when the alert fires",
+          "passed": false,
+          "evidence": "Does not explain that long `for:` consumes lead time; only says `for: 30m` 'prevents flapping' without connecting it to the prediction horizon."
+        },
+        {
+          "text": "Avoids recommending a simple byte-threshold approach as the primary fix",
+          "passed": true,
+          "evidence": "Uses predict_linear as the primary fix throughout."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the missing `by (le)` in the aggregation as the root cause — `le` must be preserved for histogram_quantile to work correctly",
+          "passed": true,
+          "evidence": "'Missing `by (le)` in the aggregation. Without it, histogram buckets are collapsed and `histogram_quantile` can't compute percentiles.'"
+        },
+        {
+          "text": "Adds `sum by (le, job)` (or `le, container`) around the `rate()` call, not outside `histogram_quantile`",
+          "passed": true,
+          "evidence": "Shows `sum by (le, container) (rate(http_request_duration_seconds_bucket[5m]))` inside histogram_quantile."
+        },
+        {
+          "text": "Applies `rate()` to the `_bucket` counter before aggregating, not to the already-aggregated series",
+          "passed": true,
+          "evidence": "`rate(http_request_duration_seconds_bucket[5m])` is applied inside the sum, before aggregation."
+        },
+        {
+          "text": "Explains that omitting `le` from the `by` clause produces a meaningless or errored quantile result",
+          "passed": true,
+          "evidence": "'`histogram_quantile` needs the `le` label preserved. When you aggregate with `sum by (...)`, you MUST include `le` in the `by()` clause.'"
+        },
+        {
+          "text": "Explains that adding `job` or `container` to the `by` clause is what produces per-container series in the panel",
+          "passed": true,
+          "evidence": "'Add any label you want to split on (here: `container`)' produces one series per container."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the missing `by (le)` in the aggregation as the root cause — `le` must be preserved for histogram_quantile to work correctly",
+          "passed": true,
+          "evidence": "'histogram_quantile requires a `le` label to compute percentiles. Without a `by` clause that preserves `le`, it can't compute anything meaningful.'"
+        },
+        {
+          "text": "Adds `sum by (le, job)` (or `le, container`) around the `rate()` call, not outside `histogram_quantile`",
+          "passed": true,
+          "evidence": "Shows `sum by (container, le) (rate(http_request_duration_seconds_bucket[5m]))` inside histogram_quantile."
+        },
+        {
+          "text": "Applies `rate()` to the `_bucket` counter before aggregating, not to the already-aggregated series",
+          "passed": true,
+          "evidence": "`rate(http_request_duration_seconds_bucket[5m])` applied inside the sum before aggregation."
+        },
+        {
+          "text": "Explains that omitting `le` from the `by` clause produces a meaningless or errored quantile result",
+          "passed": true,
+          "evidence": "'histogram_quantile(0.95, ...) needs `le` present in the label set to interpolate across buckets.'"
+        },
+        {
+          "text": "Explains that adding `job` or `container` to the `by` clause is what produces per-container series in the panel",
+          "passed": true,
+          "evidence": "'keeping only `container` and `le`... producing one series per `container`.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Distinguishes `absent()` (entire job missing from scrape) from `up == 0` (exporter reachable but service down) as detecting different failure modes",
+          "passed": true,
+          "evidence": "'absent() fires when the entire job disappears from Prometheus scrape targets... up == 0 fires when Prometheus can reach the target config but the actual scrape fails.'"
+        },
+        {
+          "text": "Explains that `absent(up{job=\"sonarr\"})` will NOT fire if one instance is down but other instances in the same job are still up",
+          "passed": true,
+          "evidence": "'with multiple instances of a job, `absent()` only fires when ALL instances disappear. If one instance goes down but others remain, the selector still matches and `absent()` returns nothing.'"
+        },
+        {
+          "text": "Recommends `up{job=\"sonarr\"} == 0` with `for: 5m` for per-instance alerting when multiple instances exist",
+          "passed": true,
+          "evidence": "Shows alert with `up{job=\"sonarr\"} == 0` and `for: 5m` as the recommended approach."
+        },
+        {
+          "text": "Avoids recommending `absent_over_time` as the primary fix for 'service down' (the skill reserves it for missing scrape data, not `up == 0`)",
+          "passed": true,
+          "evidence": "Does not mention absent_over_time; focuses on up == 0 vs absent() distinction."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Distinguishes `absent()` (entire job missing from scrape) from `up == 0` (exporter reachable but service down) as detecting different failure modes",
+          "passed": true,
+          "evidence": "Detailed table showing different failure modes: 'Container stopped (connection refused)' fires up==0 but NOT absent; 'Job removed from prometheus.yml' fires absent but NOT up==0."
+        },
+        {
+          "text": "Explains that `absent(up{job=\"sonarr\"})` will NOT fire if one instance is down but other instances in the same job are still up",
+          "passed": true,
+          "evidence": "'absent() only fires when ALL instances disappear. If one instance goes down but others remain, the selector still matches and absent() returns nothing (no alert).'"
+        },
+        {
+          "text": "Recommends `up{job=\"sonarr\"} == 0` with `for: 5m` for per-instance alerting when multiple instances exist",
+          "passed": true,
+          "evidence": "Shows `up{job=\"sonarr\"} == 0` with `for: 5m` as the primary recommendation for 'Sonarr is down'."
+        },
+        {
+          "text": "Avoids recommending `absent_over_time` as the primary fix for 'service down' (the skill reserves it for missing scrape data, not `up == 0`)",
+          "passed": true,
+          "evidence": "Does not mention absent_over_time; recommends using both up==0 and absent() for different failure modes."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +250,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded without_skill mean was 0.933 (committed: 0.783, diff: 0.150 > 0.02). Committed run_summary values preserved per drift guard rule."
   ]
 }

@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "rag-design",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends structure-aware or recursive chunking over fixed-size for legal documents",
+          "passed": true,
+          "evidence": "'Use recursive/structure-aware chunking — contracts have explicit structure (sections, clauses, sub-clauses) that must be respected.'"
+        },
+        {
+          "text": "Provides specific chunk size guidance (token range) with overlap percentage",
+          "passed": true,
+          "evidence": "'Target chunk size: 512–1024 tokens with 10-15% overlap.'"
+        },
+        {
+          "text": "Addresses the context-loss problem and recommends contextual retrieval or similar enrichment",
+          "passed": true,
+          "evidence": "'Critical addition — apply Contextual Retrieval (§5)... Before embedding, prepend a context prefix' with a concrete example."
+        },
+        {
+          "text": "Explains why isolated chunks from legal contracts are ambiguous without document context",
+          "passed": true,
+          "evidence": "'Legal chunks are deeply ambiguous in isolation. \"The Party shall indemnify...\" means nothing without knowing which contract, which party, which indemnification clause.'"
+        },
+        {
+          "text": "Mentions the retrieval stack framing (chunk layer is first design decision)",
+          "passed": true,
+          "evidence": "References retrieval stack sections (§2, §3, §5) throughout, framing chunking as the first design decision in the stack."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends structure-aware or recursive chunking over fixed-size for legal documents",
+          "passed": true,
+          "evidence": "'Structure-aware chunking based on document hierarchy... Split at clause/section boundaries (identified by numbering: \"1.\", \"1.1\", \"(a)\", \"Schedule A\").'"
+        },
+        {
+          "text": "Provides specific chunk size guidance (token range) with overlap percentage",
+          "passed": true,
+          "evidence": "'Individual clauses: 100-500 tokens (natural boundary)... If a clause is very long (>500 tokens): split at sub-clause or sentence boundaries, with 50-token overlap.'"
+        },
+        {
+          "text": "Addresses the context-loss problem and recommends contextual retrieval or similar enrichment",
+          "passed": true,
+          "evidence": "'Each chunk gets its parent section title prepended' — addresses context loss through metadata enrichment."
+        },
+        {
+          "text": "Explains why isolated chunks from legal contracts are ambiguous without document context",
+          "passed": true,
+          "evidence": "Addresses context loss by recommending heading path metadata: 'Section 3 > Obligations > 3.2 Payment Terms' — implies chunks are ambiguous without this."
+        },
+        {
+          "text": "Mentions the retrieval stack framing (chunk layer is first design decision)",
+          "passed": false,
+          "evidence": "Does not reference the retrieval stack as a design framework; provides a standalone chunking strategy without framing it within a broader retrieval stack."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses the retrieval stack as a diagnostic framework to identify the failure layer",
+          "passed": true,
+          "evidence": "'Diagnosis — which layer is failing? The problem is at the retrieval and rerank layers, not chunking.'"
+        },
+        {
+          "text": "Identifies dense-only retrieval as a likely cause of topically-related-but-irrelevant results",
+          "passed": true,
+          "evidence": "'The embedding captures topic similarity but not relevance to the specific question' — identifies dense-only as the root cause."
+        },
+        {
+          "text": "Recommends hybrid retrieval (dense + sparse) as the fix",
+          "passed": true,
+          "evidence": "'Add hybrid retrieval if not already present (§2). Dense-only misses exact keywords.'"
+        },
+        {
+          "text": "Recommends adding a neural reranker (cross-encoder) for precision improvement",
+          "passed": true,
+          "evidence": "'Add a neural reranker (§2). A cross-encoder sees query + document together and scores relevance, not just embedding similarity.'"
+        },
+        {
+          "text": "Mentions at least one retrieval quality metric (recall@k, MRR, or nDCG) for measuring improvement",
+          "passed": true,
+          "evidence": "'Measure recall@k and MRR on a test set of queries with known-relevant chunks.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses the retrieval stack as a diagnostic framework to identify the failure layer",
+          "passed": false,
+          "evidence": "Uses a 'Root causes and fixes' list structure rather than the retrieval stack framework; no mention of retrieval stack layers."
+        },
+        {
+          "text": "Identifies dense-only retrieval as a likely cause of topically-related-but-irrelevant results",
+          "passed": true,
+          "evidence": "'Your chunks are too broad' and 'No re-ranking' — identifies semantic similarity ≠ relevance as the core problem."
+        },
+        {
+          "text": "Recommends hybrid retrieval (dense + sparse) as the fix",
+          "passed": false,
+          "evidence": "Does not recommend hybrid retrieval; focuses on chunk size, HyDE, reranker, and embedding model — hybrid retrieval not mentioned."
+        },
+        {
+          "text": "Recommends adding a neural reranker (cross-encoder) for precision improvement",
+          "passed": true,
+          "evidence": "'Add a cross-encoder re-ranker (e.g., `ms-marco-MiniLM` or Cohere Rerank) after initial retrieval.'"
+        },
+        {
+          "text": "Mentions at least one retrieval quality metric (recall@k, MRR, or nDCG) for measuring improvement",
+          "passed": false,
+          "evidence": "Does not mention recall@k, MRR, or nDCG; no retrieval quality metrics mentioned."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Confirms that flat retrieval is insufficient for multi-hop/cross-document queries and structured indexing is warranted",
+          "passed": true,
+          "evidence": "'Simple questions work because flat retrieval (§2) handles single-fact lookups well. Complex multi-doc questions fail because they require: Finding information across multiple documents...'"
+        },
+        {
+          "text": "Explains at least two of the three structured indexing options (RAPTOR, GraphRAG, filesystem paradigm)",
+          "passed": true,
+          "evidence": "Explains all three: RAPTOR ('zoom in/out' queries), GraphRAG ('connected information' queries), and filesystem paradigm (L0/L1/L2 for navigation)."
+        },
+        {
+          "text": "Recommends the filesystem paradigm (L0/L1/L2) as the best fit for wiki/Confluence/Slack-style corpora",
+          "passed": true,
+          "evidence": "'My recommendation for your case (wiki + Confluence + Slack): start with the filesystem paradigm.'"
+        },
+        {
+          "text": "Notes the critical cross-reference requirement for the filesystem paradigm",
+          "passed": true,
+          "evidence": "'Critical: cross-references (links) between documents must exist. Without them, the agent finds one document but can't navigate to related content.'"
+        },
+        {
+          "text": "Explains why GraphRAG is not the best fit (entity-relationship focus vs document navigation)",
+          "passed": true,
+          "evidence": "'Caveat: loses nuance on conditional/temporal information' for GraphRAG; recommends filesystem paradigm instead for this use case."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Confirms that flat retrieval is insufficient for multi-hop/cross-document queries and structured indexing is warranted",
+          "passed": true,
+          "evidence": "'Simple questions work because the answer lives in one chunk. Complex questions fail because the answer is distributed across multiple documents and requires synthesis.'"
+        },
+        {
+          "text": "Explains at least two of the three structured indexing options (RAPTOR, GraphRAG, filesystem paradigm)",
+          "passed": true,
+          "evidence": "Explains document summaries, entity-based indexing, relationship/fact extraction, question decomposition, and knowledge graph augmentation — multiple approaches covered."
+        },
+        {
+          "text": "Recommends the filesystem paradigm (L0/L1/L2) as the best fit for wiki/Confluence/Slack-style corpora",
+          "passed": false,
+          "evidence": "Does not mention the filesystem paradigm (L0/L1/L2) at all; recommends 'document summaries + two-stage retrieval' as first priority."
+        },
+        {
+          "text": "Notes the critical cross-reference requirement for the filesystem paradigm",
+          "passed": false,
+          "evidence": "Does not mention cross-reference requirements; filesystem paradigm not discussed."
+        },
+        {
+          "text": "Explains why GraphRAG is not the best fit (entity-relationship focus vs document navigation)",
+          "passed": false,
+          "evidence": "Does not mention GraphRAG by name; mentions 'knowledge graph' as an option but frames it positively, not as something to avoid for this use case."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded with_skill mean was 1.000 (committed: 0.933, diff: 0.067 > 0.02) and without_skill mean was 0.533 (committed: 0.400, diff: 0.133 > 0.02). Committed run_summary values preserved per drift guard rule."
   ]
 }

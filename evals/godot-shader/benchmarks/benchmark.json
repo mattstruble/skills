@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "godot-shader",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that RIM and RIM_TINT in fragment() are silently ignored when light() is defined, not a bug in the Fresnel formula itself",
+          "passed": true,
+          "evidence": "'RIM and RIM_TINT are fragment() built-in outputs that Godot handles automatically — but only when light() is NOT defined. Once you define light(), Godot's entire lighting pipeline is overridden.'"
+        },
+        {
+          "text": "Implements Fresnel manually inside light() using `pow(1.0 - max(0.0, dot(NORMAL, VIEW)), power)` added to DIFFUSE_LIGHT with +=",
+          "passed": true,
+          "evidence": "fresnel() function uses 'pow(1.0 - max(0.0, dot(n, v)), power)' and result is added to DIFFUSE_LIGHT with +=."
+        },
+        {
+          "text": "Uses += (not =) for both DIFFUSE_LIGHT and SPECULAR_LIGHT, explaining that light() runs once per light and these variables accumulate across lights",
+          "passed": true,
+          "evidence": "Uses += for both, and key points state 'DIFFUSE_LIGHT and SPECULAR_LIGHT use += (accumulate across multiple lights)'."
+        },
+        {
+          "text": "Includes the Blinn-Phong shadow guard `float(dot(NORMAL, LIGHT) > 0.0)` to prevent specular highlights on back-lit surfaces",
+          "passed": true,
+          "evidence": "blinn_phong() function includes 's *= float(dot(n, l) > 0.0)' as the shadow guard."
+        },
+        {
+          "text": "Recommends render_mode ambient_light_disabled to prevent Godot's ambient from accumulating on top of the custom lighting result",
+          "passed": true,
+          "evidence": "'render_mode ambient_light_disabled' is present in the shader and explained in key points."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that RIM and RIM_TINT in fragment() are silently ignored when light() is defined, not a bug in the Fresnel formula itself",
+          "passed": true,
+          "evidence": "'when you define a light() function in a spatial shader, the engine stops applying the default lighting model... you must handle ALL lighting there — including effects like rim/Fresnel that you might have put in fragment()'"
+        },
+        {
+          "text": "Implements Fresnel manually inside light() using `pow(1.0 - max(0.0, dot(NORMAL, VIEW)), power)` added to DIFFUSE_LIGHT with +=",
+          "passed": true,
+          "evidence": "Code uses 'float rim = 1.0 - max(dot(NORMAL, VIEW), 0.0); rim = pow(rim, rim_power)' added to DIFFUSE_LIGHT with +=."
+        },
+        {
+          "text": "Uses += (not =) for both DIFFUSE_LIGHT and SPECULAR_LIGHT, explaining that light() runs once per light and these variables accumulate across lights",
+          "passed": false,
+          "evidence": "Uses += but the explanation is 'All three effects are in light() because that's where per-light data is available' — does not explain that variables accumulate across multiple lights."
+        },
+        {
+          "text": "Includes the Blinn-Phong shadow guard `float(dot(NORMAL, LIGHT) > 0.0)` to prevent specular highlights on back-lit surfaces",
+          "passed": false,
+          "evidence": "No shadow guard present — specular is computed as 'float spec = pow(max(dot(NORMAL, half_dir), 0.0), shininess)' without a guard for back-lit surfaces."
+        },
+        {
+          "text": "Recommends render_mode ambient_light_disabled to prevent Godot's ambient from accumulating on top of the custom lighting result",
+          "passed": false,
+          "evidence": "Uses 'render_mode diffuse_lambert' — not ambient_light_disabled. Ambient light isolation is not addressed."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Specifies the node setup as a canvas_item shader on a ColorRect with Anchor set to Full Rect inside a CanvasLayer, and notes the effect only appears at runtime",
+          "passed": true,
+          "evidence": "Scene setup step 1-4 specifies CanvasLayer → ColorRect with Anchors Full Rect → ShaderMaterial, and 'Effect only visible at runtime — not in editor viewport'."
+        },
+        {
+          "text": "Maps iResolution.xy to `1.0 / SCREEN_PIXEL_SIZE` (not a custom uniform or VIEWPORT_SIZE, which is the spatial equivalent)",
+          "passed": true,
+          "evidence": "Table shows 'iResolution.xy → 1.0 / SCREEN_PIXEL_SIZE' and code uses 'vec2 resolution = 1.0 / SCREEN_PIXEL_SIZE'."
+        },
+        {
+          "text": "Identifies the Y-axis flip as the cause of the upside-down appearance and fixes it with `uv.y = 1.0 - uv.y`, explaining Shadertoy is Y-up while Godot is Y-down",
+          "passed": true,
+          "evidence": "'Shadertoy's Y=0 is at the bottom; Godot's Y=0 is at the top' with fix 'uv.y = 1.0 - uv.y'."
+        },
+        {
+          "text": "Declares the screen texture with `hint_screen_texture, repeat_disable, filter_linear` and explains repeat_disable prevents tiling artifacts at screen edges",
+          "passed": false,
+          "evidence": "Declares 'uniform sampler2D _ScreenTexture : hint_screen_texture, repeat_disable, filter_linear' but does not explain that repeat_disable prevents tiling artifacts at screen edges."
+        },
+        {
+          "text": "Notes that iMouse has no built-in equivalent and must be passed as a custom `uniform vec2 _Mouse` updated each frame from GDScript via set_shader_parameter",
+          "passed": false,
+          "evidence": "iMouse is not mentioned anywhere in the answer."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Specifies the node setup as a canvas_item shader on a ColorRect with Anchor set to Full Rect inside a CanvasLayer, and notes the effect only appears at runtime",
+          "passed": false,
+          "evidence": "Recommends 'MeshInstance3D with a QuadMesh sized 2×2' as the primary approach, with ColorRect in CanvasLayer as an alternative — does not specify the correct canvas_item setup with Anchor Full Rect."
+        },
+        {
+          "text": "Maps iResolution.xy to `1.0 / SCREEN_PIXEL_SIZE` (not a custom uniform or VIEWPORT_SIZE, which is the spatial equivalent)",
+          "passed": true,
+          "evidence": "Variable mapping table shows 'iResolution → 1.0 / SCREEN_PIXEL_SIZE' and code uses 'vec2 resolution = 1.0 / SCREEN_PIXEL_SIZE'."
+        },
+        {
+          "text": "Identifies the Y-axis flip as the cause of the upside-down appearance and fixes it with `uv.y = 1.0 - uv.y`, explaining Shadertoy is Y-up while Godot is Y-down",
+          "passed": true,
+          "evidence": "'Shadertoy uses OpenGL conventions where fragCoord.y = 0 is at the bottom. Godot's SCREEN_UV and FRAGCOORD have y = 0 at the top.' Fix: 'uv.y = 1.0 - uv.y'."
+        },
+        {
+          "text": "Declares the screen texture with `hint_screen_texture, repeat_disable, filter_linear` and explains repeat_disable prevents tiling artifacts at screen edges",
+          "passed": false,
+          "evidence": "Uses 'screen_texture' as a built-in sampler2D without explicit hint declaration — no hint_screen_texture, repeat_disable, or filter_linear hints."
+        },
+        {
+          "text": "Notes that iMouse has no built-in equivalent and must be passed as a custom `uniform vec2 _Mouse` updated each frame from GDScript via set_shader_parameter",
+          "passed": false,
+          "evidence": "iMouse is not mentioned anywhere in the answer."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the lighting bug as failing to update NORMAL after displacing VERTEX, and shows the corrected normal must be recalculated to match the displaced geometry",
+          "passed": true,
+          "evidence": "'Bug 1: Normals not updated after vertex displacement. When you displace VERTEX.y with a heightmap, the original normals still point straight up.'"
+        },
+        {
+          "text": "Uses `textureLod(_HeightMap, UV, 0.0)` instead of `texture(_HeightMap, UV)` in vertex(), explaining that implicit derivatives are unavailable in vertex() making texture() produce undefined results",
+          "passed": true,
+          "evidence": "Uses textureLod throughout vertex() with explicit LOD 0, and explains 'implicit mip-level derivatives are unavailable in vertex(), so mip selection is undefined'."
+        },
+        {
+          "text": "Explains that VERTEX in vertex() is in object/model space, not world space, so displacement is applied before the MODEL_MATRIX transform",
+          "passed": false,
+          "evidence": "Does not mention that VERTEX is in object/model space or the MODEL_MATRIX transform relationship."
+        },
+        {
+          "text": "Avoids recommending texture() in vertex() for any purpose — consistently uses textureLod with explicit LOD 0",
+          "passed": true,
+          "evidence": "All texture samples in vertex() use textureLod with explicit LOD 0 — texture() is never recommended."
+        },
+        {
+          "text": "Notes that for production quality, baking normals into a normal map is preferable to approximating them from the displacement derivative",
+          "passed": false,
+          "evidence": "Does not mention baking normals into a normal map as a production-quality alternative."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the lighting bug as failing to update NORMAL after displacing VERTEX, and shows the corrected normal must be recalculated to match the displaced geometry",
+          "passed": true,
+          "evidence": "'Bug 1: Wrong normals after vertex displacement. When you displace vertices using a heightmap, the original normals (flat plane normals pointing straight up) are no longer correct.'"
+        },
+        {
+          "text": "Uses `textureLod(_HeightMap, UV, 0.0)` instead of `texture(_HeightMap, UV)` in vertex(), explaining that implicit derivatives are unavailable in vertex() making texture() produce undefined results",
+          "passed": true,
+          "evidence": "Uses textureLod with explicit LOD 0 and explains 'derivatives (used for automatic mip selection) are undefined, causing the GPU to sample random mip levels'."
+        },
+        {
+          "text": "Explains that VERTEX in vertex() is in object/model space, not world space, so displacement is applied before the MODEL_MATRIX transform",
+          "passed": false,
+          "evidence": "Does not mention that VERTEX is in object/model space or the MODEL_MATRIX transform relationship."
+        },
+        {
+          "text": "Avoids recommending texture() in vertex() for any purpose — consistently uses textureLod with explicit LOD 0",
+          "passed": true,
+          "evidence": "All texture samples in vertex() use textureLod with explicit LOD 0 — texture() is never recommended."
+        },
+        {
+          "text": "Notes that for production quality, baking normals into a normal map is preferable to approximating them from the displacement derivative",
+          "passed": false,
+          "evidence": "Does not mention baking normals into a normal map as a production-quality alternative."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "without_skill re-graded mean was 0.467 (evals 1,2=0.4, eval-3=0.6); committed value 0.4 preserved per drift guard (delta=0.067). Eval-3 without_skill likely scored 2/5 in original grading."
   ]
 }

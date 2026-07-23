@@ -2,9 +2,275 @@
   "metadata": {
     "skill_name": "k3s",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-4", "eval-5", "eval-6"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Uses curl install script with specific version pin (INSTALL_K3S_VERSION)",
+          "passed": true,
+          "evidence": "Shows `INSTALL_K3S_VERSION=v1.32.3+k3s1` in the curl install command."
+        },
+        {
+          "text": "Includes --tls-san with the public IP",
+          "passed": true,
+          "evidence": "Shows `--tls-san=203.0.113.50` in the install flags."
+        },
+        {
+          "text": "Includes --disable=traefik",
+          "passed": true,
+          "evidence": "Shows `--disable=traefik` with note \"lets you install ingress-nginx later for more control\"."
+        },
+        {
+          "text": "Includes --cluster-init for future HA capability",
+          "passed": true,
+          "evidence": "Shows `--cluster-init` with note \"uses embedded etcd (enables future HA expansion)\"."
+        },
+        {
+          "text": "Copies kubeconfig to local machine and updates server address from 127.0.0.1 to public IP",
+          "passed": true,
+          "evidence": "Shows `ssh root@203.0.113.50 cat /etc/rancher/k3s/k3s.yaml > ~/clusters/hetzner.yaml` then editing server from `127.0.0.1` to `203.0.113.50`."
+        },
+        {
+          "text": "Verifies with kubectl get nodes",
+          "passed": true,
+          "evidence": "Shows `kubectl get nodes` as the final verification step."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.333,
+        "passed": 2,
+        "failed": 4,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Uses curl install script with specific version pin (INSTALL_K3S_VERSION)",
+          "passed": false,
+          "evidence": "Shows `curl -sfL https://get.k3s.io | sh -` with no INSTALL_K3S_VERSION pin."
+        },
+        {
+          "text": "Includes --tls-san with the public IP",
+          "passed": false,
+          "evidence": "No --tls-san flag in the install command. The API server certificate won't include the public IP."
+        },
+        {
+          "text": "Includes --disable=traefik",
+          "passed": false,
+          "evidence": "No --disable=traefik. Notes \"k3s includes Traefik (ingress)...out of the box\" without suggesting disabling it."
+        },
+        {
+          "text": "Includes --cluster-init for future HA capability",
+          "passed": false,
+          "evidence": "No --cluster-init flag. Single-node SQLite install with no HA path."
+        },
+        {
+          "text": "Copies kubeconfig to local machine and updates server address from 127.0.0.1 to public IP",
+          "passed": true,
+          "evidence": "Shows `scp root@203.0.113.50:/etc/rancher/k3s/k3s.yaml ~/.kube/config` and `sed -i '' 's/127.0.0.1/203.0.113.50/'`."
+        },
+        {
+          "text": "Verifies with kubectl get nodes",
+          "passed": true,
+          "evidence": "Shows `kubectl get nodes` as the final verification step."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Retrieves join token from the correct location",
+          "passed": true,
+          "evidence": "Shows `cat /var/lib/rancher/k3s/server/token` on node0."
+        },
+        {
+          "text": "Joins server node with server subcommand and --server flag pointing to node0",
+          "passed": true,
+          "evidence": "Shows `sh -s - server --server https://NODE0_IP:6443 --token YOUR_TOKEN`."
+        },
+        {
+          "text": "Matches original install flags (--disable=traefik, --cluster-domain if set)",
+          "passed": true,
+          "evidence": "Includes `--disable=traefik` in the node1 server join command."
+        },
+        {
+          "text": "Joins agent node with agent subcommand (distinct from server join)",
+          "passed": true,
+          "evidence": "Shows `sh -s - agent --server https://NODE0_IP:6443 --token YOUR_TOKEN` for node2."
+        },
+        {
+          "text": "Pins INSTALL_K3S_VERSION to match existing cluster",
+          "passed": true,
+          "evidence": "Shows `INSTALL_K3S_VERSION=v1.32.3+k3s1` for both node1 and node2 installs."
+        },
+        {
+          "text": "Confirms mixed architecture (ARM64 + x86-64) works without special config",
+          "passed": true,
+          "evidence": "\"ARM64 works because k3s is multi-arch; the same version handles both architectures.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 4,
+        "failed": 2,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Retrieves join token from the correct location",
+          "passed": true,
+          "evidence": "Shows `cat /var/lib/rancher/k3s/server/token` on node0."
+        },
+        {
+          "text": "Joins server node with server subcommand and --server flag pointing to node0",
+          "passed": true,
+          "evidence": "Shows `sh -s - server --server https://<node0-ip>:6443` for node1."
+        },
+        {
+          "text": "Matches original install flags (--disable=traefik, --cluster-domain if set)",
+          "passed": false,
+          "evidence": "No --disable=traefik in the node1 join command. Original install flags not matched."
+        },
+        {
+          "text": "Joins agent node with agent subcommand (distinct from server join)",
+          "passed": true,
+          "evidence": "Shows `K3S_URL=... K3S_TOKEN=... sh -` for node2 — the env-var shorthand that invokes agent mode."
+        },
+        {
+          "text": "Pins INSTALL_K3S_VERSION to match existing cluster",
+          "passed": false,
+          "evidence": "No INSTALL_K3S_VERSION pin in any of the join commands."
+        },
+        {
+          "text": "Confirms mixed architecture (ARM64 + x86-64) works without special config",
+          "passed": true,
+          "evidence": "\"k3s supports ARM64 natively — the install script detects architecture and downloads the correct binary.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "eval-6",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Shows kubectl get for pods, deployments, services",
+          "passed": true,
+          "evidence": "Shows `kubectl get nodes`, `kubectl get pods -A`, `kubectl get pods -n production` and deployment/service commands."
+        },
+        {
+          "text": "Shows kubectl describe for debugging",
+          "passed": true,
+          "evidence": "Shows `kubectl describe pod <pod-name> -n <ns>` with note \"Events section at the bottom shows why something failed\"."
+        },
+        {
+          "text": "Shows kubectl logs with -f and/or --previous",
+          "passed": true,
+          "evidence": "Shows `kubectl logs <pod-name> -n <namespace> -f` and `kubectl logs --previous <pod-name>`."
+        },
+        {
+          "text": "Shows kubectl exec for interactive shell access",
+          "passed": true,
+          "evidence": "Shows `kubectl exec -it <pod-name> -n <ns> -- /bin/sh`."
+        },
+        {
+          "text": "Shows kubectl port-forward",
+          "passed": true,
+          "evidence": "Shows both `kubectl port-forward pod/<name> 8080:80` and `kubectl port-forward svc/<name> 8080:80`."
+        },
+        {
+          "text": "Explains namespace flag (-n / --all-namespaces)",
+          "passed": true,
+          "evidence": "\"Always specify -n <namespace> or use -A for all. Without it, kubectl uses the default namespace.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "eval-6",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Shows kubectl get for pods, deployments, services",
+          "passed": true,
+          "evidence": "Shows `kubectl get nodes`, `kubectl get pods -A`, `kubectl get deployments -n <ns>`, `kubectl get svc -n <ns>`."
+        },
+        {
+          "text": "Shows kubectl describe for debugging",
+          "passed": true,
+          "evidence": "Shows `kubectl describe pod <pod-name> -n <ns>` in the debugging section."
+        },
+        {
+          "text": "Shows kubectl logs with -f and/or --previous",
+          "passed": true,
+          "evidence": "Shows `kubectl logs <pod-name> -n <ns> --previous` and `kubectl logs <pod-name> -n <ns> -f`."
+        },
+        {
+          "text": "Shows kubectl exec for interactive shell access",
+          "passed": true,
+          "evidence": "Shows `kubectl exec -it <pod-name> -n <ns> -- /bin/sh`."
+        },
+        {
+          "text": "Shows kubectl port-forward",
+          "passed": true,
+          "evidence": "Shows `kubectl port-forward svc/<name> 8080:80 -n <ns>`."
+        },
+        {
+          "text": "Explains namespace flag (-n / --all-namespaces)",
+          "passed": true,
+          "evidence": "Uses `-n <namespace>` and `-A` throughout all command examples."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +290,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT NOTE: Re-graded with_skill mean=1.000 vs committed 0.944 (diff=0.056 > 0.02); re-graded without_skill mean=0.667 vs committed 0.611 (diff=0.056 > 0.02). Committed run_summary values preserved. Discrepancy likely from eval-4 and eval-5 grading differences."
   ]
 }

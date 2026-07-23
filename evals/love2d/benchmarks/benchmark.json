@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "love2d",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses Love2D GLSL flavor: `Image` instead of `sampler2D` for texture uniforms, and `Texel(tex, uv)` instead of `texture2D(tex, uv)` for sampling",
+          "passed": true,
+          "evidence": "Shader uses `uniform Image noise_tex`, `uniform Image mask_tex`, and `Texel(mask_tex, uv)`, `Texel(noise_tex, noise_uv)`, `Texel(tex, displaced_uv)` — correct Love2D GLSL flavor."
+        },
+        {
+          "text": "Loads the shader inside `love.load` (not `love.draw`) — shaders require an active graphics context and must not be created every frame",
+          "passed": true,
+          "evidence": "`water_shader = love.graphics.newShader([[...]])` inside `love.load()` — not in love.draw."
+        },
+        {
+          "text": "Uses `shader:hasUniform()` check before calling `shader:send()` to avoid errors on unused or optimized-out uniforms",
+          "passed": true,
+          "evidence": "Multiple `if water_shader:hasUniform(\"noise_tex\") then` checks before each `shader:send()` call."
+        },
+        {
+          "text": "Applies `love.graphics.setShader(shader)` before drawing and `love.graphics.setShader()` (no argument) after to reset to the default shader",
+          "passed": true,
+          "evidence": "`love.graphics.setShader(water_shader)` before draw, `love.graphics.setShader()` after — correct reset pattern."
+        },
+        {
+          "text": "Uses `love.graphics.setDefaultFilter('nearest', 'nearest')` before loading the spritesheet to preserve pixel art appearance",
+          "passed": true,
+          "evidence": "`love.graphics.setDefaultFilter(\"nearest\", \"nearest\")` at start of `love.load()` before any image loading."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses Love2D GLSL flavor: `Image` instead of `sampler2D` for texture uniforms, and `Texel(tex, uv)` instead of `texture2D(tex, uv)` for sampling",
+          "passed": true,
+          "evidence": "Shader uses `extern Image noise_tex`, `extern Image mask_tex`, and `Texel(mask_tex, uv)`, `Texel(noise_tex, noise_uv)`, `Texel(tex, displaced_uv)` — correct Love2D GLSL flavor."
+        },
+        {
+          "text": "Loads the shader inside `love.load` (not `love.draw`) — shaders require an active graphics context and must not be created every frame",
+          "passed": true,
+          "evidence": "`shader = love.graphics.newShader(\"water_displacement.glsl\")` inside `love.load()` — not in love.draw."
+        },
+        {
+          "text": "Uses `shader:hasUniform()` check before calling `shader:send()` to avoid errors on unused or optimized-out uniforms",
+          "passed": false,
+          "evidence": "Calls `shader:send(\"noise_tex\", noise_texture)` etc. directly without any `hasUniform()` checks."
+        },
+        {
+          "text": "Applies `love.graphics.setShader(shader)` before drawing and `love.graphics.setShader()` (no argument) after to reset to the default shader",
+          "passed": true,
+          "evidence": "`love.graphics.setShader(shader)` before draw, `love.graphics.setShader()` after — correct reset pattern."
+        },
+        {
+          "text": "Uses `love.graphics.setDefaultFilter('nearest', 'nearest')` before loading the spritesheet to preserve pixel art appearance",
+          "passed": true,
+          "evidence": "`love.graphics.setDefaultFilter(\"nearest\", \"nearest\")` at start of `love.load()` before image loading."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Implements the Object Pool pattern: pre-allocates a fixed array of bullet tables with active/inactive flags, and the spawn function reuses inactive bullets rather than creating new ones",
+          "passed": true,
+          "evidence": "Pre-allocates `for i = 1, POOL_SIZE do bullets[i] = { x=0, y=0, vx=0, vy=0, alive=false } end` and spawn function checks `if not bullets[i].alive then` to reuse slots."
+        },
+        {
+          "text": "Applies the Flyweight pattern: loads the bullet image once in `love.load` and shares a single image reference across all bullet instances — never calls `love.graphics.newImage` per bullet",
+          "passed": true,
+          "evidence": "`bullet_image = love.graphics.newImage(\"assets/bullet.png\")` called once in `love.load()`; all bullets reference the same image."
+        },
+        {
+          "text": "Never calls `love.graphics.newImage` (or any resource-loading function) inside `love.draw` or the spawn function — loading resources per frame is the explicit pitfall the skill warns against",
+          "passed": true,
+          "evidence": "`love.graphics.newImage` only called once in `love.load()`; not present in `love.draw` or `spawn_bullet`."
+        },
+        {
+          "text": "Multiplies movement by `dt` in `love.update`: `bullet.x = bullet.x + bullet.vx * dt` — frame-rate-independent movement is required",
+          "passed": true,
+          "evidence": "`b.x = b.x + b.vx * dt` and `b.y = b.y + b.vy * dt` — correct dt multiplication."
+        },
+        {
+          "text": "Draw loop iterates only over active bullets and uses `love.graphics.setColor(1, 1, 1, 1)` reset after any colored drawing to prevent tint bleed",
+          "passed": true,
+          "evidence": "`if b.alive then` check in draw loop; `love.graphics.setColor(1, 1, 1, 1)` reset before the draw loop."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Implements the Object Pool pattern: pre-allocates a fixed array of bullet tables with active/inactive flags, and the spawn function reuses inactive bullets rather than creating new ones",
+          "passed": false,
+          "evidence": "Uses dynamic table with `bullets[#bullets + 1] = {...}` and swap-remove — no pre-allocated pool with active/inactive flags; bullets are created and destroyed dynamically."
+        },
+        {
+          "text": "Applies the Flyweight pattern: loads the bullet image once in `love.load` and shares a single image reference across all bullet instances — never calls `love.graphics.newImage` per bullet",
+          "passed": true,
+          "evidence": "`bullet_image = love.graphics.newImage(\"bullet.png\")` called once in `love.load()`."
+        },
+        {
+          "text": "Never calls `love.graphics.newImage` (or any resource-loading function) inside `love.draw` or the spawn function — loading resources per frame is the explicit pitfall the skill warns against",
+          "passed": true,
+          "evidence": "`love.graphics.newImage` only called once in `love.load()`; not present in draw or spawn."
+        },
+        {
+          "text": "Multiplies movement by `dt` in `love.update`: `bullet.x = bullet.x + bullet.vx * dt` — frame-rate-independent movement is required",
+          "passed": true,
+          "evidence": "`b.x = b.x + b.dx * dt` and `b.y = b.y + b.dy * dt` — correct dt multiplication."
+        },
+        {
+          "text": "Draw loop iterates only over active bullets and uses `love.graphics.setColor(1, 1, 1, 1)` reset after any colored drawing to prevent tint bleed",
+          "passed": false,
+          "evidence": "SpriteBatch approach iterates only active bullets, but no `love.graphics.setColor(1, 1, 1, 1)` reset shown in the draw loop."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses `love.graphics.push()` / `love.graphics.pop()` to isolate transforms for each button's draw call — transforms must not bleed between buttons",
+          "passed": false,
+          "evidence": "No `love.graphics.push()` or `love.graphics.pop()` calls in the draw loop; transforms not isolated per button."
+        },
+        {
+          "text": "Implements hover detection using AABB check against `love.mouse.getPosition()` in `love.update` or `love.draw`, not polling in a callback",
+          "passed": true,
+          "evidence": "`local mx, my = love.mouse.getPosition()` in `love.update` with AABB check: `mx >= btn.x and mx <= btn.x + btn.w and my >= btn.y and my <= btn.y + btn.h`."
+        },
+        {
+          "text": "Handles click via `love.mousereleased` callback (not `love.mousepressed`) as specified in the expected output",
+          "passed": false,
+          "evidence": "Uses `love.mousepressed` callback instead of `love.mousereleased` as required."
+        },
+        {
+          "text": "Resets color to `love.graphics.setColor(1, 1, 1, 1)` after drawing highlighted buttons to prevent tint bleed onto subsequent draw calls",
+          "passed": true,
+          "evidence": "`love.graphics.setColor(1, 1, 1, 1)` set for button label text and final reset at end of draw — prevents tint bleed."
+        },
+        {
+          "text": "Loads sound assets once in `love.load` and stores them in variables — never calls `love.audio.newSource` inside `love.draw` or the click handler",
+          "passed": true,
+          "evidence": "`hover_sound = love.audio.newSource(\"assets/hover.wav\", \"static\")` and `click_sound = love.audio.newSource(\"assets/click.wav\", \"static\")` in `love.load()`."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses `love.graphics.push()` / `love.graphics.pop()` to isolate transforms for each button's draw call — transforms must not bleed between buttons",
+          "passed": false,
+          "evidence": "No `love.graphics.push()` or `love.graphics.pop()` calls in the draw loop."
+        },
+        {
+          "text": "Implements hover detection using AABB check against `love.mouse.getPosition()` in `love.update` or `love.draw`, not polling in a callback",
+          "passed": true,
+          "evidence": "`btn.hovered = point_in_rect(mx, my, btn.x, btn.y, btn.w, btn.h)` in `love.update` using `love.mouse.getPosition()`."
+        },
+        {
+          "text": "Handles click via `love.mousereleased` callback (not `love.mousepressed`) as specified in the expected output",
+          "passed": false,
+          "evidence": "Uses `love.mousepressed` callback instead of `love.mousereleased` as required."
+        },
+        {
+          "text": "Resets color to `love.graphics.setColor(1, 1, 1, 1)` after drawing highlighted buttons to prevent tint bleed onto subsequent draw calls",
+          "passed": true,
+          "evidence": "`love.graphics.setColor(1, 1, 1)` used for button text and title — resets color after highlighted backgrounds."
+        },
+        {
+          "text": "Loads sound assets once in `love.load` and stores them in variables — never calls `love.audio.newSource` inside `love.draw` or the click handler",
+          "passed": true,
+          "evidence": "`hover_sound = love.audio.newSource(\"click.wav\", \"static\")` in `love.load()` — not in draw or click handler."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded without_skill mean was 0.667 (committed: 0.600, diff: 0.067 > 0.02). Committed run_summary values preserved per drift guard rule."
   ]
 }

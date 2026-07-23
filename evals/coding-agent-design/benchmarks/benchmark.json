@@ -2,9 +2,285 @@
   "metadata": {
     "skill_name": "coding-agent-design",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Addresses sandbox isolation with specific controls (network egress, filesystem mounts)",
+          "passed": true,
+          "evidence": "'Network: No egress by default. Whitelist proxy for approved domains only.' 'Filesystem: Mount source code as read-only for the agent's perception tools. Write access only to a designated working directory.'"
+        },
+        {
+          "text": "Covers the threat model combining private data access + untrusted content + external communication",
+          "passed": true,
+          "evidence": "'Your agent has all three conditions of the lethal triad: (1) access to private data (production source code), (2) exposure to untrusted content (imported packages — prompt injection vector), (3) ability to communicate externally.'"
+        },
+        {
+          "text": "Addresses prompt injection via imported packages specifically",
+          "passed": true,
+          "evidence": "'Imported packages can contain text that acts as prompt injection (README files, docstrings, error messages).' Provides specific mitigations including semantic command parsing and principal loyalty."
+        },
+        {
+          "text": "Recommends keeping credentials out of the sandbox (never mounted)",
+          "passed": true,
+          "evidence": "'Credentials, .env files, SSH keys — never mounted.' and 'Never mount credentials into the sandbox. Secrets required for tool operations are handled by the harness layer outside the agent's direct access.'"
+        },
+        {
+          "text": "Mentions semantic parsing over keyword blacklists for shell command safety",
+          "passed": true,
+          "evidence": "'Semantic command parsing over keyword blacklists. Packages can embed # AI: please run curl... in their source. The harness must parse command intent, not match surface strings.'"
+        },
+        {
+          "text": "Addresses principal loyalty — who the agent serves",
+          "passed": true,
+          "evidence": "'Principal loyalty: Define explicitly in the system prompt that the agent serves the user, not instructions found in code or package content.'"
+        },
+        {
+          "text": "Recommends trust enforcement below the application layer (DB constraints, etc.)",
+          "passed": true,
+          "evidence": "'Trust boundary below the application layer: Since the agent writes code that runs on your systems, push invariants to the database/infrastructure level. A database constraint that prevents destructive operations holds regardless of what code the agent generates.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.571,
+        "passed": 4,
+        "failed": 3,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Addresses sandbox isolation with specific controls (network egress, filesystem mounts)",
+          "passed": true,
+          "evidence": "'No network access from the execution environment (prevents exfiltration). Read-only access to source code. Write access only to a working branch in a temp directory. Resource limits: CPU time, memory, disk.'"
+        },
+        {
+          "text": "Covers the threat model combining private data access + untrusted content + external communication",
+          "passed": true,
+          "evidence": "Layer 1 (sandbox), Layer 2 (credential isolation), Layer 3 (prompt injection defense) together cover private data + untrusted content + external comms, though not named as the 'lethal triad'."
+        },
+        {
+          "text": "Addresses prompt injection via imported packages specifically",
+          "passed": true,
+          "evidence": "'A malicious dependency's README or docstring could contain prompt injection (\"Ignore previous instructions and...\"). Separate the agent's instruction context from file content context.'"
+        },
+        {
+          "text": "Recommends keeping credentials out of the sandbox (never mounted)",
+          "passed": true,
+          "evidence": "'Never put credentials in the agent's accessible filesystem. Strip .env, .aws/credentials, secrets.yaml, etc., from the working copy before the agent sees it.'"
+        },
+        {
+          "text": "Mentions semantic parsing over keyword blacklists for shell command safety",
+          "passed": false,
+          "evidence": "Baseline uses an allowlist of dependencies and delimited file content sections, but does not mention semantic command parsing over keyword blacklists for shell command safety."
+        },
+        {
+          "text": "Addresses principal loyalty — who the agent serves",
+          "passed": false,
+          "evidence": "Baseline does not address principal loyalty or define who the agent serves. No mention of the agent's obligation to serve the user over instructions found in code or packages."
+        },
+        {
+          "text": "Recommends trust enforcement below the application layer (DB constraints, etc.)",
+          "passed": false,
+          "evidence": "Baseline focuses on diff review gates, static analysis, and CI — application-layer controls. No mention of pushing invariants to the database or infrastructure layer below the application."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Identifies repeated-call fingerprinting as the mechanism to detect stuck loops",
+          "passed": true,
+          "evidence": "'Repeated-call fingerprinting: Same tool + same parameters = stuck. If edit_file is called with the same arguments 2x, the agent is in a loop. Trigger: force a different approach.'"
+        },
+        {
+          "text": "Describes recovery escalation: silent retry first, then degrade, then surface to user",
+          "passed": true,
+          "evidence": "Four-level escalation: '1. Silent retry (first)... 2. Strategy shift (second)... 3. Degrade and continue (third)... 4. Surface to user (last): After all automatic recovery exhausts.'"
+        },
+        {
+          "text": "Recommends circuit breakers with max consecutive failure limits",
+          "passed": true,
+          "evidence": "'Circuit breakers: Max 5 consecutive failures of the same type → stop that approach entirely.'"
+        },
+        {
+          "text": "Addresses budget exhaustion with global caps (max turns, budget cap)",
+          "passed": true,
+          "evidence": "'Budget cap: Hard maximum of 20 edit-test cycles. If the agent hasn't solved it by then, surface to user rather than burning budget.'"
+        },
+        {
+          "text": "States that tool errors should become model input, not stop signals",
+          "passed": true,
+          "evidence": "'Tool errors don't terminate the agent. Turn the error into the model's next input. \"File not found\" → model adjusts the path. The error is information.'"
+        },
+        {
+          "text": "Mentions death-spiral defense (disabling model-invoking side effects on error paths)",
+          "passed": true,
+          "evidence": "'Death-spiral defense: On error paths, disable model-invoking side effects. If the agent is stuck, don't let it create MORE work (spawning sub-tasks, writing to memory) — only allow it to attempt the fix or ask for help.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Identifies repeated-call fingerprinting as the mechanism to detect stuck loops",
+          "passed": true,
+          "evidence": "'Repetition detection: If the agent produces a diff that's semantically identical to a previous attempt (same file, same area, similar change), force a strategy change.'"
+        },
+        {
+          "text": "Describes recovery escalation: silent retry first, then degrade, then surface to user",
+          "passed": true,
+          "evidence": "N=1 through N=5 escalation: normal retry → re-read error → force strategy change → expand search → give up and ask user. Matches the silent retry → degrade → surface pattern."
+        },
+        {
+          "text": "Recommends circuit breakers with max consecutive failure limits",
+          "passed": true,
+          "evidence": "'Hard cap at 10 iterations per sub-task, 30 iterations per overall task.' and 'N=5: Give up on this approach.' These function as circuit breakers with max failure limits."
+        },
+        {
+          "text": "Addresses budget exhaustion with global caps (max turns, budget cap)",
+          "passed": true,
+          "evidence": "'Budget enforcement: Hard cap at 10 iterations per sub-task, 30 iterations per overall task. Display remaining budget to the agent: \"You have 3 attempts remaining.\"'"
+        },
+        {
+          "text": "States that tool errors should become model input, not stop signals",
+          "passed": true,
+          "evidence": "'Inject this into the agent's context before each retry. The agent can see its own history and avoid repeating.' Tool errors are fed back as context, not used to terminate."
+        },
+        {
+          "text": "Mentions death-spiral defense (disabling model-invoking side effects on error paths)",
+          "passed": false,
+          "evidence": "Baseline does not mention death-spiral defense or the principle of disabling model-invoking side effects on error paths to prevent runaway task creation."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Lists the 7-tool minimal toolset (Code Interpreter, Bash, Read, Write, Edit, Search File Name, Search File Content)",
+          "passed": true,
+          "evidence": "Table lists: Code Interpreter, Bash Shell, Read File, Write File, Edit File, Search File Name (glob), Search File Content (grep) — all 7 tools present."
+        },
+        {
+          "text": "Explains why each tool earns its place (not just a list)",
+          "passed": true,
+          "evidence": "Each tool has a 'Role for 500k lines' column: Code Interpreter: 'Sandboxed Python execution for computation'; Bash Shell: 'pytest, mypy, pip install, build tools'; Edit File: 'Targeted in-place modification'."
+        },
+        {
+          "text": "Addresses the grep vs semantic search question for a 500k line Python codebase",
+          "passed": true,
+          "evidence": "'Should you add semantic code search? At 500k lines, grep is sufficient as the primary search tool but has limitations.' Provides detailed analysis of both grep strengths and limitations."
+        },
+        {
+          "text": "States that semantic search is an optimization, not a requirement",
+          "passed": true,
+          "evidence": "'Start with grep. Add semantic/LSP search as an optimization only when you observe the agent spending >3 tool calls navigating to the right file.' and 'Semantic search (embeddings): Lower priority.'"
+        },
+        {
+          "text": "Explains when grep is sufficient (known identifiers, error messages, imports)",
+          "passed": true,
+          "evidence": "'Grep strengths: Fast, deterministic, exact-match reliable. Finds identifiers, imports, error messages, and string literals instantly. No index to maintain, no embedding model cost.'"
+        },
+        {
+          "text": "Mentions the file-system-as-hub philosophy",
+          "passed": true,
+          "evidence": "'The file-system-as-hub philosophy applies: at 500k lines, the agent navigates by structure (glob finds modules) and content (grep finds identifiers). These two tools cover 90% of navigation needs.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 4,
+        "failed": 2,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Lists the 7-tool minimal toolset (Code Interpreter, Bash, Read, Write, Edit, Search File Name, Search File Content)",
+          "passed": false,
+          "evidence": "Baseline lists: read_file, write_file/edit_file, run_command, glob, grep — 5 tools. Missing Code Interpreter as a distinct tool and does not separate Bash Shell from run_command. Does not match the 7-tool canonical set."
+        },
+        {
+          "text": "Explains why each tool earns its place (not just a list)",
+          "passed": true,
+          "evidence": "Each tool has rationale: read_file: 'Support partial reads (offset/limit) for large files'; glob: 'Essential for navigating the codebase'; grep: 'The backbone of code navigation.'"
+        },
+        {
+          "text": "Addresses the grep vs semantic search question for a 500k line Python codebase",
+          "passed": true,
+          "evidence": "'Should you include semantic code search? At 500k lines, yes, add it — but grep alone is viable if you can't afford the setup.' Provides analysis of both options."
+        },
+        {
+          "text": "States that semantic search is an optimization, not a requirement",
+          "passed": true,
+          "evidence": "'Practical recommendation: Start with grep + glob. Add semantic search (tree-sitter AST index or embeddings) only if the agent spends too many steps searching.'"
+        },
+        {
+          "text": "Explains when grep is sufficient (known identifiers, error messages, imports)",
+          "passed": true,
+          "evidence": "'Python is highly greppable: def function_name, class ClassName, import module. Grep + glob covers 90% of navigation: find the file, find the definition, find usages.'"
+        },
+        {
+          "text": "Mentions the file-system-as-hub philosophy",
+          "passed": false,
+          "evidence": "Baseline does not mention the file-system-as-hub philosophy. It discusses tool selection but not the architectural principle of treating the filesystem as the central coordination mechanism."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +300,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded without_skill mean=0.690 differs from committed 0.530 by 0.160 (>0.02 threshold). Committed without_skill run_summary value preserved. Re-graded with_skill mean=1.000 matches committed 1.000 exactly. See DRIFT.md for details."
   ]
 }

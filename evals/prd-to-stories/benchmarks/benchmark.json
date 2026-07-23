@@ -2,9 +2,491 @@
   "metadata": {
     "skill_name": "prd-to-stories",
     "timestamp": "2026-07-23",
-    "evals_run": 5,
+    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Outputs a `bd create` command with `-t epic` for the Email Notifications capability group",
+          "passed": true,
+          "evidence": "`bd create \"Email Notifications\" --description=\"...\" -t epic -p 1 --json` is shown."
+        },
+        {
+          "text": "Outputs at least one `bd create` command with `-t task` for a story under the epic",
+          "passed": true,
+          "evidence": "Three `bd create` commands with `-t task` are shown for Job Completion Email, Job Failure Email, and Email Unsubscribe."
+        },
+        {
+          "text": "The task `bd create` commands include `--parent` referencing the epic ID",
+          "passed": true,
+          "evidence": "All three task commands include `--parent bd-42` referencing the epic ID."
+        },
+        {
+          "text": "The task `bd create` commands include `--acceptance` with acceptance criteria text",
+          "passed": true,
+          "evidence": "All three task commands include `--acceptance` with multi-line acceptance criteria text."
+        },
+        {
+          "text": "The task `bd create` commands include `--description` with the story summary",
+          "passed": true,
+          "evidence": "All three task commands include `--description` with the story summary text."
+        },
+        {
+          "text": "Story markdown files are described as being written to docs/stories/",
+          "passed": true,
+          "evidence": "The response shows story files at `docs/stories/job-completion-email.md`, `docs/stories/job-failure-email.md`, `docs/stories/email-unsubscribe.md`."
+        },
+        {
+          "text": "Reports the created beads IDs at the end (e.g., 'Created beads epic bd-X with tasks bd-Y, bd-Z')",
+          "passed": false,
+          "evidence": "The response does not report the created beads IDs at the end. It shows the commands to run but doesn't summarize the resulting IDs."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.714,
+        "passed": 5,
+        "failed": 2,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Outputs a `bd create` command with `-t epic` for the Email Notifications capability group",
+          "passed": true,
+          "evidence": "`bd create --title=\"Email Notifications\" ... --type=epic --priority=1` is shown."
+        },
+        {
+          "text": "Outputs at least one `bd create` command with `-t task` for a story under the epic",
+          "passed": true,
+          "evidence": "Three `bd create` commands with `--type=task` are shown for the three stories."
+        },
+        {
+          "text": "The task `bd create` commands include `--parent` referencing the epic ID",
+          "passed": true,
+          "evidence": "All three task commands include `--parent=<epic-id>` referencing the epic ID."
+        },
+        {
+          "text": "The task `bd create` commands include `--acceptance` with acceptance criteria text",
+          "passed": true,
+          "evidence": "All three task commands include `--acceptance` with acceptance criteria text."
+        },
+        {
+          "text": "The task `bd create` commands include `--description` with the story summary",
+          "passed": true,
+          "evidence": "All three task commands include `--description` with the story summary text."
+        },
+        {
+          "text": "Story markdown files are described as being written to docs/stories/",
+          "passed": false,
+          "evidence": "The baseline does not describe writing story markdown files to docs/stories/. It only shows bd create commands without mentioning story file creation."
+        },
+        {
+          "text": "Reports the created beads IDs at the end (e.g., 'Created beads epic bd-X with tasks bd-Y, bd-Z')",
+          "passed": false,
+          "evidence": "The baseline does not report created beads IDs at the end."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Story markdown files are described as being written to docs/stories/",
+          "passed": true,
+          "evidence": "The response states: 'I would create the same three story files in `docs/stories/`: `docs/stories/job-completion-email.md`, etc.'"
+        },
+        {
+          "text": "Does NOT output any `bd create` command",
+          "passed": true,
+          "evidence": "The response states: 'Since `.beads/` does NOT exist, I would NOT execute any `bd` commands.' No bd create commands are shown."
+        },
+        {
+          "text": "Does NOT mention creating a beads epic",
+          "passed": true,
+          "evidence": "No beads epic creation is mentioned anywhere in the response."
+        },
+        {
+          "text": "Does NOT mention creating beads tasks",
+          "passed": true,
+          "evidence": "No beads task creation is mentioned anywhere in the response."
+        },
+        {
+          "text": "Reports coverage of PRD behaviors after writing stories",
+          "passed": false,
+          "evidence": "The response does not report coverage of PRD behaviors (B1, B2, B3) after describing the story files."
+        },
+        {
+          "text": "Does not create any beads epic or task, regardless of whether the .beads/ check is mentioned",
+          "passed": true,
+          "evidence": "No beads epic or task creation is performed or mentioned."
+        },
+        {
+          "text": "Does NOT output any `bd` command of any kind (including `bd ready`, `bd show`, or `bd list`)",
+          "passed": true,
+          "evidence": "No bd commands of any kind appear in the response."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Story markdown files are described as being written to docs/stories/",
+          "passed": true,
+          "evidence": "The baseline describes files at `docs/stories/email-notifications/01-job-completion-email.md` etc. — within docs/stories/."
+        },
+        {
+          "text": "Does NOT output any `bd create` command",
+          "passed": true,
+          "evidence": "The baseline states: 'I would NOT execute any `bd` commands.' No bd create commands are shown."
+        },
+        {
+          "text": "Does NOT mention creating a beads epic",
+          "passed": true,
+          "evidence": "No beads epic creation is mentioned."
+        },
+        {
+          "text": "Does NOT mention creating beads tasks",
+          "passed": true,
+          "evidence": "No beads task creation is mentioned."
+        },
+        {
+          "text": "Reports coverage of PRD behaviors after writing stories",
+          "passed": false,
+          "evidence": "The baseline does not report coverage of PRD behaviors (B1, B2, B3) after describing the story files."
+        },
+        {
+          "text": "Does not create any beads epic or task, regardless of whether the .beads/ check is mentioned",
+          "passed": true,
+          "evidence": "No beads epic or task creation is performed or mentioned."
+        },
+        {
+          "text": "Does NOT output any `bd` command of any kind (including `bd ready`, `bd show`, or `bd list`)",
+          "passed": true,
+          "evidence": "No bd commands of any kind appear in the response."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Outputs exactly two `bd create` commands with `-t epic`",
+          "passed": true,
+          "evidence": "Two epic commands: `bd create \"Search\" ... -t epic` and `bd create \"Export\" ... -t epic`."
+        },
+        {
+          "text": "One epic command is for the Search capability group",
+          "passed": true,
+          "evidence": "`bd create \"Search\" --description=\"Users cannot find content efficiently...\" -t epic -p 1 --json`"
+        },
+        {
+          "text": "One epic command is for the Export capability group",
+          "passed": true,
+          "evidence": "`bd create \"Export\" --description=\"Users cannot extract data for external use...\" -t epic -p 1 --json`"
+        },
+        {
+          "text": "Task `bd create` commands for Search stories use `--parent` referencing the Search epic ID",
+          "passed": true,
+          "evidence": "The Search task uses `--parent bd-42` which is the Search epic ID."
+        },
+        {
+          "text": "Task `bd create` commands for Export stories use `--parent` referencing the Export epic ID",
+          "passed": true,
+          "evidence": "The Export task uses `--parent bd-45` which is the Export epic ID."
+        },
+        {
+          "text": "Each `bd create -t task` command for a Search story uses the same `--parent` value as the Search epic's `bd create` command",
+          "passed": true,
+          "evidence": "Search epic → `bd-42`; Search task → `--parent bd-42`. Same ID."
+        },
+        {
+          "text": "Each `bd create -t task` command for an Export story uses the same `--parent` value as the Export epic's `bd create` command",
+          "passed": true,
+          "evidence": "Export epic → `bd-45`; Export task → `--parent bd-45`. Same ID."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Outputs exactly two `bd create` commands with `-t epic`",
+          "passed": true,
+          "evidence": "Two epic commands: `bd create --title=\"Search\" ... --type=epic` and `bd create --title=\"Export\" ... --type=epic`."
+        },
+        {
+          "text": "One epic command is for the Search capability group",
+          "passed": true,
+          "evidence": "`bd create --title=\"Search\" --description=\"Enable users to find content efficiently...\" --type=epic --priority=1`"
+        },
+        {
+          "text": "One epic command is for the Export capability group",
+          "passed": true,
+          "evidence": "`bd create --title=\"Export\" --description=\"Allow users to extract search results...\" --type=epic --priority=2`"
+        },
+        {
+          "text": "Task `bd create` commands for Search stories use `--parent` referencing the Search epic ID",
+          "passed": true,
+          "evidence": "Search tasks use `--parent=<search-epic-id>` referencing the Search epic."
+        },
+        {
+          "text": "Task `bd create` commands for Export stories use `--parent` referencing the Export epic ID",
+          "passed": true,
+          "evidence": "Export tasks use `--parent=<export-epic-id>` referencing the Export epic."
+        },
+        {
+          "text": "Each `bd create -t task` command for a Search story uses the same `--parent` value as the Search epic's `bd create` command",
+          "passed": true,
+          "evidence": "Search epic → `<search-epic-id>`; Search tasks → `--parent=<search-epic-id>`. Consistent."
+        },
+        {
+          "text": "Each `bd create -t task` command for an Export story uses the same `--parent` value as the Export epic's `bd create` command",
+          "passed": true,
+          "evidence": "Export epic → `<export-epic-id>`; Export tasks → `--parent=<export-epic-id>`. Consistent."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Outputs exactly one `bd create` command with `-t epic`",
+          "passed": true,
+          "evidence": "One epic command: `bd create \"Authentication\" ... -t epic -p 1 --json`."
+        },
+        {
+          "text": "Outputs exactly three `bd create` commands with `-t task`",
+          "passed": true,
+          "evidence": "Three task commands: User Registration, User Login and Session Management, Endpoint Protection."
+        },
+        {
+          "text": "All three task commands include `--parent` referencing the Authentication epic ID",
+          "passed": true,
+          "evidence": "All three task commands include `--parent bd-42` referencing the Authentication epic."
+        },
+        {
+          "text": "All three task commands include `--description` with a non-empty summary",
+          "passed": true,
+          "evidence": "All three task commands include `--description` with substantive summary text."
+        },
+        {
+          "text": "All three task commands include `--acceptance` with at least one criterion",
+          "passed": true,
+          "evidence": "All three task commands include `--acceptance` with multiple acceptance criteria."
+        },
+        {
+          "text": "The three tasks together cover all five PRD behaviors (B1-B5)",
+          "passed": true,
+          "evidence": "User Registration covers B1+B5, User Login and Session Management covers B2+B3, Endpoint Protection covers B4 — all five behaviors covered."
+        },
+        {
+          "text": "Each task covers a distinct, non-overlapping subset of behaviors — no single task claims all five behaviors in its acceptance criteria",
+          "passed": true,
+          "evidence": "Each task covers a distinct subset: Registration (B1,B5), Login/Session (B2,B3), Endpoint Protection (B4). No overlap."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Outputs exactly one `bd create` command with `-t epic`",
+          "passed": true,
+          "evidence": "One epic command: `bd create --title=\"User Authentication\" ... --type=epic --priority=1`."
+        },
+        {
+          "text": "Outputs exactly three `bd create` commands with `-t task`",
+          "passed": true,
+          "evidence": "Three task commands: User Registration, Login and Logout, Endpoint Protection."
+        },
+        {
+          "text": "All three task commands include `--parent` referencing the Authentication epic ID",
+          "passed": true,
+          "evidence": "All three task commands include `--parent=<epic-id>` referencing the Authentication epic."
+        },
+        {
+          "text": "All three task commands include `--description` with a non-empty summary",
+          "passed": true,
+          "evidence": "All three task commands include `--description` with substantive summary text."
+        },
+        {
+          "text": "All three task commands include `--acceptance` with at least one criterion",
+          "passed": true,
+          "evidence": "All three task commands include `--acceptance` with multiple acceptance criteria."
+        },
+        {
+          "text": "The three tasks together cover all five PRD behaviors (B1-B5)",
+          "passed": true,
+          "evidence": "User Registration covers B1+B5, Login and Logout covers B2+B3, Endpoint Protection covers B4 — all five behaviors covered."
+        },
+        {
+          "text": "Each task covers a distinct, non-overlapping subset of behaviors — no single task claims all five behaviors in its acceptance criteria",
+          "passed": true,
+          "evidence": "Each task covers a distinct subset: Registration (B1,B5), Login/Logout (B2,B3), Endpoint Protection (B4). No overlap."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "For each story, both the markdown content and the `bd create` command are shown",
+          "passed": true,
+          "evidence": "For each of the two stories (password-reset-request.md and set-new-password.md), both the full markdown content and the corresponding `bd create` command are shown."
+        },
+        {
+          "text": "The `--description` value in each `bd create` command is verbatim or near-verbatim text from the Summary section of the corresponding story markdown — not a paraphrase or restatement",
+          "passed": true,
+          "evidence": "For password-reset-request: Summary says 'Users who forget their password can request a reset email. The system generates a time-limited reset link and sends it to the registered email address.' The `--description` matches this verbatim."
+        },
+        {
+          "text": "The `--acceptance` value in each `bd create` command contains the same criteria text as the Acceptance Criteria section of the corresponding story markdown (textual identity, not just semantic similarity)",
+          "passed": true,
+          "evidence": "The `--acceptance` criteria text matches the Acceptance Criteria section items (without checkbox syntax) for both stories."
+        },
+        {
+          "text": "Acceptance criteria in `--acceptance` do not include checkbox syntax ('- [ ]')",
+          "passed": true,
+          "evidence": "The `--acceptance` values use plain text without '- [ ]' checkbox syntax."
+        },
+        {
+          "text": "The story markdown files follow the standard template with Source, Summary, Acceptance Criteria, Open Questions, and Out of Scope sections",
+          "passed": true,
+          "evidence": "Both story markdown files include Source, Summary, Acceptance Criteria, Open Questions, and Out of Scope sections."
+        },
+        {
+          "text": "The `bd create` commands include `--parent` referencing the Password Reset epic ID",
+          "passed": true,
+          "evidence": "Both task commands include `--parent bd-42` referencing the Password Reset epic."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "For each story, both the markdown content and the `bd create` command are shown",
+          "passed": true,
+          "evidence": "For each of the three stories, both the markdown file content and the corresponding `bd create` command are shown."
+        },
+        {
+          "text": "The `--description` value in each `bd create` command is verbatim or near-verbatim text from the Summary section of the corresponding story markdown — not a paraphrase or restatement",
+          "passed": true,
+          "evidence": "For 'Request Password Reset': Summary says 'User can request a password reset email by entering their registered email address.' The `--description` matches this verbatim."
+        },
+        {
+          "text": "The `--acceptance` value in each `bd create` command contains the same criteria text as the Acceptance Criteria section of the corresponding story markdown (textual identity, not just semantic similarity)",
+          "passed": true,
+          "evidence": "The `--acceptance` criteria text matches the Acceptance Criteria section items for all three stories."
+        },
+        {
+          "text": "Acceptance criteria in `--acceptance` do not include checkbox syntax ('- [ ]')",
+          "passed": true,
+          "evidence": "The `--acceptance` values use plain text without '- [ ]' checkbox syntax."
+        },
+        {
+          "text": "The story markdown files follow the standard template with Source, Summary, Acceptance Criteria, Open Questions, and Out of Scope sections",
+          "passed": false,
+          "evidence": "The baseline story markdown files include only '# Title', '## Summary', and '## Acceptance Criteria' sections — missing Source, Open Questions, and Out of Scope sections required by the standard template."
+        },
+        {
+          "text": "The `bd create` commands include `--parent` referencing the Password Reset epic ID",
+          "passed": true,
+          "evidence": "All three task commands include `--parent=<epic-id>` referencing the Password Reset epic."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +506,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

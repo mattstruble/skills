@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "pr-reviewer",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Output includes a Recommendation line stating the count of blocking and should-fix comments to post",
+          "passed": true,
+          "evidence": "The response includes: '### Recommendation\\nPost the 1 blocking + 1 should-fix comments. The 1 nit and highlights are optional.'"
+        },
+        {
+          "text": "The missing `exp` claim KeyError and the information-leaking error response appear under 🔴 Blocking with no prefix label",
+          "passed": true,
+          "evidence": "Both the missing `exp` claim and the error response detail appear under '### 🔴 Blocking (1)' with no prefix label on the finding text."
+        },
+        {
+          "text": "The rename suggestion appears under 🟡 Should-fix or 🟢 Nits and carries an `Optional:` or `Nit:` prefix",
+          "passed": true,
+          "evidence": "The rename suggestion appears under '### 🟡 Should-fix (1)' with 'Optional:' prefix: 'Optional: `do_auth` → `authenticate_request`'."
+        },
+        {
+          "text": "Comments are written about the code, not the person — no second-person constructions like 'you are leaking' or 'you forgot'",
+          "passed": true,
+          "evidence": "All comments describe the code: 'The `exp` field is accessed directly...', 'The error response distinguishes between failure reasons...' — no second-person constructions."
+        },
+        {
+          "text": "A ✅ Highlights section is present and references a specific positive observation from the sub-reviewers (e.g., the logging or the inline comments)",
+          "passed": true,
+          "evidence": "'### ✅ Highlights\\nThe try/except wrapping the token parsing logs the raw exception, which will make debugging malformed tokens straightforward in production without leaking information to callers.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Output includes a Recommendation line stating the count of blocking and should-fix comments to post",
+          "passed": false,
+          "evidence": "The baseline has '**Verdict:** Request changes (2 must-fix items)' at the bottom — not a Recommendation line at the top specifying blocking/should-fix counts to post."
+        },
+        {
+          "text": "The missing `exp` claim KeyError and the information-leaking error response appear under 🔴 Blocking with no prefix label",
+          "passed": false,
+          "evidence": "The baseline uses '[Must Fix]' severity labels, not the '🔴 Blocking' tier format. The findings are not organized under a 🔴 Blocking section."
+        },
+        {
+          "text": "The rename suggestion appears under 🟡 Should-fix or 🟢 Nits and carries an `Optional:` or `Nit:` prefix",
+          "passed": false,
+          "evidence": "The baseline uses '[Suggestion] (non-blocking)' severity label, not the tiered emoji format with 'Optional:' or 'Nit:' prefix."
+        },
+        {
+          "text": "Comments are written about the code, not the person — no second-person constructions like 'you are leaking' or 'you forgot'",
+          "passed": true,
+          "evidence": "All comments describe the code: 'The JWT expiry check uses...', 'The error response on failed auth returns...' — no second-person constructions."
+        },
+        {
+          "text": "A ✅ Highlights section is present and references a specific positive observation from the sub-reviewers (e.g., the logging or the inline comments)",
+          "passed": false,
+          "evidence": "The baseline has a '### Positives Noted' section, not a '✅ Highlights' section. The format does not match the required pr-reviewer output template."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The hardcoded credential is placed in 🔴 Blocking with no prefix, referencing the file and line number",
+          "passed": true,
+          "evidence": "The finding appears under '### 🔴 Blocking (1)' with '[config.py:2]' as the location reference and no prefix label."
+        },
+        {
+          "text": "The comment about the credential does NOT reproduce the actual secret value — it references the file and line location only",
+          "passed": true,
+          "evidence": "The comment says 'A credential is hardcoded in source at line 2' without reproducing the actual secret value."
+        },
+        {
+          "text": "The misleading variable name finding carries an `Optional:` or `Nit:` prefix and is placed in Should-fix or Nits",
+          "passed": true,
+          "evidence": "The finding appears under '### 🟢 Nits (1)' with 'Nit: `CLOUD_SECRET` is used as a database password, which is a confusing name.'"
+        },
+        {
+          "text": "The Recommendation line appears at the top of the output and specifies how many blocking comments to post",
+          "passed": true,
+          "evidence": "'### Recommendation\\nPost the 1 blocking comment immediately. The 1 nit is optional.' — at the top, specifying 1 blocking comment."
+        },
+        {
+          "text": "A ✅ Highlights section is present and cites a specific positive (e.g., the function's simplicity or auditability)",
+          "passed": true,
+          "evidence": "'### ✅ Highlights\\nThe connection function is short and easy to audit — one responsibility, no magic. That's the right shape for infrastructure code.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The hardcoded credential is placed in 🔴 Blocking with no prefix, referencing the file and line number",
+          "passed": false,
+          "evidence": "The baseline uses '[BLOCKING]' severity label with 'File: config.py, line 2' — not the '🔴 Blocking' tier format."
+        },
+        {
+          "text": "The comment about the credential does NOT reproduce the actual secret value — it references the file and line location only",
+          "passed": true,
+          "evidence": "The baseline says 'A cloud credential is hardcoded directly in source code' without reproducing the actual secret value."
+        },
+        {
+          "text": "The misleading variable name finding carries an `Optional:` or `Nit:` prefix and is placed in Should-fix or Nits",
+          "passed": false,
+          "evidence": "The baseline uses '[Suggestion] (non-blocking)' severity label, not the tiered emoji format with 'Optional:' or 'Nit:' prefix."
+        },
+        {
+          "text": "The Recommendation line appears at the top of the output and specifies how many blocking comments to post",
+          "passed": false,
+          "evidence": "The baseline has '**Verdict:** Blocked — do not merge until the hardcoded credential is removed and rotated.' at the bottom — not a Recommendation line at the top."
+        },
+        {
+          "text": "A ✅ Highlights section is present and cites a specific positive (e.g., the function's simplicity or auditability)",
+          "passed": false,
+          "evidence": "The baseline has '### Positives Noted' section, not a '✅ Highlights' section. The format does not match the required pr-reviewer output template."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The Recommendation line states the PR is clean — no findings from any reviewer — rather than listing blocking/should-fix counts",
+          "passed": true,
+          "evidence": "'### Recommendation\\nThis PR is clean — no findings from any reviewer. The highlights below are optional positive comments.'"
+        },
+        {
+          "text": "No 🔴 Blocking, 🟡 Should-fix, or 🟢 Nits sections appear in the output",
+          "passed": true,
+          "evidence": "The response contains only a Recommendation section and a ✅ Highlights section — no tier sections."
+        },
+        {
+          "text": "A ✅ Highlights section is present and contains specific observations drawn from the sub-reviewer positives",
+          "passed": true,
+          "evidence": "'### ✅ Highlights\\nThe boundary conditions on the pagination cursor are handled correctly for both empty results and last-page edge cases...'"
+        },
+        {
+          "text": "Highlights are specific and concrete, not generic — e.g., references pagination edge cases or the retry backoff cap rather than just 'good error handling'",
+          "passed": true,
+          "evidence": "Highlights reference 'pagination cursor', 'empty results and last-page edge cases', 'exponential backoff with a cap on transient 503s', and 'clear and consistent with the module's existing conventions'."
+        },
+        {
+          "text": "The output does not invent findings or add hedging concerns — it presents a clean result without manufacturing issues",
+          "passed": true,
+          "evidence": "The response presents only the clean result and highlights — no invented findings or hedging concerns."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The Recommendation line states the PR is clean — no findings from any reviewer — rather than listing blocking/should-fix counts",
+          "passed": true,
+          "evidence": "'**Verdict:** Approve. Clean implementation with good edge case handling.' — states the PR is clean and approved."
+        },
+        {
+          "text": "No 🔴 Blocking, 🟡 Should-fix, or 🟢 Nits sections appear in the output",
+          "passed": true,
+          "evidence": "The baseline contains only a Summary, Positives Noted, and Verdict — no tier sections."
+        },
+        {
+          "text": "A ✅ Highlights section is present and contains specific observations drawn from the sub-reviewer positives",
+          "passed": false,
+          "evidence": "The baseline has '### Positives Noted' section, not a '✅ Highlights' section. The format does not match the required pr-reviewer output template."
+        },
+        {
+          "text": "Highlights are specific and concrete, not generic — e.g., references pagination edge cases or the retry backoff cap rather than just 'good error handling'",
+          "passed": true,
+          "evidence": "The positives section references 'pagination cursor handle both empty results and last-page edge cases', 'exponential backoff and a cap', 'clear and consistent with the module's existing conventions', and 'validated and sanitized before use in the query builder'."
+        },
+        {
+          "text": "The output does not invent findings or add hedging concerns — it presents a clean result without manufacturing issues",
+          "passed": true,
+          "evidence": "The baseline presents only the clean result and positives — no invented findings."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

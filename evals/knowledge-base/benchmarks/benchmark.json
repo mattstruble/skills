@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "knowledge-base",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent greps decisions/ before creating any file to check for an existing node on this topic",
+          "passed": true,
+          "evidence": "Answer begins: 'Grep decisions/ for postgres, job-queue, redis — check if the old Redis decision exists.' Explicit grep step before any file creation."
+        },
+        {
+          "text": "The created file is placed in decisions/ with a YYYY-MM-DD- prefix in the filename (e.g. decisions/2026-07-22-postgres-for-job-queue.md)",
+          "passed": true,
+          "evidence": "Answer specifies 'Create decisions/YYYY-MM-DD-postgres-for-job-queue.md' with the correct path and date prefix."
+        },
+        {
+          "text": "The frontmatter includes type: decision, status: active, decision_date, and tags containing type/decision",
+          "passed": true,
+          "evidence": "YAML block shows type: decision, status: active, decision_date: YYYY-MM-DD, and tags: [type/decision, status/active]."
+        },
+        {
+          "text": "The note body uses the Context/Decided/Why/Open structure, not free-form prose",
+          "passed": true,
+          "evidence": "Body uses exactly **Context:**, **Decided:**, **Why:**, **Open:** headings."
+        },
+        {
+          "text": "The agent updates a relevant MOC to link the new decision note and confirms with the exact filename",
+          "passed": true,
+          "evidence": "'Update the relevant MOC (Decisions MOC or project MOC) to list the new decision.' and 'Logged as decisions/YYYY-MM-DD-postgres-for-job-queue.md.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent greps decisions/ before creating any file to check for an existing node on this topic",
+          "passed": false,
+          "evidence": "Baseline goes straight to creating the file with no grep or search step mentioned."
+        },
+        {
+          "text": "The created file is placed in decisions/ with a YYYY-MM-DD- prefix in the filename (e.g. decisions/2026-07-22-postgres-for-job-queue.md)",
+          "passed": true,
+          "evidence": "Baseline specifies 'decisions/YYYY-MM-DD-use-postgres-for-job-queue.md' with correct path and date prefix."
+        },
+        {
+          "text": "The frontmatter includes type: decision, status: active, decision_date, and tags containing type/decision",
+          "passed": false,
+          "evidence": "Baseline uses status: accepted (not active) and has no decision_date field, only date: 2024-12-15."
+        },
+        {
+          "text": "The note body uses the Context/Decided/Why/Open structure, not free-form prose",
+          "passed": false,
+          "evidence": "Baseline uses Context/Decision/Rationale/Consequences headings, not the required Context/Decided/Why/Open structure."
+        },
+        {
+          "text": "The agent updates a relevant MOC to link the new decision note and confirms with the exact filename",
+          "passed": false,
+          "evidence": "Baseline says 'Update the INDEX or relevant MOC to reference this note' but does not confirm with the exact filename."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent instructs setting status: superseded on the old note (decisions/2024-11-03-use-redis-for-job-queue.md), not deleting it",
+          "passed": true,
+          "evidence": "'Update the old note's frontmatter: Set status: superseded' and 'The old note remains as an audit trail — deleting it breaks the provenance chain.'"
+        },
+        {
+          "text": "The agent specifies adding a supersedes: field to the new decision note containing the full-path wikilink [[decisions/2024-11-03-use-redis-for-job-queue.md]]",
+          "passed": true,
+          "evidence": "New note YAML shows 'supersedes: [\"[[decisions/2024-11-03-use-redis-for-job-queue]]\"]' — full-path wikilink format."
+        },
+        {
+          "text": "The agent mentions bumping updated: on the old note when its status field is changed",
+          "passed": true,
+          "evidence": "'Bump updated: to today's date' is listed as step 1b when updating the old note's frontmatter."
+        },
+        {
+          "text": "The agent instructs updating the relevant MOC to point to the new decision, not the superseded one",
+          "passed": true,
+          "evidence": "'Update the relevant MOC — add the new decision, optionally annotate the old one as superseded.'"
+        },
+        {
+          "text": "The agent avoids recommending deletion of the old decision note",
+          "passed": true,
+          "evidence": "'The old decision note at decisions/2024-11-03-use-redis-for-job-queue.md should NOT be deleted.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent instructs setting status: superseded on the old note (decisions/2024-11-03-use-redis-for-job-queue.md), not deleting it",
+          "passed": true,
+          "evidence": "Baseline says 'don't delete it. Add a status: superseded field' — correct instruction."
+        },
+        {
+          "text": "The agent specifies adding a supersedes: field to the new decision note containing the full-path wikilink [[decisions/2024-11-03-use-redis-for-job-queue.md]]",
+          "passed": false,
+          "evidence": "Baseline references Eval 1 which uses 'supersedes: decisions/2024-11-03-use-redis-for-job-queue.md' — plain path, not a wikilink [[...]] format."
+        },
+        {
+          "text": "The agent mentions bumping updated: on the old note when its status field is changed",
+          "passed": false,
+          "evidence": "Baseline does not mention bumping updated: on the old note; it only adds status:superseded and superseded_by fields."
+        },
+        {
+          "text": "The agent instructs updating the relevant MOC to point to the new decision, not the superseded one",
+          "passed": true,
+          "evidence": "'Update any MOC or index that references the old decision — add the new one adjacent to it so readers find both.'"
+        },
+        {
+          "text": "The agent avoids recommending deletion of the old decision note",
+          "passed": true,
+          "evidence": "'Two things to handle: 1. Update the old note — don't delete it.' Explicit non-deletion instruction."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent places the note at people/dana-chen.md (kebab-case filename in the people/ folder)",
+          "passed": true,
+          "evidence": "Answer specifies 'Create people/dana-chen.md' — correct path and kebab-case filename."
+        },
+        {
+          "text": "The frontmatter includes type: person and tags containing type/person and role/collaborator",
+          "passed": true,
+          "evidence": "YAML shows type: person and tags: [type/person, role/collaborator, domain/data-pipeline]."
+        },
+        {
+          "text": "The related field uses full-path wikilinks (e.g. [[orgs/partner-org]], [[topics/data-pipeline]]) not bare [[dana-chen]] or markdown links",
+          "passed": true,
+          "evidence": "related: [\"[[topics/data-pipeline]]\"] — full-path wikilink format used in the related field."
+        },
+        {
+          "text": "The agent specifies updating the people MOC (or a domain MOC) to include [[people/dana-chen|Dana Chen]] with a one-line context description",
+          "passed": true,
+          "evidence": "'Update the relevant MOC (People MOC or project MOC) to include [[people/dana-chen|Dana Chen]] — ML infra lead, partner org, data pipeline collaboration'"
+        },
+        {
+          "text": "The agent avoids recommending markdown-style links ([Dana](./people/dana-chen.md)) for inter-wiki references",
+          "passed": true,
+          "evidence": "All cross-references use wikilink format [[...]]; no markdown-style [text](path) links appear."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent places the note at people/dana-chen.md (kebab-case filename in the people/ folder)",
+          "passed": true,
+          "evidence": "Baseline specifies 'Create a people note at people/dana-chen.md' — correct path."
+        },
+        {
+          "text": "The frontmatter includes type: person and tags containing type/person and role/collaborator",
+          "passed": false,
+          "evidence": "Baseline tags are [type/person, project/data-pipeline] — missing role/collaborator tag."
+        },
+        {
+          "text": "The related field uses full-path wikilinks (e.g. [[orgs/partner-org]], [[topics/data-pipeline]]) not bare [[dana-chen]] or markdown links",
+          "passed": false,
+          "evidence": "Baseline has no 'related' field in frontmatter; uses [[projects/data-pipeline]] in the body under a Links section, not in a related field."
+        },
+        {
+          "text": "The agent specifies updating the people MOC (or a domain MOC) to include [[people/dana-chen|Dana Chen]] with a one-line context description",
+          "passed": true,
+          "evidence": "'Update the wiki INDEX under a People section if one exists, or add her to the relevant project MOC.'"
+        },
+        {
+          "text": "The agent avoids recommending markdown-style links ([Dana](./people/dana-chen.md)) for inter-wiki references",
+          "passed": true,
+          "evidence": "Baseline uses wikilink [[projects/data-pipeline]] format; no markdown-style links recommended."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -14,7 +250,7 @@
     },
     "without_skill": {
       "pass_rate": {
-        "mean": 0.47,
+        "mean": 0.467,
         "stddev": 0.0
       }
     },
@@ -24,6 +260,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

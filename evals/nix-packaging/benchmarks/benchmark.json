@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "nix-packaging",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Explains lib.fakeHash as a bootstrap sentinel that intentionally fails to reveal the correct hash, not a placeholder to leave in place",
+          "passed": true,
+          "evidence": "The response states: '`lib.fakeHash` workflow is correct as a bootstrap step... This is a sentinel that intentionally fails the build' and step 2 says 'it fails with a hash mismatch error that prints the correct hash'."
+        },
+        {
+          "text": "Warns explicitly that committing lib.fakeHash or vendorHash = \"\" as final values will always fail the build",
+          "passed": true,
+          "evidence": "The response explicitly warns: '**Never commit `lib.fakeHash`** — it always fails'."
+        },
+        {
+          "text": "Shows subPackages = [ \"cmd/mytool\" ] to limit which binaries are built",
+          "passed": true,
+          "evidence": "The code example includes `subPackages = [ \"cmd/mytool\" ]` with the comment 'Build only the binary you want'."
+        },
+        {
+          "text": "Mentions vendorHash = null as the correct value only when there are no external dependencies",
+          "passed": true,
+          "evidence": "The response states: 'If the module has zero external dependencies, use `vendorHash = null;` (not `lib.fakeHash`)'."
+        },
+        {
+          "text": "Avoids suggesting manual hash computation or any workflow other than the fakeHash error-output bootstrap",
+          "passed": true,
+          "evidence": "The response only describes the fakeHash bootstrap workflow (set fakeHash, build, get error with correct hash, replace). No manual computation suggested."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Explains lib.fakeHash as a bootstrap sentinel that intentionally fails to reveal the correct hash, not a placeholder to leave in place",
+          "passed": true,
+          "evidence": "The baseline states: 'lib.fakeHash is fine for bootstrapping — the build fails, shows you the real hash, you paste it in.' It correctly describes the bootstrap workflow."
+        },
+        {
+          "text": "Warns explicitly that committing lib.fakeHash or vendorHash = \"\" as final values will always fail the build",
+          "passed": false,
+          "evidence": "The baseline does not explicitly warn against committing lib.fakeHash. It initially says 'lib.fakeHash is the wrong approach' but then says 'lib.fakeHash is fine for bootstrapping' without warning about committing it."
+        },
+        {
+          "text": "Shows subPackages = [ \"cmd/mytool\" ] to limit which binaries are built",
+          "passed": true,
+          "evidence": "The code example includes `subPackages = [ \"cmd/mytool\" ]` with the explanation 'This restricts `go build` to only the `cmd/mytool` package'."
+        },
+        {
+          "text": "Mentions vendorHash = null as the correct value only when there are no external dependencies",
+          "passed": false,
+          "evidence": "The baseline does not mention `vendorHash = null` for the case of no external dependencies."
+        },
+        {
+          "text": "Avoids suggesting manual hash computation or any workflow other than the fakeHash error-output bootstrap",
+          "passed": true,
+          "evidence": "The baseline only describes the fakeHash bootstrap workflow. No manual hash computation is suggested."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses --replace-fail instead of --replace, and explains that --replace silently succeeds even when the pattern is absent, leaving the hardcoded path in the binary",
+          "passed": true,
+          "evidence": "The response uses `--replace-fail` in the code and explains: 'Always use `--replace-fail` — the deprecated `--replace` silently succeeds when the pattern is absent, leaving the hardcoded path in the binary (runtime crash instead of build-time error)'."
+        },
+        {
+          "text": "Correctly distinguishes ${curl} (Nix interpolation, expands at instantiation) from $out (shell variable, available at build time) inside ''...'' strings",
+          "passed": true,
+          "evidence": "The response states: '`${curl}` is Nix interpolation (resolves to the store path at evaluation time). `$out` is a shell variable (available at build time). Don't confuse them.'"
+        },
+        {
+          "text": "Shows runHook preBuild and runHook postBuild inside the overridden buildPhase",
+          "passed": true,
+          "evidence": "The buildPhase includes `runHook preBuild` at the start and `runHook postBuild` at the end."
+        },
+        {
+          "text": "Explains that omitting runHook calls silently breaks setup hooks from dependencies, which is the most common cause of mysterious build failures after adding a dependency",
+          "passed": true,
+          "evidence": "The response states: '`runHook preBuild`/`runHook postBuild` is mandatory when overriding a phase — without it, setup hooks from dependencies silently break.'"
+        },
+        {
+          "text": "Prefers postPatch for substituteInPlace rather than patchPhase override, to compose with other patches",
+          "passed": true,
+          "evidence": "The response states: 'Use `postPatch` (extends patchPhase) rather than overriding `patchPhase` entirely — this composes better with patches from `patches = [...]`'."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Uses --replace-fail instead of --replace, and explains that --replace silently succeeds even when the pattern is absent, leaving the hardcoded path in the binary",
+          "passed": false,
+          "evidence": "The baseline code uses `--replace` (not `--replace-fail`) in the substituteInPlace calls, and does not explain the silent-success failure mode of `--replace`."
+        },
+        {
+          "text": "Correctly distinguishes ${curl} (Nix interpolation, expands at instantiation) from $out (shell variable, available at build time) inside ''...'' strings",
+          "passed": false,
+          "evidence": "The baseline says '`${curl}/bin/curl` references the Nix store path of curl at build time' — incorrectly describing Nix interpolation as happening 'at build time' rather than at instantiation/evaluation time."
+        },
+        {
+          "text": "Shows runHook preBuild and runHook postBuild inside the overridden buildPhase",
+          "passed": true,
+          "evidence": "The baseline buildPhase includes `runHook preBuild` and `runHook postBuild`."
+        },
+        {
+          "text": "Explains that omitting runHook calls silently breaks setup hooks from dependencies, which is the most common cause of mysterious build failures after adding a dependency",
+          "passed": true,
+          "evidence": "The baseline states: 'Always include `runHook preBuild`/`runHook postBuild`... Omitting them breaks things like `autoPatchelf`.' This addresses the silent breakage of setup hooks."
+        },
+        {
+          "text": "Prefers postPatch for substituteInPlace rather than patchPhase override, to compose with other patches",
+          "passed": true,
+          "evidence": "The baseline states: 'Do this in `postPatch` (runs after `patchPhase`), not in `buildPhase`'."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Places makeWrapper in nativeBuildInputs (not buildInputs), because it is a build tool that runs during the build, not a linked library",
+          "passed": true,
+          "evidence": "The code uses `nativeBuildInputs = [ makeWrapper ]` with the comment 'makeWrapper is a build tool'."
+        },
+        {
+          "text": "Uses lib.makeBinPath to construct the PATH prefix rather than manually concatenating store paths",
+          "passed": true,
+          "evidence": "The wrapProgram call uses `--prefix PATH : ${lib.makeBinPath [ curl jq ]}`."
+        },
+        {
+          "text": "Explains that wrapProgram embeds store paths in a wrapper script, and that every tool in --prefix PATH becomes a runtime closure entry — this is the most common source of unexpected closure size",
+          "passed": true,
+          "evidence": "The response explains: '`wrapProgram` creates a wrapper script that prepends `curl` and `jq`'s store paths to `PATH`... this is how Nix makes runtime tools available — since there's no global `/usr/bin`, tools must be explicitly injected.' The diagnostic section notes embedded store paths as a common cause."
+        },
+        {
+          "text": "Shows the diagnostic sequence: file to detect wrapper scripts, strings | grep /nix/store/ to see embedded paths, nix why-depends to trace the dependency chain",
+          "passed": true,
+          "evidence": "The diagnostic section shows: 'Check: `file $out/bin/myscript` — if it's a \"POSIX shell script\", it's a wrapper. Run `strings $out/bin/myscript | grep /nix/store/` to see what's embedded.' and `nix why-depends` is also shown."
+        },
+        {
+          "text": "Avoids suggesting propagatedBuildInputs or buildInputs for runtime tools that are only shelled out to",
+          "passed": true,
+          "evidence": "The response uses `nativeBuildInputs = [ makeWrapper ]` and does not suggest buildInputs or propagatedBuildInputs for curl or jq."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Places makeWrapper in nativeBuildInputs (not buildInputs), because it is a build tool that runs during the build, not a linked library",
+          "passed": true,
+          "evidence": "The baseline uses `nativeBuildInputs = [ makeWrapper ]` with the comment 'Do NOT put curl/jq in buildInputs — they're runtime deps managed by the wrapper'."
+        },
+        {
+          "text": "Uses lib.makeBinPath to construct the PATH prefix rather than manually concatenating store paths",
+          "passed": true,
+          "evidence": "The baseline uses `--prefix PATH : ${lib.makeBinPath [ curl jq ]}`."
+        },
+        {
+          "text": "Explains that wrapProgram embeds store paths in a wrapper script, and that every tool in --prefix PATH becomes a runtime closure entry — this is the most common source of unexpected closure size",
+          "passed": false,
+          "evidence": "The baseline says 'wrapProgram creates a wrapper script that sets PATH to include curl and jq's bin directories' but does not explain that every tool in --prefix PATH becomes a runtime closure entry or identify this as the most common source of unexpected closure size."
+        },
+        {
+          "text": "Shows the diagnostic sequence: file to detect wrapper scripts, strings | grep /nix/store/ to see embedded paths, nix why-depends to trace the dependency chain",
+          "passed": false,
+          "evidence": "The baseline shows `nix path-info`, `nix-store -qR`, `nix path-info -rSh`, and `nix why-depends` — but does NOT show `file` to detect wrapper scripts or `strings | grep /nix/store/` to see embedded paths."
+        },
+        {
+          "text": "Avoids suggesting propagatedBuildInputs or buildInputs for runtime tools that are only shelled out to",
+          "passed": true,
+          "evidence": "The baseline uses `nativeBuildInputs = [ makeWrapper ]` and does not suggest buildInputs or propagatedBuildInputs for curl or jq."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

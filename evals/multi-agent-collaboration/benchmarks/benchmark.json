@@ -2,28 +2,265 @@
   "metadata": {
     "skill_name": "multi-agent-collaboration",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the new-information criterion to evaluate whether a reviewer agent adds value",
+          "passed": true,
+          "evidence": "'If the reviewer is the same model re-reading its own output with no new information, it's ineffective.' — new-information criterion applied explicitly."
+        },
+        {
+          "text": "Identifies that a reviewer re-reading the same text without external tools adds no new signal",
+          "passed": true,
+          "evidence": "'Self-review by the same model is ineffective — the model has no new signal to improve on.' and 'If the Reviewer can only re-read the report with no external tools, use a single agent with more thinking budget instead.'"
+        },
+        {
+          "text": "Recommends a specific topology (peer Proposer-Reviewer or single-agent with role switching) with justification",
+          "passed": true,
+          "evidence": "'Recommendation: Separate agents with tool-based verification.' with Research/Writer/Reviewer roles and justification for each."
+        },
+        {
+          "text": "Explains when shared vs non-shared context is appropriate for this pipeline",
+          "passed": true,
+          "evidence": "'non-shared context — conclusions, not full trajectory' for Writer receiving from Research; 'the report + the original source references (for cross-checking)' for Reviewer."
+        },
+        {
+          "text": "Addresses the YAGNI gate — whether multi-agent is justified at all for this task",
+          "passed": true,
+          "evidence": "'Apply the YAGNI Gate first: does multi-agent add new information here?' — explicitly named and applied."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the new-information criterion to evaluate whether a reviewer agent adds value",
+          "passed": false,
+          "evidence": "Baseline does not use the 'new-information criterion' as a named framework; it evaluates the pipeline by task structure (linear dependency) rather than information value."
+        },
+        {
+          "text": "Identifies that a reviewer re-reading the same text without external tools adds no new signal",
+          "passed": false,
+          "evidence": "Baseline's reviewer 'checks factual claims against the research notes' — it has access to source material, but the answer doesn't identify re-reading as a signal-free action."
+        },
+        {
+          "text": "Recommends a specific topology (peer Proposer-Reviewer or single-agent with role switching) with justification",
+          "passed": true,
+          "evidence": "'Use a simple pipeline: Researcher → Writer → Reviewer' with justification for why not peer review and why not a manager agent."
+        },
+        {
+          "text": "Explains when shared vs non-shared context is appropriate for this pipeline",
+          "passed": false,
+          "evidence": "Baseline does not discuss shared vs non-shared context between agents; it focuses on task decomposition and pipeline structure."
+        },
+        {
+          "text": "Addresses the YAGNI gate — whether multi-agent is justified at all for this task",
+          "passed": true,
+          "evidence": "'Start with a single agent using staged prompting... Only split into separate agents when you hit context window limits or need different tool access per stage.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Correctly diagnoses the root cause as the reviewer lacking new information (not just 'bad prompting')",
+          "passed": true,
+          "evidence": "'The reviewer saying looks good every time is the §1 problem: no new information. The reviewer is the same model re-reading output it could have produced itself.'"
+        },
+        {
+          "text": "Explains the new-information criterion specifically in the context of the Proposer-Reviewer pattern",
+          "passed": true,
+          "evidence": "Table shows 'Re-reads the copy → No new information → This is what's happening' — new-information criterion applied directly to the Proposer-Reviewer pattern."
+        },
+        {
+          "text": "Recommends concrete ways to give the reviewer access to new information (external tools, metrics, brand guidelines, etc.)",
+          "passed": true,
+          "evidence": "'Give the reviewer access to external tools the proposer lacks. Brand checklist verification, readability scoring (Flesch-Kincaid), keyword density check, competitor copy comparison.'"
+        },
+        {
+          "text": "Mentions cognitive surrender or lazy fake-done as a related failure mode",
+          "passed": false,
+          "evidence": "Answer does not use the terms 'cognitive surrender' or 'lazy fake-done'; it describes the symptom ('agree') but not the named failure mode."
+        },
+        {
+          "text": "Does NOT recommend just 'improving the reviewer prompt' as the primary fix",
+          "passed": true,
+          "evidence": "Primary fix is giving the reviewer external tools; prompt improvement ('Adversarial framing') is listed as fix #3, not the primary recommendation."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Correctly diagnoses the root cause as the reviewer lacking new information (not just 'bad prompting')",
+          "passed": false,
+          "evidence": "Baseline lists 5 causes with #1 being 'Vague review criteria' (prompting) and #3 being 'Same model, same biases' — no single root cause of lacking new information."
+        },
+        {
+          "text": "Explains the new-information criterion specifically in the context of the Proposer-Reviewer pattern",
+          "passed": false,
+          "evidence": "Baseline does not name or apply the 'new-information criterion'; it focuses on rubric specificity and adversarial framing."
+        },
+        {
+          "text": "Recommends concrete ways to give the reviewer access to new information (external tools, metrics, brand guidelines, etc.)",
+          "passed": true,
+          "evidence": "'Give it brand guidelines or style guides, examples of good vs bad copy, the specific brief/requirements, target audience description.'"
+        },
+        {
+          "text": "Mentions cognitive surrender or lazy fake-done as a related failure mode",
+          "passed": false,
+          "evidence": "Neither 'cognitive surrender' nor 'lazy fake-done' appears in the baseline answer."
+        },
+        {
+          "text": "Does NOT recommend just 'improving the reviewer prompt' as the primary fix",
+          "passed": false,
+          "evidence": "'The fix is almost always #1: The reviewer needs a specific rubric with concrete, binary-checkable criteria.' — improving the prompt/rubric IS the primary fix."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies concurrency conflicts and cascading amplification as two distinct failure modes",
+          "passed": true,
+          "evidence": "'Two distinct failure modes: concurrency conflicts and cascading error amplification.' — named and separated explicitly."
+        },
+        {
+          "text": "Recommends working copy isolation (Git branches or worktrees per agent) for the concurrency problem",
+          "passed": true,
+          "evidence": "'Per-agent branches or worktrees. Each agent works in a Git branch or worktree. Edits are isolated during work. Merge after completion.'"
+        },
+        {
+          "text": "Recommends external validation (tests, compilers) as chain breakers for the cascading amplification problem",
+          "passed": true,
+          "evidence": "'External validation as chain breakers. Run tests, type checks, and linters after each agent's work. These ground the system in reality — a failing test breaks the amplification chain regardless of how many agents agree the code is correct.'"
+        },
+        {
+          "text": "Recommends cross-validation from an independent agent that hasn't seen prior output",
+          "passed": true,
+          "evidence": "'Cross-validation from independent perspective. An agent that hasn't seen prior output reviews the code independently. It can't be biased by well, agent A did it this way.'"
+        },
+        {
+          "text": "Addresses both problems rather than only one",
+          "passed": true,
+          "evidence": "Answer has two clearly labeled sections: 'Problem 1: Overwriting each other's changes' and 'Problem 2: Error propagation and confirmation' with distinct fixes for each."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies concurrency conflicts and cascading amplification as two distinct failure modes",
+          "passed": true,
+          "evidence": "'You have two problems: write conflicts and error propagation/mutual confirmation bias.' — two distinct failure modes identified."
+        },
+        {
+          "text": "Recommends working copy isolation (Git branches or worktrees per agent) for the concurrency problem",
+          "passed": true,
+          "evidence": "'Branch-per-agent with merge. Each agent works on its own git branch. A coordinator merges branches, resolving conflicts.'"
+        },
+        {
+          "text": "Recommends external validation (tests, compilers) as chain breakers for the cascading amplification problem",
+          "passed": true,
+          "evidence": "'Test-driven validation. Each agent's work must pass tests independently before being visible to others. Tests are written from the spec, not from the implementation.'"
+        },
+        {
+          "text": "Recommends cross-validation from an independent agent that hasn't seen prior output",
+          "passed": false,
+          "evidence": "Baseline recommends 'Spec-anchored review' (checking against requirements) and 'Immutable shared context' (agents don't see in-progress code) — but not specifically an independent agent that hasn't seen prior output."
+        },
+        {
+          "text": "Addresses both problems rather than only one",
+          "passed": true,
+          "evidence": "'Problem 1: Overwriting each other's changes' and 'Problem 2: Bug propagation and false confirmation' — both addressed with distinct solutions."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
-        "mean": 0.93,
+        "mean": 0.933,
         "stddev": 0.0
       }
     },
     "without_skill": {
       "pass_rate": {
-        "mean": 0.47,
+        "mean": 0.467,
         "stddev": 0.0
       }
     },
     "delta": {
-      "pass_rate": "+46%"
+      "pass_rate": "+47%"
     }
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "Committed delta was +46%; re-graded delta is +47% (within tolerance). Committed run_summary preserved."
   ]
 }

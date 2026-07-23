@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "prd-writing",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Asks exactly one question, not a list of multiple questions",
+          "passed": true,
+          "evidence": "Asks a single question: 'Who are the primary users of this dashboard?' with no additional questions listed."
+        },
+        {
+          "text": "Provides a recommended answer alongside the question rather than leaving it blank or using a literal placeholder like [X]",
+          "passed": true,
+          "evidence": "'My recommendation based on typical data dashboard use: internal team members (analysts, product managers) who use the dashboard for reporting.'"
+        },
+        {
+          "text": "Explicitly declines to batch questions and explains that one-at-a-time produces a better document",
+          "passed": true,
+          "evidence": "'I won't batch questions — one at a time produces a better document.'"
+        },
+        {
+          "text": "The first question targets problem/actors (Phase 1), not implementation details like technology choice or data format",
+          "passed": true,
+          "evidence": "First question is 'Who are the primary users of this dashboard?' — targets actors, not technology."
+        },
+        {
+          "text": "Does not ask about class names, file layout, or internal architecture",
+          "passed": true,
+          "evidence": "No implementation questions asked; question is purely about users and their role."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Asks exactly one question, not a list of multiple questions",
+          "passed": true,
+          "evidence": "Asks one question: 'Who are the users of this CSV export, and what will they do with the exported data?'"
+        },
+        {
+          "text": "Provides a recommended answer alongside the question rather than leaving it blank or using a literal placeholder like [X]",
+          "passed": false,
+          "evidence": "No recommended answer provided alongside the question; only a parenthetical note about the interview process is included."
+        },
+        {
+          "text": "Explicitly declines to batch questions and explains that one-at-a-time produces a better document",
+          "passed": true,
+          "evidence": "'I would not ask all questions at once — the PRD writing process is iterative, one question at a time, building understanding progressively.'"
+        },
+        {
+          "text": "The first question targets problem/actors (Phase 1), not implementation details like technology choice or data format",
+          "passed": true,
+          "evidence": "First question targets users and their goals: 'Who are the users of this CSV export, and what will they do with the exported data?'"
+        },
+        {
+          "text": "Does not ask about class names, file layout, or internal architecture",
+          "passed": true,
+          "evidence": "No implementation questions asked; question is about users and their use of the export."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that the bullets describe implementation structure (class names, library, internal types) rather than observable behavior",
+          "passed": true,
+          "evidence": "'It specifies implementation, not behavior. ExportController class, ExportService.generate(), Apache POI, ByteArrayOutputStream... these are implementation prescriptions.'"
+        },
+        {
+          "text": "Flags at least one specific example — ExportController, ExportService, Apache POI, ByteArrayOutputStream, or useState — as a PRD anti-pattern",
+          "passed": true,
+          "evidence": "Flags all five: ExportController, ExportService, Apache POI, ByteArrayOutputStream, and useState hook as implementation prescriptions."
+        },
+        {
+          "text": "Explains the principle: a PRD should specify what the system does from the outside, not how it is built",
+          "passed": true,
+          "evidence": "'A PRD describes what the system does from the outside, not class names, libraries, or internal architecture.'"
+        },
+        {
+          "text": "Offers at least one rewritten behavioral statement in plain language (e.g., 'User can download filtered rows as a CSV file')",
+          "passed": true,
+          "evidence": "Rewrites as: 'User can export the current dashboard view as a CSV file' and other plain behavioral statements."
+        },
+        {
+          "text": "Avoids recommending that implementation details be moved to a design doc rather than simply removed from the PRD",
+          "passed": true,
+          "evidence": "Suggests rewriting as behavioral statements; does not recommend moving details to a design doc."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that the bullets describe implementation structure (class names, library, internal types) rather than observable behavior",
+          "passed": true,
+          "evidence": "'This section has a fundamental problem: it describes implementation, not behavior.'"
+        },
+        {
+          "text": "Flags at least one specific example — ExportController, ExportService, Apache POI, ByteArrayOutputStream, or useState — as a PRD anti-pattern",
+          "passed": true,
+          "evidence": "Flags all five by name with specific explanations for each."
+        },
+        {
+          "text": "Explains the principle: a PRD should specify what the system does from the outside, not how it is built",
+          "passed": true,
+          "evidence": "'A PRD behavior should be testable by a QA person who has never seen the code.'"
+        },
+        {
+          "text": "Offers at least one rewritten behavioral statement in plain language (e.g., 'User can download filtered rows as a CSV file')",
+          "passed": true,
+          "evidence": "Rewrites as: 'B1: User can export the currently visible rows as a CSV file' and other behavioral statements."
+        },
+        {
+          "text": "Avoids recommending that implementation details be moved to a design doc rather than simply removed from the PRD",
+          "passed": true,
+          "evidence": "Rewrites as behavioral statements without suggesting moving details to a design doc."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Presents the captured behaviors and asks 'What's missing?' (the behavior coverage check) before writing the PRD",
+          "passed": false,
+          "evidence": "Jumps directly to writing the PRD without presenting behaviors or asking 'What's missing?' first."
+        },
+        {
+          "text": "Output follows the exact template structure: Problem Statement, User Stories, Expected Behaviors, Open Questions, and Out of Scope — in that order",
+          "passed": true,
+          "evidence": "PRD contains all five sections in the correct order: Problem Statement, User Stories, Expected Behaviors, Open Questions, Out of Scope."
+        },
+        {
+          "text": "Expected Behaviors are flat plain-language statements grouped under named capability headings, not nested sub-bullets or implementation steps",
+          "passed": true,
+          "evidence": "Behaviors grouped under 'File Upload' and 'Data Preview' as flat plain-language statements."
+        },
+        {
+          "text": "Explicitly states the file will be written to docs/prd.md and that committing is the user's responsibility — does not offer to commit",
+          "passed": false,
+          "evidence": "Shows markdown content but does not explicitly state the docs/prd.md path or mention that committing is the user's responsibility."
+        },
+        {
+          "text": "User Stories section contains 3–8 'As a [actor], I want [feature], so that [benefit]' entries, not a full specification",
+          "passed": true,
+          "evidence": "Three user stories in proper 'As a data analyst, I want..., so that...' format."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Presents the captured behaviors and asks 'What's missing?' (the behavior coverage check) before writing the PRD",
+          "passed": false,
+          "evidence": "Jumps directly to writing the PRD without presenting behaviors or asking 'What's missing?' first."
+        },
+        {
+          "text": "Output follows the exact template structure: Problem Statement, User Stories, Expected Behaviors, Open Questions, and Out of Scope — in that order",
+          "passed": false,
+          "evidence": "Uses 'Capability Group' structure with nested 'Behaviors' and 'Open Questions' per group; no User Stories section; Out of Scope present but template order not followed."
+        },
+        {
+          "text": "Expected Behaviors are flat plain-language statements grouped under named capability headings, not nested sub-bullets or implementation steps",
+          "passed": true,
+          "evidence": "Flat behavioral statements under 'Capability Group: File Upload' and 'Capability Group: Data Preview'."
+        },
+        {
+          "text": "Explicitly states the file will be written to docs/prd.md and that committing is the user's responsibility — does not offer to commit",
+          "passed": false,
+          "evidence": "Does not mention docs/prd.md path or committing responsibility."
+        },
+        {
+          "text": "User Stories section contains 3–8 'As a [actor], I want [feature], so that [benefit]' entries, not a full specification",
+          "passed": false,
+          "evidence": "No User Stories section present in the output."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded without_skill mean was 0.667 (committed: 0.600, diff: 0.067 > 0.02). Committed run_summary values preserved per drift guard rule."
   ]
 }

@@ -2,9 +2,401 @@
   "metadata": {
     "skill_name": "test-driven-development",
     "timestamp": "2026-07-23",
-    "evals_run": 5,
+    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "The agent wrote a failing test BEFORE writing any implementation code for the first behavior",
+          "passed": true,
+          "evidence": "'Tracer bullet — first test (RED):' shows test written first, then 'GREEN — minimal implementation:' shows implementation after."
+        },
+        {
+          "text": "The agent verified each test failed before writing implementation (watched it go RED)",
+          "passed": true,
+          "evidence": "'Run: fails (module doesn't exist).' — explicitly confirms the test failed before implementation."
+        },
+        {
+          "text": "The agent used vertical slicing: wrote one test, made it pass, then wrote the next test -- not all tests first",
+          "passed": true,
+          "evidence": "Shows single test first, then implementation, then 'Next tests (incremental loop)' — vertical slicing pattern."
+        },
+        {
+          "text": "The agent ran tests after each GREEN step to confirm they pass",
+          "passed": true,
+          "evidence": "'All pass against the implementation above. Each test was written one at a time, verified to fail for the right reason, then implementation adjusted if needed.'"
+        },
+        {
+          "text": "Tests cover multiple behaviors (@ symbol check, non-empty parts, domain dot check, valid case)",
+          "passed": true,
+          "evidence": "Tests cover: valid email, missing @, multiple @, empty local, empty domain, domain without dot — all required behaviors."
+        },
+        {
+          "text": "The final implementation passes all tests",
+          "passed": true,
+          "evidence": "Implementation shown handles all cases; 'All pass against the implementation above.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 3,
+        "failed": 3,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "The agent wrote a failing test BEFORE writing any implementation code for the first behavior",
+          "passed": false,
+          "evidence": "Writes ALL tests first (Step 1: 'Write the tests first'), then runs them (Step 2: 'all fail'), then implements (Step 3) — horizontal slicing, not test-first per behavior."
+        },
+        {
+          "text": "The agent verified each test failed before writing implementation (watched it go RED)",
+          "passed": true,
+          "evidence": "'Step 2: Run tests — all fail (RED).' — confirms tests fail before implementation."
+        },
+        {
+          "text": "The agent used vertical slicing: wrote one test, made it pass, then wrote the next test -- not all tests first",
+          "passed": false,
+          "evidence": "Writes all 8 tests first, then implements everything — explicit horizontal slicing."
+        },
+        {
+          "text": "The agent ran tests after each GREEN step to confirm they pass",
+          "passed": false,
+          "evidence": "Runs all tests at once after implementing everything; no per-behavior test runs."
+        },
+        {
+          "text": "Tests cover multiple behaviors (@ symbol check, non-empty parts, domain dot check, valid case)",
+          "passed": true,
+          "evidence": "Tests cover all required behaviors: valid email, missing @, multiple @, empty local, empty domain, domain without dot."
+        },
+        {
+          "text": "The final implementation passes all tests",
+          "passed": true,
+          "evidence": "'Step 4: Run tests — all pass (GREEN).'"
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent wrote a test that reproduces the bug (empty list case) BEFORE modifying stats.py",
+          "passed": true,
+          "evidence": "'RED — reproduce the bug:' shows test written before any modification to stats.py."
+        },
+        {
+          "text": "The agent ran the reproducing test and watched it fail (confirmed the bug exists)",
+          "passed": true,
+          "evidence": "'Run: `ZeroDivisionError` — confirmed the bug exists and this test catches it.'"
+        },
+        {
+          "text": "The agent then fixed the implementation in stats.py",
+          "passed": true,
+          "evidence": "'GREEN — fix:' shows the fix applied after the failing test."
+        },
+        {
+          "text": "The agent ran the test again and confirmed it passes after the fix",
+          "passed": true,
+          "evidence": "'Run: passes. The guard handles the empty case before division.'"
+        },
+        {
+          "text": "The fix handles the empty list case correctly (returns 0 or similar, does not raise)",
+          "passed": true,
+          "evidence": "`if not numbers: return 0` — handles empty list by returning 0."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "The agent wrote a test that reproduces the bug (empty list case) BEFORE modifying stats.py",
+          "passed": true,
+          "evidence": "'Step 1: Write a test that reproduces the bug (RED).' — test written before modifying stats.py."
+        },
+        {
+          "text": "The agent ran the reproducing test and watched it fail (confirmed the bug exists)",
+          "passed": true,
+          "evidence": "'Step 2: Confirm the bug — `test_average_empty_list_returns_zero` fails with ZeroDivisionError.'"
+        },
+        {
+          "text": "The agent then fixed the implementation in stats.py",
+          "passed": true,
+          "evidence": "'Step 3: Fix minimally (GREEN).' — fix applied after confirming the bug."
+        },
+        {
+          "text": "The agent ran the test again and confirmed it passes after the fix",
+          "passed": true,
+          "evidence": "'Step 4: Run tests — all pass.'"
+        },
+        {
+          "text": "The fix handles the empty list case correctly (returns 0 or similar, does not raise)",
+          "passed": true,
+          "evidence": "`if not numbers: return 0` — handles empty list correctly."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "The agent wrote characterization tests that pass against the CURRENT code before refactoring",
+          "passed": true,
+          "evidence": "'Step 1 — Characterize existing behavior:' with tests written against current implementation before any refactoring."
+        },
+        {
+          "text": "Characterization tests cover key behaviors: no discount, 5% discount tier, 10% discount tier, tax calculation",
+          "passed": true,
+          "evidence": "Tests cover: no items, below 50 (no discount), above 50 (5%), above 100 (10%), multiple items — all tiers covered."
+        },
+        {
+          "text": "The agent ran characterization tests and confirmed they all pass before making changes",
+          "passed": true,
+          "evidence": "'All pass against current implementation — GREEN confirmed.'"
+        },
+        {
+          "text": "The agent refactored in small steps, running tests after each change",
+          "passed": true,
+          "evidence": "'Step 2 — Refactor (extract methods):' then 'Run all tests — still GREEN. Behavior unchanged, logic separated into named methods.'"
+        },
+        {
+          "text": "The refactored code has separate methods for discount and tax calculation",
+          "passed": true,
+          "evidence": "`_calculate_discount(self, subtotal: float) -> float:` and `_calculate_tax(self, amount: float) -> float:` — separate methods."
+        },
+        {
+          "text": "All characterization tests still pass after refactoring is complete",
+          "passed": true,
+          "evidence": "'Run all tests — still GREEN. Behavior unchanged.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "The agent wrote characterization tests that pass against the CURRENT code before refactoring",
+          "passed": true,
+          "evidence": "'Step 1: Write characterization tests for current behavior (establish safety net).' — tests written before refactoring."
+        },
+        {
+          "text": "Characterization tests cover key behaviors: no discount, 5% discount tier, 10% discount tier, tax calculation",
+          "passed": true,
+          "evidence": "Tests cover: empty cart, single item no discount, >50 (5%), >100 (10%), custom tax rate, multiple items — all tiers covered."
+        },
+        {
+          "text": "The agent ran characterization tests and confirmed they all pass before making changes",
+          "passed": true,
+          "evidence": "'Step 2: Run — all pass (GREEN). The safety net is in place.'"
+        },
+        {
+          "text": "The agent refactored in small steps, running tests after each change",
+          "passed": true,
+          "evidence": "'Step 4: Run tests — all still pass (GREEN). Behavior unchanged.'"
+        },
+        {
+          "text": "The refactored code has separate methods for discount and tax calculation",
+          "passed": true,
+          "evidence": "`_calculate_discount(self, subtotal: float) -> float:` and `_calculate_tax(self, amount: float) -> float:` — separate methods."
+        },
+        {
+          "text": "All characterization tests still pass after refactoring is complete",
+          "passed": true,
+          "evidence": "'Step 4: Run tests — all still pass (GREEN). Behavior unchanged.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "The agent wrote at least one failing test BEFORE writing the palindrome implementation",
+          "passed": true,
+          "evidence": "'RED:' section shows tests written first, then 'GREEN:' shows implementation — test-first order maintained."
+        },
+        {
+          "text": "The agent did NOT write the implementation first and tests after",
+          "passed": true,
+          "evidence": "Tests shown in RED section before implementation in GREEN section."
+        },
+        {
+          "text": "The agent did NOT write implementation and tests in the same step without running the test first",
+          "passed": true,
+          "evidence": "Separate RED and GREEN phases with tests before implementation."
+        },
+        {
+          "text": "The agent verified the test failed before writing implementation",
+          "passed": false,
+          "evidence": "No explicit 'Run: fails' statement shown for the palindrome eval — RED section shows tests but no confirmation of failure before writing implementation."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 4,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "The agent wrote at least one failing test BEFORE writing the palindrome implementation",
+          "passed": false,
+          "evidence": "'This is trivial — TDD would be overkill. Just write it:' — implementation written first, tests added after."
+        },
+        {
+          "text": "The agent did NOT write the implementation first and tests after",
+          "passed": false,
+          "evidence": "Implementation written first under 'Just write it:', then tests shown separately after."
+        },
+        {
+          "text": "The agent did NOT write implementation and tests in the same step without running the test first",
+          "passed": false,
+          "evidence": "Implementation written before tests; TDD discipline abandoned for 'trivial' task."
+        },
+        {
+          "text": "The agent verified the test failed before writing implementation",
+          "passed": false,
+          "evidence": "No test written before implementation; no RED phase at all."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "The agent did NOT write all tests first and then all implementation (horizontal slicing)",
+          "passed": false,
+          "evidence": "'I'll write all characterization tests first (since you asked for tests-first-then-implement), then implement.' — explicitly uses horizontal slicing."
+        },
+        {
+          "text": "The agent used vertical slicing: one test, then implementation to pass it, then next test",
+          "passed": false,
+          "evidence": "Writes all 8 tests first, then all implementation — horizontal slicing despite TDD skill."
+        },
+        {
+          "text": "The agent explained to the user why vertical slicing is preferred over writing all tests first",
+          "passed": true,
+          "evidence": "'Note on TDD discipline: normally I'd write one test at a time in the incremental loop. Since you explicitly asked for all tests first, I'll do that — but this is the \"write all tests first\" approach which TDD cautions against.'"
+        },
+        {
+          "text": "The agent wrote a failing test before writing each piece of implementation",
+          "passed": false,
+          "evidence": "All tests written at once before any implementation; no per-test RED-GREEN cycle."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 4,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "The agent did NOT write all tests first and then all implementation (horizontal slicing)",
+          "passed": false,
+          "evidence": "'Step 1: Write ALL tests first.' — explicitly horizontal slicing, following user's request without pushback."
+        },
+        {
+          "text": "The agent used vertical slicing: one test, then implementation to pass it, then next test",
+          "passed": false,
+          "evidence": "All tests written first, then all implementation — horizontal slicing."
+        },
+        {
+          "text": "The agent explained to the user why vertical slicing is preferred over writing all tests first",
+          "passed": false,
+          "evidence": "No explanation given about vertical vs horizontal slicing; just follows the user's request."
+        },
+        {
+          "text": "The agent wrote a failing test before writing each piece of implementation",
+          "passed": false,
+          "evidence": "All tests written at once; no per-behavior RED-GREEN cycle."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +416,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded without_skill mean was 0.500 (committed: 0.533, diff: 0.033 > 0.02). Committed run_summary values preserved per drift guard rule."
   ]
 }

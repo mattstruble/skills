@@ -2,9 +2,235 @@
   "metadata": {
     "skill_name": "helm",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Explains that Bitnami charts store auto-generated passwords in a Kubernetes Secret and read from it on upgrade",
+          "passed": true,
+          "evidence": "\"Bitnami charts auto-generate passwords on first install and store them in a Kubernetes Secret. On helm upgrade, the chart reads from that Secret.\""
+        },
+        {
+          "text": "Identifies that auth.postgresPassword in the values file is silently ignored during helm upgrade",
+          "passed": true,
+          "evidence": "\"The auth.postgresPassword in your values file is silently ignored — the chart generates a NEW password, updates the Secret, but the running database still has the OLD one.\""
+        },
+        {
+          "text": "Provides the kubectl command to retrieve the existing password: kubectl get secret postgres0 -n db -o jsonpath='{.data.postgres-password}' | base64 -d",
+          "passed": true,
+          "evidence": "Shows `kubectl get secret postgres0-postgresql -n db -o jsonpath=\"{.data.postgres-password}\" | base64 -d` — correct pattern with the right secret name convention."
+        },
+        {
+          "text": "Shows the corrected upgrade command passing the retrieved password via --set auth.postgresPassword",
+          "passed": true,
+          "evidence": "Shows `helm upgrade postgres0 bitnami/postgresql ... --set auth.postgresPassword=\"$POSTGRES_PASSWORD\"` with the retrieved value."
+        },
+        {
+          "text": "Avoids suggesting that simply re-setting the password in the values file will fix the issue",
+          "passed": true,
+          "evidence": "\"Remove auth.postgresPassword from your values file entirely. Always pass it via --set from the live Secret at upgrade time.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Explains that Bitnami charts store auto-generated passwords in a Kubernetes Secret and read from it on upgrade",
+          "passed": true,
+          "evidence": "\"Bitnami PostgreSQL stores the generated password in a Secret on first install. On helm upgrade...the chart may regenerate certain secrets.\""
+        },
+        {
+          "text": "Identifies that auth.postgresPassword in the values file is silently ignored during helm upgrade",
+          "passed": false,
+          "evidence": "Baseline says \"if the password in values doesn't match what's in the existing Secret\" — implies the values file IS read and compared, not silently ignored. The key behavior (silent ignore) is not stated."
+        },
+        {
+          "text": "Provides the kubectl command to retrieve the existing password: kubectl get secret postgres0 -n db -o jsonpath='{.data.postgres-password}' | base64 -d",
+          "passed": true,
+          "evidence": "Shows `kubectl get secret -n db postgres0-postgresql -o jsonpath=\"{.data.postgres-password}\" | base64 -d` — correct command."
+        },
+        {
+          "text": "Shows the corrected upgrade command passing the retrieved password via --set auth.postgresPassword",
+          "passed": true,
+          "evidence": "Shows `helm upgrade postgres0 bitnami/postgresql ... --set auth.postgresPassword=$POSTGRES_PASSWORD`."
+        },
+        {
+          "text": "Avoids suggesting that simply re-setting the password in the values file will fix the issue",
+          "passed": true,
+          "evidence": "Recommends --set from existing secret or auth.existingSecret; does not suggest re-setting in values file."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "States that --atomic on a failed install rolls back and deletes the release entirely (not just rolls back to a prior revision)",
+          "passed": true,
+          "evidence": "\"When --atomic is used and the install fails, Helm automatically rolls back and deletes the release entirely.\""
+        },
+        {
+          "text": "Correctly instructs to re-run helm install, not helm upgrade, because the release was deleted",
+          "passed": true,
+          "evidence": "\"Use helm install again, not helm upgrade.\" and \"Running helm upgrade on a non-existent release fails with 'release not found.'\""
+        },
+        {
+          "text": "Flags that the example command is missing --version and explains why pinning is required",
+          "passed": false,
+          "evidence": "The answer includes --version in the retry command but never calls out that pinning is required or flags it as a general rule. The principle is not stated."
+        },
+        {
+          "text": "Explains that omitting --version silently pulls the latest chart version, which may restructure values or rename keys",
+          "passed": false,
+          "evidence": "No mention of the risk of omitting --version or that it silently pulls latest with potential breaking changes."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "States that --atomic on a failed install rolls back and deletes the release entirely (not just rolls back to a prior revision)",
+          "passed": true,
+          "evidence": "\"Since this was the first install (no previous revision to rollback to), it effectively does helm uninstall — deleting the failed release entirely.\""
+        },
+        {
+          "text": "Correctly instructs to re-run helm install, not helm upgrade, because the release was deleted",
+          "passed": true,
+          "evidence": "\"You must helm install again, not helm upgrade (there's nothing to upgrade).\""
+        },
+        {
+          "text": "Flags that the example command is missing --version and explains why pinning is required",
+          "passed": false,
+          "evidence": "No mention of --version pinning requirement anywhere in the answer."
+        },
+        {
+          "text": "Explains that omitting --version silently pulls the latest chart version, which may restructure values or rename keys",
+          "passed": false,
+          "evidence": "No mention of the risk of omitting --version or silent latest-chart pull behavior."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Includes global.security.allowInsecureImages: true and explains it is required because Bitnami enforces image signing for custom images",
+          "passed": true,
+          "evidence": "Shows `global.security.allowInsecureImages: true` with comment \"required: custom image isn't signed by Bitnami\" and key decisions note \"Bitnami enforces image signing by default; custom images need this opt-out\"."
+        },
+        {
+          "text": "Formats imagePullSecrets as a flat string list (- scaleway.registry), not as Kubernetes pod spec objects ({name: scaleway.registry})",
+          "passed": true,
+          "evidence": "Shows `- scaleway.registry` under global.imagePullSecrets with note \"flat string list — matches the Secret name in the db namespace\"."
+        },
+        {
+          "text": "Sets image.registry, image.repository, and image.tag as separate fields matching the provided image reference",
+          "passed": true,
+          "evidence": "Shows `image.registry: rg.fr-par.scw.cloud`, `image.repository: myorg/pgvector`, `image.tag: 17.3.0-debian-12-r0` as separate fields."
+        },
+        {
+          "text": "Pins the image tag to the exact provided tag (17.3.0-debian-12-r0) rather than using 'latest'",
+          "passed": true,
+          "evidence": "Uses exact tag `17.3.0-debian-12-r0` with note \"pin exact tag — database version compatibility is critical\"."
+        },
+        {
+          "text": "Avoids recommending the Kubernetes pod spec imagePullSecrets format ({name: ...}) which is incorrect for Bitnami chart values",
+          "passed": true,
+          "evidence": "\"imagePullSecrets uses flat strings (not {name: ...} objects) — this is the Bitnami chart format, not the Kubernetes pod spec format\"."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Includes global.security.allowInsecureImages: true and explains it is required because Bitnami enforces image signing for custom images",
+          "passed": false,
+          "evidence": "No mention of global.security.allowInsecureImages anywhere in the baseline answer. This critical Bitnami-specific requirement is absent."
+        },
+        {
+          "text": "Formats imagePullSecrets as a flat string list (- scaleway.registry), not as Kubernetes pod spec objects ({name: scaleway.registry})",
+          "passed": true,
+          "evidence": "Shows `- scaleway.registry` as a flat string under global.imagePullSecrets."
+        },
+        {
+          "text": "Sets image.registry, image.repository, and image.tag as separate fields matching the provided image reference",
+          "passed": true,
+          "evidence": "Shows `image.registry: rg.fr-par.scw.cloud`, `image.repository: myorg/pgvector`, `image.tag: 17.3.0-debian-12-r0` as separate fields."
+        },
+        {
+          "text": "Pins the image tag to the exact provided tag (17.3.0-debian-12-r0) rather than using 'latest'",
+          "passed": true,
+          "evidence": "Uses exact tag `17.3.0-debian-12-r0`."
+        },
+        {
+          "text": "Avoids recommending the Kubernetes pod spec imagePullSecrets format ({name: ...}) which is incorrect for Bitnami chart values",
+          "passed": true,
+          "evidence": "Uses flat string format `- scaleway.registry`; does not use {name:} format."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +250,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

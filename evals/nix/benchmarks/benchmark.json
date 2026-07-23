@@ -2,9 +2,333 @@
   "metadata": {
     "skill_name": "nix",
     "timestamp": "2026-07-23",
-    "evals_run": 4,
+    "evals_run": ["eval-0", "eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "eval-0",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Output includes a flake.nix with a devShell definition",
+          "passed": true,
+          "evidence": "The response includes a complete flake.nix with `devShells.${system}.default = pkgs.mkShell { ... }` defining the dev shell."
+        },
+        {
+          "text": "Output includes a .envrc file containing 'use flake'",
+          "passed": true,
+          "evidence": "The response includes a `.envrc` file with the single line `use flake`."
+        },
+        {
+          "text": "Agent consulted references/dev-environments.md",
+          "passed": false,
+          "evidence": "No mention of consulting references/dev-environments.md in the response."
+        },
+        {
+          "text": "flake.nix includes inputs.nixpkgs.follows pattern to avoid duplicate downloads",
+          "passed": false,
+          "evidence": "The flake.nix has only a single `nixpkgs` input with no other inputs, so the `follows` pattern is not demonstrated."
+        },
+        {
+          "text": "Response addresses the pip/sandbox limitation (gotcha about Python in Nix)",
+          "passed": false,
+          "evidence": "The response does not mention the pip/sandbox limitation or any Python-in-Nix gotcha. It only notes the `git add` requirement."
+        }
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "eval-0",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Output includes a flake.nix with a devShell definition",
+          "passed": true,
+          "evidence": "The response includes a complete flake.nix with `devShells.default = pkgs.mkShell { ... }` using flake-utils."
+        },
+        {
+          "text": "Output includes a .envrc file containing 'use flake'",
+          "passed": true,
+          "evidence": "The response includes a `.envrc` file with `use flake`."
+        },
+        {
+          "text": "Agent consulted references/dev-environments.md",
+          "passed": false,
+          "evidence": "No mention of consulting references/dev-environments.md."
+        },
+        {
+          "text": "flake.nix includes inputs.nixpkgs.follows pattern to avoid duplicate downloads",
+          "passed": false,
+          "evidence": "The flake.nix uses flake-utils but neither flake-utils nor any other input uses `inputs.nixpkgs.follows`."
+        },
+        {
+          "text": "Response addresses the pip/sandbox limitation (gotcha about Python in Nix)",
+          "passed": false,
+          "evidence": "The response does not address the pip/sandbox limitation. It mentions nix-direnv setup but not the Python-in-Nix sandbox gotcha."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Output includes flake.nix, darwin.nix, and home.nix files",
+          "passed": true,
+          "evidence": "The response provides all three files: flake.nix, darwin.nix, and home.nix with complete content."
+        },
+        {
+          "text": "darwin.nix includes system.primaryUser (required in 25.11)",
+          "passed": true,
+          "evidence": "darwin.nix includes `system.primaryUser = \"username\";` as required."
+        },
+        {
+          "text": "darwin.nix configures dark mode (AppleInterfaceStyle) and dock autohide",
+          "passed": true,
+          "evidence": "darwin.nix sets `system.defaults.NSGlobalDomain.AppleInterfaceStyle = \"Dark\"` and `system.defaults.dock.autohide = true`."
+        },
+        {
+          "text": "flake.nix targets aarch64-darwin for M4 Apple Silicon",
+          "passed": true,
+          "evidence": "flake.nix includes `nixpkgs.hostPlatform = \"aarch64-darwin\"` in the module configuration."
+        },
+        {
+          "text": "Homebrew section includes casks for firefox and visual-studio-code",
+          "passed": true,
+          "evidence": "darwin.nix includes `casks = [ \"firefox\" \"visual-studio-code\" ]` in the homebrew section."
+        },
+        {
+          "text": "home.nix configures zsh and starship prompt",
+          "passed": true,
+          "evidence": "home.nix configures `programs.zsh.enable = true` and `programs.starship.enable = true` with `enableZshIntegration = true`."
+        },
+        {
+          "text": "Agent consulted references/nix-darwin.md and references/home-manager.md",
+          "passed": false,
+          "evidence": "No mention of consulting references/nix-darwin.md or references/home-manager.md in the response."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.714,
+        "passed": 5,
+        "failed": 2,
+        "total": 7
+      },
+      "expectations": [
+        {
+          "text": "Output includes flake.nix, darwin.nix, and home.nix files",
+          "passed": true,
+          "evidence": "The response provides all three files: flake.nix, darwin.nix, and home.nix."
+        },
+        {
+          "text": "darwin.nix includes system.primaryUser (required in 25.11)",
+          "passed": false,
+          "evidence": "darwin.nix does not include `system.primaryUser`. The baseline response omits this required field entirely."
+        },
+        {
+          "text": "darwin.nix configures dark mode (AppleInterfaceStyle) and dock autohide",
+          "passed": true,
+          "evidence": "darwin.nix sets `system.defaults.dock.autohide = true` and `system.defaults.NSGlobalDomain.AppleInterfaceStyle = \"Dark\"`."
+        },
+        {
+          "text": "flake.nix targets aarch64-darwin for M4 Apple Silicon",
+          "passed": true,
+          "evidence": "flake.nix includes `system = \"aarch64-darwin\"` in the darwinSystem call."
+        },
+        {
+          "text": "Homebrew section includes casks for firefox and visual-studio-code",
+          "passed": true,
+          "evidence": "darwin.nix includes `casks = [ \"firefox\" \"visual-studio-code\" ]`."
+        },
+        {
+          "text": "home.nix configures zsh and starship prompt",
+          "passed": true,
+          "evidence": "home.nix configures `programs.zsh.enable = true` and `programs.starship.enable = true` with `enableZshIntegration = true`."
+        },
+        {
+          "text": "Agent consulted references/nix-darwin.md and references/home-manager.md",
+          "passed": false,
+          "evidence": "No mention of consulting references/nix-darwin.md or references/home-manager.md."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Output uses override (not overrideAttrs) for vim with python311",
+          "passed": true,
+          "evidence": "The overlay uses `prev.vim.override { python3 = prev.python311; }` — correctly using `override` not `overrideAttrs`."
+        },
+        {
+          "text": "Output uses callPackage for the custom mytool package",
+          "passed": true,
+          "evidence": "The overlay uses `mytool = final.callPackage ./pkgs/mytool.nix { }` — correct idiomatic callPackage usage."
+        },
+        {
+          "text": "Overlay uses correct final/prev parameter naming",
+          "passed": true,
+          "evidence": "The overlay is defined as `final: prev: { ... }` with correct parameter naming throughout."
+        },
+        {
+          "text": "Response explains binary cache invalidation tradeoff from overlays",
+          "passed": true,
+          "evidence": "The tradeoffs section explicitly states: 'Overlays invalidate binary cache for affected packages — vim will build from source since the derivation hash changes.'"
+        },
+        {
+          "text": "Agent consulted references/nixpkgs-advanced.md",
+          "passed": false,
+          "evidence": "No mention of consulting references/nixpkgs-advanced.md in the response."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Output uses override (not overrideAttrs) for vim with python311",
+          "passed": true,
+          "evidence": "The overlay uses `prev.vim.override { python3 = final.python311; }` — correctly using `override` not `overrideAttrs`."
+        },
+        {
+          "text": "Output uses callPackage for the custom mytool package",
+          "passed": true,
+          "evidence": "The overlay uses `mytool = final.callPackage ./pkgs/mytool.nix { src = mytool-src; }` — correct callPackage usage."
+        },
+        {
+          "text": "Overlay uses correct final/prev parameter naming",
+          "passed": true,
+          "evidence": "The overlay is defined as `final: prev: { ... }` with correct parameter naming."
+        },
+        {
+          "text": "Response explains binary cache invalidation tradeoff from overlays",
+          "passed": false,
+          "evidence": "The tradeoffs section discusses final/prev composability but does not mention binary cache invalidation — only infinite recursion avoidance and composability are addressed."
+        },
+        {
+          "text": "Agent consulted references/nixpkgs-advanced.md",
+          "passed": false,
+          "evidence": "No mention of consulting references/nixpkgs-advanced.md."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Response identifies git add as the fix for the missing file issue",
+          "passed": true,
+          "evidence": "The response explicitly states: 'Flakes only see git-tracked files. Your new `modules/vpn.nix` doesn't exist in the Nix evaluation because it's not staged: `git add modules/vpn.nix`'"
+        },
+        {
+          "text": "Response explains final vs prev confusion as the cause of infinite recursion in overlays",
+          "passed": true,
+          "evidence": "The response explains using `final` to reference the package being overridden causes infinite recursion, and shows the correct fix using `prev`."
+        },
+        {
+          "text": "Response suggests --show-trace or nix repl as debugging tools",
+          "passed": true,
+          "evidence": "The response suggests `sudo nixos-rebuild switch --show-trace -L -v` as a debugging tool."
+        },
+        {
+          "text": "Agent consulted references/best-practices.md",
+          "passed": false,
+          "evidence": "No mention of consulting references/best-practices.md in the response."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Response identifies git add as the fix for the missing file issue",
+          "passed": true,
+          "evidence": "The response explicitly states: 'File not tracked by git. Flakes only see files tracked by git. Run `git add modules/vpn.nix`'"
+        },
+        {
+          "text": "Response explains final vs prev confusion as the cause of infinite recursion in overlays",
+          "passed": true,
+          "evidence": "The response explains the `final.myPkg` vs `prev.myPkg` confusion as the cause of infinite recursion, with a clear BAD/GOOD example."
+        },
+        {
+          "text": "Response suggests --show-trace or nix repl as debugging tools",
+          "passed": true,
+          "evidence": "The response suggests `nixos-rebuild switch --show-trace` as a debugging step."
+        },
+        {
+          "text": "Agent consulted references/best-practices.md",
+          "passed": false,
+          "evidence": "No mention of consulting references/best-practices.md."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +348,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

@@ -2,9 +2,557 @@
   "metadata": {
     "skill_name": "python-design",
     "timestamp": "2026-07-23",
-    "evals_run": 7,
+    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5", "eval-6", "eval-7"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Flags `except Exception` as violating the specific exception types rule",
+          "passed": true,
+          "evidence": "'Bare `except Exception` catches everything including programming errors (`TypeError`, `AttributeError`) that indicate bugs, not expected failures.'"
+        },
+        {
+          "text": "Asks or identifies which exceptions db.get_user and process actually raise",
+          "passed": true,
+          "evidence": "'Find what `db.get_user` and `process` actually raise and catch those' — explicitly identifies the need to determine specific exceptions."
+        },
+        {
+          "text": "Rewrites the handler with specific exception types",
+          "passed": true,
+          "evidence": "Rewrites with `except UserNotFoundError:` and `except ProcessingError as e:` — specific exception types."
+        },
+        {
+          "text": "If broad catch is retained at the boundary, adds an inline comment explaining why",
+          "passed": true,
+          "evidence": "Broad catch removed entirely; specific exceptions used throughout — no need for justification comment."
+        },
+        {
+          "text": "Does not silently swallow exceptions without logging or re-raising",
+          "passed": true,
+          "evidence": "Each exception is logged with specific context: `log.warning('user_not_found', ...)` and `log.error('processing_failed', ...)`."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Flags `except Exception` as violating the specific exception types rule",
+          "passed": true,
+          "evidence": "'Bare `except Exception` swallows everything. You lose the specific error type, stack trace context, and the ability to handle different failures differently.'"
+        },
+        {
+          "text": "Asks or identifies which exceptions db.get_user and process actually raise",
+          "passed": true,
+          "evidence": "'A `db.get_user` failure (user not found vs database down) and a `process` failure (business logic error vs external service timeout) require different responses.'"
+        },
+        {
+          "text": "Rewrites the handler with specific exception types",
+          "passed": true,
+          "evidence": "Rewrites with `except db.UserNotFound:`, `except db.DatabaseError as e:`, and `except ValidationError as e:`."
+        },
+        {
+          "text": "If broad catch is retained at the boundary, adds an inline comment explaining why",
+          "passed": false,
+          "evidence": "Retains `except Exception:` at the bottom but adds no inline comment justifying it — only uses `log.exception` without explaining why broad catch is appropriate at this boundary."
+        },
+        {
+          "text": "Does not silently swallow exceptions without logging or re-raising",
+          "passed": true,
+          "evidence": "Uses `log.exception('unexpected error processing request', ...)` for the broad catch — captures stack trace."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies `str = \"\"` as an empty-string sentinel anti-pattern",
+          "passed": true,
+          "evidence": "'`\"\"` is not \"no value.\" The empty-string default conflates \"user explicitly passed empty string\" with \"user didn't pass anything.\"'"
+        },
+        {
+          "text": "Replaces the default with `None` or removes the default",
+          "passed": true,
+          "evidence": "Rewrites as `query: str | None = None`."
+        },
+        {
+          "text": "Updates the conditional check from `== \"\"` to `is None`",
+          "passed": true,
+          "evidence": "Rewrites check as `if query is None:`."
+        },
+        {
+          "text": "Explains why `\"\"` is not a valid sentinel for 'no value'",
+          "passed": true,
+          "evidence": "'conflates \"user explicitly passed empty string\" with \"user didn't pass anything\"' — clear explanation of the semantic problem."
+        },
+        {
+          "text": "Does not introduce other sentinel defaults ([], {}) in the rewrite",
+          "passed": true,
+          "evidence": "Only uses None as the default; no other sentinel values introduced."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies `str = \"\"` as an empty-string sentinel anti-pattern",
+          "passed": true,
+          "evidence": "'uses empty string as the sentinel for \"no query provided.\" This conflates \"user explicitly searched for empty string\" with \"user didn't provide a query.\"'"
+        },
+        {
+          "text": "Replaces the default with `None` or removes the default",
+          "passed": true,
+          "evidence": "Rewrites as `query: str | None = None`."
+        },
+        {
+          "text": "Updates the conditional check from `== \"\"` to `is None`",
+          "passed": true,
+          "evidence": "Rewrites check as `if query is None:`."
+        },
+        {
+          "text": "Explains why `\"\"` is not a valid sentinel for 'no value'",
+          "passed": true,
+          "evidence": "'conflates \"user explicitly searched for empty string\" with \"user didn't provide a query\"' — explains the semantic distinction."
+        },
+        {
+          "text": "Does not introduce other sentinel defaults ([], {}) in the rewrite",
+          "passed": true,
+          "evidence": "Only uses None; no other sentinel values introduced."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies type annotations in Args as redundant with PEP 484 signature annotations",
+          "passed": true,
+          "evidence": "'The type annotations already say everything the `Args` and `Returns` sections repeat — `price: Decimal`, `rate: float`, returns `Decimal`. Duplicating types in docstrings creates a second source of truth that drifts.'"
+        },
+        {
+          "text": "Identifies the Returns section as restating what the return type already says",
+          "passed": true,
+          "evidence": "Identifies Returns section as redundant with `-> Decimal` annotation and removes it in the rewrite."
+        },
+        {
+          "text": "Removes type annotations from Args entries",
+          "passed": true,
+          "evidence": "Rewritten docstring has no Args section with type annotations."
+        },
+        {
+          "text": "Removes or simplifies the Returns section",
+          "passed": true,
+          "evidence": "Returns section removed entirely from the rewritten docstring."
+        },
+        {
+          "text": "Keeps the one-line summary and any non-obvious information (e.g., Raises)",
+          "passed": true,
+          "evidence": "Keeps 'Rate is a decimal fraction (0.1 = 10% off)' — the non-obvious semantic information about the rate parameter."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies type annotations in Args as redundant with PEP 484 signature annotations",
+          "passed": true,
+          "evidence": "'`price (Decimal): The original price` — visible from `price: Decimal`' — explicitly identifies the redundancy."
+        },
+        {
+          "text": "Identifies the Returns section as restating what the return type already says",
+          "passed": true,
+          "evidence": "'visible from `-> Decimal` and the function name `calculate_discount`' — identifies Returns as redundant."
+        },
+        {
+          "text": "Removes type annotations from Args entries",
+          "passed": true,
+          "evidence": "Rewritten docstring has no Args section with type annotations."
+        },
+        {
+          "text": "Removes or simplifies the Returns section",
+          "passed": true,
+          "evidence": "Returns section removed entirely from the rewritten docstring."
+        },
+        {
+          "text": "Keeps the one-line summary and any non-obvious information (e.g., Raises)",
+          "passed": true,
+          "evidence": "Keeps 'Rate is a fraction, e.g. 0.1 for 10% off' — the non-obvious semantic information."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the import as unnecessary on Python 3.10+",
+          "passed": true,
+          "evidence": "'`from __future__ import annotations` is unnecessary here. Python 3.12 natively supports `X | Y` syntax and `list[int]` without it.'"
+        },
+        {
+          "text": "Explains that modern Python supports X | Y and list[int] natively",
+          "passed": true,
+          "evidence": "'Python 3.12 natively supports `X | Y` syntax and `list[int]` without it.'"
+        },
+        {
+          "text": "Removes the unnecessary import from the example",
+          "passed": true,
+          "evidence": "Rewritten code shows `from dataclasses import dataclass` without the `__future__` import."
+        },
+        {
+          "text": "Describes the legitimate use case: circular imports via TYPE_CHECKING",
+          "passed": true,
+          "evidence": "'The import only has value when you need to break circular type references via `TYPE_CHECKING`.'"
+        },
+        {
+          "text": "References the TYPE_CHECKING pattern for when the import is actually needed",
+          "passed": true,
+          "evidence": "Explicitly mentions TYPE_CHECKING as the legitimate use case for the import."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the import as unnecessary on Python 3.10+",
+          "passed": true,
+          "evidence": "'unnecessary on Python 3.12. It was needed on Python 3.7-3.9 to defer annotation evaluation (PEP 563).'"
+        },
+        {
+          "text": "Explains that modern Python supports X | Y and list[int] natively",
+          "passed": true,
+          "evidence": "'in 3.12 you don't need it at all for standard cases like this.'"
+        },
+        {
+          "text": "Removes the unnecessary import from the example",
+          "passed": true,
+          "evidence": "Rewritten code shows `from dataclasses import dataclass` without the `__future__` import."
+        },
+        {
+          "text": "Describes the legitimate use case: circular imports via TYPE_CHECKING",
+          "passed": false,
+          "evidence": "Mentions 'unusual edge cases involving runtime annotation inspection (Pydantic v1 had issues)' but does not describe the TYPE_CHECKING pattern for circular imports."
+        },
+        {
+          "text": "References the TYPE_CHECKING pattern for when the import is actually needed",
+          "passed": false,
+          "evidence": "Does not mention TYPE_CHECKING at all; only mentions Pydantic v1 as an edge case."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the generics restraint principle from the skill",
+          "passed": true,
+          "evidence": "'The generic `Repository[T]` base provides minimal value here.' — directly applies generics restraint."
+        },
+        {
+          "text": "Notes that each subclass adds domain-specific methods the generic base doesn't capture",
+          "passed": true,
+          "evidence": "'Both `UserRepository` and `OrderRepository` immediately add domain-specific methods — the generic base captures only a trivial skeleton (`get`, `save`, `delete`) that every repository would have anyway.'"
+        },
+        {
+          "text": "Questions whether the generic base justifies the abstraction overhead",
+          "passed": true,
+          "evidence": "'The generic base doesn't enable polymorphism — nowhere in the codebase will you write `def do_something(repo: Repository[T])`'"
+        },
+        {
+          "text": "Suggests a caller-facing Protocol as an alternative or complement",
+          "passed": true,
+          "evidence": "'A caller-facing `Protocol` would provide more value if you genuinely need to swap implementations.'"
+        },
+        {
+          "text": "Does not simply endorse the generic design without evaluating whether it adds value",
+          "passed": true,
+          "evidence": "Recommends removing the generic base and using plain concrete repositories instead."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the generics restraint principle from the skill",
+          "passed": true,
+          "evidence": "'This is over-engineered. The `Repository[T]` generic base class gives you nothing useful here.'"
+        },
+        {
+          "text": "Notes that each subclass adds domain-specific methods the generic base doesn't capture",
+          "passed": true,
+          "evidence": "'The interesting methods are on the subclasses. `get_by_email`, `get_active_users`, `get_by_user`, `get_pending` — these are the methods you actually call.'"
+        },
+        {
+          "text": "Questions whether the generic base justifies the abstraction overhead",
+          "passed": true,
+          "evidence": "'The generic base has no shared implementation... Each subclass implements them completely differently based on the entity type, database schema, and query patterns.'"
+        },
+        {
+          "text": "Suggests a caller-facing Protocol as an alternative or complement",
+          "passed": false,
+          "evidence": "Does not suggest Protocol; only recommends plain concrete repositories without a base class."
+        },
+        {
+          "text": "Does not simply endorse the generic design without evaluating whether it adds value",
+          "passed": true,
+          "evidence": "Recommends removing the generic base entirely."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "eval-6",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends Protocol for the caller-facing contract",
+          "passed": true,
+          "evidence": "'Use `Protocol`.' with a Protocol code example showing the plugin interface."
+        },
+        {
+          "text": "Explains that structural typing means plugins don't need to inherit",
+          "passed": true,
+          "evidence": "'Protocol uses structural typing — any class with matching methods satisfies the contract without inheriting from your base. Plugin authors don't need to `import` your interface.'"
+        },
+        {
+          "text": "Distinguishes between the caller-facing contract (Protocol) and implementor convenience (ABC)",
+          "passed": true,
+          "evidence": "'Use `ABC` only if you need to provide shared implementation that plugin authors inherit... Even then, callers should type against the `Protocol`, not the `ABC`.'"
+        },
+        {
+          "text": "Notes that callers should always type against the Protocol, not the ABC",
+          "passed": true,
+          "evidence": "'callers should type against the `Protocol`, not the `ABC`' — explicit statement."
+        },
+        {
+          "text": "Addresses the dynamic loading context — no inheritance coupling is an advantage",
+          "passed": true,
+          "evidence": "'Plugins are loaded dynamically at runtime — you don't control their source code. `Protocol` uses structural typing — any class with matching methods satisfies the contract without inheriting.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "eval-6",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends Protocol for the caller-facing contract",
+          "passed": true,
+          "evidence": "'Use Protocol.' with a Protocol code example."
+        },
+        {
+          "text": "Explains that structural typing means plugins don't need to inherit",
+          "passed": true,
+          "evidence": "'Structural typing. Plugins don't need to inherit from your base class. A third-party developer's class that happens to have the right methods... satisfies the protocol — no import of your package needed.'"
+        },
+        {
+          "text": "Distinguishes between the caller-facing contract (Protocol) and implementor convenience (ABC)",
+          "passed": true,
+          "evidence": "'When ABC would be better: If you have shared implementation (default methods, template method pattern) that all plugins should inherit. But for a pure interface definition with no shared logic, Protocol wins.'"
+        },
+        {
+          "text": "Notes that callers should always type against the Protocol, not the ABC",
+          "passed": false,
+          "evidence": "Does not explicitly state that callers should type against Protocol rather than ABC; only says Protocol wins for pure interface definitions."
+        },
+        {
+          "text": "Addresses the dynamic loading context — no inheritance coupling is an advantage",
+          "passed": true,
+          "evidence": "'This is critical when you don't control the plugin source.' — addresses dynamic loading context."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "eval-7",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies Pydantic BaseModel being used in internal business logic as the anti-pattern",
+          "passed": true,
+          "evidence": "'Pydantic `BaseModel` is being used as a domain object deep in the service layer. The problem: Pydantic's validation overhead and mutability are spreading beyond the boundary.'"
+        },
+        {
+          "text": "Explains that Pydantic carries validation overhead and mutability that internal logic doesn't need",
+          "passed": true,
+          "evidence": "'Pydantic's validation overhead and mutability are spreading beyond the boundary.'"
+        },
+        {
+          "text": "Recommends a frozen dataclass for the internal domain object",
+          "passed": true,
+          "evidence": "Shows `@dataclass(frozen=True)` for the internal `UserProfile` class."
+        },
+        {
+          "text": "Shows Pydantic at the boundary (e.g., CreateUserRequest) converting to the frozen dataclass",
+          "passed": true,
+          "evidence": "Shows `UserProfileRequest(BaseModel)` at boundary and conversion: `profile = UserProfile(**request.model_dump())`."
+        },
+        {
+          "text": "Internal functions are updated to accept the frozen dataclass, not the Pydantic model",
+          "passed": true,
+          "evidence": "`def calculate_loyalty_score(profile: UserProfile) -> float: ...` — accepts frozen dataclass."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "eval-7",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies Pydantic BaseModel being used in internal business logic as the anti-pattern",
+          "passed": true,
+          "evidence": "'Pydantic is being used as a domain object when it should only be at the boundary.'"
+        },
+        {
+          "text": "Explains that Pydantic carries validation overhead and mutability that internal logic doesn't need",
+          "passed": true,
+          "evidence": "'Pay Pydantic's validation overhead on every attribute access in hot paths. Make testing harder — you must construct full Pydantic models to test business logic.'"
+        },
+        {
+          "text": "Recommends a frozen dataclass for the internal domain object",
+          "passed": false,
+          "evidence": "Recommends plain `@dataclass` (not frozen) for internal use — misses the immutability requirement."
+        },
+        {
+          "text": "Shows Pydantic at the boundary (e.g., CreateUserRequest) converting to the frozen dataclass",
+          "passed": false,
+          "evidence": "Shows `UserProfileRequest(BaseModel)` at boundary converting to plain `@dataclass`, not frozen dataclass."
+        },
+        {
+          "text": "Internal functions are updated to accept the frozen dataclass, not the Pydantic model",
+          "passed": true,
+          "evidence": "Shows `def calculate_loyalty_score(profile: UserProfile) -> float: ...` accepting the dataclass."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +572,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

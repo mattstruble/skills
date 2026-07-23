@@ -2,9 +2,235 @@
   "metadata": {
     "skill_name": "docker",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Dockerfile uses multi-stage build with a separate builder and runtime stage",
+          "passed": true,
+          "evidence": "Uses 'FROM golang:1.23-bookworm AS builder' and 'FROM gcr.io/distroless/static AS runner' — two distinct stages."
+        },
+        {
+          "text": "CGO_ENABLED=0 is set in the build command to produce a static binary",
+          "passed": true,
+          "evidence": "'CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/server' explicitly sets CGO_ENABLED=0."
+        },
+        {
+          "text": "Runtime stage uses gcr.io/distroless/static or scratch (not a full OS image)",
+          "passed": true,
+          "evidence": "Runtime stage is 'FROM gcr.io/distroless/static AS runner'."
+        },
+        {
+          "text": "USER directive sets a non-root user (UID 65534 or similar) in the runtime stage",
+          "passed": true,
+          "evidence": "'USER nonroot' — distroless provides UID 65532 as the nonroot user."
+        },
+        {
+          "text": "ENTRYPOINT uses exec form (JSON array), not shell form",
+          "passed": true,
+          "evidence": "'ENTRYPOINT [\"/server\"]' uses exec/JSON array form."
+        },
+        {
+          "text": "BuildKit cache mounts are used for Go module cache (/go/pkg/mod)",
+          "passed": true,
+          "evidence": "'--mount=type=cache,target=/go/pkg/mod' is used in both the download and build steps."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Dockerfile uses multi-stage build with a separate builder and runtime stage",
+          "passed": true,
+          "evidence": "Uses 'FROM golang:1.22-alpine AS builder' and 'FROM scratch' — two distinct stages."
+        },
+        {
+          "text": "CGO_ENABLED=0 is set in the build command to produce a static binary",
+          "passed": true,
+          "evidence": "'RUN CGO_ENABLED=0 GOOS=linux go build ...' explicitly sets CGO_ENABLED=0."
+        },
+        {
+          "text": "Runtime stage uses gcr.io/distroless/static or scratch (not a full OS image)",
+          "passed": true,
+          "evidence": "Runtime stage is 'FROM scratch' — minimal base with zero attack surface."
+        },
+        {
+          "text": "USER directive sets a non-root user (UID 65534 or similar) in the runtime stage",
+          "passed": true,
+          "evidence": "'USER 65534:65534' sets the nobody UID in the runtime stage."
+        },
+        {
+          "text": "ENTRYPOINT uses exec form (JSON array), not shell form",
+          "passed": true,
+          "evidence": "'ENTRYPOINT [\"/server\"]' uses exec/JSON array form."
+        },
+        {
+          "text": "BuildKit cache mounts are used for Go module cache (/go/pkg/mod)",
+          "passed": false,
+          "evidence": "Uses plain 'RUN go mod download' without --mount=type=cache. No BuildKit cache mounts present."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Recommends pinning the image tag away from 'latest' to a specific version",
+          "passed": true,
+          "evidence": "Changes to 'lscr.io/linuxserver/qbittorrent:4.6.7' with comment '# pin version, never :latest'."
+        },
+        {
+          "text": "Recommends adding security_opt with no-new-privileges=true",
+          "passed": true,
+          "evidence": "Adds 'security_opt: - no-new-privileges=true' with explanation about setuid/setgid escalation."
+        },
+        {
+          "text": "Explains that PUID/PGID images (LinuxServer.io) still start as root before dropping privileges",
+          "passed": true,
+          "evidence": "'LinuxServer images start the entrypoint as root before dropping to PUID/PGID. This is less secure than images that never run as root at all.'"
+        },
+        {
+          "text": "Provides a concrete updated compose.yaml snippet or diff showing the improvements",
+          "passed": true,
+          "evidence": "Provides a complete updated compose.yaml with all security changes applied and annotated."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Recommends pinning the image tag away from 'latest' to a specific version",
+          "passed": false,
+          "evidence": "The compose snippet still shows 'image: lscr.io/linuxserver/qbittorrent:latest' — the tag is not pinned."
+        },
+        {
+          "text": "Recommends adding security_opt with no-new-privileges=true",
+          "passed": true,
+          "evidence": "Adds 'security_opt: - no-new-privileges:true' in the compose snippet."
+        },
+        {
+          "text": "Explains that PUID/PGID images (LinuxServer.io) still start as root before dropping privileges",
+          "passed": true,
+          "evidence": "Point 3 explains 'no-new-privileges: Prevents privilege escalation inside the container' and the cap_drop/cap_add discussion acknowledges the root start."
+        },
+        {
+          "text": "Provides a concrete updated compose.yaml snippet or diff showing the improvements",
+          "passed": true,
+          "evidence": "Provides a full updated compose.yaml snippet with security_opt, cap_drop, read_only, and tmpfs applied."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Compose file defines a named volume with driver: local and driver_opts for NFS (type: nfs, addr pointing to 192.168.1.50, device with the share path)",
+          "passed": true,
+          "evidence": "nfs_data volume uses 'driver: local' with driver_opts type: nfs, device: ':/volume1/nextcloud'."
+        },
+        {
+          "text": "The NFS volume uses driver_opts with 'o' field containing addr=192.168.1.50",
+          "passed": true,
+          "evidence": "'o: \"addr=192.168.1.50,nolock,hard,timeo=600,retrans=3,nfsvers=4\"' is present in driver_opts."
+        },
+        {
+          "text": "Compose file includes security hardening (user directive, security_opt no-new-privileges, or equivalent)",
+          "passed": true,
+          "evidence": "Both services include 'security_opt: - no-new-privileges=true' and 'cap_drop: - ALL'."
+        },
+        {
+          "text": "Services use depends_on or healthcheck for startup ordering if a database is included",
+          "passed": true,
+          "evidence": "db service has a healthcheck, and nextcloud uses 'depends_on: db: condition: service_healthy'."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Compose file defines a named volume with driver: local and driver_opts for NFS (type: nfs, addr pointing to 192.168.1.50, device with the share path)",
+          "passed": false,
+          "evidence": "Volume defines driver_opts but omits the explicit 'driver: local' field — the expectation requires both driver: local and driver_opts to be present."
+        },
+        {
+          "text": "The NFS volume uses driver_opts with 'o' field containing addr=192.168.1.50",
+          "passed": true,
+          "evidence": "'o: addr=192.168.1.50,rw,nolock,soft' is present in driver_opts."
+        },
+        {
+          "text": "Compose file includes security hardening (user directive, security_opt no-new-privileges, or equivalent)",
+          "passed": true,
+          "evidence": "Both services include 'security_opt: - no-new-privileges:true' and 'cap_drop: - ALL'."
+        },
+        {
+          "text": "Services use depends_on or healthcheck for startup ordering if a database is included",
+          "passed": true,
+          "evidence": "db has a healthcheck and nextcloud uses 'depends_on: db: condition: service_healthy' for startup ordering."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +250,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

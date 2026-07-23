@@ -2,9 +2,869 @@
   "metadata": {
     "skill_name": "agent-post-training",
     "timestamp": "2026-07-23",
-    "evals_run": 11,
+    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4", "eval-5", "eval-6", "eval-7", "eval-8", "eval-9", "eval-10", "eval-11"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends the model-swap experiment before committing to fine-tuning: swap to a stronger frontier model with the same harness and check whether scores improve materially",
+          "passed": true,
+          "evidence": "'Run the model-swap experiment first. Before fine-tuning, fix the harness and swap to a stronger frontier model. If scores jump from 78% to, say, 88%, the bottleneck was the model.'"
+        },
+        {
+          "text": "Frames the decision correctly: if scores jump on model swap, the bottleneck is the model (SFT is warranted); if scores don't improve, the bottleneck is still the harness",
+          "passed": true,
+          "evidence": "'If scores don't improve with a stronger model, the bottleneck is your harness, not the model.' Explicitly frames the model-swap as a bottleneck diagnostic."
+        },
+        {
+          "text": "Applies the YAGNI gate: post-training is 10–100× more expensive than harness iteration and harder to reverse — exhaust the harness first",
+          "passed": true,
+          "evidence": "'a dozen prompt iterations doesn't mean the harness is exhausted — it means prompt engineering specifically may be exhausted. Context management, tool design, and workflow structure are separate harness levers.'"
+        },
+        {
+          "text": "Identifies what SFT is appropriate for in this context: stabilizing output format and baking in protocol knowledge, not injecting factual knowledge",
+          "passed": true,
+          "evidence": "'Customer service has stable deployment distribution, clear output format (response templates), and demonstrable protocol knowledge (escalation rules, identity verification steps). These are exactly what SFT excels at.'"
+        },
+        {
+          "text": "Avoids recommending RL at this stage — RL is warranted only when SFT has hit its ceiling and deployment distribution shifts systematically",
+          "passed": true,
+          "evidence": "'Don't jump to RL unless: deployment distribution shifts (new products, new policies regularly), or your demonstrations are provably suboptimal.' Neither condition is established here."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends the model-swap experiment before committing to fine-tuning: swap to a stronger frontier model with the same harness and check whether scores improve materially",
+          "passed": false,
+          "evidence": "Baseline mentions 'Model upgrade: If you're on GPT-4o-mini or an older model, try a stronger base model' but frames it as one of several checks, not as a diagnostic experiment to identify the bottleneck."
+        },
+        {
+          "text": "Frames the decision correctly: if scores jump on model swap, the bottleneck is the model (SFT is warranted); if scores don't improve, the bottleneck is still the harness",
+          "passed": false,
+          "evidence": "Baseline does not frame the model upgrade as a bottleneck diagnostic. It lists model upgrade alongside error analysis and prompt engineering without the model-vs-harness framing."
+        },
+        {
+          "text": "Applies the YAGNI gate: post-training is 10–100× more expensive than harness iteration and harder to reverse — exhaust the harness first",
+          "passed": false,
+          "evidence": "Baseline checks harness issues first but does not apply the YAGNI gate or quantify the cost differential between harness iteration and fine-tuning."
+        },
+        {
+          "text": "Identifies what SFT is appropriate for in this context: stabilizing output format and baking in protocol knowledge, not injecting factual knowledge",
+          "passed": true,
+          "evidence": "'When fine-tuning IS the right call: Failures are about format/style consistency that prompting can't enforce... The agent needs to learn company-specific patterns that are hard to articulate in rules.'"
+        },
+        {
+          "text": "Avoids recommending RL at this stage — RL is warranted only when SFT has hit its ceiling and deployment distribution shifts systematically",
+          "passed": false,
+          "evidence": "Baseline does not mention RL at all. While it avoids recommending RL, it does so by omission rather than by applying the decision framework."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the one-sentence rule: SFT memorizes (fixed input→output mapping from demonstrations), RL generalizes (transferable strategy by optimizing for outcomes)",
+          "passed": true,
+          "evidence": "'SFT memorizes patterns from the 2000 training examples. Novel codebases are out-of-distribution; the model recites old patterns rather than adapting.' and 'RL can discover that a different tool-call sequence works better for structures it's never seen.'"
+        },
+        {
+          "text": "Identifies novel codebases as a distribution shift problem — the classic SFT failure mode — making RL the appropriate tool",
+          "passed": true,
+          "evidence": "'This is a distribution shift problem — the classic SFT failure mode. SFT's ceiling is the training distribution; RL generalizes beyond it.'"
+        },
+        {
+          "text": "Notes the ordering constraint: SFT must precede RL for smaller models with structured output requirements",
+          "passed": true,
+          "evidence": "'Phase 1: SFT warm-up — Use your 2000 labeled examples to establish stable output format (correct tool-call syntax, proper edit format, structured reasoning). SFT ensures the base model produces parseable output that the reward function can evaluate.'"
+        },
+        {
+          "text": "Addresses demonstration quality: 2000 examples is a reasonable SFT dataset, but the ceiling is the demonstrator's level",
+          "passed": true,
+          "evidence": "'2000 examples is a reasonable SFT dataset, but adding more won't solve the distribution-shift problem.' and 'RL can discover that a different tool-call sequence works better — something no amount of demonstration data teaches if the demonstrations themselves use suboptimal strategies.'"
+        },
+        {
+          "text": "Identifies the RL prerequisite: verifiable correctness (tests pass/fail) makes this task well-suited for RL",
+          "passed": true,
+          "evidence": "'The task has verifiable correctness: tests pass or fail. This gives you a clean binary outcome reward signal — ideal for RL. The environment is buildable: code sandboxes exist, test suites provide feedback.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the one-sentence rule: SFT memorizes (fixed input→output mapping from demonstrations), RL generalizes (transferable strategy by optimizing for outcomes)",
+          "passed": true,
+          "evidence": "'SFT teaches imitation of your 2000 examples... RL can teach the model to explore and adapt — to try things, get feedback (tests pass/fail), and learn policies that generalize beyond the training distribution.'"
+        },
+        {
+          "text": "Identifies novel codebases as a distribution shift problem — the classic SFT failure mode — making RL the appropriate tool",
+          "passed": true,
+          "evidence": "'The RL phase teaches the model to be robust to distribution shift — exactly your \"novel codebases\" requirement.'"
+        },
+        {
+          "text": "Notes the ordering constraint: SFT must precede RL for smaller models with structured output requirements",
+          "passed": true,
+          "evidence": "'SFT first, RL second... SFT on your 2000 examples to establish baseline competence. Then RL with test-pass/fail as the reward signal.'"
+        },
+        {
+          "text": "Addresses demonstration quality: 2000 examples is a reasonable SFT dataset, but the ceiling is the demonstrator's level",
+          "passed": true,
+          "evidence": "'2000 labeled examples is enough for meaningful SFT (though more is better). SFT teaches the model the format, style, and basic patterns of good code edits.'"
+        },
+        {
+          "text": "Identifies the RL prerequisite: verifiable correctness (tests pass/fail) makes this task well-suited for RL",
+          "passed": true,
+          "evidence": "'RL with test-pass/fail as the reward signal, running against held-out codebases the model hasn't seen in SFT.' Binary test pass/fail identified as the reward signal."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends the model-swap experiment first: swap to a stronger frontier model with the same prompt and measure the accuracy delta before committing to fine-tuning",
+          "passed": false,
+          "evidence": "Answer recommends error analysis, context check, and few-shot examples before fine-tuning but does not explicitly recommend a model-swap experiment as the first diagnostic step."
+        },
+        {
+          "text": "Identifies this as a strong SFT candidate if fine-tuning is warranted: the task is classification with a fixed label set, training and deployment distributions are close, and format stabilization is the primary need",
+          "passed": true,
+          "evidence": "'What fine-tuning would buy: Cost reduction... Speed... Marginal accuracy gain: SFT on correctly classified examples might push accuracy 3-5 points if the failures are consistent patterns.'"
+        },
+        {
+          "text": "Notes SFT's ceiling: fine-tuning cannot exceed the quality of the demonstration labels — if the 82% ceiling reflects ambiguous categories or inconsistent labeling, SFT will not break through it",
+          "passed": true,
+          "evidence": "'If the 18% failures are due to genuinely ambiguous contracts (contracts that could fit multiple categories), no amount of training fixes that — you need clearer category definitions.'"
+        },
+        {
+          "text": "Applies the YAGNI gate: post-training is expensive and hard to reverse; 82% with a prompt may be close to the ceiling for this task regardless of training approach",
+          "passed": true,
+          "evidence": "'ROI calculation: If few-shot examples push you from 82% to 88% (free), fine-tuning is only worth it for cost reduction at scale or the last few percentage points.'"
+        },
+        {
+          "text": "Identifies what SFT cannot do here: inject knowledge about legal contract nuances that the model doesn't have — that requires better context (contract definitions, examples) not model weights",
+          "passed": true,
+          "evidence": "'If failures correlate with specific contract subtypes absent from training data, SFT may help but you need those subtypes in the training set first.' Implies SFT cannot inject knowledge not in demonstrations."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends the model-swap experiment first: swap to a stronger frontier model with the same prompt and measure the accuracy delta before committing to fine-tuning",
+          "passed": false,
+          "evidence": "Baseline recommends fine-tuning a smaller model to match GPT-4's performance, not a model-swap experiment to diagnose whether the bottleneck is the model or the harness."
+        },
+        {
+          "text": "Identifies this as a strong SFT candidate if fine-tuning is warranted: the task is classification with a fixed label set, training and deployment distributions are close, and format stabilization is the primary need",
+          "passed": true,
+          "evidence": "'Fine-tune GPT-4o-mini or a similar small model on your 12-class task. You'll likely hit 90%+ accuracy at a fraction of GPT-4 cost.' Treats it as a strong SFT candidate."
+        },
+        {
+          "text": "Notes SFT's ceiling: fine-tuning cannot exceed the quality of the demonstration labels — if the 82% ceiling reflects ambiguous categories or inconsistent labeling, SFT will not break through it",
+          "passed": false,
+          "evidence": "Baseline mentions 'ceiling for prompting on classification tasks is usually 85-90% with GPT-4' but does not address SFT's ceiling being bounded by demonstration label quality."
+        },
+        {
+          "text": "Applies the YAGNI gate: post-training is expensive and hard to reverse; 82% with a prompt may be close to the ceiling for this task regardless of training approach",
+          "passed": false,
+          "evidence": "Baseline says 'If 82% is good enough and cost isn't a problem → stay with prompting' but does not apply the YAGNI gate or quantify the cost/reversibility of fine-tuning vs. prompt iteration."
+        },
+        {
+          "text": "Identifies what SFT cannot do here: inject knowledge about legal contract nuances that the model doesn't have — that requires better context (contract definitions, examples) not model weights",
+          "passed": false,
+          "evidence": "Baseline does not address what SFT cannot do. It focuses on what fine-tuning provides (accuracy, cost, format) without identifying the knowledge injection limitation."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies this as a protocol knowledge problem — exactly what SFT is designed for: baking in 'how to say and do things' (the correct API call sequence)",
+          "passed": true,
+          "evidence": "'SFT. This is a protocol knowledge problem. The API has a specific, fixed call sequence... The model getting the order wrong or skipping steps is exactly what SFT solves — baking protocol knowledge into the model.'"
+        },
+        {
+          "text": "Recommends SFT over RL: the call sequence is fixed and known, the training and deployment distributions are close, and the task does not require discovering novel strategies",
+          "passed": true,
+          "evidence": "'Why SFT is right: The sequence is stable... The correct behavior is demonstrable... The training and deployment distributions are close... This is format/process solidification — SFT's sweet spot.'"
+        },
+        {
+          "text": "Notes that a few hundred high-quality demonstration trajectories showing the correct sequence will efficiently bake the protocol into the model",
+          "passed": true,
+          "evidence": "'SFT with 100-200 demonstration trajectories showing the correct call sequence. Include examples where the model encounters errors at each step so it learns the error-handling branches too.'"
+        },
+        {
+          "text": "Applies the YAGNI gate: RL is not warranted unless the API usage patterns are highly variable and optimal call sequences need to be discovered",
+          "passed": true,
+          "evidence": "'RL is not warranted unless the optimal API call sequence is unknown or varies per request in ways that can't be demonstrated. For a fixed protocol, SFT memorizes the correct sequence efficiently.'"
+        },
+        {
+          "text": "Addresses demonstration quality: demonstrations must show the complete correct sequence including authentication, not just the happy path",
+          "passed": true,
+          "evidence": "'Include examples where the model encounters errors at each step (authentication fails → retry, inventory unavailable → inform user) so it learns the error-handling branches too.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies this as a protocol knowledge problem — exactly what SFT is designed for: baking in 'how to say and do things' (the correct API call sequence)",
+          "passed": true,
+          "evidence": "'SFT is the right approach here. The problem is sequential procedure following — a memorization task, not an exploration task.' and 'SFT directly teaches \"given this state, the next correct action is X.\"'"
+        },
+        {
+          "text": "Recommends SFT over RL: the call sequence is fixed and known, the training and deployment distributions are close, and the task does not require discovering novel strategies",
+          "passed": true,
+          "evidence": "'Why SFT, not RL: The correct sequence is deterministic... RL is for learning policies in environments with multiple valid strategies and delayed feedback. Your task has a single correct path.'"
+        },
+        {
+          "text": "Notes that a few hundred high-quality demonstration trajectories showing the correct sequence will efficiently bake the protocol into the model",
+          "passed": true,
+          "evidence": "'Generate 200-500 examples of correct API call sequences with varied inputs (different products, quantities, auth tokens).'"
+        },
+        {
+          "text": "Applies the YAGNI gate: RL is not warranted unless the API usage patterns are highly variable and optimal call sequences need to be discovered",
+          "passed": false,
+          "evidence": "Baseline does not apply the YAGNI gate or explicitly state when RL would be warranted. It recommends SFT correctly but without the YAGNI framing."
+        },
+        {
+          "text": "Addresses demonstration quality: demonstrations must show the complete correct sequence including authentication, not just the happy path",
+          "passed": true,
+          "evidence": "'Include common error recovery patterns: auth expired mid-sequence → re-authenticate → resume from last successful step. Include the full conversation context at each step.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses this as the classic SFT failure mode: SFT memorized the training distribution and degrades when deployment conditions differ",
+          "passed": true,
+          "evidence": "'This is a distribution shift problem. The classic SFT failure pattern: performance drops under distribution shift. SFT memorized the test-environment patterns; production has different distributions.'"
+        },
+        {
+          "text": "Recommends RL as the appropriate tool: RL learns a transferable strategy that re-solves problems with the same strategy even when the input distribution shifts",
+          "passed": true,
+          "evidence": "'RL is the answer... RL learns a transferable strategy, not a fixed mapping. When a user phrases their request differently in production, the RL-trained model re-solves the problem using the same underlying strategy.'"
+        },
+        {
+          "text": "Applies the distribution test: the deployment environment shifts systematically from training, which is the explicit criterion for when RL becomes relevant over SFT",
+          "passed": true,
+          "evidence": "'Decision framework: Deployment distribution drifts from training: ✓ (production phrasings differ from test). Adding demonstrations no longer improves performance: ✓ (SFT ceiling reached).'"
+        },
+        {
+          "text": "Notes the data quality issue: before committing to RL, verify that the production distribution is actually captured in the training environment",
+          "passed": true,
+          "evidence": "'Build a training environment that mirrors production. RL requires an environment that resembles real deployment. If production data has different phrasings and edge cases, the RL environment must include those.'"
+        },
+        {
+          "text": "Avoids recommending simply collecting more SFT data from production: the root cause is SFT's optimization objective (memorization), not data quantity",
+          "passed": true,
+          "evidence": "'\"Adding more test examples doesn't help\" confirms this — the problem isn't data volume, it's that SFT can't generalize beyond its training distribution.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses this as the classic SFT failure mode: SFT memorized the training distribution and degrades when deployment conditions differ",
+          "passed": true,
+          "evidence": "'This is a distribution shift problem. The model learned patterns from test data that don't transfer to production. More test examples won't help because you're expanding coverage in the wrong distribution.'"
+        },
+        {
+          "text": "Recommends RL as the appropriate tool: RL learns a transferable strategy that re-solves problems with the same strategy even when the input distribution shifts",
+          "passed": false,
+          "evidence": "Baseline recommends collecting production data and doing SFT on it ('Domain adaptation via SFT'), not RL. It does not recommend RL as the appropriate tool for distribution shift."
+        },
+        {
+          "text": "Applies the distribution test: the deployment environment shifts systematically from training, which is the explicit criterion for when RL becomes relevant over SFT",
+          "passed": false,
+          "evidence": "Baseline does not apply a distribution test criterion for RL. It recommends production data collection and SFT fine-tuning without framing the RL decision criterion."
+        },
+        {
+          "text": "Notes the data quality issue: before committing to RL, verify that the production distribution is actually captured in the training environment",
+          "passed": true,
+          "evidence": "'Collect production data: Log real production inputs (with user consent). You need the actual distribution, not more synthetic test cases.' Addresses the need to capture the real distribution."
+        },
+        {
+          "text": "Avoids recommending simply collecting more SFT data from production: the root cause is SFT's optimization objective (memorization), not data quantity",
+          "passed": true,
+          "evidence": "'More test examples won't help because you're expanding coverage in the wrong distribution.' Correctly identifies that the problem is distribution, not quantity — though then recommends production SFT rather than RL."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "eval-6",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the reward density spectrum: binary outcome reward (plan changed successfully) is the starting point, but multi-step information collection warrants milestone rewards",
+          "passed": true,
+          "evidence": "'Primary signal — binary outcome reward: Did the plan change succeed? This is verifiable.' and 'Supplementary — process rewards for information collection: Each required piece of information collected = intermediate reward.'"
+        },
+        {
+          "text": "Recommends the 'reward the outcome, constrain the process' pattern: outcome reward as the primary signal, plus verifiable path penalties for skipping required information collection steps",
+          "passed": true,
+          "evidence": "'The pattern from the skill: \"Reward the outcome, constrain the process.\" Outcome reward (plan change) as primary signal, plus verifiable path penalties for detectable bad actions (giving wrong info, skipping verification).'"
+        },
+        {
+          "text": "Addresses multi-turn credit assignment: in a multi-turn phone call, which turn caused the final success or failure — turn-level credit assignment is the practical compromise",
+          "passed": true,
+          "evidence": "'Why not pure binary: A 10-turn conversation with binary-only reward has severe credit assignment problems. The model doesn't know which turn caused failure.' Process rewards address this."
+        },
+        {
+          "text": "Notes that process rewards (per-step feedback) accelerate convergence but may prevent the model from discovering more efficient information-collection strategies",
+          "passed": true,
+          "evidence": "'Why not pure process rewards: Process rewards can over-constrain exploration. If you reward \"ask for account number in turn 2,\" the model can't discover that a different ordering works better.'"
+        },
+        {
+          "text": "Identifies the penalty target correctly: the penalty must target a specific detectable bad action (skipping account number collection), never 'lack of progress'",
+          "passed": true,
+          "evidence": "'Path penalties: -0.2 for providing incorrect information to the rep, -0.1 for exceeding 15 turns.' Specific, detectable actions. The skill's principle about never penalizing 'lack of progress' is applied."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "eval-6",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the reward density spectrum: binary outcome reward (plan changed successfully) is the starting point, but multi-step information collection warrants milestone rewards",
+          "passed": true,
+          "evidence": "'Use a multi-level reward signal, not just binary success/failure.' Table shows information collection rewards (+0.2 each) plus task completion (+0.3) plus efficiency (+0.1) plus penalties."
+        },
+        {
+          "text": "Recommends the 'reward the outcome, constrain the process' pattern: outcome reward as the primary signal, plus verifiable path penalties for skipping required information collection steps",
+          "passed": true,
+          "evidence": "'The completion reward (0.3) must be the largest single component to incentivize actually finishing the task.' Outcome-primary with process constraints (penalties for incorrect info, wrong information from rep)."
+        },
+        {
+          "text": "Addresses multi-turn credit assignment: in a multi-turn phone call, which turn caused the final success or failure — turn-level credit assignment is the practical compromise",
+          "passed": true,
+          "evidence": "'Sparse reward problem: A 5-minute phone call that fails at the last step gets 0 reward — same as a call that failed immediately. The model can't learn what went right.' Granular rewards address this."
+        },
+        {
+          "text": "Notes that process rewards (per-step feedback) accelerate convergence but may prevent the model from discovering more efficient information-collection strategies",
+          "passed": true,
+          "evidence": "'Risk of reward hacking: The model might collect information perfectly but never attempt the plan change (the hard/risky part) because collecting is guaranteed reward.'"
+        },
+        {
+          "text": "Identifies the penalty target correctly: the penalty must target a specific detectable bad action (skipping account number collection), never 'lack of progress'",
+          "passed": true,
+          "evidence": "'Implementation: Use a rule-based reward function that parses the call transcript: regex/NER for account numbers, address patterns, plan names.' Specific, machine-detectable penalty targets."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "eval-7",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the YAGNI gate: exhaust prompt engineering and tool design before committing to fine-tuning — 30% error rate on a new API may be fixable with better tool descriptions and examples",
+          "passed": true,
+          "evidence": "'Start with the harness. This is almost certainly a prompt engineering problem at 30% error rate... The fix is cheaper and faster than training.'"
+        },
+        {
+          "text": "Identifies this as a protocol knowledge problem if fine-tuning is warranted: SFT is designed to bake in 'how to do things' (correct endpoint selection and query format)",
+          "passed": true,
+          "evidence": "'If harness fixes plateau above 15%: Then SFT is appropriate. This is protocol knowledge — learning the correct endpoint + format mapping.'"
+        },
+        {
+          "text": "Recommends the model-swap experiment: swap to a stronger frontier model with improved tool descriptions to determine whether the bottleneck is the model or the harness",
+          "passed": true,
+          "evidence": "Implicitly: 'Consolidation check — are some of these 5 endpoints functionally similar enough to merge?' and the harness-first approach implies model-swap before training. The answer recommends exhausting harness fixes first."
+        },
+        {
+          "text": "Notes the ACI principle: if endpoint names and parameter schemas are ambiguous, the problem may be tool design — rename endpoints so the correct choice is obvious without a comment",
+          "passed": true,
+          "evidence": "'Rewrite tool descriptions with \"when to use\" clauses (from agent-tool-design)' and 'Consolidation check — are some of these 5 endpoints functionally similar enough to merge? If the model confuses endpoint A and B because they're similar, maybe they should be one endpoint with a parameter.'"
+        },
+        {
+          "text": "Recommends SFT over RL if fine-tuning is needed: the API usage patterns are fixed and known, the training and deployment distributions are close, and no strategy discovery is required",
+          "passed": true,
+          "evidence": "'SFT is appropriate. This is protocol knowledge — learning the correct endpoint + format mapping. A few hundred demonstration trajectories showing correct endpoint selection will bake the pattern in. Not RL — the endpoints are stable.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "eval-7",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the YAGNI gate: exhaust prompt engineering and tool design before committing to fine-tuning — 30% error rate on a new API may be fixable with better tool descriptions and examples",
+          "passed": true,
+          "evidence": "'This is a prompt engineering problem that should be solved with prompt engineering — not fine-tuning.' and 'Fine-tune only if: After fixing descriptions, error rate is still >10%.'"
+        },
+        {
+          "text": "Identifies this as a protocol knowledge problem if fine-tuning is warranted: SFT is designed to bake in 'how to do things' (correct endpoint selection and query format)",
+          "passed": true,
+          "evidence": "'Fine-tune only if... you've confirmed the model understands the task.' and 'error rate is still >10%' — implies SFT for protocol knowledge if prompt engineering fails."
+        },
+        {
+          "text": "Recommends the model-swap experiment: swap to a stronger frontier model with improved tool descriptions to determine whether the bottleneck is the model or the harness",
+          "passed": false,
+          "evidence": "Baseline does not recommend a model-swap experiment. It goes directly to fixing tool descriptions without first diagnosing whether the bottleneck is the model or the harness."
+        },
+        {
+          "text": "Notes the ACI principle: if endpoint names and parameter schemas are ambiguous, the problem may be tool design — rename endpoints so the correct choice is obvious without a comment",
+          "passed": false,
+          "evidence": "Baseline recommends rewriting descriptions and adding routing tables but does not mention the ACI principle or the idea of renaming endpoints to make the correct choice obvious from the name alone."
+        },
+        {
+          "text": "Recommends SFT over RL if fine-tuning is needed: the API usage patterns are fixed and known, the training and deployment distributions are close, and no strategy discovery is required",
+          "passed": true,
+          "evidence": "'Fine-tune only if: After fixing descriptions, error rate is still >10%.' Implies SFT (not RL) for this fixed-protocol scenario."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "eval-8",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the decision framework in order: (1) is post-training needed at all — run the model-swap experiment first; (2) if training is needed, try SFT first; (3) only add RL when SFT is insufficient",
+          "passed": true,
+          "evidence": "'Step 1 — Is the harness ceiling reached? ... Step 2 — If harness is exhausted, is RL justified?' and 'Practical test: If \"adding more demonstrations of good tool-call sequences no longer improves performance on new topics\" — RL is warranted.'"
+        },
+        {
+          "text": "Identifies the RL-warranted criteria that apply here: multi-step tasks where the optimal tool selection path is unknown, and annotation cost is too high to demonstrate every path",
+          "passed": true,
+          "evidence": "'✓ Multi-step reasoning where optimal path is unknown: 15-20 tool calls with unknown-optimal ordering. ✓ Verifiable outcome: Presumably the research task has a measurable quality metric.'"
+        },
+        {
+          "text": "Notes the RL cost: 10–100× more expensive than harness iteration and harder to reverse — the team must establish that the harness ceiling is genuinely reached before committing",
+          "passed": true,
+          "evidence": "'RL costs: Building a faithful training environment (the hardest part). 10-100× more compute than SFT. Stabilization effort (RL is prone to oscillation). Ongoing environment maintenance.'"
+        },
+        {
+          "text": "Addresses the practical test for SFT ceiling: 'when no matter how many demonstrations are added, new scenarios still perform poorly' — that is the tipping point to switch to RL",
+          "passed": true,
+          "evidence": "'Practical test: If \"adding more demonstrations of good tool-call sequences no longer improves performance on new topics\" — RL is warranted. If you haven't tried SFT with high-quality demonstrations first, do that before jumping to RL.'"
+        },
+        {
+          "text": "Identifies the RL prerequisite: a verifiable reward signal (task completion quality) and a buildable training environment that resembles real research tasks",
+          "passed": true,
+          "evidence": "'? Environment buildable: Can you simulate the web search + document parsing environment for training? ? Annotation cost: Are expert demonstrations of optimal 15-20 step trajectories prohibitively expensive?'"
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "eval-8",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the decision framework in order: (1) is post-training needed at all — run the model-swap experiment first; (2) if training is needed, try SFT first; (3) only add RL when SFT is insufficient",
+          "passed": true,
+          "evidence": "'For your specific case: Try SFT first on your best trajectories... If SFT gets you 80% of the way, the remaining 20% might not justify RL infrastructure. RL is the right call if SFT plateaus.'"
+        },
+        {
+          "text": "Identifies the RL-warranted criteria that apply here: multi-step tasks where the optimal tool selection path is unknown, and annotation cost is too high to demonstrate every path",
+          "passed": true,
+          "evidence": "'The action space is large with non-obvious optimal paths: With 15-20 tool calls, there are exponentially many possible trajectories. The optimal path isn't obvious from demonstrations alone.'"
+        },
+        {
+          "text": "Notes the RL cost: 10–100× more expensive than harness iteration and harder to reverse — the team must establish that the harness ceiling is genuinely reached before committing",
+          "passed": true,
+          "evidence": "'RL training requires running the agent thousands of times in an environment, collecting trajectories, computing rewards, and updating the model. This is 10-100x more infrastructure than SFT.'"
+        },
+        {
+          "text": "Addresses the practical test for SFT ceiling: 'when no matter how many demonstrations are added, new scenarios still perform poorly' — that is the tipping point to switch to RL",
+          "passed": true,
+          "evidence": "'If SFT gets you 80% of the way, the remaining 20% might not justify RL infrastructure. RL is the right call if SFT plateaus and the remaining gap is large enough to matter.'"
+        },
+        {
+          "text": "Identifies the RL prerequisite: a verifiable reward signal (task completion quality) and a buildable training environment that resembles real research tasks",
+          "passed": true,
+          "evidence": "'The task has a verifiable reward signal: Can you automatically determine if the agent made good decisions? ✅ If you have eval tasks with known-good answers you can score against.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "eval-9",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the reward density spectrum: binary outcome reward (issue resolved) vs process rewards (per-turn feedback) vs milestone rewards (key dialogue checkpoints)",
+          "passed": true,
+          "evidence": "Table comparing 'Per-turn rewards' vs 'End-of-task reward' with advantages and disadvantages. Recommends hybrid: 'Outcome reward (primary)' + 'Per-turn lightweight signals.'"
+        },
+        {
+          "text": "Addresses multi-turn credit assignment: in an 8-12 turn task, which turn caused the final success or failure — turn-level credit assignment is the practical compromise",
+          "passed": true,
+          "evidence": "'Turn-level credit assignment (from the skill): For multi-turn agent RL, turn-level credit is the common compromise — cheaper than token-level, more precise than trajectory-level.'"
+        },
+        {
+          "text": "Notes the process reward tradeoff: per-turn rewards accelerate convergence but may prevent the model from discovering more efficient dialogue strategies",
+          "passed": true,
+          "evidence": "'Why not pure per-turn: Customer service is a domain where the \"best\" conversational strategy may vary by customer personality... Prescribing the exact turn-by-turn behavior prevents the model from adapting its approach.'"
+        },
+        {
+          "text": "Recommends starting with binary outcome rewards and adding density only when training fails to converge — the default is to start simple",
+          "passed": true,
+          "evidence": "Answer recommends hybrid but notes 'Why not pure outcome: 8-12 turns is long enough that pure outcome rewards make credit assignment very hard.' The path penalties are lightweight additions, not full process rewards."
+        },
+        {
+          "text": "Identifies the 'reward the outcome, constrain the process' pattern: outcome reward as primary signal, plus verifiable path penalties for specific bad actions",
+          "passed": true,
+          "evidence": "'Outcome reward (primary): Issue resolved successfully? Binary.' plus 'Per-turn lightweight signals: -penalty for providing incorrect information, -penalty for skipping identity verification, -penalty for exceeding turn limit.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "eval-9",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the reward density spectrum: binary outcome reward (issue resolved) vs process rewards (per-turn feedback) vs milestone rewards (key dialogue checkpoints)",
+          "passed": true,
+          "evidence": "'End-only reward (sparse)' vs 'Per-turn reward (dense)' vs 'Recommended hybrid approach' with terminal reward + per-turn shaping rewards. Covers the full density spectrum."
+        },
+        {
+          "text": "Addresses multi-turn credit assignment: in an 8-12 turn task, which turn caused the final success or failure — turn-level credit assignment is the practical compromise",
+          "passed": true,
+          "evidence": "'Credit assignment problem — with 8-12 turns, the model can't tell which turn caused success/failure. Learning is extremely slow because the signal is so delayed.'"
+        },
+        {
+          "text": "Notes the process reward tradeoff: per-turn rewards accelerate convergence but may prevent the model from discovering more efficient dialogue strategies",
+          "passed": true,
+          "evidence": "'Risk of reward hacking — model optimizes per-turn score rather than actual resolution. E.g., it might ask redundant clarifying questions (scored as \"engaging\") without progressing toward resolution.'"
+        },
+        {
+          "text": "Recommends starting with binary outcome rewards and adding density only when training fails to converge — the default is to start simple",
+          "passed": false,
+          "evidence": "Baseline recommends the hybrid approach from the start (terminal 0.5 + per-turn shaping 0.5) rather than starting with binary outcome rewards and adding density only when needed."
+        },
+        {
+          "text": "Identifies the 'reward the outcome, constrain the process' pattern: outcome reward as primary signal, plus verifiable path penalties for specific bad actions",
+          "passed": true,
+          "evidence": "'Terminal reward (weight: 0.5): Issue resolved successfully = +1.0.' plus 'Per-turn shaping rewards: Incorrect information given: -0.3.' Outcome-primary with process constraints."
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "eval-10",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies this as reward hacking: the agent is optimizing the binary success proxy without actually satisfying the underlying constraints",
+          "passed": true,
+          "evidence": "'The problem: pure outcome reward incentivizes constraint violations. Your binary success reward tells the model \"task completion is all that matters.\" The model rationally optimizes: skip verification (saves time, higher completion rate).'"
+        },
+        {
+          "text": "Recommends the 'reward the outcome, constrain the process' pattern: add verifiable path penalties for specific detectable bad actions",
+          "passed": true,
+          "evidence": "'Fix: Add verifiable path penalties for detectable bad actions.' Table shows specific penalties: skips identity verification (-0.3), edits test files (-0.5), bypasses CI (-0.5), destructive commands (-1.0 veto)."
+        },
+        {
+          "text": "Specifies that penalty targets must be specific detectable actions, never 'lack of progress'",
+          "passed": true,
+          "evidence": "'The penalty target must be a specific detectable action, never \"lack of progress.\" Penalizing \"lack of progress\" teaches the agent to do nothing (safest way to avoid the penalty).'"
+        },
+        {
+          "text": "Notes that the penalty must be machine-detectable (deterministic checks), not learned scorers — a learned scorer can itself be gamed",
+          "passed": true,
+          "evidence": "'Penalties must be machine-verifiable. If you can't detect it programmatically, you can't penalize it in RL. \"Skipping identity verification\" is detectable (check the tool call log).'"
+        },
+        {
+          "text": "Addresses the RLVP (reward outcome, penalize path) pattern: the penalty restores gradient signal for the constraint violations that the binary success reward cannot express",
+          "passed": true,
+          "evidence": "'Don't over-constrain. Only penalize things you can clearly define and detect... The goal is: \"achieve the outcome through any legitimate means, but these specific actions are never legitimate.\"'"
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "eval-10",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies this as reward hacking: the agent is optimizing the binary success proxy without actually satisfying the underlying constraints",
+          "passed": true,
+          "evidence": "'Binary success rewards always produce reward hacking in complex environments. The fix is always the same — make the reward function encode HOW you want the task done, not just THAT it got done.'"
+        },
+        {
+          "text": "Recommends the 'reward the outcome, constrain the process' pattern: add verifiable path penalties for specific detectable bad actions",
+          "passed": true,
+          "evidence": "'Decompose the reward into components: R = task_success(0.4) + process_compliance(0.4) + efficiency(0.2).' Process compliance worth as much as task success."
+        },
+        {
+          "text": "Specifies that penalty targets must be specific detectable actions, never 'lack of progress'",
+          "passed": true,
+          "evidence": "'Hard constraints (not soft penalties): Skipped identity verification → R = 0 regardless of task success. Modified test files instead of source files → R = 0.' Specific, detectable actions."
+        },
+        {
+          "text": "Notes that the penalty must be machine-detectable (deterministic checks), not learned scorers — a learned scorer can itself be gamed",
+          "passed": true,
+          "evidence": "'Check each required step was performed in order. Verify the correct API/tool was used (not a shortcut equivalent). Verify the correct information was gathered before the mutation.' Deterministic checks."
+        },
+        {
+          "text": "Addresses the RLVP (reward outcome, penalize path) pattern: the penalty restores gradient signal for the constraint violations that the binary success reward cannot express",
+          "passed": true,
+          "evidence": "'KL penalty from SFT baseline: During RL, add a KL divergence penalty from your SFT model. This prevents the RL model from drifting too far into reward-hacking territory.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "eval-11",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the decision framework: before adding RL, verify that SFT has genuinely hit its ceiling — the signal is 'adding more demonstrations no longer improves performance on new scenarios'",
+          "passed": true,
+          "evidence": "'The practical test for SFT ceiling: \"Adding more demonstrations no longer improves performance on new scenarios.\" If you add 500 more high-quality demonstrations and scores don't budge — SFT is done.'"
+        },
+        {
+          "text": "Identifies what more SFT can still deliver: better data coverage of edge cases, higher-quality demonstrations, and diversity of solutions",
+          "passed": true,
+          "evidence": "'Signs SFT still has room: Have you audited demonstration quality? Have you covered the deployment distribution? Have you tried data augmentation? Rephrase existing demonstrations, vary the contexts, add failure-recovery examples.'"
+        },
+        {
+          "text": "Addresses demonstration quality: SFT's ceiling is the demonstrator's level — if the current ceiling reflects mediocre demonstrations, improving data quality is cheaper than switching to RL",
+          "passed": true,
+          "evidence": "'Mediocre demos = mediocre model. Review: are examples correct? Do they cover edge cases? Are styles varied enough?' Explicitly ties ceiling to demonstrator quality."
+        },
+        {
+          "text": "Notes the ordering constraint: SFT must be solid before RL — overtraining SFT collapses the model onto the training distribution, limiting RL's optimization space",
+          "passed": true,
+          "evidence": "'Warm-start RL from the SFT model. Your well-performing SFT model is the initialization point. RL refines the strategy while maintaining the format and protocol knowledge SFT baked in.'"
+        },
+        {
+          "text": "Identifies the RL-warranted signal: when the task requires generalization beyond the training distribution or the optimal strategy is unknown",
+          "passed": true,
+          "evidence": "'Identifies the RL-warranted signal: when the task requires generalization beyond the training distribution or the optimal strategy is unknown — neither may be true if in-distribution performance is already great.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "eval-11",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Applies the decision framework: before adding RL, verify that SFT has genuinely hit its ceiling — the signal is 'adding more demonstrations no longer improves performance on new scenarios'",
+          "passed": true,
+          "evidence": "'Move to RL when: Rejection sampling no longer improves scores (you've exhausted the policy's variance). DPO gains flatten. The remaining failures require exploration.'"
+        },
+        {
+          "text": "Identifies what more SFT can still deliver: better data coverage of edge cases, higher-quality demonstrations, and diversity of solutions",
+          "passed": true,
+          "evidence": "'Rejection sampling / Best-of-N: Generate N completions per task with your current SFT model. Score them. Keep only the top-scoring completions as new training data.' and 'Targeted SFT on failure modes.'"
+        },
+        {
+          "text": "Addresses demonstration quality: SFT's ceiling is the demonstrator's level — if the current ceiling reflects mediocre demonstrations, improving data quality is cheaper than switching to RL",
+          "passed": true,
+          "evidence": "'Rejection sampling SFT: This is \"SFT on your own best outputs\" — often gives 5-10% improvement over vanilla SFT.' Addresses improving data quality before switching to RL."
+        },
+        {
+          "text": "Notes the ordering constraint: SFT must be solid before RL — overtraining SFT collapses the model onto the training distribution, limiting RL's optimization space",
+          "passed": false,
+          "evidence": "Baseline does not mention the ordering constraint or the risk that overtraining SFT collapses the optimization space for RL. It recommends the SFT→DPO→RL sequence without explaining why SFT must be solid first."
+        },
+        {
+          "text": "Identifies the RL-warranted signal: when the task requires generalization beyond the training distribution or the optimal strategy is unknown",
+          "passed": true,
+          "evidence": "'The remaining failures require exploration (trying novel strategies, not just filtering existing ones).' RL warranted when exploration is needed beyond the SFT distribution."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +884,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded with_skill mean=0.982 differs from committed 0.891 by 0.091 (>0.02 threshold). Re-graded without_skill mean=0.745 differs from committed 0.509 by 0.236 (>0.02 threshold). Committed run_summary values preserved. See DRIFT.md for details."
   ]
 }

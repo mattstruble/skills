@@ -2,13 +2,347 @@
   "metadata": {
     "skill_name": "logging",
     "timestamp": "2026-07-23",
-    "evals_run": 4,
+    "evals_run": ["eval-1", "eval-2", "eval-3", "eval-4"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 4,
+        "failed": 2,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Logs the happy path: successful job completion produces at least one INFO-level log line",
+          "passed": true,
+          "evidence": "task_log.info('task_completed', db_duration_ms=...) logged on successful DB store."
+        },
+        {
+          "text": "Logs entry AND exit of the external API call with duration/timing",
+          "passed": true,
+          "evidence": "task_log.info('api_calling', ...) at entry and task_log.info('api_responded', status=..., duration_ms=...) at exit with timing."
+        },
+        {
+          "text": "Uses structured logging consistently (key=value or extra={} dict, not mixed formats)",
+          "passed": true,
+          "evidence": "Uses structlog throughout with key=value pairs: task_log.info('api_responded', status=response.status_code, duration_ms=...)."
+        },
+        {
+          "text": "Includes a correlation ID or job ID that threads through all log lines for a single job",
+          "passed": true,
+          "evidence": "task_log = log.bind(task_id=task_id, correlation_id=str(uuid4())) — bound at task start, threads through all subsequent log lines."
+        },
+        {
+          "text": "Logs all major branches (success, transient failure, fatal failure, retry, exhaustion)",
+          "passed": false,
+          "evidence": "Code logs api_failed (transient) and db_store_failed (fatal) but has no retry logic or exhaustion logging — those branches are absent from the implementation."
+        },
+        {
+          "text": "Does not log sensitive data (no raw payloads with potential PII, no tokens)",
+          "passed": false,
+          "evidence": "task_log.info('task_received', payload_keys=list(task_data.keys())) logs only keys, not values — no raw payload. However, the code logs task_data.get('endpoint') which could contain sensitive path info. Marginal pass/fail; graded fail due to potential endpoint sensitivity."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Logs the happy path: successful job completion produces at least one INFO-level log line",
+          "passed": true,
+          "evidence": "logger.info('job.completed', extra={'job_id': job_id, 'status': 'success'}) on successful completion."
+        },
+        {
+          "text": "Logs entry AND exit of the external API call with duration/timing",
+          "passed": true,
+          "evidence": "logger.info('external_api.call_start', ...) at entry and logger.info('external_api.call_end', extra={..., 'duration_ms': ..., 'status_code': ...}) at exit."
+        },
+        {
+          "text": "Uses structured logging consistently (key=value or extra={} dict, not mixed formats)",
+          "passed": true,
+          "evidence": "Uses extra={} dict consistently throughout: logger.info('job.received', extra={'job_id': job_id, 'queue': REDIS_QUEUE})."
+        },
+        {
+          "text": "Includes a correlation ID or job ID that threads through all log lines for a single job",
+          "passed": true,
+          "evidence": "job_id = str(uuid.uuid4()) generated at task receipt and included in every log line via extra={'job_id': job_id}."
+        },
+        {
+          "text": "Logs all major branches (success, transient failure, fatal failure, retry, exhaustion)",
+          "passed": true,
+          "evidence": "job.completed (success), job.transient_failure (transient), job.fatal_failure (fatal), job.retry_enqueued (retry), job.retries_exhausted (exhaustion) — all 5 branches logged."
+        },
+        {
+          "text": "Does not log sensitive data (no raw payloads with potential PII, no tokens)",
+          "passed": true,
+          "evidence": "Logs job_id, queue name, status codes, and error messages — no raw task payloads or tokens logged."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Logs the happy path: successful payment completion produces at least one INFO-level log line",
+          "passed": true,
+          "evidence": "plog.info('payment_started') and plog.info('payment_completed', transaction_id=...) bracket the happy path."
+        },
+        {
+          "text": "Logs entry or exit of the payment gateway call with duration/timing",
+          "passed": true,
+          "evidence": "plog.info('gateway_charging') at entry and plog.info('gateway_charge_succeeded', transaction_id=..., duration_ms=...) at exit with timing."
+        },
+        {
+          "text": "Uses structured logging consistently (one format throughout, not mixed)",
+          "passed": true,
+          "evidence": "structlog used throughout with key=value pairs; no mixed formats."
+        },
+        {
+          "text": "Includes a correlation ID or request ID that threads through log lines",
+          "passed": true,
+          "evidence": "plog = log.bind(correlation_id=correlation_id, order_id=order_id, user_id=user_id, payment_method=payment_method) — bound at start, threads through all lines."
+        },
+        {
+          "text": "Error logs include the state/context that led to the error, not just the exception message",
+          "passed": true,
+          "evidence": "plog.error('gateway_charge_failed', error=type(e).__name__, detail=str(e), duration_ms=...) — plog carries order_id, user_id, payment_method context."
+        },
+        {
+          "text": "Does not log sensitive payment data (no card numbers, tokens, raw PII)",
+          "passed": true,
+          "evidence": "Logs order_id, user_id, transaction_id, payment_method (method type, not card details) — no card numbers or tokens."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Logs the happy path: successful payment completion produces at least one INFO-level log line",
+          "passed": true,
+          "evidence": "logger.info('payment.started', ...) and logger.info('payment.completed', ...) bracket the happy path."
+        },
+        {
+          "text": "Logs entry or exit of the payment gateway call with duration/timing",
+          "passed": true,
+          "evidence": "logger.info('payment_gateway.call_start', ...) at entry and logger.info('payment_gateway.call_end', extra={..., 'duration_ms': ..., 'charge_id': ...}) at exit."
+        },
+        {
+          "text": "Uses structured logging consistently (one format throughout, not mixed)",
+          "passed": true,
+          "evidence": "extra={} dict used consistently throughout all log calls."
+        },
+        {
+          "text": "Includes a correlation ID or request ID that threads through log lines",
+          "passed": true,
+          "evidence": "request_id = str(uuid.uuid4()) and log = {'request_id': request_id, 'order_id': order_id, ...} threaded through all log lines."
+        },
+        {
+          "text": "Error logs include the state/context that led to the error, not just the exception message",
+          "passed": true,
+          "evidence": "logger.error('payment.db_update_failed', extra={**log, 'charge_id': charge_result['id'], 'error': str(exc)}) — includes charge_id and full log context."
+        },
+        {
+          "text": "Does not log sensitive payment data (no card numbers, tokens, raw PII)",
+          "passed": true,
+          "evidence": "Logs order_id, amount_cents, charge_id, decline_code — no card numbers or raw payment method details."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Flags missing or inadequate logging as a production-readiness issue (not ranked last or treated as a nice-to-have)",
+          "passed": true,
+          "evidence": "Item #1 is 'No logging on the success path' — logging gaps are the first and primary concern raised."
+        },
+        {
+          "text": "Specifically mentions logging the success path, not just errors",
+          "passed": true,
+          "evidence": "'No logging on the success path. If the webhook processes correctly, there's no evidence it ever ran. Add log.info(\"webhook_received\", ...) at entry and log.info(\"webhook_processed\", ...) at exit.'"
+        },
+        {
+          "text": "Mentions correlation IDs or request tracing as something that should be added",
+          "passed": true,
+          "evidence": "'No correlation ID. The webhook likely carries an event ID from the third-party provider — bind it to the logger at entry so all subsequent log lines include it.'"
+        },
+        {
+          "text": "Mentions structured logging (key=value or JSON) rather than string interpolation",
+          "passed": true,
+          "evidence": "'No structured logging (MEDIUM). If log lines use f-strings or %s formatting, they're unsearchable at scale. Switch to structured logging with extra={} or a JSON logger.'"
+        },
+        {
+          "text": "Mentions logging entry/exit of external calls or timing of operations",
+          "passed": true,
+          "evidence": "'No duration on external calls (MEDIUM). The DB update and enqueue operations should log entry + exit with duration_ms.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Flags missing or inadequate logging as a production-readiness issue (not ranked last or treated as a nice-to-have)",
+          "passed": true,
+          "evidence": "'Missing success-path logging (HIGH)' is item #1 — ranked first and marked HIGH priority."
+        },
+        {
+          "text": "Specifically mentions logging the success path, not just errors",
+          "passed": true,
+          "evidence": "'Missing success-path logging (HIGH). If this endpoint processes a webhook successfully but never logs it, you have no visibility into normal operation.'"
+        },
+        {
+          "text": "Mentions correlation IDs or request tracing as something that should be added",
+          "passed": true,
+          "evidence": "'No correlation ID / request tracing (HIGH). A webhook arrives, gets processed through multiple stages — without a request ID threaded through every log line, correlating a failure is impossible.'"
+        },
+        {
+          "text": "Mentions structured logging (key=value or JSON) rather than string interpolation",
+          "passed": true,
+          "evidence": "'No structured logging (MEDIUM). If log lines use f-strings or %s formatting, they're unsearchable at scale. Switch to structured logging with extra={} or a JSON logger.'"
+        },
+        {
+          "text": "Mentions logging entry/exit of external calls or timing of operations",
+          "passed": true,
+          "evidence": "'No timing on external calls (MEDIUM). The DB update and task enqueue are external calls. Without entry/exit logging with duration, you can't tell whether a latency spike is in your code.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Fixed version logs the happy path (successful order retrieval produces a log line)",
+          "passed": true,
+          "evidence": "rlog.info('order_status_served', has_shipping=shipping is not None) — happy path logged at the end."
+        },
+        {
+          "text": "Fixed version logs entry or exit of the external shipping API call with timing",
+          "passed": true,
+          "evidence": "rlog.info('shipping_api_calling', tracking=...) at entry and rlog.info('shipping_api_responded', duration_ms=...) at exit."
+        },
+        {
+          "text": "Uses structured logging consistently in the fix",
+          "passed": true,
+          "evidence": "structlog used throughout with key=value pairs bound via rlog = log.bind(correlation_id=..., order_id=..., user_id=...)."
+        },
+        {
+          "text": "Includes a correlation ID or request ID in the fixed version",
+          "passed": true,
+          "evidence": "correlation_id = request.headers.get('X-Correlation-ID') or str(uuid4()) — extracted from headers or generated, bound to rlog."
+        },
+        {
+          "text": "Logging is presented as part of the fix strategy, not listed last or as an afterthought",
+          "passed": true,
+          "evidence": "'Immediate fix — add observability:' — the fix IS the logging; the code block is the solution, not an addendum."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Fixed version logs the happy path (successful order retrieval produces a log line)",
+          "passed": true,
+          "evidence": "logger.info('order_status.success', extra=log) — happy path logged at the end of the function."
+        },
+        {
+          "text": "Fixed version logs entry or exit of the external shipping API call with timing",
+          "passed": true,
+          "evidence": "logger.info('shipping_api.call_start', extra=log) at entry and logger.info('shipping_api.call_end', extra={**log, 'duration_ms': ...}) at exit."
+        },
+        {
+          "text": "Uses structured logging consistently in the fix",
+          "passed": true,
+          "evidence": "extra={} dict used consistently; log = {'request_id': ..., 'user_id': ..., 'order_id': ...} threaded through."
+        },
+        {
+          "text": "Includes a correlation ID or request ID in the fixed version",
+          "passed": true,
+          "evidence": "request_id = str(uuid.uuid4()) generated and included in log dict threaded through all log lines."
+        },
+        {
+          "text": "Logging is presented as part of the fix strategy, not listed last or as an afterthought",
+          "passed": true,
+          "evidence": "'Fix (logging is part of the fix, not an afterthought):' — explicitly framed as part of the fix, not a separate concern."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
-        "mean": 0.91,
+        "mean": 0.917,
         "stddev": 0.0
       }
     },
@@ -19,11 +353,13 @@
       }
     },
     "delta": {
-      "pass_rate": "-9%"
+      "pass_rate": "-8%"
     }
   },
   "notes": [
-    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak. NEGATIVE delta \u2014 likely an eval-quality issue (expectations too easy for baseline or misaligned); flag for eval rework.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "NEGATIVE delta — baseline outperforms with_skill on these evals. Likely eval-quality issue: expectations are too easy for baseline (basic logging practices) or misaligned with skill-specific guidance. Flag for eval rework.",
+    "Committed delta was -9%; re-graded delta is -8% (within tolerance)."
   ]
 }

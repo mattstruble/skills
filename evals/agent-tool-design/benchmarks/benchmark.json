@@ -2,9 +2,265 @@
   "metadata": {
     "skill_name": "agent-tool-design",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Tool descriptions use 'when to use' framing rather than 'what it does' framing",
+          "passed": true,
+          "evidence": "All three descriptions start with 'Use when...': upload: 'Use when the user provides a file to store'; search: 'Use when looking for documents by content, title, or tags'; download: 'Use when you need to retrieve the actual file content of a specific document you already know the ID of.'"
+        },
+        {
+          "text": "Parameter descriptions include concrete format examples (not just type annotations)",
+          "passed": true,
+          "evidence": "file_path: 'Example: \"/tmp/quarterly-report.pdf\"'; document_id: 'Example: \"doc_a1b2c3d4\"'; tags: 'Example: [\"finance\", \"quarterly\", \"2024\"]'. All parameters include concrete examples."
+        },
+        {
+          "text": "Each tool description includes boundary/exclusion clauses stating what the tool does NOT accept",
+          "passed": true,
+          "evidence": "upload: 'Does NOT process or extract content'; search: 'Does NOT return the full document content'; download: 'Does NOT search — use search_documents first to find the document_id.'"
+        },
+        {
+          "text": "Return value structure is documented for at least one tool",
+          "passed": true,
+          "evidence": "search_documents: 'Returns: [{document_id: string, title: string, snippet: string, relevance_score: float, tags: string[]}]'; download_document: 'Returns: {path: string, size_bytes: integer, mime_type: string}.'"
+        },
+        {
+          "text": "Tool names follow a consistent verb_noun or action-oriented convention",
+          "passed": true,
+          "evidence": "upload_document, search_documents, download_document — all follow verb_noun pattern consistently."
+        },
+        {
+          "text": "The search tool description distinguishes it from the download tool to prevent agent confusion",
+          "passed": true,
+          "evidence": "search: 'Does NOT return the full document content — use download_document with the returned document_id to get the file.' download: 'Does NOT search — use search_documents first to find the document_id.' Mutual cross-references prevent confusion."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Tool descriptions use 'when to use' framing rather than 'what it does' framing",
+          "passed": true,
+          "evidence": "search: 'Use this when you need to FIND documents'; download: 'Use this when you already have the document ID'; upload: 'Do NOT use this to update an existing document' (boundary framing). All three use decision-oriented language."
+        },
+        {
+          "text": "Parameter descriptions include concrete format examples (not just type annotations)",
+          "passed": true,
+          "evidence": "file_path: \"(e.g., '/tmp/report.pdf')\"; document_id: 'Obtained from search_documents results or provided by the user'; query: \"Can be natural language ('quarterly revenue reports from 2024') or keywords.\""
+        },
+        {
+          "text": "Each tool description includes boundary/exclusion clauses stating what the tool does NOT accept",
+          "passed": true,
+          "evidence": "upload: 'Do NOT use this to update an existing document'; search: 'not when you already have a document ID (use download_document for that)'; download description implies exclusion by specifying 'when you already have the document ID'."
+        },
+        {
+          "text": "Return value structure is documented for at least one tool",
+          "passed": true,
+          "evidence": "upload: 'Returns the document ID and upload status'; search: 'Returns a list of matching documents with IDs, titles, and content snippets'; download: 'Returns the file path where the document was saved locally.'"
+        },
+        {
+          "text": "Tool names follow a consistent verb_noun or action-oriented convention",
+          "passed": true,
+          "evidence": "upload_document, search_documents, download_document — consistent verb_noun pattern."
+        },
+        {
+          "text": "The search tool description distinguishes it from the download tool to prevent agent confusion",
+          "passed": true,
+          "evidence": "search: 'Use this when you need to FIND documents matching a query — not when you already have a document ID (use download_document for that).' download: 'Use this when you already have the document ID.' Clear mutual distinction."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that the root cause is vague 'what it does' descriptions rather than model failure",
+          "passed": true,
+          "evidence": "'The problem: descriptions tell \"what it does\" instead of \"when to use it.\" Boundaries are missing... The model has no information to distinguish them. It picks whichever sounds closest to its current intent.'"
+        },
+        {
+          "text": "Rewrites search_files description with a 'when to use' clause (e.g., 'Use when you need to find files by name or pattern but don't know the exact path')",
+          "passed": true,
+          "evidence": "'search_files: Use when you need to FIND files by name pattern or locate files containing specific text. You do NOT know the exact file path yet.'"
+        },
+        {
+          "text": "Rewrites read_file description with a 'when to use' clause (e.g., 'Use when you already know the exact file path and need its contents')",
+          "passed": true,
+          "evidence": "'read_file: Use when you already KNOW the exact file path and need to see its contents. Returns the full text content of one file.'"
+        },
+        {
+          "text": "At least one rewritten description includes a boundary/exclusion clause",
+          "passed": true,
+          "evidence": "search_files: 'Does NOT return file contents — use read_file after finding the path.' read_file: 'Does NOT search for files — use search_files first if you don't know the path.'"
+        },
+        {
+          "text": "The two rewritten descriptions are clearly distinguishable — an agent reading both would know which to call",
+          "passed": true,
+          "evidence": "search_files requires 'You do NOT know the exact file path yet'; read_file requires 'you already KNOW the exact file path'. The precondition contrast makes selection unambiguous."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that the root cause is vague 'what it does' descriptions rather than model failure",
+          "passed": true,
+          "evidence": "'The descriptions are too vague. Both say essentially \"does something with files\" — the model can't distinguish when to use which.' Root cause correctly identified as description quality."
+        },
+        {
+          "text": "Rewrites search_files description with a 'when to use' clause (e.g., 'Use when you need to find files by name or pattern but don't know the exact path')",
+          "passed": true,
+          "evidence": "'search_files: \"Find files by name, path pattern, or content match across the project. Use when you need to LOCATE files but don't know their exact path.\"'"
+        },
+        {
+          "text": "Rewrites read_file description with a 'when to use' clause (e.g., 'Use when you already know the exact file path and need its contents')",
+          "passed": true,
+          "evidence": "'read_file: \"Read and return the full contents of a single file at a known path. Use when you already know the file path and need to see what's inside it.\"'"
+        },
+        {
+          "text": "At least one rewritten description includes a boundary/exclusion clause",
+          "passed": true,
+          "evidence": "search_files: 'Do NOT use this to read file contents — use read_file for that.' read_file: 'Do NOT use this to find files — use search_files for that. Do NOT use this with glob patterns.'"
+        },
+        {
+          "text": "The two rewritten descriptions are clearly distinguishable — an agent reading both would know which to call",
+          "passed": true,
+          "evidence": "search_files: 'don't know their exact path'; read_file: 'already know the file path'. The precondition contrast ('know vs. don't know the path') makes selection unambiguous."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Applies the granularity principle: tools that operate on the same logical object are candidates for merging",
+          "passed": true,
+          "evidence": "'Consolidation by logical object' table groups tools by object (issue, comment, project). 'All operate on the same object (issue); differ only by operation.'"
+        },
+        {
+          "text": "Identifies the specific merge signal: distinguishing between these tools requires domain knowledge the model shouldn't need",
+          "passed": true,
+          "evidence": "'15 tools for one system (Jira) is well past the selection accuracy threshold... The tools differ by operation type on the same logical objects.' Implies distinguishing requires knowing the operation type, not the domain."
+        },
+        {
+          "text": "Proposes a concrete consolidation (not just 'consider merging') with specific tool groupings",
+          "passed": true,
+          "evidence": "Provides a complete 4-tool plan: jira_issue_read, jira_issue_write, jira_issue_delete, jira_comment — with specific replacements listed for each."
+        },
+        {
+          "text": "The proposed consolidated tool count is meaningfully lower (ideally 4-6 tools from 15)",
+          "passed": true,
+          "evidence": "'Final plan: 4 tools' — reduced from 15 to 4, well within the 4-6 target range."
+        },
+        {
+          "text": "At least one consolidated tool schema or description is provided as an example",
+          "passed": true,
+          "evidence": "All four tools include descriptions: jira_issue_read: 'Use when you need to look up issues — find a specific issue by key, or list/filter issues by project, assignee, status, or label.'"
+        },
+        {
+          "text": "Mentions or applies the ~100-tool selection-accuracy threshold or equivalent reasoning about tool proliferation",
+          "passed": true,
+          "evidence": "'15 tools for one system (Jira) is well past the selection accuracy threshold (~100 tools across all systems degrades selection; 15 for one system is disproportionate).'"
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Applies the granularity principle: tools that operate on the same logical object are candidates for merging",
+          "passed": true,
+          "evidence": "Baseline groups by logical object: jira_issues (all issue operations), jira_comments (all comment operations), jira_projects (all project operations). 'The model now picks from 3 clear categories (issues, comments, projects).'"
+        },
+        {
+          "text": "Identifies the specific merge signal: distinguishing between these tools requires domain knowledge the model shouldn't need",
+          "passed": true,
+          "evidence": "'15 tools is too many for reliable selection.' and 'Models are much better at filling enum parameters than choosing between 15 similar tools.' Implies the selection problem is the merge signal."
+        },
+        {
+          "text": "Proposes a concrete consolidation (not just 'consider merging') with specific tool groupings",
+          "passed": true,
+          "evidence": "Provides complete JSON schemas for jira_issues, jira_comments, and jira_projects with action enums and parameter definitions."
+        },
+        {
+          "text": "The proposed consolidated tool count is meaningfully lower (ideally 4-6 tools from 15)",
+          "passed": true,
+          "evidence": "'Result: 15 tools → 3 tools.' Three tools is below the 4-6 ideal range but is meaningfully lower than 15 and demonstrates the consolidation principle."
+        },
+        {
+          "text": "At least one consolidated tool schema or description is provided as an example",
+          "passed": true,
+          "evidence": "Full JSON schema provided for jira_issues with action enum ['create', 'get', 'update', 'delete', 'list'] and all parameter definitions."
+        },
+        {
+          "text": "Mentions or applies the ~100-tool selection-accuracy threshold or equivalent reasoning about tool proliferation",
+          "passed": false,
+          "evidence": "Baseline says '15 tools is too many for reliable selection' but does not reference the ~100-tool threshold or provide equivalent quantitative reasoning about when tool proliferation degrades accuracy."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +280,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT GUARD: re-graded without_skill mean=0.944 differs from committed 0.889 by 0.056 (>0.02 threshold). Committed without_skill run_summary value preserved. Re-graded with_skill mean=1.000 matches committed 1.000 exactly. See DRIFT.md for details."
   ]
 }

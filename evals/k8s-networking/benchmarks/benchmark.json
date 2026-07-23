@@ -2,9 +2,265 @@
   "metadata": {
     "skill_name": "k8s-networking",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Installs cert-manager with a pinned version (not latest)",
+          "passed": true,
+          "evidence": "Uses `https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml` — explicit version pin v1.16.3."
+        },
+        {
+          "text": "Creates a ClusterIssuer (not namespace-scoped Issuer) with ACME/Let's Encrypt",
+          "passed": true,
+          "evidence": "Shows `kind: ClusterIssuer` with ACME server `https://acme-v02.api.letsencrypt.org/directory`."
+        },
+        {
+          "text": "Recommends staging issuer for testing before production",
+          "passed": true,
+          "evidence": "\"test with staging first, then switch to production\" in Step 2 header."
+        },
+        {
+          "text": "Updates Ingress with tls: block and cert-manager.io/cluster-issuer annotation",
+          "passed": true,
+          "evidence": "Shows `annotations: cert-manager.io/cluster-issuer: letsencrypt-production` and `spec.tls:` block with hosts and secretName."
+        },
+        {
+          "text": "Sets nginx.ingress.kubernetes.io/ssl-redirect to true",
+          "passed": true,
+          "evidence": "Shows `nginx.ingress.kubernetes.io/ssl-redirect: \"true\"` in the Ingress annotations."
+        },
+        {
+          "text": "Shows how to verify certificate issuance",
+          "passed": true,
+          "evidence": "Shows `kubectl get certificaterequests -A` and `kubectl describe certificate mysite-com-tls -n production`."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.333,
+        "passed": 2,
+        "failed": 4,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Installs cert-manager with a pinned version (not latest)",
+          "passed": false,
+          "evidence": "Uses `https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml` — 'latest' not a pinned version."
+        },
+        {
+          "text": "Creates a ClusterIssuer (not namespace-scoped Issuer) with ACME/Let's Encrypt",
+          "passed": true,
+          "evidence": "Shows `kind: ClusterIssuer` with ACME Let's Encrypt server."
+        },
+        {
+          "text": "Recommends staging issuer for testing before production",
+          "passed": false,
+          "evidence": "No mention of staging issuer. Goes straight to production ACME endpoint."
+        },
+        {
+          "text": "Updates Ingress with tls: block and cert-manager.io/cluster-issuer annotation",
+          "passed": true,
+          "evidence": "Shows `annotations: cert-manager.io/cluster-issuer: letsencrypt-prod` and `spec.tls:` block."
+        },
+        {
+          "text": "Sets nginx.ingress.kubernetes.io/ssl-redirect to true",
+          "passed": false,
+          "evidence": "No `nginx.ingress.kubernetes.io/ssl-redirect` annotation in the Ingress manifest."
+        },
+        {
+          "text": "Shows how to verify certificate issuance",
+          "passed": false,
+          "evidence": "No verification commands shown. Describes what happens automatically but no kubectl commands to check status."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Generates private keys on the client machine (not on server then transferred)",
+          "passed": true,
+          "evidence": "Server keys generated on server; MacBook section says \"Install WireGuard, generate keys, create config\" — client generates its own keys independently."
+        },
+        {
+          "text": "Server config includes both PostUp and PostDown iptables rules",
+          "passed": true,
+          "evidence": "Shows `PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE` and matching PostDown."
+        },
+        {
+          "text": "Client config includes PersistentKeepalive",
+          "passed": true,
+          "evidence": "Shows `PersistentKeepalive = 25` in the MacBook client config."
+        },
+        {
+          "text": "Enables IP forwarding (sysctl) as a prerequisite",
+          "passed": false,
+          "evidence": "No mention of enabling IP forwarding via sysctl (net.ipv4.ip_forward=1). This is required for the iptables MASQUERADE rules to work."
+        },
+        {
+          "text": "Opens UDP port 51820 in firewall",
+          "passed": true,
+          "evidence": "\"Open port 51820/UDP in your firewall.\""
+        },
+        {
+          "text": "Uses /32 addresses in AllowedIPs for peers",
+          "passed": true,
+          "evidence": "Server peer config shows `AllowedIPs = 10.0.0.2/32`."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6
+      },
+      "expectations": [
+        {
+          "text": "Generates private keys on the client machine (not on server then transferred)",
+          "passed": true,
+          "evidence": "Server keys generated on server; client config section shows `PrivateKey = <laptop_private_key>` implying client-side generation."
+        },
+        {
+          "text": "Server config includes both PostUp and PostDown iptables rules",
+          "passed": true,
+          "evidence": "Shows `PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE` and matching PostDown."
+        },
+        {
+          "text": "Client config includes PersistentKeepalive",
+          "passed": true,
+          "evidence": "Shows `PersistentKeepalive = 25` in the MacBook client config."
+        },
+        {
+          "text": "Enables IP forwarding (sysctl) as a prerequisite",
+          "passed": false,
+          "evidence": "No mention of enabling IP forwarding via sysctl. The PostUp iptables MASQUERADE rules require ip_forward to be enabled."
+        },
+        {
+          "text": "Opens UDP port 51820 in firewall",
+          "passed": true,
+          "evidence": "\"Open port 51820/UDP on your firewall.\""
+        },
+        {
+          "text": "Uses /32 addresses in AllowedIPs for peers",
+          "passed": true,
+          "evidence": "Server peer config shows `AllowedIPs = 10.10.0.2/32`."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Creates a deny-all default NetworkPolicy",
+          "passed": true,
+          "evidence": "Shows `default-deny-all` policy with `podSelector: {}` and `policyTypes: [Ingress, Egress]` — denies all traffic."
+        },
+        {
+          "text": "Ingress rule uses namespaceSelector matching ingress-nginx",
+          "passed": true,
+          "evidence": "Shows `namespaceSelector: matchLabels: kubernetes.io/metadata.name: ingress-nginx` combined with podSelector for ingress-nginx pods."
+        },
+        {
+          "text": "Egress allows DNS (UDP 53 to kube-system)",
+          "passed": true,
+          "evidence": "Shows egress rule to kube-system namespace on UDP 53 and TCP 53 with note \"Always include DNS egress (port 53 to kube-system)\"."
+        },
+        {
+          "text": "Egress allows traffic to database namespace",
+          "passed": true,
+          "evidence": "Shows egress rule to `namespaceSelector: matchLabels: kubernetes.io/metadata.name: db` on TCP 5432."
+        },
+        {
+          "text": "Warns that Flannel alone does not enforce NetworkPolicies",
+          "passed": false,
+          "evidence": "States the opposite: \"k3s embeds the kube-router network policy controller internally — NetworkPolicies are enforced by default without installing a separate CNI.\" Does not warn about Flannel limitation."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Creates a deny-all default NetworkPolicy",
+          "passed": true,
+          "evidence": "Shows `default-deny-ingress` policy with `podSelector: {}` and `policyTypes: [Ingress]` — denies all ingress by default."
+        },
+        {
+          "text": "Ingress rule uses namespaceSelector matching ingress-nginx",
+          "passed": true,
+          "evidence": "Shows `namespaceSelector: matchLabels: kubernetes.io/metadata.name: ingress-nginx` with podSelector for ingress-nginx pods."
+        },
+        {
+          "text": "Egress allows DNS (UDP 53 to kube-system)",
+          "passed": true,
+          "evidence": "Shows egress to kube-system on UDP 53 and TCP 53 with note \"DNS egress to kube-system is essential\"."
+        },
+        {
+          "text": "Egress allows traffic to database namespace",
+          "passed": true,
+          "evidence": "Shows egress to `namespaceSelector: matchLabels: kubernetes.io/metadata.name: database` on TCP 5432."
+        },
+        {
+          "text": "Warns that Flannel alone does not enforce NetworkPolicies",
+          "passed": true,
+          "evidence": "\"k3s uses Flannel by default, which does NOT support NetworkPolicy. You need to install k3s with --flannel-backend=none and deploy a CNI that supports NetworkPolicy (Calico, Cilium).\""
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +280,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT NOTE: Re-graded without_skill mean=0.722 vs committed 0.600 (diff=0.122 > 0.02). Committed run_summary values preserved. Discrepancy driven by eval-3 baseline scoring 5/5 (Flannel warning present) vs lower committed estimate."
   ]
 }

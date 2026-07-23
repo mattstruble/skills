@@ -2,9 +2,245 @@
   "metadata": {
     "skill_name": "homelab-monitoring",
     "timestamp": "2026-07-23",
-    "evals_run": 3,
+    "evals_run": ["eval-1", "eval-2", "eval-3"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends Alloy, not the Docker Loki log driver",
+          "passed": true,
+          "evidence": "\"Use Alloy. Not the Docker Loki log driver (blocks containers if Loki is down), not Fluent Bit (overkill for single-destination homelab).\""
+        },
+        {
+          "text": "Explains that the Docker Loki log driver blocks container stdout when Loki is unreachable, causing containers to hang",
+          "passed": true,
+          "evidence": "\"Not the Docker Loki log driver (blocks containers if Loki is down)\" — directly states the blocking behavior."
+        },
+        {
+          "text": "Shows a discovery.docker block with host = \"unix:///var/run/docker.sock\" in Alloy's .alloy config syntax",
+          "passed": true,
+          "evidence": "Shows `discovery.docker \"containers\" { host = \"unix:///var/run/docker.sock\" }` in .alloy HCL syntax."
+        },
+        {
+          "text": "Shows a loki.source.docker block forwarding to loki.write.default.receiver",
+          "passed": true,
+          "evidence": "Shows `loki.source.docker \"default\" { ... forward_to = [loki.write.local.receiver] }` — functionally equivalent forwarding chain."
+        },
+        {
+          "text": "Mounts /var/run/docker.sock and /var/lib/docker/containers read-only into the Alloy container",
+          "passed": false,
+          "evidence": "Mounts `/var/run/docker.sock:/var/run/docker.sock:ro` but does NOT mount `/var/lib/docker/containers`. Only one of the two required mounts is present."
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends Alloy, not the Docker Loki log driver",
+          "passed": false,
+          "evidence": "Recommends Alloy as primary but then adds \"Alternative (simpler): Use the Docker logging driver to ship logs directly to Loki\" — explicitly recommends the Docker Loki log driver."
+        },
+        {
+          "text": "Explains that the Docker Loki log driver blocks container stdout when Loki is unreachable, causing containers to hang",
+          "passed": false,
+          "evidence": "The Docker log driver alternative section only says \"you lose docker logs locally\" — does not mention blocking container stdout when Loki is unreachable."
+        },
+        {
+          "text": "Shows a discovery.docker block with host = \"unix:///var/run/docker.sock\" in Alloy's .alloy config syntax",
+          "passed": true,
+          "evidence": "Shows `discovery.docker \"containers\" { host = \"unix:///var/run/docker.sock\" }` in .alloy HCL syntax."
+        },
+        {
+          "text": "Shows a loki.source.docker block forwarding to loki.write.default.receiver",
+          "passed": true,
+          "evidence": "Shows `loki.source.docker \"default\" { ... forward_to = [loki.write.local.receiver] }`."
+        },
+        {
+          "text": "Mounts /var/run/docker.sock and /var/lib/docker/containers read-only into the Alloy container",
+          "passed": true,
+          "evidence": "Mounts both `/var/run/docker.sock:/var/run/docker.sock:ro` and `/var/lib/docker/containers:/var/lib/docker/containers:ro`."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies serviceMonitorSelectorNilUsesHelmValues as the root cause, not a networking or RBAC issue",
+          "passed": true,
+          "evidence": "\"This is the #1 gotcha with kube-prometheus-stack. By default, Prometheus only discovers ServiceMonitors that have the Helm release's own labels. Your manually-created ServiceMonitor is silently ignored.\""
+        },
+        {
+          "text": "Specifies all three selector flags: serviceMonitorSelectorNilUsesHelmValues, podMonitorSelectorNilUsesHelmValues, and ruleSelectorNilUsesHelmValues set to false",
+          "passed": true,
+          "evidence": "Shows all three flags under prometheus.prometheusSpec: serviceMonitorSelectorNilUsesHelmValues: false, podMonitorSelectorNilUsesHelmValues: false, ruleSelectorNilUsesHelmValues: false."
+        },
+        {
+          "text": "Places the fix under prometheus.prometheusSpec in Helm values (not at the top level)",
+          "passed": true,
+          "evidence": "Shows `prometheus: prometheusSpec:` as the nesting path for all three flags."
+        },
+        {
+          "text": "Notes that without the fix Prometheus silently ignores manually created ServiceMonitors even though kubectl get servicemonitor shows them",
+          "passed": true,
+          "evidence": "\"Any ServiceMonitor without those exact labels is invisible. Setting it to false makes Prometheus discover ALL ServiceMonitors in all namespaces.\""
+        },
+        {
+          "text": "Avoids recommending manual label matching or recreating the ServiceMonitor as the fix",
+          "passed": true,
+          "evidence": "Fix is entirely the three NilUsesHelmValues flags; no suggestion to add labels to the ServiceMonitor or recreate it."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies serviceMonitorSelectorNilUsesHelmValues as the root cause, not a networking or RBAC issue",
+          "passed": false,
+          "evidence": "Identifies root cause as label mismatch (ServiceMonitor missing `release: kube-prometheus-stack` label), not the NilUsesHelmValues selector flag."
+        },
+        {
+          "text": "Specifies all three selector flags: serviceMonitorSelectorNilUsesHelmValues, podMonitorSelectorNilUsesHelmValues, and ruleSelectorNilUsesHelmValues set to false",
+          "passed": false,
+          "evidence": "Does not mention serviceMonitorSelectorNilUsesHelmValues or any of the three selector flags anywhere in the answer."
+        },
+        {
+          "text": "Places the fix under prometheus.prometheusSpec in Helm values (not at the top level)",
+          "passed": false,
+          "evidence": "No Helm values fix is provided; the answer focuses on adding labels to the ServiceMonitor manifest."
+        },
+        {
+          "text": "Notes that without the fix Prometheus silently ignores manually created ServiceMonitors even though kubectl get servicemonitor shows them",
+          "passed": false,
+          "evidence": "Does not note the silent-ignore behavior; instead frames it as a label mismatch to debug."
+        },
+        {
+          "text": "Avoids recommending manual label matching or recreating the ServiceMonitor as the fix",
+          "passed": false,
+          "evidence": "Explicitly recommends adding `release: kube-prometheus-stack` label to the ServiceMonitor as the primary fix."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Sets repeat_interval: 4h (not a generic value like 1h or 24h)",
+          "passed": true,
+          "evidence": "Shows `repeat_interval: 4h` in the route configuration."
+        },
+        {
+          "text": "Uses discord_configs under the discord receiver (not a generic webhook_configs block)",
+          "passed": true,
+          "evidence": "Shows `discord_configs:` under the discord receiver with webhook_url field."
+        },
+        {
+          "text": "Routes severity: critical to discord and severity: warning to email as separate child routes",
+          "passed": true,
+          "evidence": "Shows two child routes: `match: severity: critical → receiver: discord` and `match: severity: warning → receiver: email`."
+        },
+        {
+          "text": "Keeps the webhook URL and SMTP password out of the config file — references $DISCORD_WEBHOOK_URL via env substitution or webhook_url_file for k3s",
+          "passed": false,
+          "evidence": "Shows literal placeholder `'https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN'` in the config. Security note says to store in Secret/env but does not show $DISCORD_WEBHOOK_URL env substitution or webhook_url_file syntax."
+        },
+        {
+          "text": "Includes group_by: ['alertname', 'job'] matching the skill's reference config",
+          "passed": true,
+          "evidence": "Shows `group_by: ['alertname', 'job']` in the route configuration."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Sets repeat_interval: 4h (not a generic value like 1h or 24h)",
+          "passed": true,
+          "evidence": "Shows `repeat_interval: 4h` in the route configuration."
+        },
+        {
+          "text": "Uses discord_configs under the discord receiver (not a generic webhook_configs block)",
+          "passed": true,
+          "evidence": "Shows `discord_configs:` under both the default and discord receivers."
+        },
+        {
+          "text": "Routes severity: critical to discord and severity: warning to email as separate child routes",
+          "passed": true,
+          "evidence": "Shows `match: severity: critical → receiver: discord` and `match: severity: warning → receiver: email` as child routes."
+        },
+        {
+          "text": "Keeps the webhook URL and SMTP password out of the config file — references $DISCORD_WEBHOOK_URL via env substitution or webhook_url_file for k3s",
+          "passed": false,
+          "evidence": "Shows literal placeholder webhook URL and auth_password in the config with no env substitution or webhook_url_file reference."
+        },
+        {
+          "text": "Includes group_by: ['alertname', 'job'] matching the skill's reference config",
+          "passed": false,
+          "evidence": "Uses `group_by: ['alertname', 'namespace']` instead of `['alertname', 'job']`."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +260,7 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files.",
+    "DRIFT NOTE: Re-graded without_skill mean=0.400 vs committed 0.467 (diff=0.067 > 0.02). Committed run_summary values preserved. Discrepancy driven by eval-2 (0/5 vs expected ~0.33) — baseline completely missed the NilUsesHelmValues root cause."
   ]
 }

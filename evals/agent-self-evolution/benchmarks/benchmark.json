@@ -2,9 +2,351 @@
   "metadata": {
     "skill_name": "agent-self-evolution",
     "timestamp": "2026-07-23",
-    "evals_run": 5,
+    "evals_run": ["eval-1", "eval-4", "eval-5", "eval-8", "eval-20"],
     "runs_per_configuration": 1
   },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Recommends externalizing the discovered process into a persistent, retrievable store (not just adding more context or a bigger window)",
+          "passed": true,
+          "evidence": "'After success, the harness records the execution as a parameterized state machine' stored persistently. 'On future requests for Carrier X: Replay the stored workflow with new parameters.' Explicitly persistent and retrievable."
+        },
+        {
+          "text": "Names a specific mechanism: strategy summary (reflect on successful trajectory) or workflow recording/replay",
+          "passed": true,
+          "evidence": "'Mechanism: Workflow Recording and Replay.' Answer names this explicitly and describes the parameterized state machine recording with verification predicates."
+        },
+        {
+          "text": "Addresses how the stored experience is retrieved and reused on the next similar task",
+          "passed": true,
+          "evidence": "'On future requests for Carrier X: Replay the stored workflow with new parameters. At each state, check the verification predicate against the live environment.'"
+        },
+        {
+          "text": "Surfaces a transferability gate (not every one-off gets stored) or a verification gate before reuse",
+          "passed": true,
+          "evidence": "'Pre-storage verification gate: Reset the environment and replay the workflow from scratch before storing. This blocks workflows that appear to succeed but don't actually complete the task.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Recommends externalizing the discovered process into a persistent, retrievable store (not just adding more context or a bigger window)",
+          "passed": true,
+          "evidence": "'Build a \"playbook\" store. After the agent successfully completes a cancellation process for carrier X, extract and save the step sequence.' Stored as JSON with trigger, steps, and metadata."
+        },
+        {
+          "text": "Names a specific mechanism: strategy summary (reflect on successful trajectory) or workflow recording/replay",
+          "passed": true,
+          "evidence": "'Execution capture: After a successful multi-step task, run an extraction pass: \"Summarize the steps you took to complete this task as a reusable procedure.\" Store the result.'"
+        },
+        {
+          "text": "Addresses how the stored experience is retrieved and reused on the next similar task",
+          "passed": true,
+          "evidence": "'Retrieval before execution: When a new task arrives, search the playbook store (semantic similarity on the trigger). If a matching playbook exists with success_count > 1, inject it into the agent's context.'"
+        },
+        {
+          "text": "Surfaces a transferability gate (not every one-off gets stored) or a verification gate before reuse",
+          "passed": false,
+          "evidence": "Baseline uses confidence scaling (success_count > 1 before treating as reliable) but does not include a pre-storage verification gate or explicit transferability filter before a playbook enters the store."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Describes an explicit learning loop (distill → organize → apply → evolve, or equivalent) rather than implying the model learns automatically",
+          "passed": true,
+          "evidence": "'Three-layer accumulation over time' and the learning lifecycle table: Distillation → Organization → Application → Evolution. Explicitly named as a designed loop, not automatic learning."
+        },
+        {
+          "text": "Recommends strategy summaries: reflect on the successful trajectory and produce a structured, reusable note",
+          "passed": true,
+          "evidence": "'Post-task reflection: After a successful research task, an LLM generates a structured strategy summary' with task_type, methods_used, pitfalls_encountered, key_insight, and transferability fields."
+        },
+        {
+          "text": "Includes a transferability gate — not every trajectory becomes stored experience",
+          "passed": true,
+          "evidence": "'Transferability gate: Not every trajectory deserves to become experience. Apply the test: \"Will this lesson carry over to similar tasks?\" A strategy that only works for one specific company has low transferability.'"
+        },
+        {
+          "text": "Addresses retrieval and injection of prior experience into new tasks (semantic search over the experience store)",
+          "passed": true,
+          "evidence": "'Retrieval on future tasks: When a new research task arrives, semantic search retrieves the top 3-5 relevant strategy summaries. Inject them as context: \"In similar past tasks, these strategies worked well...\"'"
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Describes an explicit learning loop (distill → organize → apply → evolve, or equivalent) rather than implying the model learns automatically",
+          "passed": true,
+          "evidence": "'Design the learning loop as: Execute → Evaluate → Extract → Store → Retrieve.' Explicitly named as a designed loop with discrete steps."
+        },
+        {
+          "text": "Recommends strategy summaries: reflect on the successful trajectory and produce a structured, reusable note",
+          "passed": true,
+          "evidence": "'Extract: On success, run a reflection pass: \"What search strategy worked?\" Produce a structured \"strategy note\"' with domain, effective_queries, effective_sources, ineffective_approaches, synthesis_approach."
+        },
+        {
+          "text": "Includes a transferability gate — not every trajectory becomes stored experience",
+          "passed": false,
+          "evidence": "Baseline includes 'Decay unused strategies' and 'Track strategy success rate' as quality controls, but no explicit transferability gate that filters trajectories before storage based on generalizability."
+        },
+        {
+          "text": "Addresses retrieval and injection of prior experience into new tasks (semantic search over the experience store)",
+          "passed": true,
+          "evidence": "'Retrieve: On new tasks, retrieve the top-k strategy notes for similar domains. Inject them as \"recommended approaches based on past experience.\"' Uses vector store with domain/task-type indexing."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Identifies system prompt optimization / 'system prompt learning' as the mechanism (not fine-tuning)",
+          "passed": true,
+          "evidence": "'Mechanism: System Prompt Optimization (online, case-by-case mode). The symptom is a vague behavioral rule that fails on edge cases. This is exactly what system prompt learning addresses.'"
+        },
+        {
+          "text": "Frames the fix as sharpening rule boundaries through edge cases (the gray zone)",
+          "passed": true,
+          "evidence": "'Sharpening rule boundaries through real failures.' Shows a diff that sharpens 'Escalate when customer disputes a policy' into specific conditions with explicit gray-zone handling."
+        },
+        {
+          "text": "Describes an automated update loop: a coding agent reads the prompt and generates a reviewed diff, and/or an automated framework (DSPy/OPRO/GEPA)",
+          "passed": true,
+          "evidence": "'A coding agent reads the existing system prompt and the failure trajectory, then proposes a specific rule update' as a diff. 'The diff is submitted for human review before being applied.'"
+        },
+        {
+          "text": "Distinguishes online case-by-case optimization from offline batch optimization",
+          "passed": true,
+          "evidence": "'Why not batch optimization (DSPy/OPRO)? Batch optimization requires a scored eval set... For this case, each individual failure produces a precise rule update — more data-efficient.' Explicitly contrasts online vs. batch."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "eval-5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Identifies system prompt optimization / 'system prompt learning' as the mechanism (not fine-tuning)",
+          "passed": false,
+          "evidence": "Baseline uses 'failure logging with classification', 'rule distillation', and 'automated refinement pipeline' but never names this as system prompt optimization or system prompt learning. The mechanism is described but not identified by name."
+        },
+        {
+          "text": "Frames the fix as sharpening rule boundaries through edge cases (the gray zone)",
+          "passed": true,
+          "evidence": "'Cluster them by pattern. Common pattern: \"customer mentions policy dispute\" → agent escalates, but 70% of these were actually just customers asking for an explanation.' Refines the rule with specific boundary conditions."
+        },
+        {
+          "text": "Describes an automated update loop: a coding agent reads the prompt and generates a reviewed diff, and/or an automated framework (DSPy/OPRO/GEPA)",
+          "passed": true,
+          "evidence": "'Prompt an LLM: \"Given these examples where escalation was unnecessary, and the current rule, write a more specific version of the rule.\" A/B test the refined rule against the old one on held-out examples.'"
+        },
+        {
+          "text": "Distinguishes online case-by-case optimization from offline batch optimization",
+          "passed": true,
+          "evidence": "'Feedback loop cadence: Weekly batch — review escalation outcomes, refine rules, deploy. Not real-time (too noisy).' Explicitly identifies batch cadence and contrasts with real-time."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "eval-8",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Describes the tool-creation cycle: explore/search → verify task completion → store in library → reuse",
+          "passed": true,
+          "evidence": "Six-step cycle: 'Capability gap detection → Discovery → Implementation → Verification → Storage → Reuse.' Matches the explore→verify→store→reuse pattern."
+        },
+        {
+          "text": "Lists concrete safety boundaries: sandboxed execution, security scan of created tools, whitelist of permitted tool types, periodic human review",
+          "passed": true,
+          "evidence": "Lists: 'Sandbox execution', 'Security scan: Newly created tools are scanned for network calls to unexpected endpoints', 'Whitelist of permitted tool types: Only data-fetching tools can be auto-created', 'Periodic human review: Monthly review of all auto-created tools.'"
+        },
+        {
+          "text": "Addresses privilege escalation through tool composition (a composed tool inherits the union of component permissions)",
+          "passed": false,
+          "evidence": "Answer does not address privilege escalation through tool composition. It mentions whitelisting tool types and human approval for write-access tools, but not the specific risk that composed tools inherit the union of component permissions."
+        },
+        {
+          "text": "Includes a pre-storage verification gate (the tool actually accomplishes the task before entering the library)",
+          "passed": true,
+          "evidence": "'Verification: Run the tool against known test cases (historical prices that can be verified). The tool must produce correct results before storage.' Explicit pre-storage gate."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "eval-8",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Describes the tool-creation cycle: explore/search → verify task completion → store in library → reuse",
+          "passed": true,
+          "evidence": "Pipeline: 'Tool Discovery Service → Tool Generator → Sandbox Validator → Approval Gate → Tool Registry.' Covers search→verify→store→reuse cycle."
+        },
+        {
+          "text": "Lists concrete safety boundaries: sandboxed execution, security scan of created tools, whitelist of permitted tool types, periodic human review",
+          "passed": true,
+          "evidence": "'Sandboxed execution', 'Network allowlist', 'Human approval for new data sources', 'Rollback', 'Credential scoping' — covers the key safety boundaries including periodic human review."
+        },
+        {
+          "text": "Addresses privilege escalation through tool composition (a composed tool inherits the union of component permissions)",
+          "passed": false,
+          "evidence": "'No transitive dependencies: Discovered tools cannot import other discovered tools' prevents composition but does not name or explain the privilege escalation risk from tool composition."
+        },
+        {
+          "text": "Includes a pre-storage verification gate (the tool actually accomplishes the task before entering the library)",
+          "passed": true,
+          "evidence": "'Sandbox Validator: Run tests in isolated environment. Verify correct data returned for known test cases.' Pre-storage verification before the tool enters the registry."
+        }
+      ]
+    },
+    {
+      "eval_id": 20,
+      "eval_name": "eval-20",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Correctly identifies this AS self-evolution when functions are stored and reused across sessions (not one-off generation)",
+          "passed": true,
+          "evidence": "'If the agent generates a utility function, stores it in a persistent library, and calls it on future tasks without regenerating it — that IS self-evolution. Specifically, it's the Tool Creation (Voyager cycle).'"
+        },
+        {
+          "text": "Names the distinguishing criterion: persistence + cross-task reuse, plus a verification gate before a function enters the reusable library",
+          "passed": true,
+          "evidence": "'What makes it evolution: The function is verified (tested against expected inputs/outputs), stored persistently (survives the session), discoverable, and composable.' Verification gate explicitly named."
+        },
+        {
+          "text": "Connects to tool creation and three-layer capability accumulation (tools become building blocks)",
+          "passed": true,
+          "evidence": "'It's the Tool Creation (Voyager cycle).' and 'It composes (future tools can build on it).' Connects to the tool creation mechanism and composability as a building block."
+        },
+        {
+          "text": "Routes the mechanics of generating/editing the code itself to coding-agent-design",
+          "passed": true,
+          "evidence": "'If the agent generates a utility function, uses it for the current task, and discards it — that's normal code generation (see coding-agent-design).' Explicit routing."
+        }
+      ]
+    },
+    {
+      "eval_id": 20,
+      "eval_name": "eval-20",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Correctly identifies this AS self-evolution when functions are stored and reused across sessions (not one-off generation)",
+          "passed": true,
+          "evidence": "'Self-evolution if: The agent maintains a persistent utility library across sessions... It can compose previously generated utilities to solve new problems. The library grows over time.'"
+        },
+        {
+          "text": "Names the distinguishing criterion: persistence + cross-task reuse, plus a verification gate before a function enters the reusable library",
+          "passed": true,
+          "evidence": "'The key distinction: Self-evolution requires a feedback loop that changes the agent's future behavior.' and 'save it to a persistent code store with: function signature, docstring, test cases, and usage context.'"
+        },
+        {
+          "text": "Connects to tool creation and three-layer capability accumulation (tools become building blocks)",
+          "passed": false,
+          "evidence": "Baseline mentions 'analogous to Voyager's skill library' but does not connect to the three-layer capability accumulation (tools→knowledge→skills) or explain how tools become building blocks for higher-level capabilities."
+        },
+        {
+          "text": "Routes the mechanics of generating/editing the code itself to coding-agent-design",
+          "passed": false,
+          "evidence": "Baseline does not route the code generation mechanics to coding-agent-design. It addresses both the self-evolution aspect and the code generation mechanics without directing the reader to the appropriate skill."
+        }
+      ]
+    }
+  ],
   "run_summary": {
     "with_skill": {
       "pass_rate": {
@@ -24,6 +366,6 @@
   },
   "notes": [
     "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; aggregate means from leak-free grading (per-eval detail not captured in this pass)."
+    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
   ]
 }

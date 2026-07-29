@@ -1,8 +1,8 @@
 ---
-name: pr-reviewer
-summary: Peer PR review pipeline producing tiered, courteous draft comments for GitHub
-type: process
-description: Use when you want to review a peer's GitHub PR — runs the code-reviewer pipeline on the PR, transforms findings into courteous Google eng-practices-styled draft comments, tiers them by severity, and presents formatted text for you to selectively post. NOT for reviewing your own code (see code-reviewer).
+name: "pr-reviewer"
+summary: "Peer PR review pipeline producing tiered, courteous draft comments for GitHub"
+type: "process"
+description: "Use when you want to review a peer's GitHub PR — runs the code-reviewer pipeline on the PR, transforms findings into courteous Google eng-practices-styled draft comments, tiers them by severity, and presents formatted text for you to selectively post. NOT for reviewing your own code (see code-reviewer)."
 ---
 
 # PR Reviewer

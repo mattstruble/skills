@@ -1,8 +1,8 @@
 ---
-name: ml-post-training
-summary: SFT and RL post-training mechanics: data pipelines, reward design, LoRA, debugging
-type: design
-description: You MUST consult this skill when implementing SFT data pipelines, running RL training (PPO/GRPO/DPO), designing reward functions, configuring LoRA, building simulation/training environments, or debugging training instability. Also trigger when choosing between on-policy vs off-policy algorithms, engineering multi-turn credit assignment, or building tool-calling RL pipelines. NOT for deciding whether/when to fine-tune (→ agent-post-training), pre-training from scratch, model serving/inference, or eval-system design (→ agent-evaluation).
+name: "ml-post-training"
+summary: "SFT and RL post-training mechanics: data pipelines, reward design, LoRA, debugging"
+type: "design"
+description: "You MUST consult this skill when implementing SFT data pipelines, running RL training (PPO/GRPO/DPO), designing reward functions, configuring LoRA, building simulation/training environments, or debugging training instability. Also trigger when choosing between on-policy vs off-policy algorithms, engineering multi-turn credit assignment, or building tool-calling RL pipelines. NOT for deciding whether/when to fine-tune (→ agent-post-training), pre-training from scratch, model serving/inference, or eval-system design (→ agent-evaluation)."
 ---
 
 # ML Post-Training

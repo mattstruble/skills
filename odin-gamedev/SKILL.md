@@ -1,8 +1,8 @@
 ---
-name: odin-gamedev
-summary: Odin game architecture with Raylib/Sokol: entity management, hot reloading, game state
-type: design
-description: Use when working on game projects in Odin — Raylib/Sokol integration, entity management, game state architecture, hot reloading, or implementing game patterns in Odin. Takes precedence over game-patterns for Odin-specific implementation. NOT for language syntax or idioms (see odin-design). NOT for engine-agnostic pattern theory (see game-patterns).
+name: "odin-gamedev"
+summary: "Odin game architecture with Raylib/Sokol: entity management, hot reloading, game state"
+type: "design"
+description: "Use when working on game projects in Odin — Raylib/Sokol integration, entity management, game state architecture, hot reloading, or implementing game patterns in Odin. Takes precedence over game-patterns for Odin-specific implementation. NOT for language syntax or idioms (see odin-design). NOT for engine-agnostic pattern theory (see game-patterns)."
 ---
 
 # Odin Game Development

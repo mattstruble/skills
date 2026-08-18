@@ -216,3 +216,198 @@ Implementation requirements:
 - Teacher model must be accessible at training time (not just inference time)
 - Teacher must be able to evaluate the student's partial trajectories (not just complete ones)
 - KL divergence computation between teacher and student distributions at each token position
+
+---
+
+## Environment Diversity Budgeting
+
+*See also: `rl-generalization` skill for the strategic design principles underlying these implementation guidelines.*
+
+### Diversity as a Separate Budget Item
+
+The number of distinct training environments is a **separate budget item** from trace volume. These are independent axes:
+- 50,000 traces from 5 environments = narrow training
+- 700 traces from 100 environments = broader training (SWE-smith: 13.6% → 19%)
+
+Budget both explicitly. When planning a training run, specify:
+1. How many distinct environments/configurations
+2. How many traces/episodes per environment
+3. What the ratio should be
+
+**Calibration from the literature:**
+- Hundreds of distinct environments = narrow regime (memorization likely)
+- Thousands to tens of thousands = genuine invariance begins
+- Training gap closes logarithmically with environment count (Cobbe 2019)
+
+### Environment Diversity Checklist (Pre-Training)
+
+Before starting a training run, verify:
+- [ ] How many distinct environments does the generator produce?
+- [ ] Are environments meaningfully different (not just surface variation)?
+- [ ] Is each tool/skill exercised across multiple domains (crossed, not nested)?
+- [ ] Does the difficulty distribution span 0-100%, not cluster at one level?
+- [ ] Are hidden parameters (seeds, noise, latencies) randomized across episodes?
+
+---
+
+## Difficulty Band Implementation
+
+### Estimating Per-Problem Difficulty
+
+Difficulty must be measured from the **current model's own rollouts**, not a fixed external label:
+
+```python
+# Per-problem success rate estimation
+def estimate_difficulty(model, problem, n_rollouts=16):
+    successes = sum(1 for _ in range(n_rollouts)
+                    if evaluate(model.generate(problem)))
+    return successes / n_rollouts
+
+# Filter to informative band
+def is_informative(success_rate):
+    return 0.30 <= success_rate <= 0.70
+```
+
+**Refresh frequency**: re-estimate every N gradient steps (or every epoch). Problems mastered during training stop teaching.
+
+### The 30-70% Band
+
+Signal is maximized at 50% success rate (Bae et al. EACL 2026). The practical band is 30-70%:
+- Problems at >70% success → mostly all-pass groups → near-zero gradient
+- Problems at <30% success → mostly all-fail groups → near-zero gradient
+- Filtering to 30-70% beats unfiltered by ~4 points
+
+**Critical**: one-sided filtering (dropping only easy OR only hard) does *worse* than no filtering at all. Both tails contain information.
+
+### Dynamic Sampling Implementation
+
+```python
+# DARS-style adaptive sampling
+def sample_training_batch(problems, model, target_band=(0.30, 0.70)):
+    difficulties = {p: estimate_difficulty(model, p) for p in problems}
+    # Weight problems in the informative band higher
+    weights = {p: 3.0 if target_band[0] <= d <= target_band[1] else 1.0
+               for p, d in difficulties.items()}
+    # For hardest problems (< 0.30): increase rollouts per problem (DARS depth)
+    hard_problems = [p for p, d in difficulties.items() if d < target_band[0]]
+    # Sample with weights for the batch
+    return weighted_sample(problems, weights, batch_size)
+```
+
+---
+
+## Reward Hacking Audit Procedure
+
+Before training on any verifiable environment, audit it for exploits:
+
+### Step 1: Generate Deliberately Wrong Solutions
+
+```python
+def generate_wrong_solutions(problem, model, n=10):
+    """Generate solutions that are incorrect but plausible."""
+    prompt = f"Generate a solution to this problem that looks correct but contains a subtle error:\n{problem}"
+    return [model.generate(prompt) for _ in range(n)]
+```
+
+### Step 2: Run Through Verifier
+
+```python
+def audit_verifier(problem, wrong_solutions, verifier):
+    """Check what fraction of wrong solutions the verifier accepts."""
+    false_positives = sum(1 for s in wrong_solutions
+                         if verifier.verify(problem, s))
+    return false_positives / len(wrong_solutions)
+```
+
+### Step 3: Assess Hackability
+
+**Expected rates** (Rajan 2026):
+- ~28.5% of SWE-bench Verified tasks accept wrong patches
+- ~25% of R2E-Gym tasks exploitable at single-shot
+- +14pp score inflation on hackable vs robust tasks
+- 62% of auto-generated "hardening" tests fail the gold solution
+
+**Decision threshold**: if >25% of problems are hackable, harden the verifier before training. Otherwise the model will learn to exploit the weak spots rather than solve the actual problems.
+
+### Step 4: Harden
+
+For code environments specifically:
+1. Generate extra tests targeting the wrong-solution failure modes
+2. Run each generated test against the known-correct solution (gold-sanity gate)
+3. Discard tests that fail on the correct solution (~62% defect rate)
+4. Add surviving tests to the verifier
+
+---
+
+## Domain Randomization Implementation
+
+For simulation and agentic environments, randomize hidden parameters to force adaptive behavior:
+
+### What to Randomize
+
+| Parameter Type | Examples | Purpose |
+|---|---|---|
+| Physical constants | Solver tolerances, friction, gravity offsets | Force physics adaptation |
+| Noise levels | Observation noise, action noise, measurement error | Force robust perception |
+| Latencies | Tool response time, API delays, timeout durations | Force patience/retry logic |
+| Initial conditions | Starting state, seed values, file contents | Force information gathering |
+| Interface variations | Error message format, output structure, available commands | Force generalized parsing |
+
+### Implementation Pattern
+
+```python
+class RandomizedEnvironment:
+    def reset(self):
+        # Randomize hidden params each episode
+        self.noise_level = np.random.uniform(0.01, 0.5)
+        self.latency_ms = np.random.uniform(50, 2000)
+        self.solver_tol = np.random.uniform(1e-6, 1e-2)
+        # Model does NOT observe these directly
+        # It must infer them from interaction
+        return self.get_observation()
+```
+
+### Key Principle
+
+The model should have to **gather information** rather than being handed everything in the prompt. Write tasks so the model must:
+- Read the file (not be given its contents)
+- Query the database (not be told the schema)
+- Run the simulation and inspect output (not be given expected values)
+
+This forces adaptive, self-correcting behavior instead of memorized reflexes.
+
+### Cost
+
+Heavy randomization costs ~2-3× baseline compute for moderate ranges, up to ~33× for aggressive ranges (robotics). It buys **transfer** specifically, not in-distribution score.
+
+---
+
+## Potential-Based Reward Shaping
+
+The **only** form of dense intermediate reward that is guaranteed safe (Ng, Harada, Russell 1999):
+
+```
+F(s, s') = γ · Φ(s') - Φ(s)
+```
+
+Where Φ is any potential function (intuitively: "progress toward goal").
+
+### Why It's Safe
+
+The shaping signal cancels over any complete trajectory. It accelerates learning but cannot change the optimal policy. Any non-potential-based dense reward can create spurious optima.
+
+### Practical Application to RLVP
+
+The existing RLVP pattern (`r = r_outcome + μ·progress - μ·violation`) is safe when:
+- Progress rewards approximate a potential function (monotonic improvement measure)
+- Violation penalties are binary (deterministic rule-based checks)
+
+It becomes unsafe when progress rewards are learned or correlation-based (reward model that "estimates" progress can be gamed).
+
+### Red Flag Signals
+
+If you see any of these during training, suspect reward hacking:
+- Reward climbs but held-out eval quality falls
+- Outputs get longer without getting more accurate
+- Model produces rubric-satisfying text that doesn't solve the problem
+- Performance on hackable environments diverges from robust environments

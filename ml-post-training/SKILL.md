@@ -229,6 +229,7 @@ These are companion skills in the ai-agents family.
 | Concern | Companion Skill |
 |---|---|
 | Deciding whether/when to fine-tune | `agent-post-training` |
+| Designing training for broad transfer (WHY/WHEN) | `rl-generalization` |
 | Eval system design and metrics | `agent-evaluation` |
 | Tool interface design for training environments | `agent-tool-design` |
 | Agent architecture and orchestration | `agent-architecture` |

@@ -207,6 +207,7 @@ when building that layer.
 | Concern | Companion Skill |
 |---|---|
 | Agent architecture & orchestration | agent-architecture |
+| Designing training for broad transfer | rl-generalization |
 | Coding agent patterns (uses "tests pass" as completion criterion) | coding-agent-design |
 | Multi-agent verification loops | multi-agent-collaboration (Loop Engineering) |
 | Skill effectiveness evaluation (applies these principles to skill quality) | skill-creator |
@@ -237,3 +238,4 @@ score the agent's test-writing behavior.
 |---|---|
 | `references/eval-methodology.md` | Improvement loop, three-layer hypothesis framework, model selection framework, cost analysis, benchmark report reading |
 | `references/eval-infrastructure.md` | Environment component taxonomy, observability and tracing, ablation/A/B/feature-flag infrastructure, simulation environments and fidelity spectrum |
+| `references/breadth-measurement.md` | Pass@k vs pass@1 interpretation, answer entropy tracking, held-out ratio reporting, cross-task interference, fake-reward sanity checks, multi-family validation |

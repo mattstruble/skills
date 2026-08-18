@@ -522,6 +522,17 @@
 | multi-doc-spanning-structured-indexing | 2/5 | 5/5 | +3 |
 | **Total** | **8/15 (53%)** | **15/15 (100%)** | **+47%** |
 
+## rl-generalization
+
+| Eval | Baseline | With Skill | Δ |
+|------|----------|-----------|---|
+| environment-diversity-vs-trace-volume | 3/5 | 5/5 | +2 |
+| difficulty-calibration-all-easy | 3/5 | 5/5 | +2 |
+| reward-hacking-code-rl-audit | 3/5 | 4/5 | +1 |
+| compositional-factor-coverage | 3/5 | 5/5 | +2 |
+| sft-vs-rl-generalization-gap | 3/5 | 5/5 | +2 |
+| **Total** | **15/25 (60%)** | **24/25 (96%)** | **+36%** |
+
 ## skill-creator
 
 | Eval | Baseline | With Skill | Δ |

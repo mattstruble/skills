@@ -55,6 +55,7 @@ Skills that supply frameworks and judgment for architectural or creative decisio
 | odin-gamedev | Odin game architecture with Raylib/Sokol: entity management, hot reloading, game state | 71% | 89% | +18% | 2026-07-23 |
 | python-design | Python-specific design patterns, idioms, type choices, and anti-patterns | 80% | 100% | +20% | 2026-07-23 |
 | rag-design | Retrieval pipeline design: chunking, embeddings, hybrid retrieval, and structured indexes | 40% | 93% | +53% | 2026-07-23 |
+| rl-generalization | Designing RL training curricula that produce broad, transferable capability rather than narrow skills | 60% | 96% | +36% | 2026-08-18 |
 | software-design | Core software design principles: composition, minimal interfaces, and clean boundaries | 75% | 100% | +25% | 2026-06-30 |
 | test-design | Test quality tradeoffs using Kent Beck's Test Desiderata: behavior over structure | 67% | 100% | +33% | 2026-06-30 |
 

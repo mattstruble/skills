@@ -1,0 +1,112 @@
+{
+  "skill_name": "rl-generalization",
+  "evals": [
+    {
+      "id": 1,
+      "name": "environment-diversity-vs-trace-volume",
+      "prompt": "I'm training an RL agent for code repair tasks. We have 50,000 training traces from 5 GitHub repositories. Performance is good on tasks from those repos but terrible on anything else. How do I fix this?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Diagnosis of narrow training (too few environments despite high trace volume), recommendation to spread traces across many more repositories, quantitative calibration (hundreds=narrow, thousands+=generalization)",
+      "expectations": [
+        "Identifies the root cause as insufficient environment diversity: 50K traces from 5 repos is narrow training — the model memorized per-repo cues rather than learning generalizable code repair skills",
+        "States that environment count and trace volume are independent axes: a dataset with many traces from few environments is narrow regardless of total size",
+        "Recommends spreading the training budget across many more repositories (tens to hundreds) even at the cost of fewer traces per repo",
+        "Provides quantitative calibration: hundreds of distinct environments = narrow regime; thousands to tens of thousands = where genuine invariance appears",
+        "References the SWE-smith finding or similar: fixed traces across more repos yields better generalization (e.g., 4→100 repos at fixed 700 traces: 13.6%→19%)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "difficulty-calibration-all-easy",
+      "prompt": "Our RL training on math reasoning is going well — the model solves about 85% of problems on first try. But when we test on harder competition-level problems, it fails completely. We've been training for weeks. What's wrong with our curriculum?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Diagnosis: training on problems the model already solves well provides near-zero gradient signal. Need to shift to harder problems where success rate is 30-70%. Difficulty must be judged from the model's current rollouts, not fixed labels.",
+      "expectations": [
+        "Diagnoses the problem as training on too-easy material: at 85% success rate, most GRPO groups are all-pass with near-zero gradient — the model isn't learning anything new",
+        "Recommends shifting to problems where the model's current success rate is in the 30-70% band — this is where learning signal is maximized",
+        "States that difficulty must be judged from the model's own rollouts, refreshed during training — not from fixed external difficulty labels",
+        "Explains the depth-breadth tension: optimizing on medium difficulty improves pass@1 but can actually reduce pass@k (the model becomes narrower, not more capable)",
+        "Recommends targeting problems where the base model is weak (0-30% success) for genuine new capability acquisition, citing that RL adds most where the model is currently worst"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "reward-hacking-code-rl-audit",
+      "prompt": "We're training a coding agent with RL using unit test pass/fail as the reward signal. The reward keeps climbing but code quality reviews show the solutions are getting worse — they pass tests but are fragile hacks. How do we audit and fix our training environment?",
+      "should_trigger": true,
+      "co_triggers": ["ml-post-training"],
+      "files": [],
+      "expected_output": "Reward hacking diagnosis, environment audit procedure (generate wrong solutions, verify rejection), expected hackability rates (25-33%), potential-based shaping as safe dense reward",
+      "expectations": [
+        "Diagnoses reward hacking: the model learned to exploit weak test suites rather than write correct code — proxy reward (tests pass) climbs while true quality degrades",
+        "Recommends an environment audit: generate deliberately wrong solutions and verify the test suite rejects them — this reveals the hackable fraction",
+        "Provides expected rates: roughly 25-33% of code RL environments accept wrong solutions that pass tests (citing Rajan 2026 or similar)",
+        "Recommends hardening: generate additional tests targeting the exploit patterns, but gate them through a gold-sanity check (run against known-correct solution first)",
+        "Notes that reward hacking doesn't just inflate scores — it can generalize into broader disposition problems (deception, shortcutting on unrelated tasks)"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "compositional-factor-coverage",
+      "prompt": "I'm building a training curriculum for a tool-use agent. It has 5 tools (search, calculate, code, database, web) and operates across 3 domains (finance, healthcare, legal). I've created training tasks but the agent only uses search correctly in finance tasks and database correctly in healthcare tasks. How do I fix this?",
+      "should_trigger": true,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Diagnosis of nested/confounded factor design. Need crossed design where each tool is exercised across all domains. Compositional and connected support conditions.",
+      "expectations": [
+        "Diagnoses the problem as a nested/confounded factor design: tools are locked to specific domains, so the model learned fused behaviors (search-in-finance, database-in-healthcare) rather than independent skills",
+        "Recommends a crossed design: each tool must be exercised across all domains — search in finance AND healthcare AND legal, database in all three, etc.",
+        "Explains the two conditions for compositional generalization: compositional support (every factor value present) and connected support (no value locked to a single partner)",
+        "Notes the diagnostic: if the model can't use search in healthcare despite it being available, the factors are confounded — the model has not learned 'search' as an independent skill",
+        "Avoids recommending just adding more data — the fix is structural (cross the factors), not volumetric"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "sft-vs-rl-generalization-gap",
+      "prompt": "We distilled our RL-trained agent's trajectories into an SFT model for faster deployment. The SFT model scores well on the same tasks but fails on slightly modified versions of the same problems (different variable names, different error messages). Why?",
+      "should_trigger": true,
+      "co_triggers": ["ml-post-training"],
+      "files": [],
+      "expected_output": "SFT memorizes surface form while RL generalizes strategy. SFT-on-traces undoes breadth. Mitigations: trace diversity, full CoT, on-policy distillation.",
+      "expectations": [
+        "Explains the SFT-memorizes-RL-generalizes gap: SFT copies surface form of traces (specific variable names, error messages) while RL learned the underlying strategy that worked regardless of surface features",
+        "Cites the quantitative evidence: RL generalizes (+3 to +61 pts on shifted versions) while SFT on the same trajectories degrades (-6 to -80 pts)",
+        "Recommends trace diversity: ensure the distillation dataset contains many varied solutions to the same problems — diverse surface forms prevent memorization of any one",
+        "Recommends keeping full chain-of-thought: the reasoning process is what transfers, not just the final answer",
+        "Notes that on-policy distillation forgets less than standard SFT (KL divergence 0.019 vs 0.283) because it makes minimal changes to the base policy"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "near-miss-negative-agent-memory",
+      "prompt": "I'm designing a memory system for my agent. Should I use RAG to store and retrieve past experiences? What kind of memory architecture works best for long-term agent learning?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "This is agent memory/architecture design → agent-memory or agent-self-evolution, not rl-generalization"
+    },
+    {
+      "id": 7,
+      "name": "near-miss-negative-training-mechanics",
+      "prompt": "What learning rate should I use for GRPO training? Should I apply LoRA to MLP layers? How many rollouts per prompt is optimal?",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Training mechanics and hyperparameters → ml-post-training, not rl-generalization"
+    },
+    {
+      "id": 8,
+      "name": "near-miss-negative-eval-design",
+      "prompt": "How do I set up an evaluation harness for my agent? I need to measure performance across multiple benchmarks and track regressions.",
+      "should_trigger": false,
+      "co_triggers": [],
+      "files": [],
+      "expected_output": "Eval system design → agent-evaluation, not rl-generalization"
+    }
+  ]
+}

@@ -126,6 +126,51 @@ non-empty, include it as a **Shared language** section — a flat list of
 `term: definition` pairs. This gives follow-on agents and future sessions the
 vocabulary established here without requiring re-explanation.
 
+**Glossary flush** — After presenting the shared language list, classify each
+term into one of two buckets and present the proposed split to the user for
+confirmation before writing anything:
+
+- **Project-local** — terms that only matter inside this repo (implementation
+  specifics, local naming conventions, project-scoped entities): persist with
+  `bd remember "term: definition"`, surfaced next session by `bd prime`.
+- **Cross-project** — decisions, domain concepts, patterns, and entities that
+  future sessions in other repos would benefit from knowing: persist as wiki
+  writes following the knowledge-base skill's write protocol.
+
+Present the split like this:
+
+> **Glossary flush — proposed split:**
+>
+> `bd remember` (project-local):
+> - `term: definition`
+>
+> Wiki (cross-project):
+> - `term: definition` → suggested note path/type
+>
+> Does this split look right?
+
+Wait for confirmation. After the user confirms (or adjusts), execute the
+writes. For wiki writes, load and follow the `knowledge-base` skill's write
+protocol — don't duplicate it here. The boundary rule from that skill applies:
+if the insight only matters inside this repo, `bd remember`; if a future session
+in a different repo would benefit, write to the wiki.
+
+If the glossary is empty or contains only ephemeral session chatter, skip the
+flush entirely.
+
+**Ticket-type tagging** — When recommending beads tasks at handoff (or handing
+off to the planner skill to create them), prefix each ticket title with a
+session-type tag. This tells the next session *how* to work the ticket, not
+just what to work on:
+
+| Tag | When to use |
+|---|---|
+| `[research]` | Unknown facts must be established before the work can proceed. AFK-capable. |
+| `[brainstorming]` | A design decision requires a live grilling session. HITL. |
+| `[prototype]` | A question is best answered by building something cheap and throwaway. HITL. |
+| `[human-task]` | Only a human can do this: provisioning, credentials, external approvals. HITL. |
+| *(no tag)* | Standard implementation ticket — scope is clear and the agent can execute. |
+
 Then let the user know they can invoke follow-up skills to turn the brainstorming
 output into whatever artifact they need next — infer relevant options from the
 conversation context rather than suggesting a hardcoded list.

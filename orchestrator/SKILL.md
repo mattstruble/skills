@@ -47,6 +47,12 @@ Before entering the state machine:
 
 The orchestrator runs this loop until the frontier is empty.
 
+**Stop only for:**
+- All remaining open tasks are stuck (nothing dispatchable)
+- Infrastructure failure (dispatch tool unavailable, bd command errors)
+- Ambiguous acceptance criteria that no reviewer can adjudicate without human
+  judgment — in this case, flag the specific task and continue the rest
+
 ### Step 1 — Identify the Wave
 
 ```bash
@@ -87,6 +93,13 @@ Dispatch up to 3 coders simultaneously. Do not dispatch more than 3 coders in
 a single call regardless of wave size — save remaining candidates for the next
 wave.
 
+**Before dispatching each coder, claim the task:**
+```bash
+bd update '<task-id>' --claim
+```
+If the claim fails (already claimed by another session), skip that task and
+proceed to the next candidate. Do not dispatch a coder for an unclaimed task.
+
 Each coder dispatch:
 - **worktree**: `true`
 - **allowTreeMutation**: `true`
@@ -94,10 +107,13 @@ Each coder dispatch:
   Pass the task ID and full task description (title, description, acceptance
   criteria, design notes) as the user message.
 
-The dispatch tool has a **maximum of 8 tasks per call**. Reviewer dispatches
-(Step 4) consume the remaining capacity. Plan accordingly — 3 coders + 4
-reviewers per coder = 7 tasks, which fits in one call only if dispatched
-across sequential calls.
+**If a coder dispatch returns an error, timeout, or crash**, mark the task stuck
+immediately:
+```bash
+bd update '<task-id>' --note 'coder dispatch failed: <error>'
+```
+Continue dispatching any remaining coders in the wave. Include the stuck task in
+the completion report.
 
 ---
 
@@ -116,6 +132,12 @@ Each reviewer dispatch:
 If dispatch capacity is tight (approaching the 8-task limit per call), split
 reviewer dispatches across multiple calls rather than reducing reviewer count.
 Always dispatch all 4 reviewers.
+
+**If a reviewer fails to return (timeout, error):**
+1. Re-dispatch that single reviewer once.
+2. If it fails a second time, proceed without it — **3-of-4 all-LGTM is
+   sufficient to close** when the 4th reviewer is unresponsive. Treat the
+   missing result as a non-blocking finding in the completion report.
 
 ---
 
@@ -163,36 +185,26 @@ Retry path — max **2 retries** per task.
 
 ### Step 6 — Next Wave
 
-After all dispatched coders in the current wave have been reviewed and
-closed (or marked stuck):
+After all dispatched coders in the current wave have been reviewed and closed
+(or marked stuck), re-query the frontier and loop:
 
 ```bash
 bd ready --parent '<epic-id>'
 ```
 
-Go to Step 1 with the new frontier.
-
----
-
-### Step 7 — Repeat Until Done
-
-The loop runs without pausing between waves. The orchestrator does not ask the
-user for permission between waves, does not wait for human review of individual
-tasks, and does not pause to summarize mid-execution.
-
-**Stop only for:**
-- All remaining open tasks are stuck (nothing dispatchable)
-- Infrastructure failure (dispatch tool unavailable, bd command errors)
-- Ambiguous acceptance criteria that no reviewer can adjudicate without human
-  judgment — in this case, flag the specific task and continue the rest
+Return to Step 1. Do not pause between waves. Do not ask the user for permission
+or summarize mid-execution. Continue until a stop condition is reached or the
+frontier is empty.
 
 ---
 
 ## Autonomy Contract
 
-The orchestrator commits to running the full epic end-to-end. Mid-epic pauses
-break the execution model and shift coordination cost back to the user. The only
-exceptions are the stop conditions above.
+Do not pause between waves. Do not ask for permission. Stop only for:
+- All remaining open tasks are stuck (nothing dispatchable)
+- Infrastructure failure (dispatch tool unavailable, bd command errors)
+- Ambiguous acceptance criteria that no reviewer can adjudicate without human
+  judgment — flag the specific task and continue the rest
 
 If a stop condition is hit partway through:
 1. Report the exact state: which tasks closed, which are stuck, which are blocked.
@@ -224,6 +236,9 @@ criteria clarification, or re-invoking the orchestrator after resolution).
 
 ## Key Implementation Notes
 
+- **Dispatch cap is 8 tasks per call.** Reviewer dispatches (Step 4) consume
+  capacity alongside coder dispatches. Plan accordingly — 3 coders + 4 reviewers
+  per coder fits only when split across sequential calls.
 - **Single-quote all bd arguments** to prevent shell interpolation of `$`,
   backticks, or `"` in task titles and descriptions.
 - **Findings relay is cycle-scoped.** Each retry coder sees only the findings

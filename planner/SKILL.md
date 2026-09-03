@@ -76,6 +76,8 @@ the graph gets wired.
 Brainstorm grills until the scope is solid. The planning session begins when
 brainstorm signals done — not before.
 
+**Re-classify after brainstorm.** If brainstorm reveals that scope is larger than expected, success criteria are still unclear, or you cannot yet name all the tickets, re-classify this effort as Foggy and stop per the Foggy protocol — do not proceed to ticket creation.
+
 ### 2. Create Typed Tickets
 
 With scope confirmed, create beads tasks. Every ticket carries a **type tag** in

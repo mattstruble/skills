@@ -43,9 +43,10 @@ reads. Load this skill for advanced graph operations described below.
 2. **Read the relevant MOC.** It points to the atomic notes in that domain.
 3. **Pick the 1-5 atomic notes most relevant** to the current conversation. Read them.
 4. **Follow wikilinks selectively.** If a loaded note links to a relevant entity, read that note too. Don't follow every link — follow the ones that earn it. Never read the same file twice in one traversal — maintain a visited set.
-5. **Use grep for backlinks** when needed. To find what decisions touched a topic, grep for its wikilink path. If grep returns more than 10 matches, load only the 3-5 most recently updated.
-6. **Use tags to find clusters.** To find every active decision, grep for `tags:.*status/active` inside `decisions/`.
-7. **Check decision status.** When loading a decision note, check its `status` field. If `status: superseded`, follow the supersession chain to the current active decision.
+5. **Check `plans/` for active maps.** After loading the relevant MOC, check whether any active plan maps cover the current domain or effort. Active plans are listed in INDEX.md under **Active Plans**; read the maps for efforts whose destination or tags match the topic at hand. A plan map carries the live decision trail and fog for that effort — loading it can prevent duplicated work or contradictory decisions.
+6. **Use grep for backlinks** when needed. To find what decisions touched a topic, grep for its wikilink path. If grep returns more than 10 matches, load only the 3-5 most recently updated.
+7. **Use tags to find clusters.** To find every active decision, grep for `tags:.*status/active` inside `decisions/`.
+8. **Check decision status.** When loading a decision note, check its `status` field. If `status: superseded`, follow the supersession chain to the current active decision.
 
 ### Don't narrate
 
@@ -122,7 +123,7 @@ The wiki is a graph. Each markdown file is a **node**; every `[[wikilink]]` is a
 
 ### Node types
 
-Every note declares its `type` in frontmatter. Five canonical types:
+Every note declares its `type` in frontmatter. Six canonical types:
 
 | Type | What it is | Folder | Examples |
 |---|---|---|---|
@@ -131,6 +132,7 @@ Every note declares its `type` in frontmatter. Five canonical types:
 | `decision` | A dated, reasoned decision | `decisions/` | `decisions/2026-05-05-redis-for-session-cache.md` |
 | `topic` | A concept, feature, strategy, or living-fact reference | `topics/` | `topics/data-pipeline.md` |
 | `moc` | Map of Content — curated entry point linking related notes | `moc/` | `moc/project-MOC.md` |
+| `plan` | Active planning map for a multi-session effort — owned by the planner skill | `plans/` | `plans/data-pipeline-migration.md` |
 
 When a new note doesn't fit one of these types, prefer `topic`.
 
@@ -154,7 +156,7 @@ Every note begins with YAML frontmatter:
 
 ```yaml
 ---
-type: person | org | decision | topic | moc
+type: person | org | decision | topic | moc | plan
 title: "Human-readable title"
 aliases: ["Alt name", "Abbreviation"]
 tags: [type/person, domain/myproject, status/active]
@@ -183,11 +185,39 @@ supersedes: ["[[decisions/2026-02-08-old-decision]]"]
 
 When a later decision supersedes an earlier one, set `status: superseded` on the older note and add `supersedes:` to the newer note. Don't delete the old one.
 
+Plan notes additionally carry:
+
+```yaml
+status: active | complete
+destination: "One or two lines: what reaching the end of this map looks like."
+```
+
+A plan note's body follows the planner skill's map format:
+
+```markdown
+## Destination
+<what reaching the end of this map looks like>
+
+## Notes
+<domain; skills every session should consult; standing preferences for this effort>
+
+## Decisions so far
+- [Ticket title](link): one-line gist of the answer
+
+## Not yet specified
+<!-- fog: in-scope decisions you can't ticket yet -->
+
+## Out of scope
+<!-- work ruled beyond the destination -->
+```
+
+The **planner skill owns creating and updating plan notes**. Knowledge-base agents read them and maintain the Active Plans section of `INDEX.md` but do not write map bodies. A plan stays `status: active` until the user or the planner skill marks it `status: complete` — completing all tickets or clearing the fog is not sufficient on its own.
+
 ### Tag taxonomy
 
 Hierarchical, slash-separated. Pick from these branches; extend only when none fit.
 
-- `type/*` — `type/person`, `type/org`, `type/decision`, `type/topic`, `type/moc`
+- `type/*` — `type/person`, `type/org`, `type/decision`, `type/topic`, `type/moc`, `type/plan`
 - `domain/*` — `domain/myproject`, `domain/infra`, `domain/personal`. The "what part of life is this."
 - `status/*` — `status/active`, `status/deferred`, `status/superseded`, `status/draft`, `status/tbd`
 - `role/*` — for people: `role/lead`, `role/collaborator`, `role/contact`
@@ -244,11 +274,16 @@ updated: 2026-05-05
 - [[people/me|Profile]]
 - [[topics/working-style]]
 
+## Active Plans
+- [[plans/data-pipeline-migration]] — migrating the data pipeline to new infra
+
 ## Domains
 - [[moc/project-MOC|Project X]] — primary project
 - [[moc/people-MOC|People]] — every person in the graph
 - [[moc/decisions-MOC|Decisions]] — every dated decision
 ```
+
+The **Active Plans** section lists every plan note with `status: active`. When a plan is created, add it here; when it transitions to `status: complete`, remove it. The planner skill drives those edits — knowledge-base agents keep the section accurate when performing MOC maintenance.
 
 ---
 

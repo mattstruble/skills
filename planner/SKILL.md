@@ -88,7 +88,7 @@ to plan — stop and tell the user.
 ### 2. Create the Wiki Map Note
 
 Create `plans/<effort-name>.md` in the wiki (the path declared in `AGENTS.md`
-as `Knowledge base: <path>`). Follow the plan note format:
+as `Knowledge base: <path>`), creating the `plans/` directory if it doesn't exist. Follow the plan note format:
 
 ```markdown
 ---
@@ -136,18 +136,12 @@ Create a beads epic for the effort, then populate the frontier — the set of
 tickets that can be worked right now without resolving fog first.
 
 Frontier tickets are the work visible from here: research, design sessions, and
-prototypes that will clarify the fog. Every frontier ticket carries a type tag:
-
-| Tag | When to use |
-|---|---|
-| `[research]` | Unknown facts must be established before the work can proceed. AFK-capable. |
-| `[brainstorming]` | A design decision requires a live grilling session. HITL. |
-| `[prototype]` | A question is best answered by building something cheap and throwaway. HITL. |
-| `[human-task]` | Only a human can do this: provisioning, credentials, external approvals. HITL. |
-| *(no tag)* | Standard implementation ticket. Scope is clear and the agent can execute. |
+prototypes that will clarify the fog. Every frontier ticket carries a type tag — use the same type tags defined in the Simple Path.
 
 Untagged (implementation) tickets belong in the fog section until enough research
 has been done to define them precisely — don't create them now.
+
+If no frontier tickets can be framed yet, create a single `[brainstorming]` ticket to sharpen the destination and treat that as the entire frontier.
 
 Size every ticket to one focused session. If a ticket would require more than one
 agent context window, split it.
@@ -178,7 +172,7 @@ presenting to the user. The critic's checks:
 - Do ticket type tags match the actual nature of the work?
 - Is there scope that should be cut (YAGNI)?
 
-Incorporate the critic's findings. Re-run only if the map changed substantially.
+Incorporate the critic's findings. Re-run only if the map changed substantially. If the critic finds the destination unclear or the classification wrong, return to Step 1 before revising tickets.
 
 ### 6. Present Map for Approval
 
@@ -192,6 +186,10 @@ Present the map and frontier to the user:
 Then stop. The user approves the map before any ticket is claimed or any work
 begins. If they request changes, revise and re-present. Don't start executing
 until you hear an explicit yes.
+
+---
+
+*The following applies across sessions after approval — not during the initial planning session.*
 
 ### 7. Working the Frontier (Across Sessions)
 

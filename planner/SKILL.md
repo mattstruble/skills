@@ -127,8 +127,10 @@ prevent scope creep and record why something was cut. -->
 ```
 
 **Plans/ directory convention:** one file per effort, kebab-case filename matching
-the effort name, e.g. `plans/data-pipeline-migration.md`. After creating the map,
-add it to `INDEX.md` under **Active Plans**.
+the effort name, e.g. `plans/data-pipeline-migration.md`. Before constructing the
+path, strip all `/`, `\`, and `..` sequences from the effort name so the resolved
+path cannot escape `plans/` — assert the final path begins with `plans/` before
+writing. After creating the map, add it to `INDEX.md` under **Active Plans**.
 
 ### 3. Create the Epic and Frontier Tickets
 
@@ -299,7 +301,10 @@ until you hear an explicit yes.
 
 ## Beads Conventions
 
-- `bd create "<[type] title>" --parent <id>` — create a ticket under the parent
+- Use **single quotes** around titles in `bd create` commands (e.g.
+  `bd create '[type] title' --parent <id>`) to prevent shell interpolation of
+  `$`, backticks, or `"` inside the title text.
+- `bd create '<[type] title>' --parent <id>` — create a ticket under the parent
 - `bd dep add <id> --needs <blocker-id>` — wire a blocking edge
 - `bd ready <id>` — mark the frontier tickets as ready after approval
 - `bd update <id> --claim` — claim before any work starts (done by the executor, not the planner)

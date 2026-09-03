@@ -132,7 +132,10 @@ confirmation before writing anything:
 
 - **Project-local** — terms that only matter inside this repo (implementation
   specifics, local naming conventions, project-scoped entities): persist with
-  `bd remember "term: definition"`, surfaced next session by `bd prime`.
+  `bd remember 'term: definition'`, surfaced next session by `bd prime`.
+  **Guard**: only propose this bucket if `.beads/` exists in the project root.
+  If it does not, surface these terms as inline recommendations and ask the
+  user to persist them manually — do not emit `bd remember` commands.
 - **Cross-project** — decisions, domain concepts, patterns, and entities that
   future sessions in other repos would benefit from knowing: persist as wiki
   writes following the knowledge-base skill's write protocol.
@@ -141,16 +144,21 @@ Present the split like this:
 
 > **Glossary flush — proposed split:**
 >
-> `bd remember` (project-local):
-> - `term: definition`
+> `bd remember` (project-local) *(omit this section if no `.beads/` exists)*:
+> - `bd remember 'term: definition'`
 >
 > Wiki (cross-project):
 > - `term: definition` → suggested note path/type
 >
 > Does this split look right?
 
-Wait for confirmation. After the user confirms (or adjusts), execute the
-writes. For wiki writes, load and follow the `knowledge-base` skill's write
+Wait for confirmation. The user sees the exact commands (including the full
+quoted content) before anything runs — this review step is the primary
+injection safeguard. After the user confirms (or adjusts), execute the
+writes. Use single quotes for `bd remember` arguments so shell does not
+interpret `$`, backticks, or `"` inside the content.
+
+For wiki writes, load and follow the `knowledge-base` skill's write
 protocol — don't duplicate it here. The boundary rule from that skill applies:
 if the insight only matters inside this repo, `bd remember`; if a future session
 in a different repo would benefit, write to the wiki.

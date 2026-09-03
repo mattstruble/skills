@@ -76,7 +76,7 @@ their descriptions or acceptance criteria.
   acceptance criteria.
 - If two or more candidates reference the **same file**:
   - **Merge**: combine them into a single coder dispatch with a unified prompt
-    covering both changes, OR
+    covering both changes — claim all merged task IDs before dispatching; if any claim fails, fall back to the sequencing strategy, OR
   - **Sequence**: dispatch only the first candidate this wave; the second
     dispatches after the first closes.
 - The goal is zero concurrent writers to the same file. Parallel coders on
@@ -170,7 +170,7 @@ Retry path — max **2 retries** per task.
 - If all targeted reviewers pass: run a **final full validation** — dispatch all
   4 reviewers one more time against the final diff. This confirms no regression
   in previously-passing reviewers.
-- If the final full validation passes: close the task.
+- If the final full validation passes: close the task. Apply the same 3-of-4 quorum rule as Step 4 — if the 4th reviewer is unresponsive after one re-dispatch, 3-of-4 passing is sufficient to close.
 - If any reviewer fails the final full validation: that counts as a retry.
 
 **Stuck condition:**

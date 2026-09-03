@@ -167,7 +167,7 @@ related: ["[[orgs/infra-team]]", "[[people/jordan]]"]
 ```
 
 Field rules:
-- **`type`** — one of the five canonical types.
+- **`type`** — one of the six canonical types.
 - **`title`** — display title; can differ from filename. Required.
 - **`aliases`** — alternate ways the entity gets referenced. Helps resolve ambiguous mentions. Optional but encouraged.
 - **`tags`** — hierarchical tags from the taxonomy below. At minimum: `type/<node-type>`.

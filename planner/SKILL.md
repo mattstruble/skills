@@ -58,10 +58,172 @@ Signal: the user describes something big, novel, or uncertain — greenfield, la
 refactor, exploratory work, unclear success criteria. Phrases like "figure out
 how to", "research whether", "design the approach for".
 
-**→ The Foggy Path protocol is defined in a separate extension of this skill.**
-**See task mattstruble-skills-we2 for the full map-and-frontier protocol.**
-**For now: tell the user this effort is foggy, confirm the classification, and**
-**stop. Do not create tickets. The foggy protocol must be loaded before proceeding.**
+**→ Follow the Foggy Path.**
+
+---
+
+## Foggy Path
+
+The Foggy Path turns an uncertain, multi-session effort into a navigable map. The
+map carries the destination, live decision trail, and fog — the set of decisions
+you can sense but cannot yet name precisely. You work the frontier, graduate fog,
+and keep the map current until the fog clears and the effort is done.
+
+### 1. Invoke Brainstorm to Name the Destination
+
+You cannot draw the map without a destination. Invoke the brainstorm skill to
+grill until you can write two sentences answering: **what does done look like?**
+
+Brainstorm should surface:
+- The concrete end state (deployed thing, answered question, shipped feature)
+- Rough scope boundaries — what the effort is *not*
+- Any known hard constraints (deadlines, tech limitations, non-negotiables)
+- The first decision the team must make to get moving
+
+Brainstorm signals done when the destination is crisp enough to write. A
+destination is crisp when a future agent reading it cold can orient in under
+one minute. If brainstorm cannot name the destination, the effort isn't ready
+to plan — stop and tell the user.
+
+### 2. Create the Wiki Map Note
+
+Create `plans/<effort-name>.md` in the wiki (the path declared in `AGENTS.md`
+as `Knowledge base: <path>`). Follow the plan note format:
+
+```markdown
+---
+type: plan
+title: "<Effort Name>"
+tags: [type/plan, domain/<X>]
+status: active
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+related: []
+destination: "One or two lines: what done looks like."
+---
+
+# <Effort Name>
+
+## Destination
+<What reaching the end of this map looks like. 1–2 lines. Orients every session.>
+
+## Notes
+<Domain context; skills every session should consult; standing constraints or
+preferences for this effort. A future agent cold-reading this should understand
+the landscape in one minute.>
+
+## Decisions so far
+<!-- Populated as tickets close. Format per entry:
+- [Ticket title]([[beads/ticket-id]]): one-line gist of the answer -->
+
+## Not yet specified
+<!-- Fog: in-scope decisions you can't ticket yet. Write them as loosely or
+fully as the view allows. These graduate into beads tickets as understanding
+sharpens. Format freely — bullet or prose. -->
+
+## Out of scope
+<!-- Work consciously excluded from this effort. Never graduates. Exists to
+prevent scope creep and record why something was cut. -->
+```
+
+**Plans/ directory convention:** one file per effort, kebab-case filename matching
+the effort name, e.g. `plans/data-pipeline-migration.md`. After creating the map,
+add it to `INDEX.md` under **Active Plans**.
+
+### 3. Create the Epic and Frontier Tickets
+
+Create a beads epic for the effort, then populate the frontier — the set of
+tickets that can be worked right now without resolving fog first.
+
+Frontier tickets are the work visible from here: research, design sessions, and
+prototypes that will clarify the fog. Every frontier ticket carries a type tag:
+
+| Tag | When to use |
+|---|---|
+| `[research]` | Unknown facts must be established before the work can proceed. AFK-capable. |
+| `[brainstorming]` | A design decision requires a live grilling session. HITL. |
+| `[prototype]` | A question is best answered by building something cheap and throwaway. HITL. |
+| `[human-task]` | Only a human can do this: provisioning, credentials, external approvals. HITL. |
+| *(no tag)* | Standard implementation ticket. Scope is clear and the agent can execute. |
+
+Untagged (implementation) tickets belong in the fog section until enough research
+has been done to define them precisely — don't create them now.
+
+Size every ticket to one focused session. If a ticket would require more than one
+agent context window, split it.
+
+### 4. Wire Blocking
+
+After tickets exist (they need IDs), make a second pass to wire dependencies:
+
+```
+bd dep add <blocked-id> --needs <blocker-id>
+```
+
+The dependency graph determines the live frontier — tickets that are unblocked
+and ready to claim. A correct graph means agents always know what's takeable
+without reading the whole plan.
+
+### 5. Critic Loop
+
+Spawn a `plan-critic` subagent to stress-test the map and frontier before
+presenting to the user. The critic's checks:
+
+- Is the destination crisp enough to orient a future agent cold?
+- Are frontier tickets sized to one session each?
+- Are dependencies complete — any ticket that assumes a prior result without a
+  declared blocker?
+- Does the fog in *Not yet specified* cover everything known-unknown?
+- Is the *Out of scope* section present and meaningful?
+- Do ticket type tags match the actual nature of the work?
+- Is there scope that should be cut (YAGNI)?
+
+Incorporate the critic's findings. Re-run only if the map changed substantially.
+
+### 6. Present Map for Approval
+
+Present the map and frontier to the user:
+- Quote the **Destination** — this is the anchor
+- List frontier tickets in dependency order (blockers first)
+- Show the type tag and one-line description for each
+- Show the fog entries from *Not yet specified* — these are the open questions
+- Show what's *Out of scope* so the user can correct it
+
+Then stop. The user approves the map before any ticket is claimed or any work
+begins. If they request changes, revise and re-present. Don't start executing
+until you hear an explicit yes.
+
+### 7. Working the Frontier (Across Sessions)
+
+After approval, sessions proceed by working frontier tickets. After each ticket
+closes, run the **fog graduation protocol**:
+
+**Fog Graduation Protocol**
+
+1. **Update Decisions so far** — add a line to the map:
+   `- [Ticket title]([[beads/ticket-id]]): one-line gist of the answer`
+
+2. **Check fog entries** — read each entry in *Not yet specified*. For each entry:
+   - Can it now be framed as a precise, actionable ticket? If yes, **graduate**:
+     create the beads ticket with the appropriate type tag, wire its dependencies,
+     and remove the entry from *Not yet specified*.
+   - If the entry is still too fuzzy to ticket, leave it as fog. You may sharpen
+     its wording if the just-closed ticket made the question clearer.
+
+3. **Update the map's `updated:` date** and commit.
+
+The map body is a living document. Decisions so far grows; Not yet specified
+shrinks. Out of scope never shrinks — consciously excluded work stays excluded.
+
+### 8. Done Condition
+
+The effort is done when:
+- **Fog is empty** — *Not yet specified* has no remaining entries
+- **Frontier is clear** — no open tickets remain (all closed or deferred)
+
+When both conditions hold, set `status: complete` on the map note, remove it
+from `INDEX.md`'s Active Plans section, and hand off to implementation or
+whatever follow-on work the destination implies.
 
 ---
 

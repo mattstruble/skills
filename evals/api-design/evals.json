@@ -51,6 +51,34 @@
         "Response mentions a flag on List to show archived/deleted documents",
         "Response mentions state enum conventions (output-only, UPPER_SNAKE_CASE, or STATE_UNSPECIFIED)"
       ]
+    },
+    {
+      "id": 5,
+      "name": "payment-error-design-recovery",
+      "prompt": "Our payment API returns errors like `{\"error\": \"something went wrong\"}` with a 500 status code for everything \u2014 card declined, insufficient funds, invalid card number, rate limits. Our mobile team is complaining they can't show useful error messages to users and they can't implement retry logic. How should we redesign the error responses?",
+      "expected_output": "Should recommend RFC 9457 structured errors, apply error design principles (Visible, Understandable, Actionable, Stable), include recovery patterns (retry with backoff for transient, idempotency keys).",
+      "files": [],
+      "expectations": [
+        "Recommends structured error responses with distinct error types for different failure modes (not a generic 500 for everything)",
+        "Includes actionable detail that tells the caller what to do (e.g., retry for rate limits, use different card for declined)",
+        "Addresses the retry problem with a concrete recovery pattern (exponential backoff for transient errors or idempotency keys for safe retries)",
+        "Distinguishes between client errors (4xx) and server errors (5xx) for different failure modes",
+        "Recommends stable error contracts that mobile clients can reliably parse and switch on"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "sdk-abstraction-ladder",
+      "prompt": "We're building a Python SDK for our cloud storage API. Our current SDK exposes every low-level operation \u2014 create_multipart_upload, upload_part, complete_multipart_upload, list_parts, abort_multipart_upload. It's flexible but our users keep asking for a simple 'just upload this file' method. Some power users love the granular control though. How do we serve both audiences?",
+      "expected_output": "Should apply the abstraction ladder concept, recommend a layered API with simple upload() for common case and the existing granular operations for power users.",
+      "files": [],
+      "expectations": [
+        "Recommends a layered API serving multiple skill levels rather than choosing one audience over the other",
+        "Proposes a simple high-level method (e.g., upload_file) that handles multipart internally for the common case",
+        "Preserves the existing low-level operations for power users who need granular control",
+        "Shows how the simple method can be implemented using the low-level building blocks",
+        "Explains the trade-off: convenience drives adoption, flexibility retains power users"
+      ]
     }
   ]
 }

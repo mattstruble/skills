@@ -170,6 +170,67 @@ Split a module when it exceeds ~300 lines or has 3+ distinct
 responsibilities — whichever comes first. Prefer flat structure
 (`src/formatters.py`) over deep nesting (`src/utils/helpers/formatters/date.py`).
 
+### `__init__.py` as Design Document
+
+A module's `__init__.py` with explicit `__all__` is a design document — it
+defines the public interface and forces deliberate decisions about what to
+expose.
+
+```python
+# app/payments/__init__.py
+"""Payment processing domain.
+
+Public interface:
+  - charge(amount, payment_method) -> Receipt
+  - refund(receipt) -> Refund
+  - list_charges(account_id) -> list[Receipt]
+"""
+
+from .charge import charge
+from .refund import refund
+from .queries import list_charges
+
+__all__ = ["charge", "refund", "list_charges"]
+
+# Everything else is implementation detail
+# _processor, _validation, _webhook_handler are NOT exported
+```
+
+If you can't write a one-paragraph module docstring that accurately describes
+what the module does, the module has too many responsibilities.
+
+### Naming as Information Scent
+
+Strong names communicate *domain concept*, not mechanism. Weak names could
+describe code in five different modules — they're placeholders, not names.
+
+**Strong scent** (domain concept):
+- `payment_processor`, `invoice_generator`, `user_authenticator`
+- `scheduled_for`, `expires_at`, `cancelled_reason`
+- `SeatReservation`, `FlightManifest`, `BoardingPass`
+
+**Weak scent** (mechanism, not meaning):
+- `data_handler`, `process_manager`, `item_controller`
+- `flag`, `result`, `status`, `value`, `info`
+- `Manager`, `Helper`, `Util`, `Base`
+
+**Graveyard names** where scent goes to die: `utils/`, `helpers/`, `common/`,
+`shared/`, `misc/`. These contain every kind of content, so they provide no
+navigation signal. A new engineer looking for tax calculation logic will never
+guess to check `utils/helpers.py`.
+
+**Import path as scent trail:**
+```python
+# Every token narrows the search — strong scent trail
+from app.billing.invoices.line_items import calculate_tax
+
+# Trail goes cold — what kind of util? what does it help with?
+from utils.helpers import calculate_tax
+```
+
+**Renaming test:** if you had to rename a module so a new engineer finds it
+on their first try, what would you call it? That's the right name.
+
 ---
 
 ## Code Hygiene

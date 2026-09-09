@@ -106,6 +106,48 @@ at any cost.
 
 ---
 
+## Constraint Taxonomy
+
+Norman identifies four types of constraints that prevent errors by reducing
+available actions (*The Design of Everyday Things*, ch. 4). Each maps to
+software:
+
+| Type | Physical design | Software analog |
+|---|---|---|
+| **Physical** | Shape prevents wrong assembly | Type system prevents invalid inputs |
+| **Logical** | Only one piece fits here | Exactly one valid state transition from here |
+| **Cultural** | Green=go, Red=stop | Return None means "not found", raise means "error" |
+| **Semantic** | This is a library, not a shelter | Module boundaries encode domain rules |
+
+These constraints form a ladder of enforcement strength:
+
+1. **Compile/construction time** (strongest) — the type system or smart
+   constructor rejects the invalid state before any code runs. A
+   `PositiveDecimal` newtype that validates on construction.
+2. **Call time** — the function checks preconditions and raises immediately.
+   `if amount <= 0: raise ValueError(...)`
+3. **Runtime convention** — the system relies on cultural conventions (return
+   None for not-found, raise for errors). Violations compile and construct
+   fine but produce wrong behavior.
+4. **Documentation** (weakest) — the constraint exists only in a comment or
+   docstring. Violations are invisible until a human reads the docs.
+
+Invest constraints where violations would cause production incidents or data
+loss. A field that must be positive on a financial transaction earns level 1.
+A display-name format preference is fine at level 4.
+
+**Infrastructure constraints** extend this beyond code: circuit breakers
+constrain failure propagation, `--dry-run` constrains mutation, confirmation
+prompts constrain irreversible operations, and fail-closed defaults constrain
+blast radius. These are constraint design at the system architecture level.
+
+**Negative transfer warning:** Constraints have a cost — they reduce
+flexibility and increase implementation complexity. The value of a constraint
+is proportional to how hard the error is to find when the constraint is
+violated. Don't constrain everything.
+
+---
+
 ## Avoid Denormalized Data
 
 Out-of-sync copies of the same data are a representable illegal state. If

@@ -104,6 +104,9 @@ These AEP rules are the ones most likely to be missed. Each exists for a specifi
 - [ ] Long-running operations (LROs) return `202 Accepted` with Operation resource
 - [ ] Does the surface expose caller intent, or leak an internal implementation concept?
 - [ ] When the API accepts raw input, does conversion raise on invalid data rather than silently accepting it? (parse, don't validate — see `software-design/references/type-driven-design.md`)
+- [ ] Does every method name accurately describe ALL of what it does, including side effects? (Least Astonishment)
+- [ ] Do consistent name patterns signal consistent behavior across the surface? (`delete_*` always deletes, never soft-deletes sometimes)
+- [ ] Are defaults safe? (fail closed, return empty collection not null, require explicit opt-in for dangerous behavior)
 
 ---
 

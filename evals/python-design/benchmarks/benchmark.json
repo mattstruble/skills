@@ -1,8 +1,18 @@
 {
   "metadata": {
     "skill_name": "python-design",
-    "timestamp": "2026-07-23",
-    "evals_run": ["broad-exception-handler-review", "empty-string-sentinel-default", "redundant-docstring-type-annotations", "unnecessary-future-annotations-import", "generic-repository-abstraction-value", "protocol-vs-abc-plugin-system", "pydantic-model-in-business-logic"],
+    "timestamp": "2026-09-09",
+    "evals_run": [
+      "broad-exception-handler-review",
+      "empty-string-sentinel-default",
+      "redundant-docstring-type-annotations",
+      "unnecessary-future-annotations-import",
+      "generic-repository-abstraction-value",
+      "protocol-vs-abc-plugin-system",
+      "pydantic-model-in-business-logic",
+      "payments-module-init-design",
+      "weak-names-refactor"
+    ],
     "runs_per_configuration": 1
   },
   "runs": [
@@ -12,7 +22,7 @@
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 1,
         "passed": 5,
         "failed": 0,
         "total": 5
@@ -21,27 +31,27 @@
         {
           "text": "Flags `except Exception` as violating the specific exception types rule",
           "passed": true,
-          "evidence": "'Bare `except Exception` catches everything including programming errors (`TypeError`, `AttributeError`) that indicate bugs, not expected failures.'"
+          "evidence": "Section 1 is titled 'Bare `except Exception` — the biggest problem' and explicitly calls it out as swallowing different errors with the same response."
         },
         {
           "text": "Asks or identifies which exceptions db.get_user and process actually raise",
           "passed": true,
-          "evidence": "'Find what `db.get_user` and `process` actually raise and catch those' — explicitly identifies the need to determine specific exceptions."
+          "evidence": "Identifies that db.get_user raises a 'user not found' error and process raises a 'domain validation error', and rewrites using UserNotFoundError and ValidationError."
         },
         {
           "text": "Rewrites the handler with specific exception types",
           "passed": true,
-          "evidence": "Rewrites with `except UserNotFoundError:` and `except ProcessingError as e:` — specific exception types."
+          "evidence": "Provides rewritten code catching UserNotFoundError (404) and ValidationError (422) in separate try blocks."
         },
         {
           "text": "If broad catch is retained at the boundary, adds an inline comment explaining why",
           "passed": true,
-          "evidence": "Broad catch removed entirely; specific exceptions used throughout — no need for justification comment."
+          "evidence": "Shows outer except Exception with comment: '# Top-level handler — must always return a response, never crash the server.'"
         },
         {
           "text": "Does not silently swallow exceptions without logging or re-raising",
           "passed": true,
-          "evidence": "Each exception is logged with specific context: `log.warning('user_not_found', ...)` and `log.error('processing_failed', ...)`."
+          "evidence": "Section 2 explicitly flags 'log.error(\"request failed\")' as discarding context, recommends logger.exception() with exc_info, and the rewritten broad catch uses logger.exception()."
         }
       ]
     },
@@ -60,27 +70,27 @@
         {
           "text": "Flags `except Exception` as violating the specific exception types rule",
           "passed": true,
-          "evidence": "'Bare `except Exception` swallows everything. You lose the specific error type, stack trace context, and the ability to handle different failures differently.'"
+          "evidence": "Section 1 calls out 'This catches everything' and the summary table lists 'Bare except Exception with no traceback' as High severity. Section 2 explicitly separates into specific types."
         },
         {
           "text": "Asks or identifies which exceptions db.get_user and process actually raise",
           "passed": true,
-          "evidence": "'A `db.get_user` failure (user not found vs database down) and a `process` failure (business logic error vs external service timeout) require different responses.'"
+          "evidence": "Section 2 identifies UserNotFoundError, DatabaseError for db.get_user and ValidationError for process, and the rewrite uses them. However, these are assumed/invented rather than asked about — partial credit as they are identified but not confirmed with the author."
         },
         {
           "text": "Rewrites the handler with specific exception types",
           "passed": true,
-          "evidence": "Rewrites with `except db.UserNotFound:`, `except db.DatabaseError as e:`, and `except ValidationError as e:`."
+          "evidence": "Section 2 provides a full rewrite using UserNotFoundError, DatabaseError, and ValidationError in place of the blanket except Exception."
         },
         {
           "text": "If broad catch is retained at the boundary, adds an inline comment explaining why",
           "passed": false,
-          "evidence": "Retains `except Exception:` at the bottom but adds no inline comment justifying it — only uses `log.exception` without explaining why broad catch is appropriate at this boundary."
+          "evidence": "The rewrite in Section 2 retains 'except Exception:' as a fallback around process(), but there is no inline comment explaining why a broad catch is acceptable at that boundary."
         },
         {
           "text": "Does not silently swallow exceptions without logging or re-raising",
           "passed": true,
-          "evidence": "Uses `log.exception('unexpected error processing request', ...)` for the broad catch — captures stack trace."
+          "evidence": "Every except block in the rewrite either returns a specific status code with log.exception() or returns a client error. Section 1 explicitly fixes the swallowing problem by switching to log.exception()."
         }
       ]
     },
@@ -90,7 +100,7 @@
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 1,
         "passed": 5,
         "failed": 0,
         "total": 5
@@ -99,27 +109,27 @@
         {
           "text": "Identifies `str = \"\"` as an empty-string sentinel anti-pattern",
           "passed": true,
-          "evidence": "'`\"\"` is not \"no value.\" The empty-string default conflates \"user explicitly passed empty string\" with \"user didn't pass anything.\"'"
+          "evidence": "\"Your code uses `\"\"` as a stand-in for \"no value provided.\"\" and quotes the skill: \"`\"\"` is not \"no value.\"\""
         },
         {
           "text": "Replaces the default with `None` or removes the default",
           "passed": true,
-          "evidence": "Rewrites as `query: str | None = None`."
+          "evidence": "Shows `query: str | None = None` and also a split version where the parameter has no default at all."
         },
         {
           "text": "Updates the conditional check from `== \"\"` to `is None`",
           "passed": true,
-          "evidence": "Rewrites check as `if query is None:`."
+          "evidence": "Rewritten code uses `if query is None:` instead of equality check against empty string."
         },
         {
           "text": "Explains why `\"\"` is not a valid sentinel for 'no value'",
           "passed": true,
-          "evidence": "'conflates \"user explicitly passed empty string\" with \"user didn't pass anything\"' — clear explanation of the semantic problem."
+          "evidence": "\"A caller passing `\"\"` deliberately (e.g., a cleared search box) is indistinguishable from a caller who omitted the argument.\" and \"It forces equality checks against a magic value.\""
         },
         {
           "text": "Does not introduce other sentinel defaults ([], {}) in the rewrite",
           "passed": true,
-          "evidence": "Only uses None as the default; no other sentinel values introduced."
+          "evidence": "No mutable or other sentinel defaults appear in any rewritten code; only `None` and required arguments are used."
         }
       ]
     },
@@ -129,7 +139,7 @@
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 1,
         "passed": 5,
         "failed": 0,
         "total": 5
@@ -138,27 +148,27 @@
         {
           "text": "Identifies `str = \"\"` as an empty-string sentinel anti-pattern",
           "passed": true,
-          "evidence": "'uses empty string as the sentinel for \"no query provided.\" This conflates \"user explicitly searched for empty string\" with \"user didn't provide a query.\"'"
+          "evidence": "Section 1 titled 'Sentinel Value Abuse': 'Using \"\" to mean \"no query provided\" conflates two distinct intents: the user didn't search vs. the user searched for an empty string.'"
         },
         {
           "text": "Replaces the default with `None` or removes the default",
           "passed": true,
-          "evidence": "Rewrites as `query: str | None = None`."
+          "evidence": "Rewrite shows `def search_users(query: str | None = None)` replacing the original `str = \"\"` default with `None`."
         },
         {
           "text": "Updates the conditional check from `== \"\"` to `is None`",
           "passed": true,
-          "evidence": "Rewrites check as `if query is None:`."
+          "evidence": "Rewrite uses `if query is None:` instead of the original `== \"\"` check."
         },
         {
           "text": "Explains why `\"\"` is not a valid sentinel for 'no value'",
           "passed": true,
-          "evidence": "'conflates \"user explicitly searched for empty string\" with \"user didn't provide a query\"' — explains the semantic distinction."
+          "evidence": "'None is the canonical Python sentinel for \"not provided.\" An empty string is still a string — a caller might legitimately pass \"\" and expect empty-result or validation-error behavior, not \"return everything.\"'"
         },
         {
           "text": "Does not introduce other sentinel defaults ([], {}) in the rewrite",
           "passed": true,
-          "evidence": "Only uses None; no other sentinel values introduced."
+          "evidence": "No mutable or collection-type sentinel defaults appear anywhere in the rewritten code. Only `None`, `Page()` (frozen dataclass), and primitive defaults are used."
         }
       ]
     },
@@ -168,7 +178,7 @@
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 1,
         "passed": 5,
         "failed": 0,
         "total": 5
@@ -177,27 +187,27 @@
         {
           "text": "Identifies type annotations in Args as redundant with PEP 484 signature annotations",
           "passed": true,
-          "evidence": "'The type annotations already say everything the `Args` and `Returns` sections repeat — `price: Decimal`, `rate: float`, returns `Decimal`. Duplicating types in docstrings creates a second source of truth that drifts.'"
+          "evidence": "\"Types belong in the PEP 484 signature annotations — duplicating them in (Decimal), (float), (Decimal) creates a second source of truth that drifts over time.\""
         },
         {
           "text": "Identifies the Returns section as restating what the return type already says",
           "passed": true,
-          "evidence": "Identifies Returns section as redundant with `-> Decimal` annotation and removes it in the rewrite."
+          "evidence": "\"The Returns section adds nothing beyond the -> Decimal annotation.\""
         },
         {
           "text": "Removes type annotations from Args entries",
           "passed": true,
-          "evidence": "Rewritten docstring has no Args section with type annotations."
+          "evidence": "The revised docstring contains no Args section at all, and the only parameter note is the non-obvious rate convention without type annotations."
         },
         {
           "text": "Removes or simplifies the Returns section",
           "passed": true,
-          "evidence": "Returns section removed entirely from the rewritten docstring."
+          "evidence": "The revised docstring has no Returns section."
         },
         {
           "text": "Keeps the one-line summary and any non-obvious information (e.g., Raises)",
           "passed": true,
-          "evidence": "Keeps 'Rate is a decimal fraction (0.1 = 10% off)' — the non-obvious semantic information about the rate parameter."
+          "evidence": "Revised docstring keeps \"Calculate the discounted price.\" as one-line summary and retains the non-obvious rate convention: \"Rate is expressed as a decimal fraction (e.g., 0.1 for 10%).\""
         }
       ]
     },
@@ -207,36 +217,36 @@
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
-        "passed": 5,
-        "failed": 0,
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
         "total": 5
       },
       "expectations": [
         {
           "text": "Identifies type annotations in Args as redundant with PEP 484 signature annotations",
-          "passed": true,
-          "evidence": "'`price (Decimal): The original price` — visible from `price: Decimal`' — explicitly identifies the redundancy."
+          "passed": false,
+          "evidence": "The response does not mention that the (Decimal) and (float) type annotations in the Args docstring entries are redundant with the PEP 484 type hints in the function signature. The revised docstring examples still include '(Decimal):' and '(float):' in Args."
         },
         {
           "text": "Identifies the Returns section as restating what the return type already says",
-          "passed": true,
-          "evidence": "'visible from `-> Decimal` and the function name `calculate_discount`' — identifies Returns as redundant."
+          "passed": false,
+          "evidence": "The response never mentions that the Returns section is redundant with the -> Decimal return type annotation. It focuses on semantic mismatch instead."
         },
         {
           "text": "Removes type annotations from Args entries",
-          "passed": true,
-          "evidence": "Rewritten docstring has no Args section with type annotations."
+          "passed": false,
+          "evidence": "The revised docstring examples still contain '(Decimal)' and '(float)' type annotations in the Args entries, e.g. 'price (Decimal): The original price.'"
         },
         {
           "text": "Removes or simplifies the Returns section",
-          "passed": true,
-          "evidence": "Returns section removed entirely from the rewritten docstring."
+          "passed": false,
+          "evidence": "The revised docstring example retains a full Returns section with 'Decimal: The discount amount to subtract from the price.' — it was not removed or simplified."
         },
         {
           "text": "Keeps the one-line summary and any non-obvious information (e.g., Raises)",
           "passed": true,
-          "evidence": "Keeps 'Rate is a fraction, e.g. 0.1 for 10% off' — the non-obvious semantic information."
+          "evidence": "The revised examples retain the one-line summary ('Calculate the discount amount.' / 'Calculate the discounted price.'). No Raises section was present to preserve."
         }
       ]
     },
@@ -246,7 +256,7 @@
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 1,
         "passed": 5,
         "failed": 0,
         "total": 5
@@ -255,27 +265,27 @@
         {
           "text": "Identifies the import as unnecessary on Python 3.10+",
           "passed": true,
-          "evidence": "'`from __future__ import annotations` is unnecessary here. Python 3.12 natively supports `X | Y` syntax and `list[int]` without it.'"
+          "evidence": "\"The list[int], dict[str, int], and X | Y union syntax all work natively since 3.10.\""
         },
         {
           "text": "Explains that modern Python supports X | Y and list[int] natively",
           "passed": true,
-          "evidence": "'Python 3.12 natively supports `X | Y` syntax and `list[int]` without it.'"
+          "evidence": "\"list[int], dict[str, int], and X | Y union syntax all work natively since 3.10\""
         },
         {
           "text": "Removes the unnecessary import from the example",
           "passed": true,
-          "evidence": "Rewritten code shows `from dataclasses import dataclass` without the `__future__` import."
+          "evidence": "Corrected code shows the dataclass without the __future__ import"
         },
         {
           "text": "Describes the legitimate use case: circular imports via TYPE_CHECKING",
           "passed": true,
-          "evidence": "'The import only has value when you need to break circular type references via `TYPE_CHECKING`.'"
+          "evidence": "\"The only legitimate use case for from __future__ import annotations is breaking circular import cycles via TYPE_CHECKING\""
         },
         {
           "text": "References the TYPE_CHECKING pattern for when the import is actually needed",
           "passed": true,
-          "evidence": "Explicitly mentions TYPE_CHECKING as the legitimate use case for the import."
+          "evidence": "Provides a full code example with TYPE_CHECKING guard and explains the mechanism"
         }
       ]
     },
@@ -285,36 +295,36 @@
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 0.6,
-        "passed": 3,
-        "failed": 2,
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
         "total": 5
       },
       "expectations": [
         {
           "text": "Identifies the import as unnecessary on Python 3.10+",
           "passed": true,
-          "evidence": "'unnecessary on Python 3.12. It was needed on Python 3.7-3.9 to defer annotation evaluation (PEP 563).'"
+          "evidence": "\"Your specific Config class has no forward references at all — str and int are builtins. The import is unnecessary here\" and table notes Python 3.10+ handles X | Y syntax natively."
         },
         {
           "text": "Explains that modern Python supports X | Y and list[int] natively",
           "passed": true,
-          "evidence": "'in 3.12 you don't need it at all for standard cases like this.'"
+          "evidence": "Table row: \"Python 3.10+ handles X | Y syntax\" and the code example uses list[int] without the future import."
         },
         {
           "text": "Removes the unnecessary import from the example",
           "passed": true,
-          "evidence": "Rewritten code shows `from dataclasses import dataclass` without the `__future__` import."
+          "evidence": "Shows cleaned example: \"# Just this. No future import needed.\" with only `from dataclasses import dataclass`."
         },
         {
           "text": "Describes the legitimate use case: circular imports via TYPE_CHECKING",
-          "passed": false,
-          "evidence": "Mentions 'unusual edge cases involving runtime annotation inspection (Pydantic v1 had issues)' but does not describe the TYPE_CHECKING pattern for circular imports."
+          "passed": true,
+          "evidence": "Table: \"Avoiding circular import issues in TYPE_CHECKING blocks — Yes, this is the most legitimate use.\""
         },
         {
           "text": "References the TYPE_CHECKING pattern for when the import is actually needed",
-          "passed": false,
-          "evidence": "Does not mention TYPE_CHECKING at all; only mentions Pydantic v1 as an edge case."
+          "passed": true,
+          "evidence": "\"Reserve from __future__ import annotations for modules where you have TYPE_CHECKING-gated imports used in annotations throughout the file.\""
         }
       ]
     },
@@ -324,7 +334,7 @@
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 1,
         "passed": 5,
         "failed": 0,
         "total": 5
@@ -333,27 +343,27 @@
         {
           "text": "Applies the generics restraint principle from the skill",
           "passed": true,
-          "evidence": "'The generic `Repository[T]` base provides minimal value here.' — directly applies generics restraint."
+          "evidence": "Opens with 'Your design hits the generics restraint anti-pattern directly' and argues the generic base captures only a trivial skeleton."
         },
         {
           "text": "Notes that each subclass adds domain-specific methods the generic base doesn't capture",
           "passed": true,
-          "evidence": "'Both `UserRepository` and `OrderRepository` immediately add domain-specific methods — the generic base captures only a trivial skeleton (`get`, `save`, `delete`) that every repository would have anyway.'"
+          "evidence": "Section 1: 'Every concrete repository immediately adds domain-specific methods (get_by_email, get_pending, get_by_user)... callers of UserRepository always know they have a UserRepository — they never interact with Repository[T].'"
         },
         {
           "text": "Questions whether the generic base justifies the abstraction overhead",
           "passed": true,
-          "evidence": "'The generic base doesn't enable polymorphism — nowhere in the codebase will you write `def do_something(repo: Repository[T])`'"
+          "evidence": "'that's a trivially small surface to justify the abstraction layer' and 'Ask yourself: will any caller ever type a parameter as Repository[T] and operate on it generically? If not, the generic isn't buying you anything'"
         },
         {
           "text": "Suggests a caller-facing Protocol as an alternative or complement",
           "passed": true,
-          "evidence": "'A caller-facing `Protocol` would provide more value if you genuinely need to swap implementations.'"
+          "evidence": "Section 2 titled 'A caller-facing Protocol is more useful' with a full Protocol[T] code example, plus Section 3 shows Protocol as caller contract alongside ABC for shared implementation."
         },
         {
           "text": "Does not simply endorse the generic design without evaluating whether it adds value",
           "passed": true,
-          "evidence": "Recommends removing the generic base and using plain concrete repositories instead."
+          "evidence": "Verdict is 'The generic base is doing less work than it appears to' and concludes 'the generic Repository[T] looks reusable, but if every consumer needs the domain-specific methods, they're always reaching past the generic interface anyway.'"
         }
       ]
     },
@@ -363,36 +373,36 @@
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 0.8,
-        "passed": 4,
-        "failed": 1,
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
         "total": 5
       },
       "expectations": [
         {
           "text": "Applies the generics restraint principle from the skill",
-          "passed": true,
-          "evidence": "'This is over-engineered. The `Repository[T]` generic base class gives you nothing useful here.'"
+          "passed": false,
+          "evidence": "Response endorses generics ('the right shape') and even adds a second TypeVar (ID), expanding generic usage rather than applying restraint."
         },
         {
           "text": "Notes that each subclass adds domain-specific methods the generic base doesn't capture",
           "passed": true,
-          "evidence": "'The interesting methods are on the subclasses. `get_by_email`, `get_active_users`, `get_by_user`, `get_pending` — these are the methods you actually call.'"
+          "evidence": "Section 5 explicitly calls out 'get_active_users() and get_pending() are query operations' as domain-specific, and the revised design shows get_by_email on UserRepository."
         },
         {
           "text": "Questions whether the generic base justifies the abstraction overhead",
-          "passed": true,
-          "evidence": "'The generic base has no shared implementation... Each subclass implements them completely differently based on the entity type, database schema, and query patterns.'"
+          "passed": false,
+          "evidence": "Opens with 'the Generic base with concrete subclasses is the right shape' and never questions whether the abstraction earns its keep."
         },
         {
           "text": "Suggests a caller-facing Protocol as an alternative or complement",
           "passed": false,
-          "evidence": "Does not suggest Protocol; only recommends plain concrete repositories without a base class."
+          "evidence": "Protocol is never mentioned. The only structural alternative offered is CQRS-lite query services, not Protocol-based typing."
         },
         {
           "text": "Does not simply endorse the generic design without evaluating whether it adds value",
-          "passed": true,
-          "evidence": "Recommends removing the generic base entirely."
+          "passed": false,
+          "evidence": "First sentence: 'the Generic base with concrete subclasses is the right shape.' The response then improves the design but never evaluates whether the generic abstraction itself adds value over simpler alternatives."
         }
       ]
     },
@@ -402,7 +412,7 @@
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 1,
         "passed": 5,
         "failed": 0,
         "total": 5
@@ -411,27 +421,27 @@
         {
           "text": "Recommends Protocol for the caller-facing contract",
           "passed": true,
-          "evidence": "'Use `Protocol`.' with a Protocol code example showing the plugin interface."
+          "evidence": "Opening heading: \"Use Protocol — it's the right fit for this exact scenario\"; summary table lists \"Caller-facing contract | Protocol — structural, no coupling\""
         },
         {
           "text": "Explains that structural typing means plugins don't need to inherit",
           "passed": true,
-          "evidence": "'Protocol uses structural typing — any class with matching methods satisfies the contract without inheriting from your base. Plugin authors don't need to `import` your interface.'"
+          "evidence": "\"Protocol uses structural typing — any object with matching methods satisfies the contract, no inheritance required.\" Also demonstrated with CsvExporter example: \"No import of your interface, no inheritance, no registration.\""
         },
         {
           "text": "Distinguishes between the caller-facing contract (Protocol) and implementor convenience (ABC)",
           "passed": true,
-          "evidence": "'Use `ABC` only if you need to provide shared implementation that plugin authors inherit... Even then, callers should type against the `Protocol`, not the `ABC`.'"
+          "evidence": "Dedicated section \"When to Layer an ABC Underneath\" with: \"offer an ABC as an optional helper — but keep the Protocol as the caller-facing contract.\" Summary: \"Protocol defines what callers need; ABC (if any) is an implementor convenience.\""
         },
         {
           "text": "Notes that callers should always type against the Protocol, not the ABC",
           "passed": true,
-          "evidence": "'callers should type against the `Protocol`, not the `ABC`' — explicit statement."
+          "evidence": "\"Callers never reference this type — they type against Plugin.\" and \"Your loader code types everything as Plugin, never BasePlugin.\""
         },
         {
           "text": "Addresses the dynamic loading context — no inheritance coupling is an advantage",
           "passed": true,
-          "evidence": "'Plugins are loaded dynamically at runtime — you don't control their source code. `Protocol` uses structural typing — any class with matching methods satisfies the contract without inheriting.'"
+          "evidence": "\"you don't control plugin source code. ABC requires plugins to explicitly inherit from your base class... If you can't mandate that inheritance, ABC-based isinstance checks and @abstractmethod enforcement simply don't apply.\" Also provides importlib-based load_plugin function demonstrating the dynamic loading use case."
         }
       ]
     },
@@ -439,6 +449,123 @@
       "eval_id": 6,
       "eval_name": "protocol-vs-abc-plugin-system",
       "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends Protocol for the caller-facing contract",
+          "passed": true,
+          "evidence": "Title: \"Use Protocol — it's the correct choice for this scenario\"; Summary: \"Protocol with @runtime_checkable, validated at the loading boundary\""
+        },
+        {
+          "text": "Explains that structural typing means plugins don't need to inherit",
+          "passed": true,
+          "evidence": "\"Protocol uses structural subtyping — any class with matching method signatures conforms, with zero inheritance\" and the ImageResizer example \"satisfies PluginInterface without knowing it exists.\""
+        },
+        {
+          "text": "Distinguishes between the caller-facing contract (Protocol) and implementor convenience (ABC)",
+          "passed": true,
+          "evidence": "The comparison table and \"When ABC is the right call\" section: \"Use ABC when you do control the implementations and want to provide shared base functionality\" vs Protocol for when \"You don't control the source.\""
+        },
+        {
+          "text": "Notes that callers should always type against the Protocol, not the ABC",
+          "passed": true,
+          "evidence": "load_plugin return type is annotated as PluginInterface (the Protocol), and the response states \"type checkers now know this is PluginInterface\". The entire framing positions Protocol as the type contract callers use."
+        },
+        {
+          "text": "Addresses the dynamic loading context — no inheritance coupling is an advantage",
+          "passed": true,
+          "evidence": "\"A hard dependency on your package in every plugin's dependency tree\", \"Impossible retroactive conformance\", and the full load_plugin example using importlib explicitly demonstrate dynamic loading with no inheritance coupling as the key advantage."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "pydantic-model-in-business-logic",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies Pydantic BaseModel being used in internal business logic as the anti-pattern",
+          "passed": true,
+          "evidence": "\"Your UserProfile is a Pydantic model... But you're passing it deep into your service layer — calculate_loyalty_score, generate_recommendations, format_display_name all accept UserProfile directly.\""
+        },
+        {
+          "text": "Explains that Pydantic carries validation overhead and mutability that internal logic doesn't need",
+          "passed": true,
+          "evidence": "\"Validation overhead where none is needed. Every attribute access on a BaseModel goes through Pydantic's descriptor machinery.\" and \"Mutability where you want guarantees. BaseModel instances are mutable by default.\""
+        },
+        {
+          "text": "Recommends a frozen dataclass for the internal domain object",
+          "passed": true,
+          "evidence": "\"@dataclass(frozen=True) class UserProfile:\" and \"frozen dataclasses inside\""
+        },
+        {
+          "text": "Shows Pydantic at the boundary (e.g., CreateUserRequest) converting to the frozen dataclass",
+          "passed": true,
+          "evidence": "Shows UserProfileRequest(BaseModel) at boundary and a \"def to_domain(request: UserProfileRequest) -> UserProfile\" conversion function"
+        },
+        {
+          "text": "Internal functions are updated to accept the frozen dataclass, not the Pydantic model",
+          "passed": true,
+          "evidence": "Functions like \"calculate_loyalty_score(user_id: str, preferences: UserPreferences)\" and \"generate_recommendations(preferences: UserPreferences)\" take frozen dataclass types or primitives, not the Pydantic model"
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "pydantic-model-in-business-logic",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies Pydantic BaseModel being used in internal business logic as the anti-pattern",
+          "passed": true,
+          "evidence": "Section 3 explicitly states 'By threading it through your service layer, you've coupled business logic to a serialization boundary' and the summary says 'Pydantic is a validation and serialization tool, not an architecture tool. When it starts dictating your function signatures deep in the service layer, you've let the boundary leak inward.'"
+        },
+        {
+          "text": "Explains that Pydantic carries validation overhead and mutability that internal logic doesn't need",
+          "passed": false,
+          "evidence": "The response discusses coupling and boundary concerns but never mentions validation overhead (runtime cost) or mutability as problems. The word 'mutable' or 'immutable' does not appear."
+        },
+        {
+          "text": "Recommends a frozen dataclass for the internal domain object",
+          "passed": false,
+          "evidence": "The response recommends passing 'domain types or primitives' inward and narrowing function signatures, but never mentions frozen dataclasses (or dataclasses at all). No frozen/immutable domain object is proposed."
+        },
+        {
+          "text": "Shows Pydantic at the boundary (e.g., CreateUserRequest) converting to the frozen dataclass",
+          "passed": false,
+          "evidence": "The response shows a conceptual flow diagram ('HTTP Request → Pydantic validates → decompose into domain args → service functions') but never shows a concrete Pydantic boundary model like CreateUserRequest converting to a frozen dataclass. The conversion step is described abstractly as 'decompose into domain args' meaning primitives, not a dataclass."
+        },
+        {
+          "text": "Internal functions are updated to accept the frozen dataclass, not the Pydantic model",
+          "passed": false,
+          "evidence": "The refactored functions accept primitives (e.g., 'def format_display_name(name: str, email: str)') and a Pydantic sub-model (UserPreferences as BaseModel), not a frozen dataclass."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "payments-module-init-design",
+      "configuration": "with_skill",
       "run_number": 1,
       "result": {
         "pass_rate": 0.8,
@@ -448,107 +575,146 @@
       },
       "expectations": [
         {
-          "text": "Recommends Protocol for the caller-facing contract",
+          "text": "Splits the monolith into focused modules by responsibility (charge, refund, webhooks, client, receipts or similar)",
           "passed": true,
-          "evidence": "'Use Protocol.' with a Protocol code example."
+          "evidence": "Directory tree shows charge.py, refund.py, webhooks.py, _stripe_client.py, receipts.py, and _types.py — each mapped to one responsibility."
         },
         {
-          "text": "Explains that structural typing means plugins don't need to inherit",
+          "text": "Uses __init__.py to define the public interface with explicit imports and __all__",
           "passed": true,
-          "evidence": "'Structural typing. Plugins don't need to inherit from your base class. A third-party developer's class that happens to have the right methods... satisfies the protocol — no import of your package needed.'"
+          "evidence": "__init__.py contains explicit `from .charge import charge`, `from .refund import refund`, etc. and defines `__all__ = [\"charge\", \"refund\", \"handle_webhook\", \"Receipt\", \"Refund\", \"PaymentError\"]`."
         },
         {
-          "text": "Distinguishes between the caller-facing contract (Protocol) and implementor convenience (ABC)",
+          "text": "Includes a module-level docstring in __init__.py describing what the package does",
           "passed": true,
-          "evidence": "'When ABC would be better: If you have shared implementation (default methods, template method pattern) that all plugins should inherit. But for a pure interface definition with no shared logic, Protocol wins.'"
+          "evidence": "Docstring present: `\"\"\"Payment processing.\\n\\nPublic interface:\\n  - charge(amount, method) -> Receipt\\n  - refund(receipt_id) -> Refund\\n  - handle_webhook(payload, signature) -> None\\n\"\"\"`"
         },
         {
-          "text": "Notes that callers should always type against the Protocol, not the ABC",
+          "text": "Keeps internal implementation details (Stripe client wrapper, webhook handling) out of the public interface",
           "passed": false,
-          "evidence": "Does not explicitly state that callers should type against Protocol rather than ABC; only says Protocol wins for pure interface definitions."
+          "evidence": "_stripe_client.py is correctly excluded from __init__.py exports, but handle_webhook IS exported in __all__ and re-exported from __init__.py. Webhook handling is exposed as part of the public interface, not kept internal."
         },
         {
-          "text": "Addresses the dynamic loading context — no inheritance coupling is an advantage",
+          "text": "Demonstrates that callers import from the package not from internal modules",
           "passed": true,
-          "evidence": "'This is critical when you don't control the plugin source.' — addresses dynamic loading context."
+          "evidence": "Caller example shows `from payments import charge, refund, Receipt, PaymentError` and explicitly states \"Callers import from the package, not submodules. External code writes `from payments import charge`, never `from payments.charge import charge`.\""
         }
       ]
     },
     {
-      "eval_id": 7,
-      "eval_name": "pydantic-model-in-business-logic",
-      "configuration": "with_skill",
+      "eval_id": 8,
+      "eval_name": "payments-module-init-design",
+      "configuration": "without_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 1,
         "passed": 5,
         "failed": 0,
         "total": 5
       },
       "expectations": [
         {
-          "text": "Identifies Pydantic BaseModel being used in internal business logic as the anti-pattern",
+          "text": "Splits the monolith into focused modules by responsibility (charge, refund, webhooks, client, receipts or similar)",
           "passed": true,
-          "evidence": "'Pydantic `BaseModel` is being used as a domain object deep in the service layer. The problem: Pydantic's validation overhead and mutability are spreading beyond the boundary.'"
+          "evidence": "Package structure shows charge.py, refund.py, webhooks.py, client.py, receipts.py, exceptions.py, and types.py with clear single-responsibility descriptions."
         },
         {
-          "text": "Explains that Pydantic carries validation overhead and mutability that internal logic doesn't need",
+          "text": "Uses __init__.py to define the public interface with explicit imports and __all__",
           "passed": true,
-          "evidence": "'Pydantic's validation overhead and mutability are spreading beyond the boundary.'"
+          "evidence": "__init__.py contains explicit `from payments.charge import create_charge, capture_charge` style imports and a full `__all__` list of 8 public symbols."
         },
         {
-          "text": "Recommends a frozen dataclass for the internal domain object",
+          "text": "Includes a module-level docstring in __init__.py describing what the package does",
           "passed": true,
-          "evidence": "Shows `@dataclass(frozen=True)` for the internal `UserProfile` class."
+          "evidence": "First line of __init__.py: `\"\"\"Payments package — charge, refund, and receipt processing via Stripe.\"\"\"`"
         },
         {
-          "text": "Shows Pydantic at the boundary (e.g., CreateUserRequest) converting to the frozen dataclass",
+          "text": "Keeps internal implementation details (Stripe client wrapper, webhook handling) out of the public interface",
           "passed": true,
-          "evidence": "Shows `UserProfileRequest(BaseModel)` at boundary and conversion: `profile = UserProfile(**request.model_dump())`."
+          "evidence": "client.py is explicitly excluded from __init__.py re-exports: \"client.py isn't in __init__.py because external callers shouldn't build raw Stripe API calls.\" However, handle_webhook IS exported, which is reasonable as a public entry point. The internal client wrapper (get_stripe_client) stays hidden."
         },
         {
-          "text": "Internal functions are updated to accept the frozen dataclass, not the Pydantic model",
+          "text": "Demonstrates that callers import from the package not from internal modules",
           "passed": true,
-          "evidence": "`def calculate_loyalty_score(profile: UserProfile) -> float: ...` — accepts frozen dataclass."
+          "evidence": "Explicitly stated: \"Callers do `from payments import create_charge` — they never touch `client.py` directly.\" Migration path also confirms: \"Existing `from payments import create_charge` calls never break.\""
         }
       ]
     },
     {
-      "eval_id": 7,
-      "eval_name": "pydantic-model-in-business-logic",
-      "configuration": "without_skill",
+      "eval_id": 9,
+      "eval_name": "weak-names-refactor",
+      "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 0.6,
-        "passed": 3,
-        "failed": 2,
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
         "total": 5
       },
       "expectations": [
         {
-          "text": "Identifies Pydantic BaseModel being used in internal business logic as the anti-pattern",
+          "text": "Identifies that generic suffixes (Manager, Handler, Processor) communicate mechanism rather than domain purpose",
           "passed": true,
-          "evidence": "'Pydantic is being used as a domain object when it should only be at the boundary.'"
+          "evidence": "\"Manager, Handler, Processor are mechanism words with zero domain scent. They could describe anything — they're placeholders, not names.\""
         },
         {
-          "text": "Explains that Pydantic carries validation overhead and mutability that internal logic doesn't need",
+          "text": "Recommends renaming based on what the code actually does rather than generic patterns",
           "passed": true,
-          "evidence": "'Pay Pydantic's validation overhead on every attribute access in hot paths. Make testing harder — you must construct full Pydantic models to test business logic.'"
+          "evidence": "Step 3 table maps mechanism names to domain concepts, e.g. OrderProcessor.process() → fulfillment.place_order(), UserManager.authenticate() → authentication.authenticate()"
         },
         {
-          "text": "Recommends a frozen dataclass for the internal domain object",
-          "passed": false,
-          "evidence": "Recommends plain `@dataclass` (not frozen) for internal use — misses the immutability requirement."
-        },
-        {
-          "text": "Shows Pydantic at the boundary (e.g., CreateUserRequest) converting to the frozen dataclass",
-          "passed": false,
-          "evidence": "Shows `UserProfileRequest(BaseModel)` at boundary converting to plain `@dataclass`, not frozen dataclass."
-        },
-        {
-          "text": "Internal functions are updated to accept the frozen dataclass, not the Pydantic model",
+          "text": "Suggests splitting classes with multiple responsibilities (UserManager into authenticator, profile, preferences or similar)",
           "passed": true,
-          "evidence": "Shows `def calculate_loyalty_score(profile: UserProfile) -> float: ...` accepting the dataclass."
+          "evidence": "\"UserManager → 3 modules: authentication.py, profiles.py, email_preferences.py\" and \"OrderProcessor → 4 modules: validation.py, pricing.py, fulfillment.py, notifications.py\""
+        },
+        {
+          "text": "Applies a findability or discoverability heuristic for proposed names",
+          "passed": true,
+          "evidence": "Step 5 explicitly applies a \"renaming test\": \"if a new engineer had to find the authentication logic on their first try, would they look in service.py? No. Would they look in app/users/authentication.py? Yes.\" Also calls it the \"import-path scent trail test.\""
+        },
+        {
+          "text": "Recommends domain-aligned module names over technical-layer names",
+          "passed": true,
+          "evidence": "Package structure uses domain names (users/, orders/) not technical layers. Step 4 explicitly kills utils.py as a \"graveyard name\" and redistributes to domain modules like app/orders/pricing.py and app/notifications/templates.py."
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "weak-names-refactor",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that generic suffixes (Manager, Handler, Processor) communicate mechanism rather than domain purpose",
+          "passed": true,
+          "evidence": "\"classes named after their structural role (Manager, Handler, Processor) rather than their domain responsibility. These suffixes are semantic voids: they tell you a class does stuff without telling you what stuff.\""
+        },
+        {
+          "text": "Recommends renaming based on what the code actually does rather than generic patterns",
+          "passed": true,
+          "evidence": "\"A class name should answer 'what business concept does this own?' — not 'what architectural layer is this?'\" with concrete renames like OrderProcessor → OrderValidator, PricingEngine, FulfillmentService, OrderNotifier."
+        },
+        {
+          "text": "Suggests splitting classes with multiple responsibilities (UserManager into authenticator, profile, preferences or similar)",
+          "passed": true,
+          "evidence": "Explicitly splits UserManager into Authenticator, CredentialStore, UserProfile, and EmailPreferences under auth/ and users/ packages."
+        },
+        {
+          "text": "Applies a findability or discoverability heuristic for proposed names",
+          "passed": true,
+          "evidence": "\"Can a new developer find where to add a pricing-related feature without asking? If the answer is 'look in pricing.py', the names are working.\" and \"the name of each file is a map to the codebase. Someone reading the directory listing should understand the domain without opening a single file.\""
+        },
+        {
+          "text": "Recommends domain-aligned module names over technical-layer names",
+          "passed": true,
+          "evidence": "Restructures into domain packages (auth/, users/, orders/) rather than technical layers (service.py, manager.py, handler.py, processor.py). Also: \"If it's infrastructure (retry, logging, serialization), it moves to an infra/ package\" — domain logic goes to domain modules."
         }
       ]
     }
@@ -556,22 +722,18 @@
   "run_summary": {
     "with_skill": {
       "pass_rate": {
-        "mean": 1.0,
-        "stddev": 0.0
+        "mean": 0.978,
+        "stddev": 0.063
       }
     },
     "without_skill": {
       "pass_rate": {
-        "mean": 0.8,
-        "stddev": 0.0
+        "mean": 0.711,
+        "stddev": 0.366
       }
     },
     "delta": {
-      "pass_rate": "+20%"
+      "pass_rate": "+27%"
     }
-  },
-  "notes": [
-    "Leak-free re-run: run-agents received only prompts (no expected_output/expectations). Supersedes the earlier invalid +0% result caused by a grading-rubric leak.",
-    "runs_per_configuration=1; per-eval detail backfilled from preserved answer files."
-  ]
+  }
 }

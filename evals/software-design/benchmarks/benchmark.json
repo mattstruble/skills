@@ -1,78 +1,1036 @@
 {
   "metadata": {
     "skill_name": "software-design",
-    "timestamp": "2026-06-30",
+    "timestamp": "2026-09-09",
     "evals_run": [
-      "eval-0"
+      "notification-channels-composition",
+      "user-manager-god-class-split",
+      "order-processing-pure-io-separation",
+      "retry-removal-chestertons-fence",
+      "file-parser-layered-api-design",
+      "api-fetch-ambiguous-edge-cases",
+      "redundant-comments-docstring-review",
+      "silent-exception-mutable-default-review",
+      "dense-access-control-conditional-refactor",
+      "report-format-inheritance-to-composition",
+      "api-shape-affordance-review",
+      "utils-module-naming-scent",
+      "cli-deploy-dangerous-feedback"
     ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
-      "eval_id": 0,
-      "eval_name": "scary-fn-and-flat-profile",
+      "eval_id": 1,
+      "eval_name": "notification-channels-composition",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
-        "passed": 4,
+        "pass_rate": 1,
+        "passed": 5,
         "failed": 0,
-        "total": 4
+        "total": 5
       },
       "expectations": [
         {
-          "text": "Treats feeling 'scared' of code as a signal of complexity worth simplifying (judging code by runtime behavior/dynamics, not line count)",
+          "text": "Recommends composition (delegation) over a class hierarchy for combining notification channels",
           "passed": true,
-          "evidence": "Line 8: '**Stop judging it by line count. Judge it by its dynamics.**' Line 16-19: 'So your fear is data. Jonathan Blow argues ... that feeling *scared* of a section is a reliable signal that it's too complex ... The fear is your own pattern-matcher telling you the dynamics don't fit in your working memory.' Both halves present: fear-as-complexity-signal and judge-by-dynamics-not-line-count."
+          "evidence": "\"Your scenario is a textbook case for composition over inheritance\" and the Notifier class delegates to a list of channels rather than inheriting from them."
         },
         {
-          "text": "For the flat profile, advises accepting it or making an architectural change rather than grinding many tiny contributors for a big win",
+          "text": "Defines a narrow interface or protocol that each channel implements independently",
           "passed": true,
-          "evidence": "Lines 91-106 list options in order: '1. **Accept it and stop.**' and '2. **Make an architectural / algorithmic change** ... they come from removing whole categories of work: a better algorithm, a data structure ...'. Lines 84-89 and 113-117 warn against grinding 0.5% items ('Micro-grinding a flat profile is high-effort, low-yield')."
+          "evidence": "Defines `NotificationChannel(Protocol)` with a single `send` method; each channel (Email, SMS, Push) implements it independently with no shared base class."
         },
         {
-          "text": "Advises understanding the code's invariants / not papering over behavior before changing it",
+          "text": "Shows how callers receive only the notifiers they need rather than a monolithic notification class",
           "passed": true,
-          "evidence": "Line 22 '**Understand it before you touch it.**'; lines 32-40 'make those invariants explicit ... What must be true on entry and on exit'; line 47 '**Don't paper over behavior you don't understand.**' plus pin-the-behavior-with-a-characterization-test guidance (lines 50-52)."
+          "evidence": "Wiring section: `billing_notifier = Notifier([email])` and `mobile_notifier = Notifier([push, sms])` — each service gets a purpose-built notifier. Explicitly states \"The billing service can't accidentally send a push notification.\""
         },
         {
-          "text": "Presents Jonathan Blow's contestable claims as his stance, not as absolute rules",
+          "text": "Explains why inheritance couples unrelated channels and makes future channels harder to add",
           "passed": true,
-          "evidence": "Line 16-17 'Jonathan Blow argues \u2014 and I'd treat this as a useful heuristic rather than a law'; line 76 'Blow's framing (again, his stance, but it matches reality)'; lines 119-121 '*(The Blow positions above ... are his opinions, offered because they're useful, not as universal law. Your context can override any of them.)*' Explicit attribution AND explicit contestability."
+          "evidence": "Anti-pattern section shows `EmailAndSMSNotifier(EmailNotifier)` labeled \"combinatorial explosion\" and the summary table contrasts \"Channels are composed into a Notifier, not inherited from a base.\""
+        },
+        {
+          "text": "Provides a concrete code example demonstrating the composed approach",
+          "passed": true,
+          "evidence": "Multiple concrete Python snippets: protocol definition, three channel implementations, Notifier class composing channels, wiring at startup, and BillingService consuming the notifier."
         }
       ]
     },
     {
-      "eval_id": 0,
-      "eval_name": "scary-fn-and-flat-profile",
+      "eval_id": 1,
+      "eval_name": "notification-channels-composition",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 0.75,
-        "passed": 3,
-        "failed": 1,
-        "total": 4
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
       },
       "expectations": [
         {
-          "text": "Treats feeling 'scared' of code as a signal of complexity worth simplifying (judging code by runtime behavior/dynamics, not line count)",
+          "text": "Recommends composition (delegation) over a class hierarchy for combining notification channels",
           "passed": true,
-          "evidence": "Lines 8-9 'Size is the wrong metric ... Judge code by its **dynamics \u2014 what it actually does at runtime \u2014** not by its line count.' Lines 10-13 'Your fear is real information: it's telling you that this small function has complexity you can't simulate in your head. That's the thing worth fixing, not the line count.' Both halves present."
+          "evidence": "Pattern 1 uses NotificationDispatcher composing a list of channels via delegation. Anti-pattern table explicitly states: 'Channels aren't subtypes of each other. This is composition, not inheritance.'"
         },
         {
-          "text": "For the flat profile, advises accepting it or making an architectural change rather than grinding many tiny contributors for a big win",
+          "text": "Defines a narrow interface or protocol that each channel implements independently",
           "passed": true,
-          "evidence": "Lines 69-83 give ordered options '1. **Decide the speed is good enough and stop.**' and '2. **If it genuinely isn't fast enough, change the architecture, not the functions.**' Lines 85-86 'Treat \"grind the long tail of tiny contributors\" as the option of last resort, not the default.'"
+          "evidence": "NotificationChannel ABC with single method `send(self, recipient: str, message: str) -> bool` — each channel (Email, SMS, Push) implements it independently."
         },
         {
-          "text": "Advises understanding the code's invariants / not papering over behavior before changing it",
+          "text": "Shows how callers receive only the notifiers they need rather than a monolithic notification class",
           "passed": true,
-          "evidence": "Lines 25-30 '**An invariant you don't understand (Chesterton's Fence).** That lone `if` almost certainly guards *something* ... **Before you change anything, find out what it protects.** Don't paper over the behavior.' Lines 32-37 establish 'understand -> then decide' and 'Pin down the invariant.'"
+          "evidence": "`billing_notifier = NotificationDispatcher([EmailChannel()])` and `mobile_notifier = NotificationDispatcher([PushChannel(), SMSChannel()])` — each caller gets exactly its needed channels at construction time."
         },
         {
-          "text": "Presents Jonathan Blow's contestable claims as his stance, not as absolute rules",
+          "text": "Explains why inheritance couples unrelated channels and makes future channels harder to add",
+          "passed": true,
+          "evidence": "Anti-pattern table: 'Inheritance hierarchy (EmailNotifier extends BaseNotifier) — Channels aren't subtypes of each other.' Pattern 1 explanation: 'Adding a channel (Slack, webhook, etc.) means one new class. Zero changes to existing code.'"
+        },
+        {
+          "text": "Provides a concrete code example demonstrating the composed approach",
+          "passed": true,
+          "evidence": "Full Python code for Pattern 1 including NotificationChannel ABC, three concrete channels, NotificationDispatcher composite, and per-caller wiring."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "user-manager-god-class-split",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that 6 dependencies is a signal the class has multiple responsibilities",
+          "passed": true,
+          "evidence": "\"Your UserManager is a textbook god class — it has accumulated multiple responsibilities behind a single interface, and the 6 dependencies are the proof. Each dependency represents a distinct concern.\""
+        },
+        {
+          "text": "Suggests splitting by asking which callers use which subsets of methods",
+          "passed": true,
+          "evidence": "\"Apply the focused-interfaces test: which callers use which methods?\" and \"Group the 18 methods by which dependencies they actually use\" with a concrete cluster table."
+        },
+        {
+          "text": "Proposes focused classes (e.g., repository, notifier, audit) rather than one large manager",
+          "passed": true,
+          "evidence": "Proposes UserRepository, AuthService, AuthzService, UserNotifier, and UserAuditor with a concrete directory layout and code examples for each."
+        },
+        {
+          "text": "Explains how focused interfaces reduce test setup and blast radius of changes",
+          "passed": true,
+          "evidence": "Symptom table: \"Each unit has 1-2 dependencies; pure functions have zero\" and \"Changes are scoped to one module; other modules don't recompile, re-mock, or re-test.\" Also: \"validate_new_user needs zero mocks.\""
+        },
+        {
+          "text": "Warns against cosmetic refactors that don't actually reduce coupling",
           "passed": false,
-          "evidence": "Jonathan Blow is never mentioned anywhere in the answer (searched full text). The claims are framed as the assistant's own generic 'opinionated judgment calls, not absolute rules' and 'lenses to reason with, not laws to obey' (lines 90-96). The contestability half is present, but the attribution to Blow as 'his stance' \u2014 required by the assertion \u2014 is entirely absent, so the expectation is not demonstrated."
+          "evidence": "No explicit warning about cosmetic refactors. The migration strategy says \"Don't rewrite. Strangle incrementally\" but never warns that superficial moves (e.g., renaming, shuffling methods without changing dependency graphs) fail to reduce coupling."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "user-manager-god-class-split",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that 6 dependencies is a signal the class has multiple responsibilities",
+          "passed": true,
+          "evidence": "\"high fan-out coupling (6 dependencies), low cohesion (18 methods doing unrelated things)\" and \"Each cluster has a different reason to change and a different set of dependencies. That's your decomposition boundary.\""
+        },
+        {
+          "text": "Suggests splitting by asking which callers use which subsets of methods",
+          "passed": true,
+          "evidence": "The dependency-usage table maps each cluster to its dependencies used, and Section 4 notes \"Callers that only need lookup don't see auth methods\" (ISP). The facade section also references caller patterns."
+        },
+        {
+          "text": "Proposes focused classes (e.g., repository, notifier, audit) rather than one large manager",
+          "passed": true,
+          "evidence": "Explicitly proposes UserRepository, UserAuthService, UserPermissions, UserAuditLog, and CachedUserLookup, each with 1-2 dependencies."
+        },
+        {
+          "text": "Explains how focused interfaces reduce test setup and blast radius of changes",
+          "passed": true,
+          "evidence": "Section 4 shows before/after test setup (6 mocks → 2 mocks) and explains \"changing password-reset logic cannot affect permission checks—they don't share code paths or state.\""
+        },
+        {
+          "text": "Warns against cosmetic refactors that don't actually reduce coupling",
+          "passed": true,
+          "evidence": "\"Don't just split into UserManager1 and UserManager2 by alphabetical method order. Cohesion means grouping by reason-to-change, not by count.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "order-processing-pure-io-separation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the root cause as mixing pure logic with IO side effects in one function",
+          "passed": true,
+          "evidence": "\"business logic (discount calculation, validation rules) is tangled with side effects (payment, email, DB writes)\" and \"The disease is that logic and side effects are fused into one unit.\""
+        },
+        {
+          "text": "Extracts pure functions (validate_cart, calculate_discount) that take data and return data",
+          "passed": true,
+          "evidence": "Extracts validate_cart returning ValidatedCart, apply_discounts returning PricedOrder, and build_inventory_adjustments returning list[InventoryAdjustment], all labeled \"Pure — no mocks needed\""
+        },
+        {
+          "text": "Pushes IO operations (charge, update_inventory, send_email, log) to the boundary",
+          "passed": true,
+          "evidence": "Orchestrator clearly separates \"# Pure logic — no IO\" block from \"# Side effects\" block containing payment_service.charge, inventory_service.apply, email_service.send_confirmation, audit_log.record"
+        },
+        {
+          "text": "Shows that pure functions require no mocks and are trivially testable",
+          "passed": true,
+          "evidence": "\"These are trivially testable — pass in values, assert on the result. Zero mocks.\" Plus concrete tests: test_discount_caps_at_30_percent and test_empty_cart_rejected with no mocks."
+        },
+        {
+          "text": "Demonstrates the orchestrator pattern that sequences pure logic and IO calls",
+          "passed": true,
+          "evidence": "process_order shown as thin shell: first calls pure functions (validate_cart, apply_discounts, build_inventory_adjustments), then sequences IO calls. Explicitly described as \"The orchestrator becomes a thin shell that sequences pure results through side effects.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "order-processing-pure-io-separation",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the root cause as mixing pure logic with IO side effects in one function",
+          "passed": true,
+          "evidence": "\"To test discount logic, you must mock the payment gateway... Every test requires standing up the entire world.\" and \"Separate decisions from effects.\""
+        },
+        {
+          "text": "Extracts pure functions (validate_cart, calculate_discount) that take data and return data",
+          "passed": true,
+          "evidence": "Shows validate_cart(cart, available_products) -> list[ValidationError] and calculate_discounts(cart, active_promotions) -> DiscountResult, both labeled \"Pure. No mocks needed. Test with plain data.\""
+        },
+        {
+          "text": "Pushes IO operations (charge, update_inventory, send_email, log) to the boundary",
+          "passed": true,
+          "evidence": "Defines Protocol interfaces for PaymentGateway, InventoryService, OrderNotifier, AuditLog and injects them into the orchestrator, keeping IO at the boundary of the process() method."
+        },
+        {
+          "text": "Shows that pure functions require no mocks and are trivially testable",
+          "passed": true,
+          "evidence": "Table row: \"Test discount logic — Before: Mock DB + Stripe + SendGrid + inventory — After: assert calculate_discounts(cart, promos) == expected\". Also: \"Zero mocks. Dozens of edge cases testable in milliseconds.\""
+        },
+        {
+          "text": "Demonstrates the orchestrator pattern that sequences pure logic and IO calls",
+          "passed": true,
+          "evidence": "OrderProcessor.process() method explicitly sequences pure calls (validate_cart, calculate_discounts) with IO calls (reserve, charge, commit, send_confirmation, record), plus test_payment_failure_releases_inventory shows testing the orchestrator with fakes."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "retry-removal-chestertons-fence",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Invokes Chesterton's Fence by name or principle before recommending removal",
+          "passed": true,
+          "evidence": "Opening line: \"This is a textbook Chesterton's Fence violation.\" Also quotes the skill's definition of the principle."
+        },
+        {
+          "text": "Points out that 30 days of clean logs is insufficient evidence — rare failures may not appear in that window",
+          "passed": true,
+          "evidence": "\"Thirty days of calm proves nothing about day 31\" and \"The retry block may be the reason there are no errors in the logs — it silently recovers before anything surfaces.\""
+        },
+        {
+          "text": "Asks what failure mode or incident originally motivated the retry logic",
+          "passed": true,
+          "evidence": "\"Why was it added? Check git blame, linked tickets, or PR history. Was it added in response to an outage? A vendor SLA issue? A known flaky endpoint?\""
+        },
+        {
+          "text": "Distinguishes between 'no evidence it fired' and 'evidence it is no longer needed'",
+          "passed": true,
+          "evidence": "\"'It hasn't fired in 30 days' is not the same as 'it can never fire.'\" and the seatbelt analogy: \"That's like removing your seatbelt because you haven't crashed recently.\""
+        },
+        {
+          "text": "Recommends documenting the reasoning if removal is ultimately justified",
+          "passed": false,
+          "evidence": "Response strongly argues against removal and suggests discussing maintenance burden instead, but never explicitly recommends documenting the reasoning if removal is ultimately justified."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "retry-removal-chestertons-fence",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Invokes Chesterton's Fence by name or principle before recommending removal",
+          "passed": false,
+          "evidence": "The response applies the principle (don't remove what you don't understand) but never names Chesterton's Fence explicitly. Section 3 distinguishes defensive vs dead code, which is adjacent, but the specific concept is absent."
+        },
+        {
+          "text": "Points out that 30 days of clean logs is insufficient evidence — rare failures may not appear in that window",
+          "passed": true,
+          "evidence": "Section 1 directly states '30 days of clean logs means the network was healthy for 30 days. It says nothing about day 31' and lists rare failure modes like quarterly cloud provider blips."
+        },
+        {
+          "text": "Asks what failure mode or incident originally motivated the retry logic",
+          "passed": false,
+          "evidence": "The response never asks what originally motivated the retry logic. It argues for keeping it and suggests refactoring, but does not prompt investigation into the original reason it was added."
+        },
+        {
+          "text": "Distinguishes between 'no evidence it fired' and 'evidence it is no longer needed'",
+          "passed": true,
+          "evidence": "Section 1 header is literally 'Absence of evidence ≠ evidence of absence' and the fire insurance analogy reinforces the distinction."
+        },
+        {
+          "text": "Recommends documenting the reasoning if removal is ultimately justified",
+          "passed": false,
+          "evidence": "The response never considers the scenario where removal is justified and therefore never recommends documenting the reasoning. It recommends refactoring instead of removal but does not address documentation of a removal decision."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "file-parser-layered-api-design",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends a layered API: simple function for common case, building blocks for power users",
+          "passed": true,
+          "evidence": "Explicitly structures code into 'Layer 1: Building blocks (power users compose these directly)' and 'Layer 2: Convenience (80% of callers use this)'"
+        },
+        {
+          "text": "Shows the simple function implemented in terms of the lower-level building blocks",
+          "passed": true,
+          "evidence": "parse_csv body calls open_source, tokenize, next(tokens), and rows_to_dicts — all Layer 1 building blocks"
+        },
+        {
+          "text": "Explains that the simple API should not expose parameters that most callers don't need",
+          "passed": true,
+          "evidence": "\"No delimiter argument, no encoding argument, no error policy. The defaults reflect a decision rather than shipping the burden to every caller.\""
+        },
+        {
+          "text": "Demonstrates that power users can bypass the simple API without losing capability",
+          "passed": true,
+          "evidence": "Shows a 'Power user: TSV, latin-1, collect errors, stream' example composing building blocks directly with 'No subclassing. No config object with 12 fields.'"
+        },
+        {
+          "text": "Explains that forcing all callers to supply unused parameters burdens the common case",
+          "passed": true,
+          "evidence": "\"forces every caller to confront complexity they don't need\" and \"Every parameter is a question the 80% caller shouldn't have to answer.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "file-parser-layered-api-design",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends a layered API: simple function for common case, building blocks for power users",
+          "passed": true,
+          "evidence": "Architecture diagram shows 'Simple API (module-level fn) ← 90% of callers stop here' and 'Parser class (full control) ← power users live here'"
+        },
+        {
+          "text": "Shows the simple function implemented in terms of the lower-level building blocks",
+          "passed": true,
+          "evidence": "parse_csv body is 'return Parser(path).parse()' and section explicitly states 'Simple function delegates to the class — not the reverse. parse_csv is literally Parser(path).parse(). One source of truth for behavior.'"
+        },
+        {
+          "text": "Explains that the simple API should not expose parameters that most callers don't need",
+          "passed": true,
+          "evidence": "parse_csv takes only path. Table shows 'Just parse this CSV' → 'Decisions they make: Zero'. Closing line: 'No caller pays the cognitive cost of options they don't use.'"
+        },
+        {
+          "text": "Demonstrates that power users can bypass the simple API without losing capability",
+          "passed": true,
+          "evidence": "Power user examples show Parser used directly with .delimiter(), .encoding(), .on_error(), .stream() — full control without going through parse_csv. Streaming 10GB example bypasses simple API entirely."
+        },
+        {
+          "text": "Explains that forcing all callers to supply unused parameters burdens the common case",
+          "passed": true,
+          "evidence": "Constructor kwargs comparison: 'unreadable at 4+ options' and 'A new constructor kwarg is noise for everyone.' Closing: 'No caller pays the cognitive cost of options they don't use. The simple path stays simple even as the power path grows.'"
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "api-fetch-ambiguous-edge-cases",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Stops and asks about empty list behavior before writing code",
+          "passed": false,
+          "evidence": "Response silently decided empty lists return UserResult.empty() and skips malformed records without asking the user what behavior they want."
+        },
+        {
+          "text": "Asks what should happen on timeout — raise, retry, or return default",
+          "passed": false,
+          "evidence": "Response chose to raise UserFetchError on timeout without asking. States 'Or retry, or use cached data — caller's decision' but made the design choice unilaterally."
+        },
+        {
+          "text": "Asks whether partial responses are acceptable or should be treated as errors",
+          "passed": false,
+          "evidence": "Response decided partial responses are acceptable and modeled them as FetchStatus.PARTIAL, with malformed records silently skipped ('partial data is better than none'), without asking."
+        },
+        {
+          "text": "Explains that guessing edge-case behavior leads to rework when callers discover wrong assumptions",
+          "passed": false,
+          "evidence": "Response never mentions the risk of guessing. It confidently presents its choices as correct design, e.g. 'These aren't exceptional; they're the stated requirements.'"
+        },
+        {
+          "text": "Does not write a complete implementation until the ambiguous behaviors are resolved",
+          "passed": false,
+          "evidence": "Response provides a full implementation across four steps with domain types, parsing, fetching, and caller code — all before asking any clarifying questions."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "api-fetch-ambiguous-edge-cases",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0,
+        "passed": 0,
+        "failed": 5,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Stops and asks about empty list behavior before writing code",
+          "passed": false,
+          "evidence": "Response does not ask — it decides unilaterally: 'Retry once — might be a transient blip' and implements that logic directly."
+        },
+        {
+          "text": "Asks what should happen on timeout — raise, retry, or return default",
+          "passed": false,
+          "evidence": "Response decides without asking: 'Timeouts (httpx.TimeoutException) → always retry' and implements exponential backoff on timeout."
+        },
+        {
+          "text": "Asks whether partial responses are acceptable or should be treated as errors",
+          "passed": false,
+          "evidence": "Response decides without asking: 'Partial response → return as-is (service is degraded, retrying won't help). Return what we have and let the caller decide.'"
+        },
+        {
+          "text": "Explains that guessing edge-case behavior leads to rework when callers discover wrong assumptions",
+          "passed": false,
+          "evidence": "Response never mentions this risk. It confidently presents its own assumptions as the correct design in the 'Why This Design' table without acknowledging they are assumptions that could be wrong."
+        },
+        {
+          "text": "Does not write a complete implementation until the ambiguous behaviors are resolved",
+          "passed": false,
+          "evidence": "Response provides a fully complete implementation (~200 lines of Python) with all edge-case behaviors hard-coded, including RetryConfig, CircuitBreaker, FetchResult envelope, and caller usage examples."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "redundant-comments-docstring-review",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Flags the docstring as restating the signature without adding information",
+          "passed": true,
+          "evidence": "\"Docstring `\"Gets user data for the given user_id and returns it\"` — that's the function name and signature repeated in prose.\""
+        },
+        {
+          "text": "Flags the inline comments as narrating the code rather than explaining the 'why'",
+          "passed": true,
+          "evidence": "\"Comments `# Call the database to get the user`, `# query the database`, `# Return the result` — narrate the code line-by-line.\""
+        },
+        {
+          "text": "Flags the process() wrapper as a single-use abstraction that adds indirection without simplifying",
+          "passed": true,
+          "evidence": "\"Wrapper adds nothing. Same pattern as above — a single-line delegation that a caller could make directly. What does `process` provide that `run_pipeline` doesn't?\""
+        },
+        {
+          "text": "Applies the 'if removing it loses no information, remove it' test",
+          "passed": true,
+          "evidence": "\"Docstring, all three comments, and both wrappers carry zero information beyond what the code already expresses.\" and \"If this wrapper has no planned reason to exist, callers should just call `db.query(user_id)` directly.\""
+        },
+        {
+          "text": "Does not suggest adding more documentation — the fix is removal, not elaboration",
+          "passed": false,
+          "evidence": "Response suggests an alternative docstring: `\"Isolates callers from the storage layer so we can swap backends.\"` — this is adding documentation rather than purely recommending removal. While framed conditionally, it steers toward elaboration as a valid fix."
+        }
+      ]
+    },
+    {
+      "eval_id": 7,
+      "eval_name": "redundant-comments-docstring-review",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Flags the docstring as restating the signature without adding information",
+          "passed": true,
+          "evidence": "\"The docstring, the inline comments, and the line comment on `db.query` all add zero information.\""
+        },
+        {
+          "text": "Flags the inline comments as narrating the code rather than explaining the 'why'",
+          "passed": true,
+          "evidence": "\"Every comment restates what the code already says... Comments should explain *why*, not *what*.\""
+        },
+        {
+          "text": "Flags the process() wrapper as a single-use abstraction that adds indirection without simplifying",
+          "passed": true,
+          "evidence": "\"Pure delegation with no value... it's a wrapper that adds nothing. Either inline it at the call site or add the logic that justifies its existence.\""
+        },
+        {
+          "text": "Applies the 'if removing it loses no information, remove it' test",
+          "passed": true,
+          "evidence": "\"Delete all of them — the function name and code are self-documenting\" and \"`process` is omitted — it needs a real name and real purpose before it belongs in the codebase.\""
+        },
+        {
+          "text": "Does not suggest adding more documentation — the fix is removal, not elaboration",
+          "passed": false,
+          "evidence": "Under `process`, the review states \"No docstring or type hints. The caller has no idea what `run_pipeline()` returns\" — this explicitly suggests adding documentation to a function the review also says should be removed. The revised code also adds a new docstring and type hints, framing elaboration as the fix rather than pure removal."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "silent-exception-mutable-default-review",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Flags the bare 'except Exception: pass' as a silent convention violation requiring a comment",
+          "passed": true,
+          "evidence": "\"A bare `except Exception: pass` silently discards every possible failure\" and references 'Comment when breaking a convention' principle, requiring \"a comment explaining *why* the broad catch is intentional\""
+        },
+        {
+          "text": "Explains that broad exception catches are sometimes justified but must document the reason",
+          "passed": true,
+          "evidence": "\"If there's a legitimate reason to catch broadly (e.g., a plugin sandbox that must not crash the host), it requires: (1) logging the exception so it's diagnosable, (2) a comment explaining why the broad catch is intentional, and (3) a sensible fallback value\""
+        },
+        {
+          "text": "Flags silencing the exception entirely (pass) as almost always wrong — at minimum log it",
+          "passed": true,
+          "evidence": "Minimum fix includes `logger.exception(\"plugin.execute failed\")` and states without logging \"this is silent data loss\""
+        },
+        {
+          "text": "Flags the mutable default argument as a Python anti-pattern that causes shared state",
+          "passed": true,
+          "evidence": "\"Python evaluates default arguments once at function definition time. That `{}` is a single dict object shared across every call\" with demonstration of shared state via `result1 is result2 # True`"
+        },
+        {
+          "text": "Notes that both violations are silent — no comment signals the author considered the tradeoff",
+          "passed": true,
+          "evidence": "Summary states both are blocking PR comments; Issue 1 explicitly requires a comment explaining intent. The overall framing under 'Honesty' and the 'Comment when breaking a convention' reference implies the absence of comments signals unconsidered tradeoffs."
+        }
+      ]
+    },
+    {
+      "eval_id": 8,
+      "eval_name": "silent-exception-mutable-default-review",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Flags the bare 'except Exception: pass' as a silent convention violation requiring a comment",
+          "passed": true,
+          "evidence": "Section 1 is titled 'Bare except Exception: pass — Silent failure' and calls it a 'serious error-handling anti-pattern', recommending explicit handling and logging as minimum fix."
+        },
+        {
+          "text": "Explains that broad exception catches are sometimes justified but must document the reason",
+          "passed": false,
+          "evidence": "The response says to 'catch the narrowest exception you can handle' but never acknowledges that broad catches are sometimes justified if documented. It treats broad catches as purely wrong rather than conditionally acceptable."
+        },
+        {
+          "text": "Flags silencing the exception entirely (pass) as almost always wrong — at minimum log it",
+          "passed": true,
+          "evidence": "States 'This swallows every exception and continues as if nothing happened' and provides 'Minimum fix: Log the error and handle it explicitly' with a logger.exception example."
+        },
+        {
+          "text": "Flags the mutable default argument as a Python anti-pattern that causes shared state",
+          "passed": true,
+          "evidence": "Section 2 is titled 'Mutable default argument — Shared state across calls' and explains 'That single dict object is shared across every invocation' causing 'action-at-a-distance bugs'."
+        },
+        {
+          "text": "Notes that both violations are silent — no comment signals the author considered the tradeoff",
+          "passed": false,
+          "evidence": "While the response calls both issues 'blocking comments on the PR' and notes the exception handling is 'silent failure', it never explicitly observes that the absence of any comment in the code signals the author did not consider the tradeoff."
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "dense-access-control-conditional-refactor",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the conditional as too dense to read at a glance",
+          "passed": true,
+          "evidence": "Implies the original is a 'dense compound expression' and 'one-liner' that requires mentally decomposing to understand."
+        },
+        {
+          "text": "Extracts each logical sub-condition into a named boolean variable",
+          "passed": true,
+          "evidence": "Extracts four named booleans: is_privileged, is_active, has_valid_access, dashboard_enabled."
+        },
+        {
+          "text": "Names the intermediates to capture intent (e.g., is_privileged_role, is_active_account)",
+          "passed": true,
+          "evidence": "Variables named is_privileged, is_active, has_valid_access, dashboard_enabled — all capture intent. States \"Each condition's *intent* is obvious from its name.\""
+        },
+        {
+          "text": "Shows the final if statement reading as a clear logical sentence",
+          "passed": true,
+          "evidence": "\"the `if` statement now reads like a sentence: 'if privileged, active, has valid access, and dashboard is enabled.'\""
+        },
+        {
+          "text": "Notes that named intermediates are also inspectable in a debugger",
+          "passed": true,
+          "evidence": "\"you can inspect each intermediate variable in a debugger or log them individually\""
+        }
+      ]
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "dense-access-control-conditional-refactor",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies the conditional as too dense to read at a glance",
+          "passed": true,
+          "evidence": "\"This conditional encodes four independent concerns into a single expression. Each clause answers a different question, but they're fused together, making the logic hard to audit, test, and extend.\""
+        },
+        {
+          "text": "Extracts each logical sub-condition into a named boolean variable",
+          "passed": true,
+          "evidence": "Extracts into named properties: has_privileged_role, is_active, has_valid_access, plus feature_flags.is_enabled. Uses properties rather than local variables, but achieves the same decomposition."
+        },
+        {
+          "text": "Names the intermediates to capture intent (e.g., is_privileged_role, is_active_account)",
+          "passed": true,
+          "evidence": "Names like has_privileged_role, is_active, has_valid_access clearly capture domain intent. Response explicitly states: \"The names should read as domain language, not implementation details.\""
+        },
+        {
+          "text": "Shows the final if statement reading as a clear logical sentence",
+          "passed": true,
+          "evidence": "Final if uses `user.has_privileged_role and user.is_active and user.has_valid_access and feature_flags.is_enabled('new_dashboard')` with annotations: Authorization, Account status, Temporal validity, Feature gating."
+        },
+        {
+          "text": "Notes that named intermediates are also inspectable in a debugger",
+          "passed": false,
+          "evidence": "The response mentions auditability (\"Log or return which specific predicate failed\") but never explicitly mentions debugger inspectability of named intermediates."
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "report-format-inheritance-to-composition",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that the need to combine formats exposes the limits of the inheritance hierarchy",
+          "passed": true,
+          "evidence": "\"You've hit the classic combinatorial explosion of inheritance. To get PDF+CSV, you'd need a PdfCsvReport subclass. Add Excel+PDF and you need another.\""
+        },
+        {
+          "text": "Recommends replacing inheritance with a narrow Renderer protocol and independent implementations",
+          "passed": false,
+          "evidence": "Recommends standalone render functions and explicitly advises against a protocol/base class: \"Don't reach for a Strategy pattern class hierarchy. You don't need a ReportRenderer base class.\" No Protocol is defined; renderers are plain functions with an implicit shared signature but no formal protocol."
+        },
+        {
+          "text": "Shows how combinations are expressed as composition (list of renderers) rather than new subclasses",
+          "passed": true,
+          "evidence": "generate_report takes `formats: list[str]`, iterates over RENDERERS dict: \"for fmt in formats: renderer = RENDERERS[fmt]\" — combinations are a list, not new subclasses."
+        },
+        {
+          "text": "Explains that new format combinations require no new classes with the composition approach",
+          "passed": true,
+          "evidence": "\"Adding a new format means writing one function and adding it to the dict — zero changes to existing code.\" Also: \"No new class needed.\""
+        },
+        {
+          "text": "Provides a concrete code example of the composed ReportPackage",
+          "passed": true,
+          "evidence": "The generate_summary_package function and the generate_report function with RENDERERS dict serve as concrete composed report-package examples, though not named ReportPackage explicitly."
+        }
+      ]
+    },
+    {
+      "eval_id": 10,
+      "eval_name": "report-format-inheritance-to-composition",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that the need to combine formats exposes the limits of the inheritance hierarchy",
+          "passed": true,
+          "evidence": "\"What you're experiencing has a name: the class explosion problem. Every new combination of behaviors doubles your subclass count.\" and \"inheritance is modeling the wrong axis.\""
+        },
+        {
+          "text": "Recommends replacing inheritance with a narrow Renderer protocol and independent implementations",
+          "passed": true,
+          "evidence": "Defines an abstract ReportRenderer ABC with a single `render` method, then PdfRenderer, CsvRenderer, ExcelRenderer as independent implementations."
+        },
+        {
+          "text": "Shows how combinations are expressed as composition (list of renderers) rather than new subclasses",
+          "passed": true,
+          "evidence": "ReportGenerator accepts `renderers: list[ReportRenderer]` and usage shows `summary_package = ReportGenerator([PdfRenderer(orientation=\"landscape\"), CsvRenderer()])` — no new subclass."
+        },
+        {
+          "text": "Explains that new format combinations require no new classes with the composition approach",
+          "passed": true,
+          "evidence": "Table row: \"New combination | New subclass with duplicated logic | Pass a different list at construction\" and inline comment \"# All three? Just add it to the list.\""
+        },
+        {
+          "text": "Provides a concrete code example of the composed ReportPackage",
+          "passed": true,
+          "evidence": "Shows a full ReportGenerator class composed with renderers, plus a `summary_package` factory function that constructs a ReportGenerator with PdfRenderer + CsvRenderer — serving as the composed report package."
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "api-shape-affordance-review",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that the generic signature (str, dict, dict) communicates nothing about valid usage or expected inputs",
+          "passed": true,
+          "evidence": "\"the type system communicates *none* of them\" and \"`dict` In, `dict` Out Erases All Type Information... The caller doesn't know what keys to provide\""
+        },
+        {
+          "text": "Suggests stronger types (enum for action, dataclass or typed dict for data and options) to make the API self-documenting",
+          "passed": true,
+          "evidence": "Recommends dataclasses (CreateUserRequest), typed return types (User), Role enum, and explicit keyword arguments instead of untyped dicts. Also mentions TypedDict as an option."
+        },
+        {
+          "text": "Points out that callers must read the implementation or docs to understand correct usage",
+          "passed": true,
+          "evidence": "\"The caller must read the implementation (or docs) to know which `action` strings are valid\" and \"Correct usage requires reading the implementation\""
+        },
+        {
+          "text": "Recommends the API shape itself should guide toward correct use through its types and naming",
+          "passed": true,
+          "evidence": "\"correct usage is impossible to infer from the signature alone\" and \"has a signature that communicates exactly what it needs\" — explicitly argues affordances should make correct use discoverable"
+        },
+        {
+          "text": "Provides a concrete improved signature that communicates intent through its structure",
+          "passed": true,
+          "evidence": "Multiple concrete signatures: `def create_user(*, name: str, email: Email, role: Role = Role.MEMBER) -> User`, `def delete_user(user_id: UserId) -> None`, and the dataclass-based `def create_user(request: CreateUserRequest) -> User`"
+        }
+      ]
+    },
+    {
+      "eval_id": 11,
+      "eval_name": "api-shape-affordance-review",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Identifies that the generic signature (str, dict, dict) communicates nothing about valid usage or expected inputs",
+          "passed": true,
+          "evidence": "\"the original signature `(str, dict, dict) -> dict` pushes all contract enforcement to runtime\" and \"Untyped `dict` In, Untyped `dict` Out... erase all structural information\""
+        },
+        {
+          "text": "Suggests stronger types (enum for action, dataclass or typed dict for data and options) to make the API self-documenting",
+          "passed": true,
+          "evidence": "Recommends \"an `enum.Enum` for `action`\" and \"Typed models (dataclasses, `TypedDict`, Pydantic `BaseModel`) for each operation's input and output\" with concrete examples like CreateUserRequest dataclass"
+        },
+        {
+          "text": "Points out that callers must read the implementation or docs to understand correct usage",
+          "passed": true,
+          "evidence": "\"Callers must read docs or source to learn valid actions\" and \"Caller doesn't know without reading internals\""
+        },
+        {
+          "text": "Recommends the API shape itself should guide toward correct use through its types and naming",
+          "passed": true,
+          "evidence": "\"A well-designed API encodes its contracts in the type system so that incorrect usage is caught before the code runs\" and each operation gets \"A distinct name — discoverable, greppable\" and \"A typed input — self-documenting\""
+        },
+        {
+          "text": "Provides a concrete improved signature that communicates intent through its structure",
+          "passed": true,
+          "evidence": "Provides full UserService class with create_user(CreateUserRequest) -> CreateUserResponse, delete_user, update_user, plus dataclass definitions for CreateUserRequest and CreateUserResponse"
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "utils-module-naming-scent",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the root problem as names that provide no navigation signal rather than just file size",
+          "passed": true,
+          "evidence": "\"names where information scent goes to die. They contain every kind of scent, so they contain none.\" and \"the import path tells the reader nothing about where they are in the codebase. The word 'helpers' narrows zero search space.\""
+        },
+        {
+          "text": "Specifically calls out utils/, helpers/, common/, shared/ as names that defeat discoverability",
+          "passed": true,
+          "evidence": "\"utils/helpers.py and common/shared.py are what the design-lenses reference calls graveyard names\" — all four names explicitly called out in the opening."
+        },
+        {
+          "text": "Recommends domain-aligned module names based on what the code actually does (e.g., date_formatting, csv_parsing, retry)",
+          "passed": true,
+          "evidence": "Concrete renaming: dates.py, csv_io.py, retry.py, sanitize.py, urls.py, config.py, auth.py, feature_flags.py — all domain-aligned."
+        },
+        {
+          "text": "Suggests a findability heuristic like 'what would a new engineer search for?' to guide renaming",
+          "passed": true,
+          "evidence": "\"if you had to rename the module so a new engineer found it on the first try, what would you call it?\" and the import-path test: \"Before adding a function, write the import statement a caller would use.\""
+        },
+        {
+          "text": "Warns against just splitting into smaller files with the same generic names (utils_a.py, helpers_2.py)",
+          "passed": true,
+          "evidence": "\"Split by domain, not by implementation role\" and \"These files grow unboundedly because they have no rejection criterion\" — the entire framing rejects size-only splits. The before/after never uses generic sub-names; every replacement is domain-specific."
+        }
+      ]
+    },
+    {
+      "eval_id": 12,
+      "eval_name": "utils-module-naming-scent",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Diagnoses the root problem as names that provide no navigation signal rather than just file size",
+          "passed": true,
+          "evidence": "\"when a name communicates nothing about contents (helpers.py), the only discovery mechanism is grep\" and \"attractively vague names: everything could go there, so everything does\""
+        },
+        {
+          "text": "Specifically calls out utils/, helpers/, common/, shared/ as names that defeat discoverability",
+          "passed": true,
+          "evidence": "Explicitly names \"utils/\" and \"common/\" in the opening, \"helpers.py\" in the cohesion section, and \"common/shared.py\" in the PR template checkbox"
+        },
+        {
+          "text": "Recommends domain-aligned module names based on what the code actually does (e.g., date_formatting, csv_parsing, retry)",
+          "passed": true,
+          "evidence": "Provides concrete module names: dates.py, retry.py, csv_parsing.py, strings.py, collections.py, validation.py with specific function groupings"
+        },
+        {
+          "text": "Suggests a findability heuristic like 'what would a new engineer search for?' to guide renaming",
+          "passed": false,
+          "evidence": "No explicit findability heuristic or new-engineer-perspective test is offered. The rule given is \"no new files without a specific noun in the filename\" which is structural, not search-oriented."
+        },
+        {
+          "text": "Warns against just splitting into smaller files with the same generic names (utils_a.py, helpers_2.py)",
+          "passed": true,
+          "evidence": "The entire approach is framed around domain-specific naming. The rule \"utils/ gets no new files without a specific noun in the filename\" and the emphasis on clear names implicitly warns against generic splits, though no explicit anti-pattern example like utils_a.py is given. However, the response does say \"If someone can't name the module, the function probably belongs in the domain package\" which addresses the spirit. On reflection this is borderline — no explicit warning against the pattern."
+        }
+      ]
+    },
+    {
+      "eval_id": 13,
+      "eval_name": "cli-deploy-dangerous-feedback",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends a confirmation prompt or safeguard for the destructive db reset command (e.g., type the database name to confirm, require --force flag)",
+          "passed": true,
+          "evidence": "\"Confirmation prompt requires typing the database name, not y/n\" and \"--force as the automation escape hatch\" — both safeguards explicitly recommended for db reset."
+        },
+        {
+          "text": "Suggests --dry-run support that shows what would happen without executing",
+          "passed": true,
+          "evidence": "\"db migrate --dry-run shows the preview and exits without prompting. Useful in CI to verify pending migrations exist (or don't).\""
+        },
+        {
+          "text": "Recommends progress feedback for long-running operations like migrations (step counts, timing)",
+          "passed": true,
+          "evidence": "\"Per-migration progress with timing. Migrations can be slow; the operator needs to know which one is running and whether it's hung.\" Shows per-step timing like \"done (12.4s)\" and summary \"3 migrations applied in 12.8s.\""
+        },
+        {
+          "text": "Distinguishes between safe commands (seed) and dangerous ones (reset) in terms of required safeguards",
+          "passed": true,
+          "evidence": "Explicit classification table with safety tiers (Low/Medium/High) and statement: \"Friction proportional to blast radius: seed → progress only. migrate → preview + lightweight confirm. reset → explicit env + typed confirmation.\""
+        },
+        {
+          "text": "Suggests failure feedback that tells the user what failed, why, and how to fix it",
+          "passed": false,
+          "evidence": "Error messages shown are minimal (e.g., \"Error: db reset requires explicit --env flag\", \"Error: db seed is disabled for production\"). No example of a failure mid-operation with explanation of why it failed and how to fix it. The response focuses on prevention, not failure recovery."
+        }
+      ]
+    },
+    {
+      "eval_id": 13,
+      "eval_name": "cli-deploy-dangerous-feedback",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends a confirmation prompt or safeguard for the destructive db reset command (e.g., type the database name to confirm, require --force flag)",
+          "passed": true,
+          "evidence": "Section 3 shows escalating confirmation: y/N for dev, type environment name for staging, type full database name for production. Section 2 also shows 'Type the database name \"myapp_production\" to confirm'."
+        },
+        {
+          "text": "Suggests --dry-run support that shows what would happen without executing",
+          "passed": true,
+          "evidence": "Section 6 dedicates a full section to --dry-run with example output: 'Would drop 12 tables... Would recreate schema from migrations 001–047.'"
+        },
+        {
+          "text": "Recommends progress feedback for long-running operations like migrations (step counts, timing)",
+          "passed": true,
+          "evidence": "Section 4 shows '[1/3] Applying 20240115_add_users_table... done (42ms)' with step counts, per-step timing, and a summary '3 migrations applied in 165ms'."
+        },
+        {
+          "text": "Distinguishes between safe commands (seed) and dangerous ones (reset) in terms of required safeguards",
+          "passed": false,
+          "evidence": "The tier table in Section 1 actually classifies 'db seed' as Destructive alongside 'db reset', and 'db migrate' as Safe. The expectation specifically calls seed safe and reset dangerous, but the response treats seed as dangerous. The response does distinguish tiers, but inverts the seed classification relative to the expectation."
+        },
+        {
+          "text": "Suggests failure feedback that tells the user what failed, why, and how to fix it",
+          "passed": false,
+          "evidence": "No section addresses error messages or failure output. The response covers progress for success cases, audit logging, and dry-run, but never shows what happens when a migration fails or a reset errors out, nor any guidance on communicating failure cause or remediation to the user."
         }
       ]
     }
@@ -80,22 +1038,18 @@
   "run_summary": {
     "with_skill": {
       "pass_rate": {
-        "mean": 1.0,
-        "stddev": 0
+        "mean": 0.846,
+        "stddev": 0.262
       }
     },
     "without_skill": {
       "pass_rate": {
-        "mean": 0.75,
-        "stddev": 0
+        "mean": 0.769,
+        "stddev": 0.292
       }
     },
     "delta": {
-      "pass_rate": "+0.25"
+      "pass_rate": "+8%"
     }
-  },
-  "notes": [
-    "Assertions 1-3 (fear-as-complexity signal; flat-profile architectural change; understand-invariants-before-changing) pass in BOTH configs - non-discriminating.",
-    "Sole discriminator: A4 'present Jonathan Blow's claims as his stance' - baseline framed claims as contestable but never attributed them to Blow (attribution-only delta)."
-  ]
+  }
 }

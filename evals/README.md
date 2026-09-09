@@ -80,8 +80,13 @@
 
 | Eval | Baseline | With Skill | Δ |
 |------|----------|-----------|---|
-| networking-api-sockets | 3/3 | 3/3 | +0 |
-| **Total** | **3/3 (100%)** | **3/3 (100%)** | **+0%** |
+| user-org-roles-resource-design | 3/6 | 4/6 | +1 |
+| book-api-consistency-review | 1/5 | 5/5 | +4 |
+| video-transcoding-lro-design | 4/4 | 4/4 | +0 |
+| document-archive-publish-custom-methods | 4/4 | 4/4 | +0 |
+| payment-error-design-recovery | 5/5 | 5/5 | +0 |
+| sdk-abstraction-ladder | 5/5 | 5/5 | +0 |
+| **Total** | **22/29 (76%)** | **27/29 (93%)** | **+17%** |
 
 ## application-architecture
 
@@ -506,12 +511,14 @@
 |------|----------|-----------|---|
 | broad-exception-handler-review | 4/5 | 5/5 | +1 |
 | empty-string-sentinel-default | 5/5 | 5/5 | +0 |
-| redundant-docstring-type-annotations | 5/5 | 5/5 | +0 |
-| unnecessary-future-annotations-import | 3/5 | 5/5 | +2 |
-| generic-repository-abstraction-value | 4/5 | 5/5 | +1 |
-| protocol-vs-abc-plugin-system | 4/5 | 5/5 | +1 |
-| pydantic-model-in-business-logic | 3/5 | 5/5 | +2 |
-| **Total** | **28/35 (80%)** | **35/35 (100%)** | **+20%** |
+| redundant-docstring-type-annotations | 1/5 | 5/5 | +4 |
+| unnecessary-future-annotations-import | 5/5 | 5/5 | +0 |
+| generic-repository-abstraction-value | 1/5 | 5/5 | +4 |
+| protocol-vs-abc-plugin-system | 5/5 | 5/5 | +0 |
+| pydantic-model-in-business-logic | 1/5 | 5/5 | +4 |
+| payments-module-init-design | 5/5 | 4/5 | -1 |
+| weak-names-refactor | 5/5 | 5/5 | +0 |
+| **Total** | **32/45 (71%)** | **44/45 (98%)** | **+27%** |
 
 ## rag-design
 
@@ -546,8 +553,20 @@
 
 | Eval | Baseline | With Skill | Δ |
 |------|----------|-----------|---|
-| scary-fn-and-flat-profile | 3/4 | 4/4 | +1 |
-| **Total** | **3/4 (75%)** | **4/4 (100%)** | **+25%** |
+| notification-channels-composition | 5/5 | 5/5 | +0 |
+| user-manager-god-class-split | 5/5 | 4/5 | -1 |
+| order-processing-pure-io-separation | 5/5 | 5/5 | +0 |
+| retry-removal-chestertons-fence | 2/5 | 4/5 | +2 |
+| file-parser-layered-api-design | 5/5 | 5/5 | +0 |
+| api-fetch-ambiguous-edge-cases | 0/5 | 0/5 | +0 |
+| redundant-comments-docstring-review | 4/5 | 4/5 | +0 |
+| silent-exception-mutable-default-review | 3/5 | 5/5 | +2 |
+| dense-access-control-conditional-refactor | 4/5 | 5/5 | +1 |
+| report-format-inheritance-to-composition | 5/5 | 4/5 | -1 |
+| api-shape-affordance-review | 5/5 | 5/5 | +0 |
+| utils-module-naming-scent | 4/5 | 5/5 | +1 |
+| cli-deploy-dangerous-feedback | 3/5 | 4/5 | +1 |
+| **Total** | **50/65 (77%)** | **55/65 (85%)** | **+8%** |
 
 ## test-design
 

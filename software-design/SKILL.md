@@ -330,6 +330,10 @@ When reviewing code or making design decisions:
 13. **Do I actually understand what this does at runtime, or am I papering over it?** (Engineering Judgment)
 14. **Are my queues and pools bounded? Does the caller see rejection explicitly?** (Bounded Resources as API Honesty)
 15. **Does this function return a refined type, or does it validate and discard the proof?** (Parse, Don't Validate)
+16. **Can a caller understand correct usage from the signature alone, without reading the body?** (Affordances — Design Lenses)
+17. **What mental model does this interface present to a new caller? Is it accurate?** (Conceptual Model — Design Lenses)
+18. **Do names lead a new engineer to the right place on the first try?** (Information Scent — Design Lenses)
+19. **Can a competent engineer hold this interface in working memory in one sitting?** (Cognitive Load — Design Lenses)
 
 These are lenses, not laws. They sometimes conflict -- minimalism might suggest
 fewer types while thoroughness demands explicit error handling. Use judgment.
@@ -345,3 +349,7 @@ respectful of the humans who interact with it.
 | `references/patterns.md` | Full before/after catalog for specific refactoring patterns -- bloated config, deep inheritance, hidden side effects, immutability, declarative style, etc. Consult when you need a concrete model for a specific principle. |
 | `references/engineering-judgment.md` | Optimization judgment, understand-before-you-change, invariants, root-cause discipline, state calibration, activity-vs-output, and design-for-hard-cases. Consult when reasoning about runtime behavior, calibrating optimization effort, or applying principles with judgment. |
 | `references/type-driven-design.md` | Parse vs validate (information preservation), make illegal states unrepresentable, shotgun parsing antipattern, push the burden of proof upward. Consult when designing boundary types or eliminating redundant downstream checks. |
+| `references/design-lenses.md` | Affordances, signifiers, conceptual models, information scent, Gestalt principles, and structured design critique workflow. Consult when reviewing code for structural quality, when something feels off but you can't articulate why, or when naming and navigability are the concern. |
+| `references/documentation-patterns.md` | Diátaxis framework, BLUF, code examples as first-class content. Consult when writing or reviewing documentation, READMEs, or API docs. |
+| `references/module-patterns.md` | Domain-aligned vs implementation-aligned structure, dependency direction as architectural constraint. Consult when organizing modules or reviewing project structure. |
+| `references/cli-patterns.md` | Progressive disclosure in commands, feedback contracts, constraint defaults for dangerous operations. Consult when designing or reviewing CLI tools. |

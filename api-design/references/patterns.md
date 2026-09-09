@@ -59,6 +59,27 @@ Content-Type: application/problem+json
 - `detail`: may contain PII, request-specific, do not log. Must be actionable — tell the user what to do.
 - Dynamic variables in `detail` must also appear as top-level fields for programmatic access (e.g., `"zone": "us-east1-a"`).
 
+**Four Principles of Error Design:**
+1. **Visible** — Never silent failures. Include request ID for correlation.
+2. **Understandable** — Human-readable detail, not internal error codes.
+3. **Actionable** — Tell the caller what to do, not just what went wrong.
+4. **Stable** — Never change error shapes. Treat them as API contracts.
+
+**Recovery Patterns:**
+
+Exponential backoff for transient failures:
+```python
+time.sleep(min(2 ** attempt + random.random(), 60))
+```
+
+Idempotency key to make retries safe:
+```python
+response = client.charges.create(
+    amount=2000,
+    idempotency_key=f"order-{order_id}-charge"
+)
+```
+
 **Permission check order:**
 1. Check permissions first — before any existence check.
 2. Caller lacks permission -> `403 PERMISSION_DENIED` (even if resource doesn't exist — checking existence first leaks information).
@@ -119,3 +140,34 @@ Child resources that exist exactly once per parent have no ID segment: `publishe
 ## Enumerations (AEP-126)
 
 Always include `UNSPECIFIED` (value 0 in protobuf) — prevents uninitialized messages from defaulting to a meaningful state. Use `UPPER_SNAKE_CASE` values. Use strings for open-ended sets (language codes, etc.).
+
+---
+
+## Abstraction Ladder
+
+Every API should serve callers at multiple skill levels (Stripe's framework):
+
+1. **Flexible first** — The API is composable; operations return types that feed back in. Advanced users can build anything.
+2. **Gradual second** — Complexity reveals itself progressively. Novices become experts without hitting walls.
+3. **Convenient third** — Common combinations packaged as shortcuts. But don't over-package.
+
+Market reality:
+- No convenience → beginners don't adopt
+- No gradual → novices never become experts
+- No flexibility → power users leave
+
+Example:
+```python
+# Convenient: common case is trivial
+charge = stripe.Charge.create(amount=2000, currency="usd", source=token)
+
+# Flexible: full composition for complex flows
+payment_intent = stripe.PaymentIntent.create(
+    amount=2000, currency="usd",
+    payment_method_types=["card"],
+    metadata={"order_id": "6735"}
+)
+payment_intent.confirm(payment_method=pm_id, return_url=url)
+```
+
+This complements the `software-design` skill's 'layered interfaces' principle with an API-specific framework.

@@ -1,68 +1,473 @@
 {
   "metadata": {
     "skill_name": "api-design",
-    "timestamp": "2026-06-30",
+    "timestamp": "2026-09-09",
     "evals_run": [
-      "eval-0"
+      "user-org-roles-resource-design",
+      "book-api-consistency-review",
+      "video-transcoding-lro-design",
+      "document-archive-publish-custom-methods",
+      "payment-error-design-recovery",
+      "sdk-abstraction-ladder"
     ],
     "runs_per_configuration": 1
   },
   "runs": [
     {
-      "eval_id": 0,
-      "eval_name": "networking-api-sockets",
+      "eval_id": 1,
+      "eval_name": "user-org-roles-resource-design",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
-        "passed": 3,
-        "failed": 0,
-        "total": 3
+        "pass_rate": 0.67,
+        "passed": 4,
+        "failed": 2,
+        "total": 6
       },
       "expectations": [
         {
-          "text": "Advises designing around what callers actually want in their vocabulary (connect/read/write/disconnect) rather than exposing an internal concept like 'socket'",
+          "text": "API paths use nouns (resources), not verbs like /createUser or /getOrganization",
           "passed": true,
-          "evidence": "Lines 4-6 'Design around what callers actually want, in their vocabulary'. Lines 14-24 enumerate '**connect** ... **send a message** ... **receive a message** ... **disconnect**' and 'Model the surface around caller intent, not around the internal mechanism.' Lines 11-13 'A socket is a Unix *implementation* abstraction.' Direct match."
+          "evidence": "All paths are noun-based: /v1/users, /v1/organizations, /v1/organizations/acme-corp/roles, /v1/organizations/acme-corp/memberships. Custom actions use :verb suffix (e.g. :suspend) not verb paths."
         },
         {
-          "text": "Warns against footgun-by-omission: sensible behavior should be the default, not gated behind obscure mandatory flags",
-          "passed": true,
-          "evidence": "Section line 35 '## No footgun-by-omission'. Lines 50-51 '**sensible, safe behavior is the default; deviation is an explicit opt-in.** Nothing should break because the caller didn't know to set a flag.' Concrete examples (partial send/recv, missing framing, TCP_NODELAY) at lines 40-48."
+          "text": "List endpoint responses use 'results' as the array field name, not 'users' or 'organizations'",
+          "passed": false,
+          "evidence": "No list response body is shown anywhere in the response. List endpoints are defined (GET /v1/users, GET /v1/organizations, etc.) but no response schema demonstrates the array field name."
         },
         {
-          "text": "Recommends keeping low-level/raw bindings as a separate escape hatch so the common-case API stays simple (layered)",
+          "text": "Create operations use POST, not PUT",
           "passed": true,
-          "evidence": "Section line 64 '## Layer it: keep the raw bindings as a separate escape hatch'. Lines 66-71 'Provide raw/low-level bindings ... as a **distinct lower layer** ... This is the standard layered design: make the common case simple, and the uncommon case possible.' Layer diagram at lines 73-76 (net vs net.raw)."
+          "evidence": "All create operations use POST: \"POST /v1/users?id=jdoe # CreateUser\", \"POST /v1/organizations?id=acme-corp # CreateOrganization\", etc."
+        },
+        {
+          "text": "Update operations use PATCH with merge-patch semantics, not PUT",
+          "passed": true,
+          "evidence": "\"PATCH /v1/users/jdoe # UpdateUser (merge-patch)\", \"PATCH /v1/organizations/acme-corp # UpdateOrganization\", \"PATCH /v1/organizations/acme-corp/roles/billing-admin # UpdateRole\". No PUT used for updates."
+        },
+        {
+          "text": "Pagination is mentioned for List endpoints (max_page_size, page_token, or similar)",
+          "passed": false,
+          "evidence": "No mention of pagination, page_token, max_page_size, or any pagination mechanism anywhere in the response despite multiple List endpoints being defined."
+        },
+        {
+          "text": "Standard fields like create_time, update_time are mentioned",
+          "passed": true,
+          "evidence": "All resource schemas include these fields, e.g. User: \"create_time\": \"2024-01-15T10:30:00Z\" // output-only, \"update_time\": \"2024-06-01T08:00:00Z\" // output-only. Also present on Organization, Role, Membership, and RoleAssignment."
         }
       ]
     },
     {
-      "eval_id": 0,
-      "eval_name": "networking-api-sockets",
+      "eval_id": 1,
+      "eval_name": "user-org-roles-resource-design",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 1.0,
+        "pass_rate": 0.5,
         "passed": 3,
-        "failed": 0,
-        "total": 3
+        "failed": 3,
+        "total": 6
       },
       "expectations": [
         {
-          "text": "Advises designing around what callers actually want in their vocabulary (connect/read/write/disconnect) rather than exposing an internal concept like 'socket'",
+          "text": "API paths use nouns (resources), not verbs like /createUser or /getOrganization",
           "passed": true,
-          "evidence": "Lines 16-25 \"'Socket' is the OS's internal concept ... Exposing it makes your API a mirror of the implementation instead of a contract with the caller ... design around the *thing the caller has* (a connection) and the operations they actually perform \u2014 **connect / read / write / disconnect**.\" Generalizes 'not a DB mirror' to 'not an OS-internals mirror'. Genuine match."
+          "evidence": "All paths use nouns: /users, /organizations, /memberships, /roles. Explicit section 'Avoid verb endpoints' contrasts bad verb paths (POST /add-member) with correct noun-based paths."
         },
         {
-          "text": "Warns against footgun-by-omission: sensible behavior should be the default, not gated behind obscure mandatory flags",
-          "passed": true,
-          "evidence": "Section line 43 '## Make the sensible behavior the default'. Lines 54-59 'the behavior most callers need ... should be what the API gives you by default \u2014 not functionality gated behind an obscure mandatory flag the caller has to *know* to set. An API where correct behavior only happens if you remember to pass an option is a footgun.' Direct match."
+          "text": "List endpoint responses use 'results' as the array field name, not 'users' or 'organizations'",
+          "passed": false,
+          "evidence": "No list endpoint response body is shown at all. The only 'results' usage is in the bulk 207 Multi-Status response, which is not a list endpoint. Cannot confirm list responses use 'results'."
         },
         {
-          "text": "Recommends keeping low-level/raw bindings as a separate escape hatch so the common-case API stays simple (layered)",
+          "text": "Create operations use POST, not PUT",
           "passed": true,
-          "evidence": "Section line 30 '## Keep the common case simple; raw access is a lower, separate layer'. Lines 36-40 'keep it \u2014 but as a deliberately separate escape-hatch layer, not mixed into the common-case API.' Lines 66-67 'Expose raw sockets only as a separate lower layer for the rare caller who needs it.' Match."
+          "evidence": "All create operations use POST: 'POST /users', 'POST /organizations', 'POST /organizations/{org_id}/memberships', 'POST /organizations/{org_id}/roles'. PUT is never used for creation."
+        },
+        {
+          "text": "Update operations use PATCH with merge-patch semantics, not PUT",
+          "passed": false,
+          "evidence": "PATCH is correctly used for all updates and PUT is avoided. However, 'merge-patch' semantics are never mentioned. The PATCH example for role_ids states it 'replaces all roles' which is full-replacement behavior on that field, and no mention of merge-patch content type or semantics appears anywhere."
+        },
+        {
+          "text": "Pagination is mentioned for List endpoints (max_page_size, page_token, or similar)",
+          "passed": false,
+          "evidence": "Pagination is never mentioned. List endpoints (GET /users, GET /organizations, GET /memberships) are defined but no pagination parameters (page_token, max_page_size, limit, offset, cursor) appear anywhere in the response."
+        },
+        {
+          "text": "Standard fields like create_time, update_time are mentioned",
+          "passed": true,
+          "evidence": "Membership response includes 'created_at' and 'updated_at' timestamp fields: '\"created_at\": \"2025-01-15T10:00:00Z\", \"updated_at\": \"2025-01-15T10:00:00Z\"'."
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "book-api-consistency-review",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Review identifies that paths use verbs (getBooks, createBook) instead of resource-oriented nouns",
+          "passed": true,
+          "evidence": "Section 1: 'The paths embed verbs (getBooks, createBook, deleteBook, getChapters, create). HTTP methods already carry the verb — this is redundant'"
+        },
+        {
+          "text": "Review identifies PUT as problematic and recommends PATCH with merge-patch",
+          "passed": true,
+          "evidence": "Section 2: 'PUT requires the full resource body... Use PATCH with application/merge-patch+json'"
+        },
+        {
+          "text": "Review identifies 'bookList' should be 'results'",
+          "passed": true,
+          "evidence": "Section 6: 'List response uses bookList instead of results' with corrected example showing { \"results\": [...] }"
+        },
+        {
+          "text": "Review identifies that 'id' should be a query parameter, not in the request body",
+          "passed": true,
+          "evidence": "Section 7: 'Client-specified id should be a query param, not in the body' with example POST /api/books?id=my-book"
+        },
+        {
+          "text": "Review identifies createdAt/updatedAt should use _time suffix (create_time/update_time)",
+          "passed": true,
+          "evidence": "Section 8: 'Timestamp fields use camelCase _at instead of snake_case _time' with table showing createdAt → create_time, updatedAt → update_time"
+        }
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "book-api-consistency-review",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Review identifies that paths use verbs (getBooks, createBook) instead of resource-oriented nouns",
+          "passed": true,
+          "evidence": "Section 1 'Verb-in-URL Anti-Pattern' explicitly calls out getBooks, createBook, updateBook, deleteBook, getChapters and recommends noun-only paths like /api/books."
+        },
+        {
+          "text": "Review identifies PUT as problematic and recommends PATCH with merge-patch",
+          "passed": false,
+          "evidence": "The response retains PUT in the corrected design ('PUT /api/books/{bookId} → update a book') and never mentions PATCH or merge-patch anywhere."
+        },
+        {
+          "text": "Review identifies 'bookList' should be 'results'",
+          "passed": false,
+          "evidence": "Section 5 correctly flags 'bookList' as problematic but recommends 'data' or 'items' as the key name, not 'results'."
+        },
+        {
+          "text": "Review identifies that 'id' should be a query parameter, not in the request body",
+          "passed": false,
+          "evidence": "Section 4 discusses client-supplied ID issues but recommends either stripping id from the body (server-assigned) or using PUT for client-assigned IDs. Never suggests moving id to a query parameter."
+        },
+        {
+          "text": "Review identifies createdAt/updatedAt should use _time suffix (create_time/update_time)",
+          "passed": false,
+          "evidence": "Section 6 only flags casing inconsistency (camelCase vs snake_case) and never mentions renaming to create_time/update_time or using a _time suffix convention."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "video-transcoding-lro-design",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Response recommends Long-running Operations (LROs) for the async transcoding work",
+          "passed": true,
+          "evidence": "Title states \"Use a Long-Running Operation (LRO), not a standard Create\" and references AEP-151 for the pattern."
+        },
+        {
+          "text": "Response mentions returning 202 Accepted (not 200/201) for the async operation",
+          "passed": true,
+          "evidence": "\"Step 1: Create returns `202 Accepted` with an Operation resource\" with HTTP response showing \"HTTP/1.1 202 Accepted\"."
+        },
+        {
+          "text": "Response mentions an Operation resource with done/status tracking",
+          "passed": true,
+          "evidence": "Operation resource shown with \"done: false\" and later \"done: true\" with either \"response\" or \"error\" populated, plus progress_percent in metadata."
+        },
+        {
+          "text": "Response mentions a state field on the video resource for tracking readiness",
+          "passed": true,
+          "evidence": "Video resource includes \"state\": \"TRANSCODING\" and \"The `state` field tells them it's not usable yet.\" Full state machine: TRANSCODING → ACTIVE / FAILED / PARTIALLY_COMPLETED."
+        }
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "video-transcoding-lro-design",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Response recommends Long-running Operations (LROs) for the async transcoding work",
+          "passed": true,
+          "evidence": "Title is 'Long-Running Operations: Video Transcoding API Design' and explicitly references Google's LRO AIP pattern and Microsoft's Azure Async Operation pattern."
+        },
+        {
+          "text": "Response mentions returning 202 Accepted (not 200/201) for the async operation",
+          "passed": true,
+          "evidence": "Returns **`202 Accepted`** (not `201 Created`) with explicit rationale: 'The request was accepted but not yet fulfilled. `201` implies the resource is ready. It isn't.'"
+        },
+        {
+          "text": "Response mentions an Operation resource with done/status tracking",
+          "passed": true,
+          "evidence": "Separate `/operations/{id}` resource with `status` field tracking 'pending' → 'processing' → 'completed'/'failed', plus progress details and completion time."
+        },
+        {
+          "text": "Response mentions a state field on the video resource for tracking readiness",
+          "passed": true,
+          "evidence": "GET /videos/{id} response includes `\"status\": \"ready\"` field on the video resource."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "document-archive-publish-custom-methods",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Response recommends custom methods (:archive, :publish) for state transitions",
+          "passed": true,
+          "evidence": "Explicitly defines 'POST /v1/documents/{document_id}:publish' and ':archive' as custom methods, stating 'State transitions via custom methods — :archive, :publish, not PATCH on a state field.'"
+        },
+        {
+          "text": "Response explains that state should not be directly writable via Update/PATCH",
+          "passed": true,
+          "evidence": "Dedicated section 'Why not PATCH on a state field?' explains loss of valid transition control, side effects, and atomicity. Also states 'state is output-only. Clients cannot set it via Create or Update.'"
+        },
+        {
+          "text": "Response mentions a flag on List to show archived/deleted documents",
+          "passed": true,
+          "evidence": "Section 'Filtering Archived Documents on List' shows 'GET /v1/documents?show_archived=true' and references 'same pattern as soft-delete's show_deleted from AEP-164.'"
+        },
+        {
+          "text": "Response mentions state enum conventions (output-only, UPPER_SNAKE_CASE, or STATE_UNSPECIFIED)",
+          "passed": true,
+          "evidence": "Table includes 'STATE_UNSPECIFIED' as 'Zero value — Required — prevents uninitialized defaults from being meaningful', values shown in UPPER_SNAKE_CASE (DRAFT, PUBLISHED, ARCHIVED), and 'state is output-only' explicitly stated."
+        }
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "document-archive-publish-custom-methods",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "expectations": [
+        {
+          "text": "Response recommends custom methods (:archive, :publish) for state transitions",
+          "passed": true,
+          "evidence": "Explicitly recommends 'POST /documents/{id}:publish' and 'POST /documents/{id}:archive' following AIP-136 conventions."
+        },
+        {
+          "text": "Response explains that state should not be directly writable via Update/PATCH",
+          "passed": true,
+          "evidence": "'state is an output-only field on the Document resource. Clients cannot set it via Create or Update — they must use the custom methods.' Also: 'PATCH /documents/{id} # UpdateDocument (title, body, etc. — NOT state)'"
+        },
+        {
+          "text": "Response mentions a flag on List to show archived/deleted documents",
+          "passed": true,
+          "evidence": "Dedicated section 'List Filtering for Archived Documents' with Option A 'show_archived=true' boolean flag and Option B structured filter field."
+        },
+        {
+          "text": "Response mentions state enum conventions (output-only, UPPER_SNAKE_CASE, or STATE_UNSPECIFIED)",
+          "passed": true,
+          "evidence": "Enum uses UPPER_SNAKE_CASE values (DRAFT, PUBLISHED, ARCHIVED), includes 'DOCUMENT_STATE_UNSPECIFIED = 0', and explicitly states 'state is an output-only field'."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "payment-error-design-recovery",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends structured error responses with distinct error types for different failure modes (not a generic 500 for everything)",
+          "passed": true,
+          "evidence": "Adopts RFC 9457 Problem Details with distinct `type` URIs per failure: `/card-declined`, `/invalid-card`, `/rate-limited`, `/internal`. Explicitly states 'a 500 for a card decline tells the mobile team server broke when the server is fine.'"
+        },
+        {
+          "text": "Includes actionable detail that tells the caller what to do (e.g., retry for rate limits, use different card for declined)",
+          "passed": true,
+          "evidence": "Card declined detail says 'Ask the cardholder to contact their bank or try a different payment method.' Insufficient funds says 'Try a smaller amount or a different payment method.' Rate limited says 'Retry after 30 seconds.' Invalid card says 'Check for typos.'"
+        },
+        {
+          "text": "Addresses the retry problem with a concrete recovery pattern (exponential backoff for transient errors or idempotency keys for safe retries)",
+          "passed": true,
+          "evidence": "Step 3 provides exponential backoff with jitter in Swift code: `min(pow(2, attempt) + Double.random(in: 0...1), 60)`. Step 4 requires idempotency keys on charges to prevent double charges, with concrete request body example and 409 behavior on replays."
+        },
+        {
+          "text": "Distinguishes between client errors (4xx) and server errors (5xx) for different failure modes",
+          "passed": true,
+          "evidence": "Status code taxonomy table maps: card declined→402, validation→422, auth→401, rate limit→429 (all 4xx client errors) vs. server error→500, upstream down→502 (5xx server errors). Explicitly states '500 is the only thing that should be 500.'"
+        },
+        {
+          "text": "Recommends stable error contracts that mobile clients can reliably parse and switch on",
+          "passed": true,
+          "evidence": "Step 5 says '`type` field is stable and never changes shape—treat it like a resource path.' Key design principle states dynamic variables must appear as top-level fields so mobile teams 'never have to regex-parse `detail`.' The `retryable` boolean and `type` URI are explicitly designed as machine-readable switch targets."
+        }
+      ]
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "payment-error-design-recovery",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends structured error responses with distinct error types for different failure modes (not a generic 500 for everything)",
+          "passed": true,
+          "evidence": "Defines a closed taxonomy of 6 error types (card_error, validation_error, authentication_error, rate_limit_error, idempotency_error, api_error) with machine-readable `type` and `code` fields in a structured JSON body."
+        },
+        {
+          "text": "Includes actionable detail that tells the caller what to do (e.g., retry for rate limits, use different card for declined)",
+          "passed": true,
+          "evidence": "Swift example shows showAddDifferentCard() for insufficient_funds, showContactBank() for fraudSuspected, scheduleRetry for rate limits. user_message field gives display-ready text like 'Please try a different payment method.' param field enables inline field highlighting."
+        },
+        {
+          "text": "Addresses the retry problem with a concrete recovery pattern (exponential backoff for transient errors or idempotency keys for safe retries)",
+          "passed": true,
+          "evidence": "Section 3 specifies: retryable boolean field, retry_after seconds, exponential backoff starting at retry_after, idempotency keys on all payment mutations to prevent double-charges. States 'Always send the idempotency key on payment mutations so retries don't double-charge.'"
+        },
+        {
+          "text": "Distinguishes between client errors (4xx) and server errors (5xx) for different failure modes",
+          "passed": true,
+          "evidence": "Section 1 maps 8+ scenarios to specific status codes: 400, 401, 402, 403, 409, 422, 429 for client errors; 500 and 503 for server errors. Explicitly states '4xx = don't retry (except 429). 5xx = safe to retry.'"
+        },
+        {
+          "text": "Recommends stable error contracts that mobile clients can reliably parse and switch on",
+          "passed": true,
+          "evidence": "Section 4 defines a closed set of type values as a 'stability contract,' states codes 'never changes without versioning,' new codes can be added but never removed/renamed without a version bump, and advises mobile to have a default branch for unknown codes. Section 5 shows a complete Swift switch statement."
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "sdk-abstraction-ladder",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends a layered API serving multiple skill levels rather than choosing one audience over the other",
+          "passed": true,
+          "evidence": "\"The answer is not to choose one audience. It's to build three layers that stack on top of each other.\" Proposes Convenient, Composed, and Flexible layers."
+        },
+        {
+          "text": "Proposes a simple high-level method (e.g., upload_file) that handles multipart internally for the common case",
+          "passed": true,
+          "evidence": "Layer 3 shows `client.upload(\"my-bucket\", \"data.csv\", Path(\"./data.csv\"))` and Layer 2 shows `upload_file` which \"automatically choosing single-put or multipart\" with internal abort-on-failure handling."
+        },
+        {
+          "text": "Preserves the existing low-level operations for power users who need granular control",
+          "passed": true,
+          "evidence": "Layer 1 explicitly states \"Your existing surface — create_multipart_upload, upload_part, complete_multipart_upload, list_parts, abort_multipart_upload — is the flexible layer... Don't remove it.\" Also: \"Don't hide Layer 1 behind _private naming.\""
+        },
+        {
+          "text": "Shows how the simple method can be implemented using the low-level building blocks",
+          "passed": true,
+          "evidence": "The `upload_file` code sample explicitly calls `self.multipart.create()`, `self._upload_parts_concurrent()`, and `upload.complete(parts=parts)` — demonstrating composition from the low-level primitives. States \"Layer 3 calls Layer 2 calls Layer 1.\""
+        },
+        {
+          "text": "Explains the trade-off: convenience drives adoption, flexibility retains power users",
+          "passed": true,
+          "evidence": "\"The Market Reality Test\" section: \"No convenience → beginners don't adopt... No flexibility → power users leave for a library that gives them control.\" Also: \"Difficulty is not a virtue... Your current five-method surface is the right answer for ~5% of your users.\""
+        }
+      ]
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "sdk-abstraction-ladder",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "expectations": [
+        {
+          "text": "Recommends a layered API serving multiple skill levels rather than choosing one audience over the other",
+          "passed": true,
+          "evidence": "Opens with 'The answer is a two-tier API — a high-level facade that delegates to the low-level primitives, without hiding them' and the architecture diagram shows both layers coexisting."
+        },
+        {
+          "text": "Proposes a simple high-level method (e.g., upload_file) that handles multipart internally for the common case",
+          "passed": true,
+          "evidence": "Storage.upload() method: 'Upload a file. Automatically picks single-put vs multipart.' Casual user example: storage.upload(\"huge_backup.tar.gz\", \"my-bucket\", \"backups/latest.tar.gz\")"
+        },
+        {
+          "text": "Preserves the existing low-level operations for power users who need granular control",
+          "passed": true,
+          "evidence": "Layer 1 section: 'Low-level client stays unchanged. This is your existing API. Don't touch it.' StorageClient with create_multipart_upload, upload_part, complete_multipart_upload, abort_multipart_upload, list_parts all preserved."
+        },
+        {
+          "text": "Shows how the simple method can be implemented using the low-level building blocks",
+          "passed": true,
+          "evidence": "_multipart_upload calls self._client.create_multipart_upload, self._client.upload_part, self._client.complete_multipart_upload, and self._client.abort_multipart_upload — all public StorageClient methods. 'Facade calls the same public primitives users would. No hidden internal API.'"
+        },
+        {
+          "text": "Explains the trade-off: convenience drives adoption, flexibility retains power users",
+          "passed": true,
+          "evidence": "Design principles table: 'Progressive disclosure — Simple use case = 1 method call. Complexity is available, never forced.' and 'Pit of success — The easy path (.upload()) automatically handles retries, parallelism, and abort-on-failure. The hard path (raw primitives) is opt-in.'"
         }
       ]
     }
@@ -70,22 +475,18 @@
   "run_summary": {
     "with_skill": {
       "pass_rate": {
-        "mean": 1.0,
-        "stddev": 0
+        "mean": 0.945,
+        "stddev": 0.123
       }
     },
     "without_skill": {
       "pass_rate": {
-        "mean": 1.0,
-        "stddev": 0
+        "mean": 0.783,
+        "stddev": 0.318
       }
     },
     "delta": {
-      "pass_rate": "+0.00"
+      "pass_rate": "+16%"
     }
-  },
-  "notes": [
-    "All 3 assertions pass in BOTH configs - non-discriminating. Baseline transferred REST principles (contract-not-mirror, defaults-on, layered escape hatch) cleanly to the socket question.",
-    "No discriminating assertion. Grader suggests socket-specific footguns (partial read/write loops, message framing) as a sharper test."
-  ]
+  }
 }

@@ -16,6 +16,8 @@ Skills that enforce a specific way of working — a multi-step procedure or disc
 | git-pr | Pull request creation: sizing, title conventions, and description writing | 7% | 53% | +47% | 2026-07-23 |
 | knowledge-base | Maintaining and writing to a persistent Obsidian-style cross-session knowledge graph | 47% | 100% | +53% | 2026-07-23 |
 | logging | Production logging discipline: structured logs, happy-path coverage, correlation IDs | 100% | 92% | -8% | 2026-07-23 |
+| orchestrator | Execute a planned epic end-to-end by dispatching coders and reviewers in autonomous waves | — | — | — | — |
+| planner | Decompose a well-understood effort into a typed, critic-reviewed task graph ready for execution | — | — | — | — |
 | pr-reviewer | Peer PR review pipeline producing tiered, courteous draft comments for GitHub | 40% | 100% | +60% | 2026-07-23 |
 | prd-to-stories | Decomposing behavioral PRDs into deliverable stories with specific acceptance criteria | 88% | 94% | +6% | 2026-07-23 |
 | prd-writing | Co-authoring behavioral product requirements documents through structured interview | 60% | 87% | +27% | 2026-07-23 |
@@ -34,7 +36,7 @@ Skills that supply frameworks and judgment for architectural or creative decisio
 | agent-post-training | Decision framework for when and how to fine-tune models for agent tasks | 51% | 89% | +38% | 2026-07-23 |
 | agent-self-evolution | Designing agents that accumulate experience and improve across sessions without retraining | 70% | 95% | +25% | 2026-07-23 |
 | agent-tool-design | Designing tool interfaces that LLMs can reliably discover, select, and invoke | 89% | 100% | +11% | 2026-07-23 |
-| api-design | REST and gRPC API conventions: resource modeling, naming, versioning, error handling | 100% | 100% | +0% | 2026-06-30 |
+| api-design | REST and gRPC API conventions: resource modeling, naming, versioning, error handling | 78% | 94% | +16% | 2026-09-09 |
 | application-architecture | Layering, domain modeling, and data access patterns for application-level structure | 25% | 100% | +75% | 2026-06-30 |
 | coding-agent-design | Building coding agents: toolset design, security model, workflow, and failure handling | 53% | 100% | +47% | 2026-07-23 |
 | concurrency-design | Choosing thread topology, concurrency units, and inter-component communication models | 67% | 93% | +27% | 2026-07-22 |
@@ -53,10 +55,10 @@ Skills that supply frameworks and judgment for architectural or creative decisio
 | nix-dendritic | Aspect-oriented flake-parts Nix configuration for multi-host, multi-platform setups | 49% | 90% | +41% | 2026-07-23 |
 | odin-design | Idiomatic Odin patterns, allocators, package structure, and LLM knowledge-gap corrections | 67% | 86% | +19% | 2026-07-23 |
 | odin-gamedev | Odin game architecture with Raylib/Sokol: entity management, hot reloading, game state | 71% | 89% | +18% | 2026-07-23 |
-| python-design | Python-specific design patterns, idioms, type choices, and anti-patterns | 80% | 100% | +20% | 2026-07-23 |
+| python-design | Python-specific design patterns, idioms, type choices, and anti-patterns | 71% | 98% | +27% | 2026-09-09 |
 | rag-design | Retrieval pipeline design: chunking, embeddings, hybrid retrieval, and structured indexes | 40% | 93% | +53% | 2026-07-23 |
 | rl-generalization | Designing RL training curricula that produce broad, transferable capability rather than narrow skills | 60% | 96% | +36% | 2026-08-18 |
-| software-design | Core software design principles: composition, minimal interfaces, and clean boundaries | 75% | 100% | +25% | 2026-06-30 |
+| software-design | Core software design principles: composition, minimal interfaces, and clean boundaries | 77% | 85% | +8% | 2026-09-09 |
 | test-design | Test quality tradeoffs using Kent Beck's Test Desiderata: behavior over structure | 67% | 100% | +33% | 2026-06-30 |
 
 ### Reference Skills

@@ -248,6 +248,18 @@ These are companion skills in the ai-agents family.
 
 ---
 
+## §5 Production-Scale RL Patterns
+
+For production-scale RL patterns from real deployments (100+ GPUs), see `references/ray-summit-2026-rl-patterns.md`. Key additions beyond the core skill:
+
+- **Async RL architectures**: fully async training loops with sample-level scheduling, bounded staleness buffers, and in-loop delta weight updates that eliminate train/inference bubbles (Miles, SkyRL, Microsoft AI RELAY tree for 32K workers)
+- **Token-level correctness**: Token-In Token-Out (TiToR) session servers and R3 (Rollout Routing Replay) prevent silent off-policy errors from tokenization drift and MoE router flips — the worst bugs never crash, they just quietly learn less
+- **Reward stress testing**: systematic verifier validation before scaling (fault injection, scorer isolation, best-of-N amplification tests, trajectory-level agent judges) — roughly half of injected code faults are invisible to existing test suites
+- **Topology-aware placement**: NVLink domain-aware actor placement (+20% throughput), NUMA binding (+10%), and RDMA weight sync via Ray Direct Transport achieving ~859 GB/s on NVLink
+- **Custom silicon portability**: TPU and Trainium both slot below Ray's worker interface with near-zero application code changes; GPU time-slicing can recover 40–60% of idle accelerator capacity
+
+---
+
 ## References
 
 | Reference | When to read |
@@ -255,3 +267,4 @@ These are companion skills in the ai-agents family.
 | `references/sft-methodology.md` | Loss masking mechanics, data preparation recipes, LoRA configuration details, format stabilization, prompt distillation |
 | `references/rl-training.md` | RLHF pipeline, PPO/GRPO/DPO mechanics, KL divergence design, Bradley-Terry reward model training, training stability |
 | `references/training-data-environment.md` | Simulation environment requirements, reward density engineering, multi-turn credit assignment, RLVP, on-policy distillation |
+| `references/ray-summit-2026-rl-patterns.md` | Async RL architectures, weight sync (RDMA/NIXL/RDT), token correctness (TiToR/R3), reward stress testing, topology-aware placement, custom silicon (TPU/Trainium), simulation-RL unification, GCS scaling at 3K+ GPUs |

@@ -64,7 +64,7 @@ FusedActor[fetch→decode→infer] (GPU) → Score/Fuse (CPU)
 ```
 
 **When to use**: The intermediate payload between stages is large (e.g.,
-decoded video frames at ~100MB per clip). Motive found this 2x faster than
+decoded video frames at ~100MB per clip). Motive found this faster than
 the modular approach because it eliminates serialization of heavy payloads
 across the object store boundary.
 
@@ -233,7 +233,7 @@ aggregate all shards into one `failure.parquet` with grouped error reasons.
 | **Iceberg** | Enterprise lakehouse, ACID upserts | Built-in Ray Data writer (fixed in recent versions); Unity Catalog integration in Ray Data |
 | **LeRobot** | Robotics episode data | `ray.data.read_lerobot()` groups episodes by shared video files for 15-135x fewer file opens |
 | **Delta Lake** | Versioned feature stores, time-travel queries | Polars + Delta Table for predicate pushdown; compaction jobs for read performance |
-| **S3/Object Store** | Raw blob storage | CoreWeave CAIOS: NVMe caching layer delivers 7GB/s per GPU; cache is global across nodes |
+| **S3/Object Store** | Raw blob storage | CoreWeave CAIOS: NVMe caching layer delivers ~120 GB/s aggregate reads across 46 CPU nodes |
 
 ### Key Storage Lessons
 - **Keep storage close to compute**: CoreWeave's integrated NVMe cache
@@ -260,7 +260,7 @@ recovery eliminated hundreds of lines of manual orchestration code.
 Uber's experience: Spark still has an edge for pure statistics aggregation
 (mean, stddev, quantiles) at extreme scale. Ray Data excels at the transform
 path — Uber achieved 19x less CPU time with 3x less memory for their
-700M-row feature transform pipeline vs Spark baseline. Consider hybrid:
+4.5B-row, 100TB+ feature transform pipeline vs Spark baseline. Consider hybrid:
 Spark for stats fitting, Ray Data for transforms.
 
 ### Actor-Only Future (v2.60+)

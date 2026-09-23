@@ -23,6 +23,7 @@ Skills that enforce a specific way of working — a multi-step procedure or disc
 | prd-writing | Co-authoring behavioral product requirements documents through structured interview | 60% | 87% | +27% | 2026-07-23 |
 | skill-creator | Creating, iterating, and benchmarking skills through eval-driven refinement | 33% | 27% | -7% | 2026-07-23 |
 | test-driven-development | Red-green-refactor TDD workflow: writing tests before implementation | 53% | 82% | +28% | 2026-07-23 |
+| wiki-hygiene | Scan the knowledge base for stale notes, orphans, and frontmatter inconsistencies | — | — | — | — |
 
 ### Design Skills
 
@@ -48,13 +49,16 @@ Skills that supply frameworks and judgment for architectural or creative decisio
 | game-performance | Systematic GPU/CPU/memory profiling and optimization methodology for games | 100% | 100% | +0% | 2026-06-30 |
 | game-visuals | Visual design principles for legibility, color hierarchy, and art direction in games | 33% | 100% | +67% | 2026-06-30 |
 | level-design | Combat arena and action game level design: spatial choice, legibility, encounter flow | 20% | 100% | +80% | 2026-07-23 |
+| llm-inference-serving | Production LLM inference: parallelism strategy, speculative decoding, KV cache management, serving architecture, and cost optimization | — | — | — | — |
 | love2d-fennel | Fennel + Love2D interactive development: REPL workflow, hot-reloading, mode architecture | 20% | 87% | +67% | 2026-07-23 |
+| ml-platform-architecture | ML platform architecture: maturity models, cluster topology, GPU admission control, migration frameworks, and platform engineering patterns for production ML | — | — | — | — |
 | ml-post-training | SFT and RL post-training mechanics: data pipelines, reward design, LoRA, debugging | 64% | 84% | +20% | 2026-07-23 |
 | multi-agent-collaboration | Designing multi-agent topologies, context sharing, handoff protocols, and failure modes | 47% | 93% | +47% | 2026-07-23 |
 | nix | NixOS, Home Manager, nix-darwin, flakes, devShells, and declarative system configuration | 62% | 70% | +9% | 2026-07-23 |
 | nix-dendritic | Aspect-oriented flake-parts Nix configuration for multi-host, multi-platform setups | 49% | 90% | +41% | 2026-07-23 |
 | odin-design | Idiomatic Odin patterns, allocators, package structure, and LLM knowledge-gap corrections | 67% | 86% | +19% | 2026-07-23 |
 | odin-gamedev | Odin game architecture with Raylib/Sokol: entity management, hot reloading, game state | 71% | 89% | +18% | 2026-07-23 |
+| physical-ai-systems | Data pipelines, inference patterns, and training optimization for AI systems operating in the physical world | — | — | — | — |
 | python-design | Python-specific design patterns, idioms, type choices, and anti-patterns | 71% | 98% | +27% | 2026-09-09 |
 | rag-design | Retrieval pipeline design: chunking, embeddings, hybrid retrieval, and structured indexes | 40% | 93% | +53% | 2026-07-23 |
 | rl-generalization | Designing RL training curricula that produce broad, transferable capability rather than narrow skills | 60% | 96% | +36% | 2026-08-18 |
@@ -84,6 +88,15 @@ Skills that provide domain facts and syntax the model already knows; they exist 
 | love2d | Love2D 11.x Lua development: callbacks, input, shaders, and game loop patterns | 60% | 87% | +27% | 2026-07-23 |
 | nix-packaging | Writing Nix derivations with stdenv and language-specific builders from scratch | 60% | 100% | +40% | 2026-07-23 |
 | promql | PromQL query syntax for Prometheus: rates, histograms, alerting, and capacity planning | 78% | 100% | +22% | 2026-07-23 |
+
+### Other Skills
+
+Skills not yet assigned to a section.
+
+| Skill | Summary | Baseline | With Skill | Δ | Last Run |
+|-------|---------|----------|-----------|---|----------|
+| ray-data-pipelines | Design patterns for building production Ray Data pipelines across CPU/GPU heterogeneous clusters | — | — | — | — |
+| ray-kubernetes-infrastructure | Production patterns for running Ray on Kubernetes with topology-aware scheduling, fault tolerance, and full-stack observability | — | — | — | — |
 
 [Detailed per-eval results →](evals/README.md)
 

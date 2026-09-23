@@ -50,7 +50,7 @@
 ### vLLM Leaderboard — Eagle + Kernel Fusion (DigitalOcean)
 [Cd-3H6XdAyE](https://www.youtube.com/watch?v=Cd-3H6XdAyE)
 
-- **Hardware:** B100 GPUs (50% more memory than B200 prior gen; 1.5× NVB4 compute).
+- **Hardware:** B100 GPUs (192 GB HBM3e; NVB4 quantization support).
 - **NVB4 quantization:** 1.8× less memory footprint. Less data movement → faster TPOT. Minimal accuracy loss (GPQ/diamond benchmarks).
 - **Kernel fusion:** Attention path has many small kernels (RMSNorm, RoPE, FP8 quant). Fused 33 kernel launches → 10. Eliminates repeated main memory round-trips; uses register/shared memory. 1.2× speedup. Also fused DeepSeek sparse attention (DSA) path.
 - **Programmatic dependent launch (PDL):** Overlap dependent kernel launches. Reduces kernel launch time in decode path.

@@ -79,7 +79,7 @@ Data Center
 
 | Fabric | Scope | Bandwidth (GB200) | Notes |
 |--------|-------|--------------------|-------|
-| NVLink (intra-rack) | Within NVLink domain | 1.8 TB/s | NVSwitch on back of rack |
+| NVLink (intra-rack) | Within NVLink domain | High bandwidth (TB/s class) | NVSwitch on back of rack |
 | InfiniBand / RoCE (inter-rack) | Across racks | 400 GB/s (GB200), 800 GB/s (GB300) | Hierarchical; within-scale-unit faster than cross |
 | Front-end Ethernet | Storage, SSH, management | Varies | Congestion risk if workloads are front-end heavy |
 | TPU ICI | Within TPU slice | Dedicated optical | 2D/3D torus mesh; slice is indivisible |
@@ -184,7 +184,7 @@ if info is not None:
 ```
 
 - GKE TPU: ~30 seconds warning
-- AWS spot: ~420 seconds warning
+- AWS spot: ~120 seconds warning
 - Qwen3-8B on 4× H100 spot: JIT checkpointing reduced recomputed steps from 672 → 4 (100× less waste), 60% cheaper than on-demand (vs 50% with periodic-only checkpointing)
 
 ### NCCL Hang Detection (Ray Train, coming soon)
@@ -285,7 +285,7 @@ NVIDIA Exemplar status validates top performance across model families.
 - NVLink domain = full rack (NVL72); roadmap to NVL576 (8 racks)
 - NVLink Sharp: AllReduce offloaded to switch ASICs
 - Fault tolerance: node-level (spare in rack) vs rack-level (spare rack)
-- Each compute tray: 4 Blackwell Ultra GPUs + 2 ARM Grace CPUs + 4 ConnectX-8 NICs (ConnectX-7 for GB300)
+- Each compute tray: 4 Blackwell Ultra GPUs + 2 ARM Grace CPUs + ConnectX NICs
 
 ### TPU Key Facts
 - Slices: indivisible hardware units; chips connected via ICI (optical 2D/3D torus)

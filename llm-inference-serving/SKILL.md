@@ -153,8 +153,8 @@ Agentic workloads generate 10–15× more tokens than single-turn chat. Each ite
 
 | Hardware | Sweet spot | Key property |
 |---|---|---|
-| **B200 (single node, 8 GPU)** | TP8 serving; moderate MoE models | 288 GB HBM; 1.5× NVB4 compute vs. prior gen |
+| **B200 (single node, 8 GPU)** | TP8 serving; moderate MoE models | 192 GB HBM3e per GPU; NVB4 quantization support |
 | **GB300 NVL72 (rack)** | Frontier MoE (DeepSeek V4, Qwen 3.8, Kimi K3) | 72 GPUs, 130 TB/s all-to-all NVLink; 20× agentic perf vs. Hopper |
-| **Vera Rubin (pod)** | Next-gen; 7 chip types including Groq LPX for low-latency decode | 30× over Blackwell on agentic benchmarks (silicon) |
+| **Vera Rubin (pod)** | Next-gen rack-scale platform | Expected ~30× improvement over Hopper on agentic benchmarks (roadmap) |
 | **Intel Xeon (CPU)** | SLM inference (<20B); tool execution; agentic orchestration | Day-zero vLLM/SGLang support; 1.44× user density with head-node SLMs |
 | **Google TPU v7x / 8i** | High memory bandwidth; MoE-optimized SRAM | First-class Ray support via CubeRay TPU webhook |

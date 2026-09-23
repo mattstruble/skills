@@ -26,7 +26,7 @@ Platforms evolve through predictable stages. Skipping stages creates debt; over-
 | **5. Unified ecosystem** | Single control plane across clouds/on-prem, automated workload placement | — |
 
 **Real-world progression timelines:**
-- Recursion: ad-hoc scripts → prefect + K8s jobs → Ray + Anyscale (~1 year migration)
+- Recursion: legacy K8s orchestrator + Prefect Cloud → Ray + Anyscale (~1 year migration)
 - Discord: organic Ray adoption → self-managed KubeRay → Anyscale managed (platform 2.0)
 - Coinbase: SageMaker → self-managed Ray on EKS → Anyscale managed (~18 months total)
 - Capital One: fragmented siloed tools → unified KubeRay ecosystem
@@ -95,7 +95,7 @@ GPUs are the scarcest resource. Without admission control, teams either hoard or
 
 - Define priority classes: `production` > `staging` > `experiment`
 - Use Kueue's preemption policies to evict lower-priority workloads when capacity is needed
-- Robinhood: spot instances for validation workers; scale to zero when not in use
+- Robinhood: exploring spot instances for validation workers (planned); scale to zero when not in use
 
 ### Cost Control Patterns
 
@@ -152,7 +152,7 @@ A golden path is the supported, paved route to production. Make it so easy that 
 
 **Lila Sciences model:**
 - **Green path (on-platform):** Straight shot — platform handles security, GPU quotas, observability, reproducibility
-- **Purple path (custom):** Still reaches compute, but requires more securitous route through security boundary
+- **Purple path (custom):** Still reaches compute, but requires a more circuitous route through security boundary
 - **Red path (off-platform):** Hits security boundary and gets blocked
 
 **Implementation patterns:**
@@ -170,7 +170,7 @@ A golden path is the supported, paved route to production. Make it so easy that 
 
 | Investment | Impact | Example |
 |---|---|---|
-| **Internal CLI** | Eliminates auth chain breakage, surfaces job status | Lila's Chariot, Discord's X-ray |
+| **Internal CLI** | Eliminates auth chain breakage, surfaces job status | Lila's Chariot |
 | **Training recipes** | Battle-tested defaults for attention, FSDP, masking | Spotify Hendrix recipes |
 | **Template-based generation** | Reduces hallucination in AI-assisted config generation | Anyscale Agent Skills |
 | **Composable workflows** | Swap training cores without changing infra | Spotify's routing layer over Ray Torch Trainer |

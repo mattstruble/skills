@@ -1,254 +1,138 @@
 ---
 name: "orchestrator"
-summary: "Execute a planned epic end-to-end by dispatching coders and reviewers in autonomous waves"
+summary: "Execute a planned beads epic in waves: coders and reviewers in worktrees via a workflow script, integration branch, audits, signed landing"
 type: "process"
-description: "Load when the user wants to execute a planned epic — when they say 'orchestrate', 'execute this epic', 'run the tasks', 'dispatch the work', 'kick off the epic', or 'run the plan'. Also load when the frontier of a beads epic is ready and the user wants autonomous execution. NOT for planning (see planner), NOT for brainstorming (see brainstorm), NOT for code review of a single PR. Requires dispatch tool access — do not invoke if dispatch is unavailable."
+description: "Load when the user wants to execute a planned epic — when they say 'orchestrate', 'execute this epic', 'run the tasks', 'kick off the epic', or 'run the plan'. Also load when the frontier of a beads epic is ready and the user wants autonomous execution. NOT for planning (see planner), NOT for brainstorming (see brainstorm), NOT for code review of a single PR. Requires the `workflow` tool (pi-dynamic-workflows) — stop if it is unavailable."
 ---
 
 # Orchestrator
 
-Execute a planned beads epic to completion by autonomously dispatching coders and
-reviewers in waves. The orchestrator drives the work from the first ready task to
-the last closed task without pausing between waves.
-
-The orchestrator executes. It does not plan, write code, or review diffs itself.
-Every deliverable comes from dispatched subagents. The orchestrator's only tools
-are bd commands and dispatch.
-
-> **Requires dispatch tool access.** If dispatch is unavailable in this session,
-> stop immediately and tell the user — this skill cannot function without it.
+Drive a beads epic from its first ready ticket to a presented, audited branch. Coders and reviewers run as
+subagents inside a workflow script; you own beads, git integration, verification, and governance.
 
 <HARD-GATE>
-Do NOT implement code, write files, or edit files directly. Do NOT use write or
-edit tools for any purpose other than bd commands. ALL implementation is
-dispatched to coder subagents. ALL review is dispatched to reviewer subagents.
-Bash is permitted only for bd commands. Violating this gate corrupts the
-review-gate model and produces unreviewed deliverables.
+Never edit, write, or create files yourself — every change comes from a coder in its own worktree. Bash is for
+`bd`, the git integration commands below, and verification commands from tickets. Never push. `git commit`,
+`git reset`, and the final landing cherry-pick go through the user's permission prompts; do not work around them.
 </HARD-GATE>
 
----
+## Layout
 
-## Invocation
+| Thing | Where |
+|---|---|
+| Integration worktree | `<repo>/.pi/worktrees/epic-<epic-id>` on branch `pi/epic/<epic-id>` |
+| Task worktree | `<repo>/.pi/worktrees/<task-id>` on branch `pi/wf/<task-id>`, cut from `pi/epic/<epic-id>` |
+| Wave script | `references/wave.js` — pass its full text as the `workflow` tool's `script`, tasks in `args` |
+| Audit script | `references/audit.js` — same, once at the end |
+| Agent profiles | `coder`, `correctness-reviewer`, `failure-path-reviewer`, `readability-reviewer`, `security-reviewer`, `ticket-auditor`, `epic-auditor` |
 
-The orchestrator takes a single input: **an epic ID**.
+`<repo>` is the user's checkout (`git rev-parse --show-toplevel`). Never touch its working tree or branch until landing.
+Pass **absolute** paths (`<repo>/.pi/worktrees/...`) as `worktreePath` / `integrationPath`; agent `cwd` must be absolute.
+Run both scripts with `background: false` so the result returns in the same turn.
+Always write beads notes with `--append-notes` (`--notes` refuses to overwrite existing notes).
 
-Before entering the state machine:
+## 1. Start
 
-1. **Confirm the epic exists**: `bd ready --parent '<epic-id>'`
-2. **Confirm it has children**: if the command returns no tasks, report "Empty
-   frontier — no ready tasks under `<epic-id>`. Nothing to execute." and stop.
-3. **Empty frontier at start is a hard stop.** Either the epic has no children,
-   all children are blocked, or all children are already closed. Report the exact
-   state and stop — do not guess at work to create.
+1. `bd show <epic-id>`: the description must link a plan or design note. If none, warn the user once and continue —
+   the epic audit then judges against the description and tickets only.
+2. If `<repo>/.pi/worktrees/epic-<epic-id>` exists, you are resuming: read `BASE` from the epic notes, run **Resume**
+   below, then continue with the waves (or straight to Audit if nothing is runnable).
+3. Otherwise `bd ready --parent <epic-id>`. Empty frontier: report the state (no children, all blocked, all closed) and stop.
+4. Record `BASE=$(git rev-parse HEAD)` of the user's branch, create the integration worktree
+   `cd <repo> && git worktree add -b pi/epic/<epic-id> .pi/worktrees/epic-<epic-id> HEAD`, and
+   `bd update <epic-id> --append-notes "orchestrator base=<BASE>"`.
+5. Submodule paths, once: `git config -f <repo>/.gitmodules --get-regexp '\.path$'` (missing file = none).
 
----
+## 2. Each wave
 
-## State Machine
+1. **Candidates:** `bd ready --parent <epic-id>` plus any tickets Resume returned to the queue, minus the set-aside list. Set aside `[human-task]`,
+   `[research]`, `[brainstorming]`, `[prototype]` tickets.
+2. **Submodule filter:** tickets naming paths inside a submodule (from Start step 5) are set aside, once:
+   `bd update <id> --append-notes "edits submodule <path>; run in the main checkout"`.
+   Set-aside tickets stay in the list for the presentation and are never re-noted.
+   **No runnable candidates left → go to Audit.**
+3. **File conflicts:** two candidates naming the same file go in different waves (keep the first).
+4. **Claim** each candidate (`bd update <id> --claim`); skip any that fail.
+5. **Commit message:** write one conventional-commit subject per ticket from its title and intent (git-commit skill rules:
+   type(scope): imperative, lowercase, < 72 chars, no ticket IDs).
+6. **Worktrees:** for each ticket,
+   `cd <repo> && git worktree add -B pi/wf/<task-id> .pi/worktrees/<task-id> pi/epic/<epic-id>` (`-B` resets a branch
+   left by an earlier attempt); note the integration head SHA as that task's `base`.
+7. **Run the wave:** `bd update <id> --append-notes "wave started: <commitMessage>"` for each ticket, then
+   `workflow({ script: <references/wave.js>, background: false, args: { tasks: [{ id, title, description, acceptance,
+   commitMessage, verify, worktreePath, branch, base }] } })`. `verify` is the command from the acceptance criteria
+   (tests/build), or empty. For integration retries, append the previous failure output to `description`.
+   A `null` entry in `results` (that task's agent call failed outright) maps back to its task by index: treat it as stuck.
+8. **Integrate** each `pass` result, one at a time, in the integration worktree:
+   - `git log --oneline <base>..pi/wf/<task-id>` must show exactly one commit; otherwise it is an integration failure
+     ("expected one commit, found N").
+   - `cd <integration> && git -c commit.gpgsign=false cherry-pick pi/wf/<task-id>`, then the ticket's verification command.
+   - **Conflict:** `git cherry-pick --abort`. **Verification fails:** `git reset --keep HEAD~1` (prompts the user).
+   - **Integration failure:** if the ticket's notes already contain `integration retry`, it is stuck (step 9).
+     Otherwise `bd update <id> --status open --append-notes "integration retry 1: <reason>"` — it comes back in the
+     next wave from the new integration head, with the reason added to its description.
+   - Success: `bd close <id> --reason "<one line: what landed, reviews passed>"` and
+     `bd update <epic-id> --append-notes "landed <id>"` (the audit covers only landed tickets).
+9. **Stuck** (`verdict: "stuck"` or a second integration failure):
+   `bd update <id> --append-notes "stuck: <blocking findings or failure summary>"`. Do not close; leave it in progress
+   and add it to the set-aside list. Only its dependents wait on it.
+10. **Clean up** each task worktree: `git worktree remove --force <repo>/.pi/worktrees/<task-id>` (untracked build output is
+    expected; the branch keeps the commit until landing).
+11. Loop. No pauses or check-ins between waves.
 
-The orchestrator runs this loop until the frontier is empty.
+**Stop early only for:** infrastructure failure (`workflow` tool missing, bd/git errors), all remaining tickets stuck or
+blocked, or acceptance criteria no reviewer can judge — flag that ticket and continue the rest.
 
-**Stop only for:**
-- All remaining open tasks are stuck (nothing dispatchable)
-- Infrastructure failure (dispatch tool unavailable, bd command errors)
-- Ambiguous acceptance criteria that no reviewer can adjudicate without human
-  judgment — in this case, flag the specific task and continue the rest
+**Resume** (integration worktree already exists):
+1. **Live waves:** if any task worktrees exist under `<repo>/.pi/worktrees/` (other than `epic-*`), ask the user once
+   whether another session is still running a wave for this epic. Yes → stop. No → remove them all with
+   `git worktree remove --force` (a crash left them).
+2. **Set-aside list:** rebuild it from notes — tickets whose notes contain `stuck:` or `edits submodule` stay set aside
+   and are not noted again.
+3. **Landed:** an in-progress ticket whose `wave started: <subject>` note is in `git log --format=%s <BASE>..pi/epic/<epic-id>`,
+   or whose commit `git cherry pi/epic/<epic-id> pi/wf/<task-id>` marks `-`, already landed → `bd close` it and note
+   `landed <id>` on the epic. The ticket audit re-runs its verification.
+4. **Everything else in progress** returns to the candidate queue (`-B` resets its branch). Coder threads are not
+   journaled, so `resumeFromRunId` gains nothing here.
 
-### Step 1 — Identify the Wave
+## 3. Audit (every run)
 
-```bash
-bd ready --parent '<epic-id>'
-```
+`workflow({ script: <references/audit.js>, args: { integrationPath, base: BASE, tickets: [closed tickets: { id, title,
+acceptance, verify }], epic: { id, description, planPath } } })` — tickets = those noted `landed <id>` on the epic.
 
-Collect every task returned. These are the **candidates** for this wave —
-unblocked tasks ready to dispatch.
+- A ticket `not-met`: reopen it (`bd update <id> --status open --append-notes "audit: <evidence>"`). Report it; do not re-run.
+- A ticket `unknown` or `epic: null`: the auditor produced no verdict — report it as unaudited; never reopen for it.
+- Epic `missing` / `outOfScope` / `contradicted`: report; never auto-fix.
 
-If no candidates are returned and the epic has open tasks, those tasks are either
-blocked or stuck. Report the state and stop — do not force-dispatch blocked work.
+## 4. Present and land
 
----
-
-### Step 2 — File Conflict Check
-
-Before dispatching, check whether two or more candidates name the same file in
-their descriptions or acceptance criteria.
-
-- Extract file paths mentioned in each candidate's title, description, and
-  acceptance criteria.
-- If two or more candidates reference the **same file**:
-  - **Merge**: combine them into a single coder dispatch with a unified prompt
-    covering both changes — claim all merged task IDs before dispatching; if any claim fails, fall back to the sequencing strategy, OR
-  - **Sequence**: dispatch only the first candidate this wave; the second
-    dispatches after the first closes.
-- The goal is zero concurrent writers to the same file. Parallel coders on
-  different files are safe.
-
-Document the merge/sequencing decision in the dispatch prompt so the coder
-understands the combined scope.
-
----
-
-### Step 3 — Dispatch Coders (max 3 parallel)
-
-Dispatch up to 3 coders simultaneously. Do not dispatch more than 3 coders in
-a single call regardless of wave size — save remaining candidates for the next
-wave.
-
-**Before dispatching each coder, claim the task:**
-```bash
-bd update '<task-id>' --claim
-```
-If the claim fails (already claimed by another session), skip that task and
-proceed to the next candidate. Do not dispatch a coder for an unclaimed task.
-
-Each coder dispatch:
-- **worktree**: `true`
-- **allowTreeMutation**: `true`
-- **Prompt**: load `references/coder-prompt.md` and use it as the system prompt.
-  Pass the task ID and full task description (title, description, acceptance
-  criteria, design notes) as the user message.
-
-**If a coder dispatch returns an error, timeout, or crash**, mark the task stuck
-immediately:
-```bash
-bd update '<task-id>' --note 'coder dispatch failed: <error>'
-```
-Continue dispatching any remaining coders in the wave. Include the stuck task in
-the completion report.
-
----
-
-### Step 4 — Dispatch Reviewers
-
-When a coder completes, immediately dispatch **4 reviewers** for that task.
-
-Each reviewer dispatch:
-- **Prompt**: load `references/reviewer-prompt.md` and use it as the system
-  prompt. Pass the task ID, acceptance criteria, and the coder's full output
-  diff/summary as the user message.
-- Reviewers operate independently — dispatch all 4 in parallel.
-- **Reviewers do not write to beads.** Their findings return to the orchestrator
-  via the dispatch result payload. The orchestrator owns all beads writes.
-
-If dispatch capacity is tight (approaching the 8-task limit per call), split
-reviewer dispatches across multiple calls rather than reducing reviewer count.
-Always dispatch all 4 reviewers.
-
-**If a reviewer fails to return (timeout, error):**
-1. Re-dispatch that single reviewer once.
-2. If it fails a second time, proceed without it — **3-of-4 all-LGTM is
-   sufficient to close** when the 4th reviewer is unresponsive. Treat the
-   missing result as a non-blocking finding in the completion report.
-
----
-
-### Step 5 — Review Loop
-
-Collect all 4 reviewer results for a task. Two outcomes:
-
-#### All 4 LGTM
-
-```bash
-bd close '<task-id>' --reason 'All reviewers passed.'
-```
-
-Proceed to the next wave.
-
-#### One or More Findings
-
-Retry path — max **2 retries** per task.
-
-**Retry dispatch:**
-- Re-dispatch the coder with **only the current-cycle findings** from reviewers
-  that had findings. Do NOT relay findings from prior cycles — they are stale
-  and may no longer apply to the current diff.
-- Construct the retry prompt: current diff + current-cycle non-LGTM reviewer
-  output only.
-
-**Targeted re-review:**
-- After the retry coder completes, dispatch **only the reviewers that had
-  findings** in the prior cycle (not the full set of 4).
-- If all targeted reviewers pass: run a **final full validation** — dispatch all
-  4 reviewers one more time against the final diff. This confirms no regression
-  in previously-passing reviewers.
-- If the final full validation passes: close the task. Apply the same 3-of-4 quorum rule as Step 4 — if the 4th reviewer is unresponsive after one re-dispatch, 3-of-4 passing is sufficient to close.
-- If any reviewer fails the final full validation: that counts as a retry.
-
-**Stuck condition:**
-- After 2 retries without a passing full validation, mark the task stuck:
-  ```bash
-  bd update '<task-id>' --note 'Stuck after 2 retries. Last findings: <summary>'
-  ```
-- Do not close the task. Continue to the next wave — stuck tasks do not block
-  the rest of the epic.
-
----
-
-### Step 6 — Next Wave
-
-After all dispatched coders in the current wave have been reviewed and closed
-(or marked stuck), re-query the frontier and loop:
-
-```bash
-bd ready --parent '<epic-id>'
-```
-
-Return to Step 1. Do not pause between waves. Do not ask the user for permission
-or summarize mid-execution. Continue until a stop condition is reached or the
-frontier is empty.
-
----
-
-## Autonomy Contract
-
-Do not pause between waves. Do not ask for permission. Stop only for:
-- All remaining open tasks are stuck (nothing dispatchable)
-- Infrastructure failure (dispatch tool unavailable, bd command errors)
-- Ambiguous acceptance criteria that no reviewer can adjudicate without human
-  judgment — flag the specific task and continue the rest
-
-If a stop condition is hit partway through:
-1. Report the exact state: which tasks closed, which are stuck, which are blocked.
-2. Quote the stop reason precisely.
-3. Propose the next human action (e.g., resolve the ambiguous criteria, then
-   re-invoke the orchestrator with the same epic ID — it will pick up from the
-   remaining frontier).
-
----
-
-## Completion Report
-
-When `bd ready --parent '<epic-id>'` returns empty and no tasks are in-flight,
-the epic is done. Report:
+Present, then stop and wait:
 
 ```
-Epic <epic-id> complete.
+Epic <id> — <N> waves
 
-Waves: <N>
-Closed: <list of task IDs and titles>
-Stuck:  <list of task IDs with last-cycle finding summaries>
-Blocked (never reached): <list of task IDs that remained blocked throughout>
+| Commit | Ticket | Title | Reviews | Verification | Audit |
+|---|---|---|---|---|---|
+| <sha> | <id> | <title> | pass (retries: n; missing: reviewer?) | pass | met / not-met / unknown |
+
+Stuck: <id — last blocking findings>
+Set aside: <id — submodule path / human task>
+Epic audit: missing [...], out of scope [...], contradicted [...]
+
+git log --stat <BASE>..pi/epic/<epic-id>
 ```
 
-If there are stuck or blocked tasks, recommend the next action (human review,
-criteria clarification, or re-invoking the orchestrator after resolution).
+On the user's go-ahead, land on their active branch with signing (one signature prompt per commit):
+`cd <repo> && git cherry-pick <BASE>..pi/epic/<epic-id>`. If it stops on a conflict (their branch moved since `BASE`),
+stop and report the commit; the user resolves (`git cherry-pick --continue`) or aborts. Never resolve it yourself.
+Then clean up: `git worktree remove --force <repo>/.pi/worktrees/epic-<epic-id>`, `git branch -D pi/epic/<epic-id>` and each
+landed `pi/wf/<task-id>`. List the branches left behind (stuck, set aside). If they decline, leave everything in place.
 
----
+## Rules
 
-## Key Implementation Notes
-
-- **Dispatch cap is 8 tasks per call.** Reviewer dispatches (Step 4) consume
-  capacity alongside coder dispatches. Plan accordingly — 3 coders + 4 reviewers
-  per coder fits only when split across sequential calls.
-- **Single-quote all bd arguments** to prevent shell interpolation of `$`,
-  backticks, or `"` in task titles and descriptions.
-- **Findings relay is cycle-scoped.** Each retry coder sees only the findings
-  from the immediately preceding review cycle. Prior-cycle findings are dropped —
-  they describe a diff that no longer exists.
-- **Reviewer count is fixed at 4.** Never reduce to 3 or fewer, even under time
-  pressure. The review-gate model depends on the quorum.
-- **Worktrees are required for coders.** Set `worktree: true` and
-  `allowTreeMutation: true` on every coder dispatch. This prevents concurrent
-  coders from colliding on the main working tree.
-- **Coder and reviewer prompts live in `references/`**, not inline. Always load
-  from `references/coder-prompt.md` and `references/reviewer-prompt.md` at
-  dispatch time so prompt updates take effect without modifying this skill.
+- **Never run the `pi` binary** and never tell a subagent to.
+- **Children are hermetic:** no MCP, codemode, web tools, or user extensions; they do have the skills catalog. Put
+  everything a coder needs in the ticket text.
+- **Findings severity:** `critical` and `important` block and trigger a retry (max 2, inside `wave.js`); `suggestion`
+  never blocks — list them in the presentation.
+- **Commit messages** describe the change, never the process ("address review findings").

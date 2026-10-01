@@ -22,13 +22,14 @@ Never edit, write, or create files yourself — every change comes from a coder 
 |---|---|
 | Integration worktree | `<repo>/.pi/worktrees/epic-<epic-id>` on branch `pi/epic/<epic-id>` |
 | Task worktree | `<repo>/.pi/worktrees/<task-id>` on branch `pi/wf/<task-id>`, cut from `pi/epic/<epic-id>` |
-| Wave script | `references/wave.js` — pass its full text as the `workflow` tool's `script`, tasks in `args` |
-| Audit script | `references/audit.js` — same, once at the end |
+| Wave script | saved workflow `orchestrator_wave` (source: `references/wave.js`) |
+| Audit script | saved workflow `orchestrator_audit` (source: `references/audit.js`) |
 | Agent profiles | `coder`, `correctness-reviewer`, `failure-path-reviewer`, `readability-reviewer`, `security-reviewer`, `ticket-auditor`, `epic-auditor` |
 
 `<repo>` is the user's checkout (`git rev-parse --show-toplevel`). Never touch its working tree or branch until landing.
 Pass **absolute** paths (`<repo>/.pi/worktrees/...`) as `worktreePath` / `integrationPath`; agent `cwd` must be absolute.
-Run both scripts with `background: false` so the result returns in the same turn.
+Run both with `workflow({ name: "orchestrator_wave" | "orchestrator_audit", background: false, args })` so the result
+returns in the same turn. If the saved workflow is missing, pass the reference file's full text as `script` instead.
 Always write beads notes with `--append-notes` (`--notes` refuses to overwrite existing notes).
 
 ## 1. Start
@@ -60,7 +61,7 @@ Always write beads notes with `--append-notes` (`--notes` refuses to overwrite e
    `cd <repo> && git worktree add -B pi/wf/<task-id> .pi/worktrees/<task-id> pi/epic/<epic-id>` (`-B` resets a branch
    left by an earlier attempt); note the integration head SHA as that task's `base`.
 7. **Run the wave:** `bd update <id> --append-notes "wave started: <commitMessage>"` for each ticket, then
-   `workflow({ script: <references/wave.js>, background: false, args: { tasks: [{ id, title, description, acceptance,
+   `workflow({ name: "orchestrator_wave", background: false, args: { tasks: [{ id, title, description, acceptance,
    commitMessage, verify, worktreePath, branch, base }] } })`. `verify` is the command from the acceptance criteria
    (tests/build), or empty. For integration retries, append the previous failure output to `description`.
    A `null` entry in `results` (that task's agent call failed outright) maps back to its task by index: treat it as stuck.
@@ -98,7 +99,7 @@ blocked, or acceptance criteria no reviewer can judge — flag that ticket and c
 
 ## 3. Audit (every run)
 
-`workflow({ script: <references/audit.js>, args: { integrationPath, base: BASE, tickets: [closed tickets: { id, title,
+`workflow({ name: "orchestrator_audit", background: false, args: { integrationPath, base: BASE, tickets: [closed tickets: { id, title,
 acceptance, verify }], epic: { id, description, planPath } } })` — tickets = those noted `landed <id>` on the epic.
 
 - A ticket `not-met`: reopen it (`bd update <id> --status open --append-notes "audit: <evidence>"`). Report it; do not re-run.
@@ -126,8 +127,9 @@ git log --stat <BASE>..pi/epic/<epic-id>
 On the user's go-ahead, land on their active branch with signing (one signature prompt per commit):
 `cd <repo> && git cherry-pick <BASE>..pi/epic/<epic-id>`. If it stops on a conflict (their branch moved since `BASE`),
 stop and report the commit; the user resolves (`git cherry-pick --continue`) or aborts. Never resolve it yourself.
-Then clean up: `git worktree remove --force <repo>/.pi/worktrees/epic-<epic-id>`, `git branch -D pi/epic/<epic-id>` and each
-landed `pi/wf/<task-id>`. List the branches left behind (stuck, set aside). If they decline, leave everything in place.
+Then clean up: `git worktree remove --force <repo>/.pi/worktrees/epic-<epic-id>`, then `git branch -D pi/epic/<epic-id>` and
+`git branch -D pi/wf/<task-id>` for each landed ticket — one branch per command (multi-branch deletes prompt).
+List the branches left behind (stuck, set aside). If they decline, leave everything in place.
 
 ## Rules
 

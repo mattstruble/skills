@@ -29,7 +29,8 @@ Never edit, write, or create files yourself — every change comes from a coder 
 `<repo>` is the user's checkout (`git rev-parse --show-toplevel`). Never touch its working tree or branch until landing.
 Pass **absolute** paths (`<repo>/.pi/worktrees/...`) as `worktreePath` / `integrationPath`; agent `cwd` must be absolute.
 Run both with `workflow({ name: "orchestrator_wave" | "orchestrator_audit", background: false, args })` so the result
-returns in the same turn. If the saved workflow is missing, pass the reference file's full text as `script` instead.
+returns in the same turn. Call `workflow` directly as a tool, never from codemode: nested calls hide the
+workflow progress panel (guardrails blocks them). If the saved workflow is missing, pass the reference file's full text as `script` instead.
 Always write beads notes with `--append-notes` (`--notes` refuses to overwrite existing notes).
 
 ## 1. Start

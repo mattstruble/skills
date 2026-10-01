@@ -134,7 +134,7 @@ writing. After creating the map, add it to `INDEX.md` under **Active Plans**.
 
 ### 3. Create the Epic and Frontier Tickets
 
-Create a beads epic for the effort, then populate the frontier — the set of
+Create a beads epic for the effort whose description links the map note (see Beads Conventions), then populate the frontier — the set of
 tickets that can be worked right now without resolving fog first.
 
 Frontier tickets are the work visible from here: research, design sessions, and
@@ -300,6 +300,10 @@ until you hear an explicit yes.
 ---
 
 ## Beads Conventions
+
+- **Every epic description links its plan**: the wiki plan map (Foggy Path) or the
+  design/decision note from brainstorm (Simple Path), e.g. `Plan: ~/llm-wiki/plans/<effort>.md`.
+  The orchestrator audits the finished epic against that document and warns when it is missing.
 
 - Use **single quotes** around titles in `bd create` commands (e.g.
   `bd create '[type] title' --parent <id>`) to prevent shell interpolation of

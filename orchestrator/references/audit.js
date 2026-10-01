@@ -37,7 +37,7 @@ const ticketResults = await parallel(
         `Acceptance criteria:\n${t.acceptance}`,
         t.verify ? `Verification command: ${t.verify}` : "Verification command: (none given)",
       ].join("\n\n"),
-      { agentType: "ticket-auditor", cwd: integrationPath, tier: "medium", schema: ticketSchema, label: `ticket-audit:${t.id}` },
+      { agentType: "ticket-auditor", cwd: integrationPath, tier: "ticket-auditor", schema: ticketSchema, label: `ticket-audit:${t.id}` },
     ).catch(() => null),
   ),
 );
@@ -50,7 +50,7 @@ const epicResult = await agent(
     epic.planPath ? `Plan document: ${epic.planPath}` : "No plan document is linked; audit against the epic description and tickets only.",
     `Tickets:\n${tickets.map((t) => `- ${t.id}: ${t.title}`).join("\n")}`,
   ].join("\n\n"),
-  { agentType: "epic-auditor", cwd: integrationPath, tier: "big", schema: epicSchema, label: `epic-audit:${epic.id}` },
+  { agentType: "epic-auditor", cwd: integrationPath, tier: "epic-auditor", schema: epicSchema, label: `epic-audit:${epic.id}` },
 ).catch(() => null);
 
 // null = the auditor produced no verdict: missing coverage, never a negative finding.

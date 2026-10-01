@@ -60,7 +60,7 @@ async function reviewAll(t, report, pass) {
     agent(reviewPrompt(t, report, pass), {
       agentType: reviewer,
       cwd: t.worktreePath,
-      tier: "medium",
+      tier: reviewer, // role-named tier from the host's model map
       schema: verdictSchema,
       phase: "Review",
       label: `${reviewer}:${t.id}:p${pass}`,
@@ -79,7 +79,7 @@ async function reviewAll(t, report, pass) {
 
 async function runTask(t) {
   const coder = (prompt, label) =>
-    agent(prompt, { agentType: "coder", cwd: t.worktreePath, thread: t.id, tier: "medium", phase: "Code", label });
+    agent(prompt, { agentType: "coder", cwd: t.worktreePath, thread: t.id, tier: "coder", phase: "Code", label });
 
   let report = await coder(coderPrompt(t), `coder:${t.id}`);
   let review = await reviewAll(t, report, 1);

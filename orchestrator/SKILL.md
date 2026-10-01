@@ -51,7 +51,8 @@ Always write beads notes with `--append-notes` (`--notes` refuses to overwrite e
    `bd update <id> --append-notes "edits submodule <path>; run in the main checkout"`.
    Set-aside tickets stay in the list for the presentation and are never re-noted.
    **No runnable candidates left → go to Audit.**
-3. **File conflicts:** two candidates naming the same file go in different waves (keep the first).
+3. **File conflicts:** two candidates naming the same file go in different waves (keep the first). Tickets back for an
+   integration retry run at most one per wave: they already collided once, and siblings retried together collide again.
 4. **Claim** each candidate (`bd update <id> --claim`); skip any that fail.
 5. **Commit message:** write one conventional-commit subject per ticket from its title and intent (git-commit skill rules:
    type(scope): imperative, lowercase, < 72 chars, no ticket IDs).

@@ -1,0 +1,102 @@
+[
+  {
+    "query": "commit my changes in the auth module",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "can you amend the last one, I forgot a file",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "git add the new migration and wrap it up",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "stage only the changes in src/api/client.py",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "unstage the lockfile please",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "git push this when it's ready",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "split my working tree into a few logical commit groups",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "write a commit message for the parser refactor",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "please commit everything under docs/",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "I need to amend and fix the typo in the title",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "rebase my branch onto main",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "cherry-pick abc123 into the release branch",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "resolve the merge conflict in setup.py",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "show me the git log for utils/io.py",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "revert the deploy script change",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "create a new branch for the billing work",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "squash the last three into one",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "what does git blame say about line 40",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "configure my git user email",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "explain how the cache layer works",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  }
+]

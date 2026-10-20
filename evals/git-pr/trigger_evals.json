@@ -1,0 +1,102 @@
+[
+  {
+    "query": "open a PR for the feature branch",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "create a pull request against main",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "write a pull request description for my changes",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "gh pr create with a good title",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "please create the PR for infra-tools",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "open the PR once tests are green",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "can you open a draft pr for this",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "submit a pull request for the cleanup",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "use gh pr to publish this branch",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "create a PR titled fix flaky upload test",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "merge the feature branch into main",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "rebase onto origin/main",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "what's the status of the build",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "write a changelog entry for v2.1",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "delete the stale local branches",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "explain this stack trace from the worker",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "add retries to the http client",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "list my open issues",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "summarize the sprint notes",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "bump the version in pyproject.toml",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  }
+]

@@ -1,0 +1,102 @@
+[
+  {
+    "query": "how do I set up a tracking allocator in Odin to find leaks in my game loop?",
+    "should_trigger": true,
+    "reasoning": "names Odin and allocators"
+  },
+  {
+    "query": "is it idiomatic odin to return a [dynamic]Entity from a proc or pass an allocator in?",
+    "should_trigger": true,
+    "reasoning": "odin keyword"
+  },
+  {
+    "query": "review src/renderer/mesh.odin and tell me if my proc groups are sane",
+    "should_trigger": true,
+    "reasoning": "odin file reference"
+  },
+  {
+    "query": "how should I lay out packages in an odin-lang project with vendor:raylib?",
+    "should_trigger": true,
+    "reasoning": "odin-lang keyword"
+  },
+  {
+    "query": "what's the Odin equivalent of a tagged union with a default case in a switch?",
+    "should_trigger": true,
+    "reasoning": "Odin-specific construct"
+  },
+  {
+    "query": "my context.temp_allocator keeps growing in odin, when do I call free_all?",
+    "should_trigger": true,
+    "reasoning": "odin allocator question"
+  },
+  {
+    "query": "Odin's using statement on struct fields, good idea or smell?",
+    "should_trigger": true,
+    "reasoning": "Odin idiom"
+  },
+  {
+    "query": "can you convert this C struct with bit fields into odin bit_set?",
+    "should_trigger": true,
+    "reasoning": "odin conversion"
+  },
+  {
+    "query": "explain how odin handles multiple return values and or_return",
+    "should_trigger": true,
+    "reasoning": "odin feature"
+  },
+  {
+    "query": "write an odin proc that parses a CSV into a slice of structs using core:strings",
+    "should_trigger": true,
+    "reasoning": "odin code generation"
+  },
+  {
+    "query": "how do I write a custom arena allocator in Zig for my parser?",
+    "should_trigger": false,
+    "reasoning": "Zig, not Odin"
+  },
+  {
+    "query": "Rust borrow checker keeps complaining about my linked list, how do I fix it?",
+    "should_trigger": false,
+    "reasoning": "Rust"
+  },
+  {
+    "query": "what's the best way to organize a large C project with many headers?",
+    "should_trigger": false,
+    "reasoning": "C project layout"
+  },
+  {
+    "query": "explain the Norse god of wisdom and his two ravens",
+    "should_trigger": false,
+    "reasoning": "mythology without the keyword"
+  },
+  {
+    "query": "how do I profile memory fragmentation in a C++ game engine?",
+    "should_trigger": false,
+    "reasoning": "C++"
+  },
+  {
+    "query": "review my Jai compile-time metaprogramming macros",
+    "should_trigger": false,
+    "reasoning": "Jai language"
+  },
+  {
+    "query": "should I use arena allocation or malloc per object in my Go service?",
+    "should_trigger": false,
+    "reasoning": "Go allocators"
+  },
+  {
+    "query": "help me write a Makefile that builds a static library and links it into a test binary",
+    "should_trigger": false,
+    "reasoning": "build tooling"
+  },
+  {
+    "query": "what are the tradeoffs of data-oriented design versus ECS in a game?",
+    "should_trigger": false,
+    "reasoning": "generic game architecture"
+  },
+  {
+    "query": "how do tagged unions work in Rust enums versus C unions?",
+    "should_trigger": false,
+    "reasoning": "other languages"
+  }
+]

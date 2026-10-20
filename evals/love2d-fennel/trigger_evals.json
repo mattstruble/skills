@@ -1,0 +1,102 @@
+[
+  {
+    "query": "how do I hot-reload my modes in fennel without losing game state?",
+    "should_trigger": true,
+    "reasoning": "fennel keyword"
+  },
+  {
+    "query": "my main.fnl crashes on require when I reload, how do I fix it?",
+    "should_trigger": true,
+    "reasoning": "fnl reference"
+  },
+  {
+    "query": "set up a REPL workflow for a fennel game with the min-love2d-fennel template",
+    "should_trigger": true,
+    "reasoning": "fennel template"
+  },
+  {
+    "query": "write a fennel macro that persists state across reloads",
+    "should_trigger": true,
+    "reasoning": "fennel macro"
+  },
+  {
+    "query": "how do I structure modes in a love2d fennel project?",
+    "should_trigger": true,
+    "reasoning": "love2d*fennel"
+  },
+  {
+    "query": "why is my .fnl file not found by love's require?",
+    "should_trigger": true,
+    "reasoning": "dot fnl keyword"
+  },
+  {
+    "query": "fennel's lambda vs fn: when do I want nil checks in my game code?",
+    "should_trigger": true,
+    "reasoning": "fennel"
+  },
+  {
+    "query": "connect my editor to a running fennel REPL while the game is live",
+    "should_trigger": true,
+    "reasoning": "fennel REPL"
+  },
+  {
+    "query": "how do I do pattern matching with match in fennel for entity types?",
+    "should_trigger": true,
+    "reasoning": "fennel"
+  },
+  {
+    "query": "compile fennel to lua for the final love2d release build",
+    "should_trigger": true,
+    "reasoning": "fennel and love2d"
+  },
+  {
+    "query": "how do I write a Neovim config in Lua with lazy.nvim?",
+    "should_trigger": false,
+    "reasoning": "Lua, no Fennel"
+  },
+  {
+    "query": "explain Clojure's atoms and refs for state persistence",
+    "should_trigger": false,
+    "reasoning": "Clojure"
+  },
+  {
+    "query": "how do I hot-reload modules in Python with importlib?",
+    "should_trigger": false,
+    "reasoning": "Python"
+  },
+  {
+    "query": "how do I set up a Janet REPL for scripting?",
+    "should_trigger": false,
+    "reasoning": "Janet"
+  },
+  {
+    "query": "how do I define a macro in Racket to wrap a state transition?",
+    "should_trigger": false,
+    "reasoning": "Racket"
+  },
+  {
+    "query": "implement a mode stack for a menu system in Godot GDScript",
+    "should_trigger": false,
+    "reasoning": "other engine"
+  },
+  {
+    "query": "how do I use Emacs lisp to bind a key for REPL eval?",
+    "should_trigger": false,
+    "reasoning": "Emacs lisp"
+  },
+  {
+    "query": "what are the pros and cons of Elixir hot code reloading?",
+    "should_trigger": false,
+    "reasoning": "Elixir"
+  },
+  {
+    "query": "help me write a Makefile target that watches files and reruns tests",
+    "should_trigger": false,
+    "reasoning": "tooling"
+  },
+  {
+    "query": "how do I structure game states in SDL2 with C++?",
+    "should_trigger": false,
+    "reasoning": "SDL2"
+  }
+]

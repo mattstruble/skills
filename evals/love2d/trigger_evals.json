@@ -1,0 +1,102 @@
+[
+  {
+    "query": "in love2d how do I scale the canvas to fit any window size?",
+    "should_trigger": true,
+    "reasoning": "love2d keyword"
+  },
+  {
+    "query": "my love.update dt seems to spike after alt-tabbing, how do I clamp it?",
+    "should_trigger": true,
+    "reasoning": "love.update"
+  },
+  {
+    "query": "what should I put in love.draw versus a separate render function?",
+    "should_trigger": true,
+    "reasoning": "love.draw"
+  },
+  {
+    "query": "how do I set the window title and vsync in love2d conf.lua?",
+    "should_trigger": true,
+    "reasoning": "conf.lua path"
+  },
+  {
+    "query": "love-2d collision with bump.lua keeps tunneling through walls",
+    "should_trigger": true,
+    "reasoning": "love-2d keyword"
+  },
+  {
+    "query": "how do I structure a gamestate stack in Love2D with push and pop?",
+    "should_trigger": true,
+    "reasoning": "love2d keyword"
+  },
+  {
+    "query": "write a love2d particle system for a hit spark effect",
+    "should_trigger": true,
+    "reasoning": "love2d keyword"
+  },
+  {
+    "query": "review my love.keypressed handler for menu navigation (love2d 11.4)",
+    "should_trigger": true,
+    "reasoning": "love2d keyword"
+  },
+  {
+    "query": "how do I load a spritesheet with love2d and animate it using quads?",
+    "should_trigger": true,
+    "reasoning": "love2d keyword"
+  },
+  {
+    "query": "how do I handle gamepad input in love2d with joystick hotplugging?",
+    "should_trigger": true,
+    "reasoning": "love2d keyword"
+  },
+  {
+    "query": "I'm editing main.lua in my plain Lua script that parses log files, how do I split on commas?",
+    "should_trigger": false,
+    "reasoning": "plain Lua main.lua, no LOVE"
+  },
+  {
+    "query": "open main.lua in my Neovim plugin and add a keymap for toggling comments",
+    "should_trigger": false,
+    "reasoning": "non-LOVE main.lua"
+  },
+  {
+    "query": "how do I write a metatable-based class system in Lua 5.4?",
+    "should_trigger": false,
+    "reasoning": "plain Lua"
+  },
+  {
+    "query": "how do I use lpeg to parse arithmetic expressions in Lua?",
+    "should_trigger": false,
+    "reasoning": "plain Lua"
+  },
+  {
+    "query": "what is the difference between pairs and ipairs in Lua?",
+    "should_trigger": false,
+    "reasoning": "plain Lua"
+  },
+  {
+    "query": "how do I make a Roblox Luau module return a table of functions?",
+    "should_trigger": false,
+    "reasoning": "Roblox"
+  },
+  {
+    "query": "help me with a Defold go script that moves a sprite",
+    "should_trigger": false,
+    "reasoning": "Defold"
+  },
+  {
+    "query": "how do I write a PICO-8 draw loop for a shmup?",
+    "should_trigger": false,
+    "reasoning": "PICO-8"
+  },
+  {
+    "query": "how do I design a good game loop with fixed timestep in Pygame?",
+    "should_trigger": false,
+    "reasoning": "Pygame"
+  },
+  {
+    "query": "explain how a love interest arc should pace in a romance novel",
+    "should_trigger": false,
+    "reasoning": "unrelated 'love'"
+  }
+]

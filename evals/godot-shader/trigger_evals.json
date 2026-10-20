@@ -1,0 +1,102 @@
+[
+  {
+    "query": "my dissolve.gdshader shows a hard edge, how do I smooth it with smoothstep?",
+    "should_trigger": true,
+    "reasoning": "gdshader file"
+  },
+  {
+    "query": "write a godot canvas_item shader that outlines a sprite",
+    "should_trigger": true,
+    "reasoning": "godot shader"
+  },
+  {
+    "query": "how do I port this Shadertoy water ripple to a godot spatial shader?",
+    "should_trigger": true,
+    "reasoning": "godot shader"
+  },
+  {
+    "query": "what's the difference between a visual-shader and code in godot 4?",
+    "should_trigger": true,
+    "reasoning": "visual-shader keyword"
+  },
+  {
+    "query": "the godot particle shader isn't picking up my custom uniform, what's wrong?",
+    "should_trigger": true,
+    "reasoning": "godot particle shader"
+  },
+  {
+    "query": "can you do vertex displacement for ocean waves in a godot spatial shader?",
+    "should_trigger": true,
+    "reasoning": "godot shader"
+  },
+  {
+    "query": "review shaders/toon.gdshader for lighting model mistakes",
+    "should_trigger": true,
+    "reasoning": "gdshader file"
+  },
+  {
+    "query": "how do I read the screen texture for a distortion effect in a godot canvas shader?",
+    "should_trigger": true,
+    "reasoning": "godot shader"
+  },
+  {
+    "query": "godot 4 hint_screen_texture is erroring in my shader, how should I declare it?",
+    "should_trigger": true,
+    "reasoning": "godot shader"
+  },
+  {
+    "query": "convert this gdshader to use instance uniforms so each mesh can tint differently",
+    "should_trigger": true,
+    "reasoning": "gdshader keyword"
+  },
+  {
+    "query": "write a GLSL fragment shader for bloom in plain OpenGL",
+    "should_trigger": false,
+    "reasoning": "GLSL outside Godot"
+  },
+  {
+    "query": "how do I make a Unity Shader Graph that scrolls a texture?",
+    "should_trigger": false,
+    "reasoning": "Unity"
+  },
+  {
+    "query": "my HLSL compute shader writes garbage to the UAV, any ideas?",
+    "should_trigger": false,
+    "reasoning": "HLSL"
+  },
+  {
+    "query": "how do I write a Three.js ShaderMaterial with a custom vertex program?",
+    "should_trigger": false,
+    "reasoning": "Three.js"
+  },
+  {
+    "query": "write a GDScript function that spawns enemies on a timer",
+    "should_trigger": false,
+    "reasoning": "gdscript logic, not shaders"
+  },
+  {
+    "query": "help me tune the camera follow smoothing in my platformer",
+    "should_trigger": false,
+    "reasoning": "game logic"
+  },
+  {
+    "query": "what is ray marching and how does signed distance work conceptually?",
+    "should_trigger": false,
+    "reasoning": "theory without keyword"
+  },
+  {
+    "query": "how do I write a Metal compute kernel for image blur?",
+    "should_trigger": false,
+    "reasoning": "Metal"
+  },
+  {
+    "query": "design the scene tree for a 2D platformer level",
+    "should_trigger": false,
+    "reasoning": "scene architecture"
+  },
+  {
+    "query": "how do I bake lightmaps in Blender for export?",
+    "should_trigger": false,
+    "reasoning": "Blender"
+  }
+]

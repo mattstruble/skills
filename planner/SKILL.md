@@ -3,6 +3,7 @@ name: "planner"
 summary: "Decompose a well-understood effort into a typed, critic-reviewed task graph ready for execution"
 type: "process"
 description: "Load when a request is about planning, decomposing, or scoping work into tickets — when the user says 'plan this', 'break this down', 'create tickets for', 'scope this out', or 'what are the tasks'. Also load when coming out of a brainstorm session and the next step is task creation. NOT for brainstorming (see brainstorm), NOT for debugging, NOT for code review, NOT for implementation. The output of this skill is a task graph, not built software."
+disable-model-invocation: true
 ---
 
 # Planner

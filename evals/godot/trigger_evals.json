@@ -1,0 +1,102 @@
+[
+  {
+    "query": "my player.gd keeps losing its signal connection after I reload the scene",
+    "should_trigger": true,
+    "reasoning": "gd file"
+  },
+  {
+    "query": "how should I structure an AutoLoad for save data in godot 4?",
+    "should_trigger": true,
+    "reasoning": "godot keyword"
+  },
+  {
+    "query": "what's the right way to build a scene-tree for a top-down shooter with enemies and bullets?",
+    "should_trigger": true,
+    "reasoning": "scene-tree keyword"
+  },
+  {
+    "query": "write a GDScript state machine for my character controller",
+    "should_trigger": true,
+    "reasoning": "gdscript keyword"
+  },
+  {
+    "query": "why does my main_menu.tscn instantiate twice when I call change_scene_to_file?",
+    "should_trigger": true,
+    "reasoning": "tscn file"
+  },
+  {
+    "query": "godot signals vs calling methods directly on child nodes \u2014 which is cleaner?",
+    "should_trigger": true,
+    "reasoning": "godot keyword"
+  },
+  {
+    "query": "how do I make a custom Resource for item stats and edit it in the inspector in Godot?",
+    "should_trigger": true,
+    "reasoning": "godot Resource"
+  },
+  {
+    "query": "implement the observer pattern for health changes in gdscript",
+    "should_trigger": true,
+    "reasoning": "gdscript pattern"
+  },
+  {
+    "query": "is it ok to use get_node with long paths or should I use @export node references? Godot 4.3",
+    "should_trigger": true,
+    "reasoning": "godot keyword"
+  },
+  {
+    "query": "what goes in project.godot vs an autoload script for global settings? we use godot",
+    "should_trigger": true,
+    "reasoning": "godot keyword"
+  },
+  {
+    "query": "how do I set up a singleton manager in Unity with DontDestroyOnLoad?",
+    "should_trigger": false,
+    "reasoning": "Unity"
+  },
+  {
+    "query": "explain the observer pattern and when it beats polling in a game",
+    "should_trigger": false,
+    "reasoning": "engine-agnostic patterns"
+  },
+  {
+    "query": "my Unreal blueprint for the door keeps firing twice on overlap",
+    "should_trigger": false,
+    "reasoning": "Unreal"
+  },
+  {
+    "query": "how do I structure a Bevy ECS system that moves enemies toward the player?",
+    "should_trigger": false,
+    "reasoning": "Bevy"
+  },
+  {
+    "query": "what's the best way to organize a Phaser 3 scene with preloading and a HUD?",
+    "should_trigger": false,
+    "reasoning": "Phaser"
+  },
+  {
+    "query": "help me write a Python script that batch-renames my sprite sheets",
+    "should_trigger": false,
+    "reasoning": "Python tooling"
+  },
+  {
+    "query": "how do I load a PNG as a texture in raylib and draw it scaled?",
+    "should_trigger": false,
+    "reasoning": "raylib"
+  },
+  {
+    "query": "can you review my React component tree for unnecessary re-renders?",
+    "should_trigger": false,
+    "reasoning": "web frontend"
+  },
+  {
+    "query": "how do I tune enemy spawn pacing to keep difficulty curves smooth?",
+    "should_trigger": false,
+    "reasoning": "game design"
+  },
+  {
+    "query": "explain how a scene graph differs from a flat entity list in rendering engines",
+    "should_trigger": false,
+    "reasoning": "generic scene graph without the keyword"
+  }
+]

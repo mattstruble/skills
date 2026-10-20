@@ -1,0 +1,102 @@
+[
+  {
+    "query": "Implement a retry wrapper around our payment client",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: implement"
+  },
+  {
+    "query": "Refactor the order module so it stops depending on the database layer",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: refactor"
+  },
+  {
+    "query": "Help me design a notification dispatcher with minimal interfaces",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: design"
+  },
+  {
+    "query": "Architect a plugin loader that other teams can extend",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: architect"
+  },
+  {
+    "query": "Write some code that parses the config and validates it",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: write*code"
+  },
+  {
+    "query": "Add a new export feature to the reports page",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: add*feature"
+  },
+  {
+    "query": "Build a search feature on top of the existing index",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: build*feature"
+  },
+  {
+    "query": "Can you review the software design of this module?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: design"
+  },
+  {
+    "query": "I want to implement caching without making the interface bigger",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: implement"
+  },
+  {
+    "query": "Time to refactor this 400-line handler into smaller pieces",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: refactor"
+  },
+  {
+    "query": "Why is my build failing with a linker error?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: No design verb; no routing keyword"
+  },
+  {
+    "query": "What does this stack trace mean?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Debugging; no routing keyword"
+  },
+  {
+    "query": "Explain how git rebase works",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Git question; no routing keyword"
+  },
+  {
+    "query": "Summarize this article about interest rates",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "Fix the typo in the README heading",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Small edit; no routing keyword"
+  },
+  {
+    "query": "Which version of Node does this project require?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Version question; no routing keyword"
+  },
+  {
+    "query": "Rename this variable to something clearer",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Rename only; no routing keyword"
+  },
+  {
+    "query": "Why is the deploy pipeline slow today?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: CI question; no routing keyword"
+  },
+  {
+    "query": "Translate this paragraph into French",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "List the environment variables used by the service",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Lookup; no routing keyword"
+  }
+]

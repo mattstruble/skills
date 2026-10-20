@@ -1,0 +1,102 @@
+[
+  {
+    "query": "Should I use a Protocol or an ABC for this plugin interface in my Python service?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names python"
+  },
+  {
+    "query": "Review my Pydantic models at the API boundary for anything unidiomatic",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names pydantic"
+  },
+  {
+    "query": "Why does my fastapi dependency get re-created on each request?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names fastapi"
+  },
+  {
+    "query": "Clean up utils.py so the generator pipeline is easier to follow",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names a .py file"
+  },
+  {
+    "query": "Is TypedDict or a dataclass better for this config payload in Django settings?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names django"
+  },
+  {
+    "query": "Help me structure a flask app factory with typed config",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names flask"
+  },
+  {
+    "query": "My pytest fixtures are tangled; how should I reorganize them?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names pytest"
+  },
+  {
+    "query": "What goes in pyproject for a src-layout library?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names pyproject"
+  },
+  {
+    "query": "Refactor this python function that catches bare Exception everywhere",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names python"
+  },
+  {
+    "query": "Should I use functools.cache or lru_cache here in python?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: Names python"
+  },
+  {
+    "query": "Explain how Rust lifetimes work in struct fields",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Different language; no routing keyword"
+  },
+  {
+    "query": "Write a Go function that retries HTTP requests with backoff",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Different language; no routing keyword"
+  },
+  {
+    "query": "Set up a TypeScript monorepo with pnpm workspaces",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Different language; no routing keyword"
+  },
+  {
+    "query": "Why does my Kubernetes pod keep restarting?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated infra; no routing keyword"
+  },
+  {
+    "query": "Draft a SQL query that ranks customers by monthly spend",
+    "should_trigger": false,
+    "reasoning": "Near-miss: SQL not Python; no routing keyword"
+  },
+  {
+    "query": "What's the best way to cook a ribeye?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "Explain the difference between TCP and UDP",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated networking; no routing keyword"
+  },
+  {
+    "query": "Convert this JavaScript promise chain to async/await",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Different language; no routing keyword"
+  },
+  {
+    "query": "Summarize the meeting notes into action items",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "How do I write a Lua script for Neovim keymaps?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Different language; no routing keyword"
+  }
+]

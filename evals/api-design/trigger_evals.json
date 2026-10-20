@@ -1,0 +1,102 @@
+[
+  {
+    "query": "Help with api design for our billing service",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: api design"
+  },
+  {
+    "query": "Review my REST API for naming consistency",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: rest api"
+  },
+  {
+    "query": "Should this gRPC service use streaming for list calls?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: grpc"
+  },
+  {
+    "query": "Validate my OpenAPI document for versioning problems",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: openapi"
+  },
+  {
+    "query": "Generate swagger docs that match the pagination scheme",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: swagger"
+  },
+  {
+    "query": "How should the resource model nest projects and tasks?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: resource model"
+  },
+  {
+    "query": "Is this endpoint design okay for a long-running export?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: endpoint design"
+  },
+  {
+    "query": "Where should the api spec define error shapes?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: api spec"
+  },
+  {
+    "query": "Is a custom method or a standard one better for archiving in this rest api?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: rest api"
+  },
+  {
+    "query": "Critique this api design for field naming",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: api design"
+  },
+  {
+    "query": "Add a database index on the users email column",
+    "should_trigger": false,
+    "reasoning": "Near-miss: DB not API; no routing keyword"
+  },
+  {
+    "query": "Parse this JSON file and print the keys",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "Why does my fetch call return a CORS error?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Debugging; no routing keyword"
+  },
+  {
+    "query": "Write a Terraform module for an S3 bucket",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Infra; no routing keyword"
+  },
+  {
+    "query": "Explain OAuth refresh tokens",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Auth theory; no routing keyword"
+  },
+  {
+    "query": "Fix the flaky retry logic in our HTTP client",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Implementation; no routing keyword"
+  },
+  {
+    "query": "Set up Prometheus alerts for latency",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Observability; no routing keyword"
+  },
+  {
+    "query": "Rename the config key in the YAML file",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Config; no routing keyword"
+  },
+  {
+    "query": "Summarize this quarterly report",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "Make the button blue on hover",
+    "should_trigger": false,
+    "reasoning": "Near-miss: CSS; no routing keyword"
+  }
+]

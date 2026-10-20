@@ -3,6 +3,8 @@ name: "api-design"
 summary: "REST and gRPC API conventions: resource modeling, naming, versioning, error handling"
 type: "design"
 description: "You MUST consult this skill when designing or reviewing any API — REST, gRPC, or OpenAPI specs. Also trigger on resource modeling, field naming, pagination, error handling, versioning, custom vs standard methods, or reviewing an existing API for consistency problems — even if the user doesn't mention AEP. NOT for implementation details (framework setup, middleware config) or general software design (see software-design)."
+metadata:
+  route-prompt: "api-design rest-api grpc openapi swagger resource-model endpoint-design api-spec"
 ---
 
 # AEP-Compliant API Design

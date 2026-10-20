@@ -1,0 +1,102 @@
+[
+  {
+    "query": "Write a test for the invoice calculator",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: write*test"
+  },
+  {
+    "query": "Add another test for the empty cart case",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: add*test"
+  },
+  {
+    "query": "Our test coverage dropped after the last merge; what should we cover?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: test*coverage"
+  },
+  {
+    "query": "What makes a good unit test for a pure function?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: unit test"
+  },
+  {
+    "query": "How should I structure an integration test against a real database?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: integration test"
+  },
+  {
+    "query": "Is tdd worth it for exploratory prototypes?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: tdd"
+  },
+  {
+    "query": "Please write a test for the new parser before I ship it",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: write*test"
+  },
+  {
+    "query": "Should I add a regression test for this bug?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: add*test"
+  },
+  {
+    "query": "Do we need better test coverage on the billing package?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: test*coverage"
+  },
+  {
+    "query": "My unit test suite breaks every time I refactor; why?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keyword: unit test"
+  },
+  {
+    "query": "Explain the difference between a mutex and a semaphore",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "Fix the failing CI job on the main branch",
+    "should_trigger": false,
+    "reasoning": "Near-miss: CI not tests wording; no routing keyword"
+  },
+  {
+    "query": "Review my pull request description",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "Build a landing page with a hero section",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Unrelated; no routing keyword"
+  },
+  {
+    "query": "Why does my program segfault on startup?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Debugging; no routing keyword"
+  },
+  {
+    "query": "Document the public functions in this module",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Docs; no routing keyword"
+  },
+  {
+    "query": "Optimize this loop that runs a million iterations",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Perf; no routing keyword"
+  },
+  {
+    "query": "What is a monad?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Theory; no routing keyword"
+  },
+  {
+    "query": "Set up a Docker image for the web server",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Infra; no routing keyword"
+  },
+  {
+    "query": "Draft release notes for version 2.1",
+    "should_trigger": false,
+    "reasoning": "Near-miss: Docs; no routing keyword"
+  }
+]

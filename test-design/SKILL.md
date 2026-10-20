@@ -3,6 +3,10 @@ name: "test-design"
 summary: "Test quality tradeoffs using Kent Beck's Test Desiderata: behavior over structure"
 type: "design"
 description: "You MUST consult this skill when writing, reviewing, or fixing tests at any level (unit, integration, e2e). Also trigger when delivering features where tests are expected, when tests break on refactors, or when asking what makes a good test — even if 'write tests' wasn't explicitly requested. NOT for TDD workflow (see test-driven-development), test infrastructure setup (CI config, test runners), or diagnosing production code bugs."
+metadata:
+  route-prompt: "write*test add*test test*coverage unit-test integration-test tdd"
+  route-paths: "**/test_*.py **/*_test.py **/*_test.go **/*.test.ts **/*.test.js **/conftest.py"
+  route-commands: "pytest uv-run-pytest go-test npx-vitest"
 ---
 
 # Test Design Desiderata

@@ -1,0 +1,396 @@
+{
+  "frontmatter": [
+    {
+      "text": "---\nname: \"foo\"\nsummary: 'bar baz'\ntype: process\n---\n# Body",
+      "expect": {
+        "name": "foo",
+        "summary": "bar baz",
+        "type": "process"
+      }
+    },
+    {
+      "text": "---\nname: x\ndescription: >-\n  Use when writing\n  things well.\n---\n",
+      "expect": {
+        "name": "x",
+        "description": "Use when writing things well."
+      }
+    },
+    {
+      "text": "---\nname: x\ndescription: |-\n  line one\n  line two\n---\n",
+      "expect": {
+        "description": "line one\nline two"
+      }
+    },
+    {
+      "text": "---\nname: x\ndescription: \"say \\\"hi\\\"\"\n---\n",
+      "expect": {
+        "description": "say \"hi\""
+      }
+    },
+    {
+      "text": "---\nname: x\nmetadata:\n  route-prompt: \"write*test git-push\"\n  route-paths: '**/*.nix **/Chart.yaml'\n  route-commands: pytest uv-run-pytest\n---\n",
+      "expect": {
+        "metadata": {
+          "route-prompt": "write*test git-push",
+          "route-paths": "**/*.nix **/Chart.yaml",
+          "route-commands": "pytest uv-run-pytest"
+        }
+      }
+    },
+    {
+      "text": "---\nname: x\ndisable-model-invocation: true\n---\n",
+      "expect": {
+        "disable-model-invocation": true
+      }
+    },
+    {
+      "text": "---\nname: x\ndisable-model-invocation: false\n---\n",
+      "expect": {
+        "disable-model-invocation": false
+      }
+    },
+    {
+      "text": "---\nname: x\nmetadata:\n  route-prompt: [a, b]\n---\n",
+      "expect": {
+        "errors": [
+          "metadata.route-prompt: value must be a string"
+        ]
+      }
+    },
+    {
+      "text": "---\nname: x\nmetadata:\n  route-prompt:\n    - a\n    - b\n---\n",
+      "expect": {
+        "errors": [
+          "metadata.route-prompt: value must be a string",
+          "metadata: unsupported nested value: '- a'",
+          "metadata: unsupported nested value: '- b'"
+        ]
+      }
+    },
+    {
+      "text": "# Just a heading\n\nNo frontmatter.",
+      "expect": {}
+    }
+  ],
+  "keywords": [
+    {
+      "spec": "write*test*",
+      "text": "please write unit tests",
+      "match": true
+    },
+    {
+      "spec": "write*test*",
+      "text": "rewrite the testimony",
+      "match": false
+    },
+    {
+      "spec": "git-push",
+      "text": "git push origin",
+      "match": true
+    },
+    {
+      "spec": "git-push",
+      "text": "git-push now",
+      "match": true
+    },
+    {
+      "spec": "git-push",
+      "text": "digit push",
+      "match": false
+    },
+    {
+      "spec": "pr",
+      "text": "improve the parser",
+      "match": false
+    },
+    {
+      "spec": "pr",
+      "text": "open a PR please",
+      "match": true
+    },
+    {
+      "spec": ".py",
+      "text": "edit foo.py",
+      "match": true
+    },
+    {
+      "spec": "helm chart",
+      "text": "Update the Helm values",
+      "match": true
+    },
+    {
+      "spec": "helm chart",
+      "text": "Fix the helm.",
+      "match": true
+    },
+    {
+      "spec": "deploy",
+      "text": "pre-deploy checks",
+      "match": false
+    },
+    {
+      "spec": "*",
+      "invalid": true
+    },
+    {
+      "spec": "-",
+      "invalid": true
+    },
+    {
+      "spec": "*-",
+      "invalid": true
+    },
+    {
+      "spec": "",
+      "invalid": true
+    },
+    {
+      "spec": "   ",
+      "invalid": true
+    },
+    {
+      "spec": "a **",
+      "invalid": true
+    }
+  ],
+  "commands": [
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "cd x && uv run pytest -q",
+      "match": true
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "FOO=1 pytest",
+      "match": true
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "pytest",
+      "match": true
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "sudo pytest tests/",
+      "match": true
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "echo pytest",
+      "match": false
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "grep \"pytest\" f",
+      "match": false
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "pytest-cov-report",
+      "match": false
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "# pytest",
+      "match": false
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "echo hi | uv-run-pytest",
+      "match": true
+    },
+    {
+      "spec": "pytest uv-run-pytest",
+      "command": "echo 'a; pytest'",
+      "match": false
+    },
+    {
+      "spec": "terraform-*",
+      "command": "terraform plan",
+      "match": true
+    },
+    {
+      "spec": "terraform-*",
+      "command": "echo terraform",
+      "match": false
+    }
+  ],
+  "git_commit": [
+    {
+      "command": "git commit -m x",
+      "match": true
+    },
+    {
+      "command": "cd a && git commit -m x",
+      "match": true
+    },
+    {
+      "command": "git -C repo commit",
+      "match": true
+    },
+    {
+      "command": "git -c user.name=x commit",
+      "match": true
+    },
+    {
+      "command": "FOO=1 git commit",
+      "match": true
+    },
+    {
+      "command": "echo y | git commit -m x",
+      "match": true
+    },
+    {
+      "command": "echo hello; git commit -m x",
+      "match": true
+    },
+    {
+      "command": "(git commit -m x)",
+      "match": true
+    },
+    {
+      "command": "git --no-pager commit -m x",
+      "match": true
+    },
+    {
+      "command": "git --bare commit -m x",
+      "match": true
+    },
+    {
+      "command": "sudo git commit -m x",
+      "match": true
+    },
+    {
+      "command": "cat <<EOF\nnot git commit\nEOF\ngit commit -m x",
+      "match": true
+    },
+    {
+      "command": "bd update --append-notes='git commit later'",
+      "match": false
+    },
+    {
+      "command": "echo \"git commit\"",
+      "match": false
+    },
+    {
+      "command": "grep -n \"git commit\" f",
+      "match": false
+    },
+    {
+      "command": "cat <<EOF\ngit commit -m x\nEOF",
+      "match": false
+    },
+    {
+      "command": "# git commit later",
+      "match": false
+    },
+    {
+      "command": "git log --grep commit",
+      "match": false
+    },
+    {
+      "command": "git show HEAD:commit.txt",
+      "match": false
+    },
+    {
+      "command": "echo 'git commit -m test'",
+      "match": false
+    },
+    {
+      "command": "bd update --append-notes=$'git commit\\nlater'",
+      "match": false
+    }
+  ],
+  "globs": [
+    {
+      "spec": "**/*.nix",
+      "path": "/Users/u/.pi/agent/worktrees/x/flake.nix",
+      "match": true
+    },
+    {
+      "spec": "**/*.yml",
+      "path": ".github/workflows/ci.yml",
+      "match": true
+    },
+    {
+      "spec": "**/test_*.py",
+      "path": "tests/test_a.py",
+      "match": true
+    },
+    {
+      "spec": "**/test_*.py",
+      "path": "test_a.py",
+      "match": true
+    },
+    {
+      "spec": "**/test_*.py",
+      "path": "/abs/repo/tests/test_a.py",
+      "match": true
+    },
+    {
+      "spec": "**/test_*.py",
+      "path": "tests/a_test.txt",
+      "match": false
+    },
+    {
+      "spec": "**/Chart.yaml",
+      "path": "charts/app/Chart.yaml",
+      "match": true
+    },
+    {
+      "spec": "**/Chart.yaml",
+      "path": "charts/app/Chart.yaml.bak",
+      "match": false
+    },
+    {
+      "spec": "src/*.py",
+      "path": "src/a/b.py",
+      "root": "/r",
+      "match": false
+    },
+    {
+      "spec": "src/*.py",
+      "path": "/r/src/b.py",
+      "root": "/r",
+      "match": true
+    },
+    {
+      "spec": "src/*.py",
+      "path": "/r/lib/src/b.py",
+      "root": "/r",
+      "match": false
+    },
+    {
+      "spec": "src/**",
+      "path": "/r/src/a/b.py",
+      "root": "/r",
+      "match": true
+    },
+    {
+      "spec": "docs/?.md",
+      "path": "docs/a.md",
+      "match": true
+    },
+    {
+      "spec": "docs/?.md",
+      "path": "docs/ab.md",
+      "match": false
+    },
+    {
+      "spec": "[ab].txt",
+      "path": "b.txt",
+      "match": true
+    },
+    {
+      "spec": "[!ab].txt",
+      "path": "a.txt",
+      "match": false
+    },
+    {
+      "spec": "*.md",
+      "path": "/r/docs/a.md",
+      "root": "/r",
+      "match": false
+    }
+  ]
+}

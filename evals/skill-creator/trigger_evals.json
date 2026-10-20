@@ -1,0 +1,102 @@
+[
+  {
+    "query": "I want to create a new skill for our Terraform review workflow",
+    "should_trigger": true,
+    "reasoning": "create*skill matches"
+  },
+  {
+    "query": "Can you help me improve the skill we wrote for API design? It keeps undertriggering.",
+    "should_trigger": true,
+    "reasoning": "improve*skill"
+  },
+  {
+    "query": "Open skill.md and tighten the frontmatter",
+    "should_trigger": true,
+    "reasoning": "skill.md keyword"
+  },
+  {
+    "query": "Write a trigger eval set for my docker skill",
+    "should_trigger": true,
+    "reasoning": "trigger*eval"
+  },
+  {
+    "query": "Let's edit the skill so it stops firing on unrelated Python questions",
+    "should_trigger": true,
+    "reasoning": "edit*skill"
+  },
+  {
+    "query": "I need a new skill that teaches the agent our release process",
+    "should_trigger": true,
+    "reasoning": "new*skill"
+  },
+  {
+    "query": "Use skill-creator to benchmark my helm skill",
+    "should_trigger": true,
+    "reasoning": "skill-creator whole word"
+  },
+  {
+    "query": "please create a skill for writing changelogs",
+    "should_trigger": true,
+    "reasoning": "create*skill"
+  },
+  {
+    "query": "Time to improve the skill description; run the trigger evals again",
+    "should_trigger": true,
+    "reasoning": "improve*skill, trigger*eval"
+  },
+  {
+    "query": "Run the skill creator workflow on my logging notes",
+    "should_trigger": true,
+    "reasoning": "skill creator whole word"
+  },
+  {
+    "query": "Create a new Python class for parsing config files",
+    "should_trigger": false,
+    "reasoning": "no skill keyword"
+  },
+  {
+    "query": "Fix the failing unit tests in the billing module",
+    "should_trigger": false,
+    "reasoning": "unrelated"
+  },
+  {
+    "query": "Explain how Kubernetes admission controllers work",
+    "should_trigger": false,
+    "reasoning": "unrelated"
+  },
+  {
+    "query": "Review my pull request for race conditions",
+    "should_trigger": false,
+    "reasoning": "unrelated"
+  },
+  {
+    "query": "Her skills in negotiation are improving; draft a performance review",
+    "should_trigger": false,
+    "reasoning": "'skills' plural with no keyword match"
+  },
+  {
+    "query": "Edit the README to describe the install steps",
+    "should_trigger": false,
+    "reasoning": "edit without skill"
+  },
+  {
+    "query": "Write an evaluation harness for my RAG pipeline",
+    "should_trigger": false,
+    "reasoning": "eval without trigger"
+  },
+  {
+    "query": "What's a good strategy for a roguelike skill tree?",
+    "should_trigger": false,
+    "reasoning": "skill tree, not matching keywords"
+  },
+  {
+    "query": "Add a new endpoint to the FastAPI service",
+    "should_trigger": false,
+    "reasoning": "new without skill"
+  },
+  {
+    "query": "Summarize the markdown document in docs/overview.md",
+    "should_trigger": false,
+    "reasoning": "md file but not skill.md"
+  }
+]

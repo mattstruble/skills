@@ -3,6 +3,8 @@ name: "skill-creator"
 summary: "Creating, iterating, and benchmarking skills through eval-driven refinement"
 type: "process"
 description: "Use when creating a new skill from scratch, editing or optimizing an existing skill, running evals to test a skill, benchmarking skill performance with variance analysis, or optimizing a skill's description for better triggering accuracy."
+metadata:
+  route-prompt: "create*skill new*skill skill.md trigger*eval improve*skill edit*skill"
 ---
 
 # Skill Creator
@@ -77,14 +79,38 @@ Check available tools — if useful for research (searching docs, finding simila
 Based on the user interview, fill in these components:
 
 - **name**: Skill identifier
-- **description**: When to trigger. This is the primary triggering mechanism. Models tend to **undertrigger** skills — they won't consult a skill if they feel confident handling the task alone. Combat this with forceful language and a clear template. See the "Description Template" section under Description Optimization for the full pattern, but the key rules are:
+- **description**: When to trigger. In pi it is a secondary mechanism (see "Routing keys"), but other harnesses rely on it. Models tend to **undertrigger** skills — they won't consult a skill if they feel confident handling the task alone. Combat this with forceful language and a clear template. See the "Description Template" section under Description Optimization for the full pattern, but the key rules are:
 
   - **Use MUST language** for skills that need aggressive triggering: "You MUST consult this skill when..." or "You MUST use this skill before..."
   - **Target ~80 words**: forceful opener (~15 words) + 2-3 non-obvious triggers (~30 words) + concise exclusions (~25 words)
   - **Don't list keyword variants** — "commit my stuff", "commit this", "make a commit" wastes words. A broad opener catches these; save words for non-obvious triggers the opener wouldn't catch.
   - **Don't summarize the workflow** — descriptions that explain *how* the skill works create a shortcut: the agent follows the summary instead of loading the full skill. See "Description Anti-Pattern: Workflow Summaries" under Description Optimization.
+  - **Keep exclusions visible** — the filter model may cut long descriptions. Stay under ~400 characters where possible, or put the "NOT for ..." exclusions early.
+- **metadata.route-\***: Routing keys, required for finished skills. See "Routing keys" below.
 - **compatibility**: Required tools, dependencies (optional, rarely needed)
 - **the rest of the skill :)**
+
+#### Routing keys
+
+In pi, a router shows the model only skill names. It scores each prompt against the skill name and `route-prompt` keywords, injects matching skills, sends full descriptions to a small filter model, and blocks the first edit/command matching `route-paths`/`route-commands` to deliver the skill. Every skill in this repo needs, in frontmatter after `description:`:
+
+```yaml
+metadata:
+  route-prompt: "..."    # required unless disable-model-invocation: true
+  route-paths: "..."     # when a file type signals the skill (globs)
+  route-commands: "..."  # when a shell command signals it
+```
+
+- Syntax: space-separated keywords, whole-word, case-insensitive. `*` inside a word = any text; `-` = hyphen or space; a lone `*` is invalid. A word ends at a whole-word boundary (`test` does not match "tests").
+- `route-paths` are globs; `**/` crosses directories, including dot-dirs.
+- Values must be strings (Agent Skills spec: metadata is string to string).
+- Adding or changing routing keys requires `evals/<skill>/trigger_evals.json`: 10 should-trigger and 10 should-not queries (synthetic), each `{"query", "should_trigger", "reasoning"}`. `make check` runs `scripts/check_routing.py` (lint + trigger evals) and the tests.
+- Manual-only skills set `disable-model-invocation: true` instead.
+
+#### What to put in a skill
+
+- **Cost order for new instruction**: prefer a skill (on demand), then a bundled script, a subagent, a plugin/extension (acts in the tool loop, cannot be skipped), and always-on prose last. Adding always-on text means cutting some.
+- **Deliverable shape belongs to the request**: a skill changes how the agent works, never the fields, sections, names or order the user asked for in the deliverable.
 
 ### Skill Writing Guide
 
@@ -378,7 +404,7 @@ This is optional, requires subagents, and most users won't need it. The human re
 
 ## Description Optimization
 
-The description field in SKILL.md frontmatter is the primary mechanism that determines whether a model invokes a skill. After creating or improving a skill, offer to optimize the description for better triggering accuracy.
+The description field matters for the filter model and for harnesses without routing keys; in pi, `route-*` metadata does the primary routing. After creating or improving a skill, offer to optimize the description for better triggering accuracy.
 
 ### Description Anti-Pattern: Workflow Summaries
 
@@ -488,7 +514,7 @@ Test trigger accuracy by running each query and checking whether the skill trigg
 
 ### How skill triggering works
 
-Understanding the triggering mechanism helps design better eval queries. Skills appear in the model's `available_skills` list with their name + description, and the model decides whether to consult a skill based on that description. The important thing to know is that models only consult skills for tasks they can't easily handle on their own — simple, one-step queries like "read this PDF" may not trigger a skill even if the description matches perfectly, because the model can handle them directly with basic tools. Complex, multi-step, or specialized queries reliably trigger skills when the description matches.
+Understanding the triggering mechanism helps design better eval queries. In harnesses without a router, skills appear in the model's `available_skills` list with name + description, and the model decides based on that description (in pi, see "Routing keys"). The important thing to know is that models only consult skills for tasks they can't easily handle on their own — simple, one-step queries like "read this PDF" may not trigger a skill even if the description matches perfectly, because the model can handle them directly with basic tools. Complex, multi-step, or specialized queries reliably trigger skills when the description matches.
 
 This means your eval queries should be substantive enough that the model would actually benefit from consulting a skill. Simple queries like "read file X" are poor test cases — they won't trigger skills regardless of description quality.
 

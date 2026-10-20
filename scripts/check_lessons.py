@@ -1,6 +1,7 @@
 """Validate evals/lessons/*.md entries. Stdlib only."""
 
 import argparse
+import os
 import re
 import sys
 from pathlib import Path
@@ -38,7 +39,7 @@ def check_file(path, rel):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--root", default=str(Path(__file__).resolve().parent.parent))
+    ap.add_argument("--root", default=os.environ.get("CHECK_ROOT") or str(Path(__file__).resolve().parent.parent))
     args = ap.parse_args(argv)
     d = Path(args.root) / "evals" / "lessons"
     errors = []

@@ -85,7 +85,6 @@ Based on the user interview, fill in these components:
   - **Target ~80 words**: forceful opener (~15 words) + 2-3 non-obvious triggers (~30 words) + concise exclusions (~25 words)
   - **Don't list keyword variants** — "commit my stuff", "commit this", "make a commit" wastes words. A broad opener catches these; save words for non-obvious triggers the opener wouldn't catch.
   - **Don't summarize the workflow** — descriptions that explain *how* the skill works create a shortcut: the agent follows the summary instead of loading the full skill. See "Description Anti-Pattern: Workflow Summaries" under Description Optimization.
-  - **Keep exclusions visible** — the filter model may cut long descriptions. Stay under ~400 characters where possible, or put the "NOT for ..." exclusions early.
 - **metadata.route-\***: Routing keys, required for finished skills. See "Routing keys" below.
 - **compatibility**: Required tools, dependencies (optional, rarely needed)
 - **the rest of the skill :)**

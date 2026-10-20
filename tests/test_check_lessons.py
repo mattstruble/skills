@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -61,3 +62,15 @@ def test_21_entries_rejected(tmp_path):
 
 def test_20_entries_pass(tmp_path):
     assert run(tmp_path, "\n".join(entry(i) for i in range(20))).returncode == 0
+
+
+def test_check_root_env_used_when_no_root_flag(tmp_path):
+    d = tmp_path / "evals" / "lessons"
+    d.mkdir(parents=True)
+    (d / "process.md").write_text("## bad heading\n")
+    r = subprocess.run(
+        [sys.executable, str(SCRIPT)],
+        capture_output=True, text=True,
+        env={**os.environ, "CHECK_ROOT": str(tmp_path)},
+    )
+    assert r.returncode == 1

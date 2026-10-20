@@ -3,6 +3,8 @@ name: "agent-self-evolution"
 summary: "Designing agents that accumulate experience and improve across sessions without retraining"
 type: "design"
 description: "You MUST consult this skill when designing agents that improve across sessions without retraining — building experience accumulation systems, implementing workflow record/replay, creating skill-generation pipelines, designing system prompt optimization loops, or building tool-creation systems. Also trigger when asking \"how does this agent get better over time?\" or designing the learning lifecycle (distill → organize → apply → evolve). NOT for user memory storage/retrieval (see agent-memory), tool interface design (see agent-tool-design), prompt structure or KV-cache layout (see context-engineering), post-training or weight changes (see agent-post-training or ml-post-training), or code generation patterns (see coding-agent-design)."
+metadata:
+  route-prompt: "self-evolution self-evolving self-improving agent*learn* experience*replay workflow-replay skill-generation skill-library tool-creation improve*over*time prompt-optimization reflexion"
 ---
 
 # Agent Self-Evolution
@@ -96,6 +98,8 @@ Two modes:
 - **Offline (batch)**: automated frameworks (DSPy, OPRO, GEPA) optimize against an evaluation set. Efficient but requires scored task sets; liable to overfit phrasing.
 
 In practice: batch-optimize the initial prompt with an automated framework, then let the online diff approach carry continuous evolution after launch.
+
+Gate every evolved artifact: one that does not beat the current one on held-out evidence is discarded (KEEP_BASE is a valid result). An evolution step changes how the agent works, never the shape of the deliverable the user asked for.
 
 → Read `references/prompt-evolution.md` for the full treatment.
 

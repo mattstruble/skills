@@ -1,0 +1,102 @@
+[
+  {
+    "query": "How do I build a self-evolving agent that gets better after each task?",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "Design a self-improving coding agent with a skill library",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "We want experience replay for our agent across sessions",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "Should our agent improve over time by rewriting its own prompt?",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "Implement workflow-replay so the agent reuses recorded procedures",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "Build a tool-creation loop like Voyager for our agent",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "How to structure skill-generation from past agent trajectories?",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "Add a reflexion step so the agent learns from failures",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "Set up prompt-optimization loop that evolves the system prompt",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "Use the agent-self-evolution skill to review my learning lifecycle design",
+    "should_trigger": true,
+    "reasoning": "Matches self-evolution routing keywords or skill name."
+  },
+  {
+    "query": "How do I store user preferences for a chatbot?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "Fine-tune a Llama model with LoRA on our logs",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "Design the JSON schema for my agent's search tool",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "Optimize KV-cache layout for my long prompt",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "Write a Python function to parse CSV files",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "Help me deploy a Helm chart to staging",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "How do I do RLHF post-training on a reward model?",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "Explain how retrieval works over vector embeddings",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "Review my pull request for race conditions",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  },
+  {
+    "query": "Draft a PRD for the billing dashboard",
+    "should_trigger": false,
+    "reasoning": "Near-miss: adjacent topic the self-evolution keywords do not match."
+  }
+]

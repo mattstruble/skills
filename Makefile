@@ -9,4 +9,5 @@ extract-prompts:
 
 check:
 	python3 scripts/check_routing.py
+	python3 scripts/check_lessons.py
 	python3 -m pytest -q tests

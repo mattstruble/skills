@@ -1,0 +1,102 @@
+[
+  {
+    "query": "Install postgres with helm into the data namespace",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Override values.yaml for the redis chart",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Roll back my last helm release",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Write a helmfile for our three services",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Run helm template to preview manifests",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Package my own helm chart for internal use",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Which helm-chart repo hosts kafka?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Pin the chart version in helm upgrade",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Diff helm values between staging and prod",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Add a values.yaml entry for resource limits",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Write a Kubernetes Deployment manifest for my API",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Set up a k3s cluster on three Raspberry Pis",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Explain Kubernetes persistent volume claims",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Configure an nginx ingress rule",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Rename the YAML config keys in my app settings",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Upgrade the Kubernetes control plane version",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Why is my pod stuck in Pending?",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Write a Terraform module for an S3 bucket",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "What does a steering wheel helmet do?",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Explain Kubernetes network policies",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  }
+]

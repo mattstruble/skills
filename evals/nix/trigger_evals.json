@@ -1,0 +1,102 @@
+[
+  {
+    "query": "Add a devShell to my flake.nix",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Fix my nixos configuration failing to build",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Set up nix-darwin on a new MacBook",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Run darwin-rebuild switch with a new overlay",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Configure home-manager to manage my zsh",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Pin nixpkgs to a specific commit",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Why does this derivation fail in the sandbox?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "How do I use nix to install a package temporarily?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Split my NixOS config into modules",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Update nixpkgs input and rebuild",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Open a unix socket from a Python server",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Configure a Debian apt mirror",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Write a Makefile target for linting",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Set up a Python virtualenv with pip",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Explain unix file permissions",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Install homebrew packages on my Mac",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Write a bash script to rename files",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "How do I configure tmux key bindings?",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Set up an Ubuntu systemd service",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Compile a C project with cmake",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  }
+]

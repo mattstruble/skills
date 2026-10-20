@@ -1,0 +1,102 @@
+[
+  {
+    "query": "Write a Dockerfile for my Flask app",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Convert this docker-compose setup to use named volumes",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Why is my container exiting immediately after start?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Speed up the build of this image with layer caching",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Help me containerize our Go service",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Add a healthcheck to my docker compose file",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Create a multi-stage Dockerfile for a Rust binary",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "My container can't reach the database on the host",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Set up a dockerfile linter in pre-commit",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "How do I build a slim image for Node?",
+    "should_trigger": true,
+    "reasoning": "Matches routing keywords."
+  },
+  {
+    "query": "Write a Kubernetes Deployment for my API",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Set up a GitHub Actions workflow to run tests",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Explain how pods get scheduled on nodes",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Configure an nginx ingress rule",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Debug a Terraform apply failure",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Write a systemd unit for my daemon",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "How do I create a python virtualenv?",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Tune the postgres connection pool size",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Explain the difference between TCP and UDP",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  },
+  {
+    "query": "Set up a cron job to rotate logs",
+    "should_trigger": false,
+    "reasoning": "Near-miss; no routing keyword matches."
+  }
+]

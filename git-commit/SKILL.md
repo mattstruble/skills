@@ -162,6 +162,7 @@ Stop if you catch yourself thinking any of these:
 | "It's all one logical change" | If part of it could be reverted independently, it's not one change. |
 | "These are all from the same sprint/PR" | Sharing a sprint doesn't make changes logically related. Group by intent, not by timeframe. |
 | "The user asked for one big commit" | Propose proper grouping and explain why. Respect their final call, but don't silently comply with a vague message. |
+| "I can improve the message the user dictated" | If the user dictates an exact commit message, use it verbatim. Grouping advice still applies; rewording does not. |
 | "The message is clear enough" | If the subject doesn't convey *what and why* without the diff, it's not clear enough. |
 | "I'll group all tests in a `test:` commit" | Tests go with the code they test. `test:` is for test-only changes. |
 | "The lockfile/migration is a separate `chore:`" | Generated files go with the commit that caused them. |

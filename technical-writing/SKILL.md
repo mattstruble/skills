@@ -101,4 +101,5 @@ When rewriting an existing doc:
 | Reference | When to read |
 |---|---|
 | `references/docs.md` | Section anatomy, callouts, routing tables, troubleshooting entries, operational details: structuring docs, runbooks and specs. |
+| `references/simplified-technical-english.md` | **Required** for specs, PRDs, RFCs, design docs, stories and tickets: current vs proposed behavior, term definitions, exact outcomes, STE sentence rules, requirement wording. Read it before writing one. |
 | `references/documentation-patterns.md` | Diátaxis quadrants, BLUF, code examples as first-class content: choosing what kind of document to write. |

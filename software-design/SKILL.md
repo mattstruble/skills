@@ -32,6 +32,15 @@ later, but removing is painful. When an interface feels bloated, ask: "Which
 callers use which parts?" If different callers use different subsets, that's a
 signal to split.
 
+**Scope to the request.** Change what was asked. Unrequested edits, refactors,
+cross-references, merges or history rewrites go in your summary as suggestions,
+not into the diff.
+
+**Prefer the simplest mechanism.** When a fix starts to need new options,
+override layers or patches to upstream code, look for a simpler approach that
+meets the goal (separate copies, another install path, the platform default),
+and name what the heavier option would add.
+
 ```
 # Before: speculative abstraction nobody asked for
 class DataPipelineOrchestrator:
@@ -151,6 +160,9 @@ Code should communicate its purpose and not promise more than it delivers.
 - **Longevity**: choose boring technology. Depend on abstractions, not
   implementations. Wrap external dependencies so you can swap them. Write for
   the reader who comes after you.
+- **Check the primary source**: before you state how code, config or a tool
+  behaves, read its source or docs, or run it with unfiltered output. If you
+  can't reach the source, say what you couldn't check instead of inferring it.
 
 ### Parse, Don't Validate
 

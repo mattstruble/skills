@@ -3,6 +3,8 @@ name: "prd-writing"
 summary: "Co-authoring behavioral product requirements documents through structured interview"
 type: "process"
 description: "Behavioral PRD writing — co-author a product requirements document through structured interview and codebase exploration, saved as a local Markdown file. Use when user wants to write a PRD, create a product requirements document, plan a new feature, define requirements, capture expected behaviors, or scope a project. Also trigger when the user mentions \"PRD\", \"product requirements\", \"requirements doc\", or wants to define what a system should do before implementation begins."
+metadata:
+  route-prompt: "prd product*requirements requirements*doc"
 ---
 
 # Behavioral PRD Writing
@@ -87,7 +89,7 @@ This is the primary quality gate — it catches missing use cases before they be
 
 ### Step 5: Write `docs/prd.md`
 
-Write the PRD in a single pass using the template below. Create the `docs/` directory if it doesn't exist. Write the file to `docs/prd.md` relative to the repository root. If overwriting an existing file, mention this to the user before writing.
+Write the PRD in a single pass using the template below, applying the `technical-writing` skill's voice and revision rules. Create the `docs/` directory if it doesn't exist. Write the file to `docs/prd.md` relative to the repository root. If overwriting an existing file, mention this to the user before writing.
 
 Do NOT commit the file — not even if the user says "save it" or "finalize it". Writing the file to disk is the complete action. Tell the user the file is at `docs/prd.md` and that committing is their responsibility.
 

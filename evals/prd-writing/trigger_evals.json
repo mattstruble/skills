@@ -1,0 +1,7 @@
+[
+  {"query": "Help me write a PRD for the offline sync feature.", "should_trigger": true, "reasoning": "PRD"},
+  {"query": "We need product requirements for the billing dashboard before engineering starts.", "should_trigger": true, "reasoning": "product requirements"},
+  {"query": "Draft a requirements doc for the new import tool.", "should_trigger": true, "reasoning": "requirements doc"},
+  {"query": "Write the commit message for these changes.", "should_trigger": false, "reasoning": "git-commit"},
+  {"query": "Refactor the importer to stream rows.", "should_trigger": false, "reasoning": "implementation"}
+]

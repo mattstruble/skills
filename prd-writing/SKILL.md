@@ -89,7 +89,7 @@ This is the primary quality gate — it catches missing use cases before they be
 
 ### Step 5: Write `docs/prd.md`
 
-Write the PRD in a single pass using the template below, applying the `technical-writing` skill's voice and revision rules. Create the `docs/` directory if it doesn't exist. Write the file to `docs/prd.md` relative to the repository root. If overwriting an existing file, mention this to the user before writing.
+Read `technical-writing/references/simplified-technical-english.md` from the skills catalog before you write. Write the PRD in a single pass using the template below, in that Simplified Technical English, and apply the `technical-writing` skill's voice and revision rules. Create the `docs/` directory if it doesn't exist. Write the file to `docs/prd.md` relative to the repository root. If overwriting an existing file, mention this to the user before writing.
 
 Do NOT commit the file — not even if the user says "save it" or "finalize it". Writing the file to disk is the complete action. Tell the user the file is at `docs/prd.md` and that committing is their responsibility.
 
@@ -101,6 +101,10 @@ Do NOT commit the file — not even if the user says "save it" or "finalize it".
 ## Problem Statement
 What problem exists, from the user's perspective.
 
+## Terms
+Each project term the behaviors use, with a one-sentence definition.
+- **[term]**: [definition]
+
 ## User Stories
 Short list establishing actors and motivations.
 - As a [actor], I want [feature], so that [benefit]
@@ -108,8 +112,9 @@ Short list establishing actors and motivations.
 ## Expected Behaviors
 
 ### [Capability Group 1]
-- Behavioral statement
-- Behavioral statement
+Today: [current behavior in one or two sentences, or "No current behavior."]
+- When [condition], [actor] must [observable result].
+- [actor] must [observable result].
 
 ### [Capability Group 2]
 - Behavioral statement
@@ -131,14 +136,24 @@ Short list establishing actors and motivations.
 
 ## Writing Guidelines
 
-Apply these when writing the PRD:
+Apply these when writing the PRD. The Simplified Technical English reference applies to every section.
 
 1. **Specify behavior, not structure.** Describe what the system does from the outside. Don't prescribe class names, file layout, or internal architecture.
 
-2. **State intent, not mechanism.** Say *why* something matters so downstream implementors can find better approaches.
+2. **One behavior per statement.** Each statement names the actor, the condition, and one observable result, and uses "must" for the requirement. "When the export has no rows, the API must return an empty CSV file." Split a statement that contains "and" between two results.
 
-3. **Make uncertainty visible.** Unresolved decisions go in Open Questions. Don't bury assumptions in behavioral statements.
+3. **Exact outcomes.** No verdict words ("invalid", "malformed", "handles", "supports", "gracefully"). Say what the user or caller observes.
 
-4. **Be terse.** Every unnecessary word is a potential error amplified downstream. Cut adjectives, qualifiers, and hedges that don't add meaning.
+4. **Today versus required.** Each capability group opens with one "Today:" line. Behavior statements describe the required system; never describe current behavior without "Today".
 
-5. **Each capability group should be independently shippable.** If a group bundles unrelated concerns, split it.
+5. **Define every term.** Each project term in a behavior statement appears in Terms. Everyday words with a project meaning are terms.
+
+6. **State intent, not mechanism.** Say *why* something matters so downstream implementors can find better approaches.
+
+7. **Make uncertainty visible.** Unresolved decisions and missing numbers go in Open Questions. Don't bury assumptions in behavioral statements, and don't write "should" or "may" for a requirement.
+
+8. **Be terse.** Every unnecessary word is a potential error amplified downstream. Cut adjectives, qualifiers, and hedges that don't add meaning.
+
+9. **Each capability group should be independently shippable.** If a group bundles unrelated concerns, split it.
+
+10. **Final check.** Before you tell the user the file is written, run the reference's final check over the whole PRD and fix what it finds.

@@ -1,0 +1,8 @@
+[
+  {"query": "Generate stories from the PRD for the search capability group.", "should_trigger": true, "reasoning": "stories from PRD"},
+  {"query": "Decompose the PRD into work items we can ship one at a time.", "should_trigger": true, "reasoning": "decompose the PRD"},
+  {"query": "Break down capabilities in docs/prd.md into stories with acceptance criteria.", "should_trigger": true, "reasoning": "break down capabilities"},
+  {"query": "Write acceptance criteria for the export story.", "should_trigger": true, "reasoning": "acceptance criteria"},
+  {"query": "Write a PRD for the billing dashboard.", "should_trigger": false, "reasoning": "prd-writing, not decomposition"},
+  {"query": "Commit the story files.", "should_trigger": false, "reasoning": "git-commit"}
+]

@@ -3,6 +3,8 @@ name: "prd-to-stories"
 summary: "Decomposing behavioral PRDs into deliverable stories with specific acceptance criteria"
 type: "process"
 description: "Decompose a behavioral PRD into deliverable stories with technically specific acceptance criteria, saved as Markdown files. Use when the user wants to generate stories from a PRD, break capability groups into work items, create acceptance criteria, or go from PRD to implementable stories. Also trigger when the user mentions \"stories from PRD\", \"decompose the PRD\", \"break down capabilities\", or wants to turn behavioral requirements into testable deliverables."
+metadata:
+  route-prompt: "stories*from*prd decompose*prd break*down*capabilit acceptance*criteria"
 ---
 
 # PRD to Stories
@@ -90,6 +92,8 @@ After completing interviews for all stories, scan for contradictory answers on s
 
 ### Step 7: Write story files
 
+Read `technical-writing/references/simplified-technical-english.md` from the skills catalog before you write, and write every story in that Simplified Technical English. Use the PRD's Terms; add a term to the PRD's Open Questions instead of defining it differently in a story.
+
 Write one file per story to `docs/stories/<story-name>.md` using kebab-case naming derived from the story title. Strip any path separators (`/`, `\`) and `..` sequences from the filename. Create `docs/stories/` (and `docs/` if needed) if it doesn't exist.
 
 Do NOT commit the files — not even if the user says "save" or "finalize". Writing files to disk is the complete action. Tell the user what was created.
@@ -145,12 +149,12 @@ Behaviors covered:
 - [PRD behavior 2]
 
 ## Summary
-One paragraph describing what this story delivers.
+Today: [current behavior, or "No current behavior."]
+After this story: [required behavior, in one or two sentences].
 
 ## Acceptance Criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
+- [ ] When [condition], [actor] [observable result].
+- [ ] [actor] [observable result within a numbered limit].
 
 ## Open Questions
 - None.
@@ -168,14 +172,26 @@ One paragraph describing what this story delivers.
 
 ## Writing Guidelines
 
-Apply these when writing stories:
+Apply these when writing stories. The Simplified Technical English reference applies to every section.
 
-1. **Acceptance criteria must be verifiable.** Each criterion should be something an engineer can confirm as passing or failing. If you can't describe how to verify it, it's not specific enough.
+1. **Acceptance criteria must be verifiable.** Each criterion is one sentence that an engineer can mark pass or fail without asking the author. If you can't describe how to verify it, it's not specific enough.
 
-2. **Be terse.** Say enough to be testable, no more.
+2. **Condition, actor, result.** Write each criterion as "When [condition], [actor] [observable result]." One result per criterion; split a criterion that joins two results with "and".
 
-3. **Reference PRD behaviors, don't restate them.** The Source section ties back to the PRD. Acceptance criteria add specificity — they don't repeat what the PRD already says.
+3. **Numbers, not adjectives.** "Within 200 ms", "at most 50 items", not "fast" or "large". A missing number goes in Open Questions.
 
-4. **Technical specificity is welcome, implementation prescription is not.** "Search returns results within 200ms" is good. "Use Elasticsearch with a fuzzy query" is not.
+4. **Exact outcomes.** No verdict words ("invalid", "malformed", "handles", "supports", "gracefully"). Name the status, error, message, or state the caller observes.
 
-5. **Make uncertainty visible.** Unresolved technical decisions go in Open Questions. Don't bury assumptions in acceptance criteria.
+5. **Today versus after.** The Summary separates current from required behavior. Criteria describe only the required behavior.
+
+6. **Same terms as the PRD.** Use the PRD's term for each concept; never a synonym.
+
+7. **Be terse.** Say enough to be testable, no more.
+
+8. **Reference PRD behaviors, don't restate them.** The Source section ties back to the PRD. Acceptance criteria add specificity — they don't repeat what the PRD already says.
+
+9. **Technical specificity is welcome, implementation prescription is not.** "Search returns results within 200ms" is good. "Use Elasticsearch with a fuzzy query" is not.
+
+10. **Make uncertainty visible.** Unresolved technical decisions go in Open Questions. Don't bury assumptions in acceptance criteria.
+
+11. **Final check.** Before you report the files, run the reference's final check over each story and fix what it finds. Beads descriptions and acceptance fields copy the checked text.

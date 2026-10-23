@@ -335,5 +335,8 @@ When building or consolidating the graph:
 - Merge tickets that touch the same code.
 - Split an oversized ticket yourself instead of noting it "could be split later".
 - Put the design details a ticket needs into its body, not only in the plan.
+- Write ticket bodies and acceptance criteria in the Simplified Technical English of
+  `technical-writing/references/simplified-technical-english.md`: "Today" versus
+  required behavior, defined terms, exact outcomes, one testable sentence per criterion.
 - Phrase decisions someone else owns as neutral questions with links to the
   sources, without a recommendation.

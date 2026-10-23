@@ -329,3 +329,11 @@ specific aspect of X.
 
 Merge when two tickets have no independent value — if ticket B is meaningless
 without ticket A already done and incorporated, they may be one ticket.
+
+When building or consolidating the graph:
+- Order prerequisites before the tickets that depend on them.
+- Merge tickets that touch the same code.
+- Split an oversized ticket yourself instead of noting it "could be split later".
+- Put the design details a ticket needs into its body, not only in the plan.
+- Phrase decisions someone else owns as neutral questions with links to the
+  sources, without a recommendation.

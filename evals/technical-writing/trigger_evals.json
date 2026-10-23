@@ -1,0 +1,12 @@
+[
+  {"query": "Rewrite our onboarding doc for the deploy CLI, it reads like AI wrote it and nobody can find the setup steps.", "should_trigger": true, "reasoning": "Doc rewrite of an onboarding doc for readability"},
+  {"query": "Draft a design doc for moving the job queue to a bounded worker pool, with the rationale and rejected options.", "should_trigger": true, "reasoning": "Design doc authoring"},
+  {"query": "Can you write a runbook for when the ingestion workers fall behind?", "should_trigger": true, "reasoning": "Runbook"},
+  {"query": "Turn these notes into a README for the repo so new contributors know how to build and test it.", "should_trigger": true, "reasoning": "README writing"},
+  {"query": "I want to publish a blog post about how we cut CI time in half; help me outline and draft it.", "should_trigger": true, "reasoning": "Technical article"},
+  {"query": "Review this RFC for readability and anything that repeats itself.", "should_trigger": true, "reasoning": "RFC review for prose quality"},
+  {"query": "Write a commit message for the staged changes.", "should_trigger": false, "reasoning": "Commit message belongs to git-commit"},
+  {"query": "Fix the failing test in the parser module.", "should_trigger": false, "reasoning": "Debugging, not writing"},
+  {"query": "Add docstrings to the public functions in utils.py.", "should_trigger": false, "reasoning": "Code docstrings belong to software-design"},
+  {"query": "Reply to this Slack thread saying the deploy is done.", "should_trigger": false, "reasoning": "Chat message, out of scope"}
+]

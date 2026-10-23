@@ -3,6 +3,8 @@ name: "brainstorm"
 summary: "Interview-driven design through relentless questioning before implementation"
 type: "process"
 description: "You MUST use this before any creative work — creating features, building components, adding functionality, or modifying behavior. Also trigger when the user mentions brainstorming, wants to think through a design, stress-test a plan, or says 'grill me'. NOT for debugging, code review, writing tests, committing, or mechanical refactors (renaming, version bumps, config changes)."
+metadata:
+  route-prompt: "grill*me stress-test*plan stress*test*design think*through*design"
 ---
 
 # Brainstorm
@@ -54,6 +56,9 @@ for truly simple topics, but you still question before acting.
   question becomes: what's the version that delivers 80% of the value with 20%
   of the complexity? Strip it to the core need. The goal shifts from elimination
   to simplification.
+- **Answer the objection.** When the user pushes back, address their specific
+  point and check the option against their underlying goal instead of restating
+  the earlier recommendation.
 - **Flag scope early.** If the request covers multiple independent subsystems, flag
   it immediately rather than refining details of something that needs decomposition
   first. Help break it into pieces, then brainstorm the first piece.

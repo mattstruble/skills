@@ -1,0 +1,7 @@
+[
+  {"query": "Grill me on this plan for the new caching layer before I start.", "should_trigger": true, "reasoning": "grill me"},
+  {"query": "Can you stress-test my plan for splitting the monolith?", "should_trigger": true, "reasoning": "stress-test a plan"},
+  {"query": "I want to think through the design of the export feature with you.", "should_trigger": true, "reasoning": "think through a design"},
+  {"query": "Rename the config module to settings.", "should_trigger": false, "reasoning": "mechanical refactor"},
+  {"query": "Why is this test failing on CI?", "should_trigger": false, "reasoning": "debugging"}
+]

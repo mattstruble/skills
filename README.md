@@ -16,7 +16,7 @@ Skills that enforce a specific way of working — a multi-step procedure or disc
 | git-pr | Pull request creation: sizing, title conventions, and description writing | 7% | 53% | +47% | 2026-07-23 |
 | knowledge-base | Maintaining and writing to a persistent Obsidian-style cross-session knowledge graph | 47% | 100% | +53% | 2026-07-23 |
 | logging | Production logging discipline: structured logs, happy-path coverage, correlation IDs | 100% | 92% | -8% | 2026-07-23 |
-| orchestrator | Execute a planned beads epic in waves: coders and reviewers in worktrees via a workflow script, each passed ticket cherry-picked onto the working branch, then audits | — | — | — | — |
+| orchestrator | Execute a planned beads epic in waves: coder plus fast-review tier in worktrees via a workflow script, deferred findings caught by pipelined wave-end deep review and an epic-end deep sweep, then audits | — | — | — | — |
 | planner | Decompose a well-understood effort into a typed, critic-reviewed task graph ready for execution | — | — | — | — |
 | pr-reviewer | Peer PR review pipeline producing tiered, courteous draft comments for GitHub | 40% | 100% | +60% | 2026-07-23 |
 | prd-to-stories | Decomposing behavioral PRDs into deliverable stories with specific acceptance criteria | 88% | 94% | +6% | 2026-07-23 |

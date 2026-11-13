@@ -102,13 +102,24 @@ final summary gives the user the one-line re-sign command.
 11. **Strong pass (wave mode), after every wave's tickets are decided:**
    `STRONG_SINCE=$(last SHA noted as "orchestrator strong=", or BASE)` then
    `workflow({ name: "orchestrator_strong_pass", background: true, args: { integrationPath: <repo>, mode: "wave", since: STRONG_SINCE } })`.
-   Then record the SHA it will cover: `bd update <epic-id> --append-notes "orchestrator strong=$(git -C <repo> rev-parse HEAD)"`.
-   It runs pipelined with the next wave — do not wait for it. When its result arrives (it is delivered back into the
-   conversation):
-   - **critical finding → preempt:** create the fix ticket, put it first in the next wave's candidates, and set aside
+   Note the runId it returns. Then record the SHA it will cover as pending:
+   `bd update <epic-id> --append-notes "orchestrator strong-pending <runId> since=$(git -C <repo> rev-parse HEAD)"`.
+   It runs pipelined with the next wave — do not wait for it. **Never rely on the result being delivered into the conversation: an orchestrator mid-wave is never idle and idle-delivery times out.**
+   **Retrieve the result yourself at every wave boundary** (step 1 of the next wave, before candidates):
+   ```bash
+   python3 -c '
+   import json,sys
+   for l in reversed(open(sys.argv[1]).readlines()):
+     d=json.loads(l); s=d.get("delta",{}).get("set",{})
+     if s.get("status")=="completed": print(json.dumps(s.get("result"))); break
+   ' ~/.pi/workflows/projects/*/runs/<runId>.events.jsonl
+   ```
+   No output or `running` → still going: proceed with the wave, check again at the next boundary. A result consumed:
+   - **critical finding → preempt:** create the fix ticket, put it first in this wave's candidates, and set aside
      tickets that touch the same files until the fix lands. Building on broken ground compounds.
    - **important finding → fix ticket:** normal candidate for the next wave.
    - **suggestion → note** it on the epic; it never blocks.
+   Then convert the pending note: `bd update <epic-id> --append-notes "orchestrator strong=<sha> (clean | N findings)"`.
 12. Loop. No pauses or check-ins between waves.
 
 **Stop early only for:** infrastructure failure (`workflow` tool missing, bd/git errors), all remaining tickets stuck or
@@ -124,7 +135,8 @@ blocked, or acceptance criteria no reviewer can judge — flag that ticket and c
 4. **Everything else in progress** returns to the candidate queue. Coder threads are not journaled, so
    `resumeFromRunId` gains nothing here.
 5. **Strong-pass pointer:** the last `orchestrator strong=<sha>` note stands — the next wave-mode pass covers from
-   there. If commits landed that the recorded strong SHA does not cover, launch a wave-mode strong pass at Resume
+   there. If the notes carry a `strong-pending <runId>`, retrieve that run's result first (step 11's journal command).
+   If commits landed that the recorded strong SHA does not cover, launch a wave-mode strong pass at Resume
    instead of waiting for the next wave.
 
 ## 3. Epic-end sweep, then Audit

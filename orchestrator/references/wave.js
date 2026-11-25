@@ -74,8 +74,6 @@ const commitBody = (t, review, blockers, retries) => {
   return [
     t.commitMessage,
     "",
-    `Ticket: ${t.id} — ${t.title}`,
-    "",
     "Acceptance criteria:",
     t.acceptance,
     "",

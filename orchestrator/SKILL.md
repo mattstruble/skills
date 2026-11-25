@@ -3,6 +3,8 @@ name: "orchestrator"
 summary: "Execute a planned beads epic in waves: coder plus fast-review tier in worktrees via a workflow script, deferred findings caught by pipelined wave-end deep review and an epic-end deep sweep, then audits"
 type: "process"
 description: "Load when the user wants to execute a planned epic — when they say 'orchestrate', 'execute this epic', 'run the tasks', 'kick off the epic', or 'run the plan'. Also load when the frontier of a beads epic is ready and the user wants autonomous execution. NOT for planning (see planner), NOT for brainstorming (see brainstorm), NOT for code review of a single PR. Requires the `workflow` tool (pi-dynamic-workflows) — stop if it is unavailable."
+metadata:
+  route-prompt: "orchestrat* execute*epic run*the*tasks kick*off*the*epic run*the*plan"
 ---
 
 # Orchestrator
@@ -14,8 +16,8 @@ so the user reviews the whole run with `git diff origin/<branch>`.
 
 <HARD-GATE>
 Never edit, write, or create files yourself — every change comes from a coder in its own worktree. Bash is for
-`bd`, the git integration commands below, and verification commands from tickets. Never push. `git commit` and
-`git reset` go through the user's permission prompts; do not work around them.
+`bd`, the git integration commands below, and verification commands from tickets. Never push. A permission denial
+is final: do not work around it; record it for the summary's **Needs approval** section.
 </HARD-GATE>
 
 ## Layout
@@ -37,7 +39,7 @@ workflow progress panel (guardrails blocks them). If the saved workflow is missi
 as `script` instead. Always write beads notes with `--append-notes` (`--notes` refuses to overwrite existing notes).
 
 Integration commits are unsigned (`-c commit.gpgsign=false`) so an unattended run never waits on a signing prompt; the
-final summary gives the user the one-line re-sign command.
+final summary gives the user the optional `git sign-unpushed` command for signing before a push.
 
 ## 1. Start
 
@@ -48,7 +50,8 @@ final summary gives the user the one-line re-sign command.
 3. If the epic notes contain `orchestrator base=`, you are resuming: read `BASE` from them, run **Resume** below, then
    continue with the waves (or straight to the epic-end sweep if nothing is runnable).
 4. Otherwise `bd ready --parent <epic-id>`. Empty frontier: report the state (no children, all blocked, all closed) and stop.
-5. Record `BASE=$(git -C <repo> rev-parse HEAD)` and `bd update <epic-id> --append-notes "orchestrator base=<BASE>"`.
+5. Record `BASE=$(git -C <repo> rev-parse HEAD)` and `BRANCH=$(git -C <repo> branch --show-current)`, then
+   `bd update <epic-id> --append-notes "orchestrator base=<BASE> branch=<BRANCH>"`.
 6. Submodule paths, once: `git config -f <repo>/.gitmodules --get-regexp '\.path$'` (missing file = none).
 
 ## 2. Each wave
@@ -81,10 +84,14 @@ final summary gives the user the one-line re-sign command.
 8. **Land** each `pass` **or `deferred`** result on the working branch, one at a time
    (`deferred` = blocking findings survived the fast loop's one retry; the strong pass judges them — the commit body
    already lists them under "deferred to the strong pass"):
+   - **Before the wave's first cherry-pick:** `git -C <repo> branch --show-current` must equal `BRANCH`, and
+     `git -C <repo> status --porcelain --untracked-files=no` must be empty. If either check fails, land nothing: keep
+     the passed worktrees and `pi/wf/*` branches (skip step 10 for them), note `not landed: <reason>` on each ticket,
+     stop the run, and report the reason and the kept branches in the summary.
    - `git -C <repo> log --oneline <base>..pi/wf/<task-id>` must show exactly one commit; otherwise it is an integration
      failure ("expected one commit, found N").
    - `cd <repo> && git -c commit.gpgsign=false cherry-pick pi/wf/<task-id>`, then the ticket's verification command in `<repo>`.
-   - **Conflict:** `git cherry-pick --abort`. **Verification fails:** `git reset --keep HEAD~1` (prompts the user).
+   - **Conflict:** `git cherry-pick --abort`. **Verification fails:** `git reset --keep HEAD~1`.
    - **Integration failure:** if the ticket's notes already contain `integration retry`, it is stuck (step 9).
      Otherwise `bd update <id> --status open --append-notes "integration retry 1: <reason>"` — it comes back in the
      next wave from the new `HEAD`, with the reason added to its description.
@@ -125,7 +132,8 @@ final summary gives the user the one-line re-sign command.
 **Stop early only for:** infrastructure failure (`workflow` tool missing, bd/git errors), all remaining tickets stuck or
 blocked, or acceptance criteria no reviewer can judge — flag that ticket and continue the rest.
 
-**Resume** (epic notes contain `orchestrator base=`):
+**Resume** (epic notes contain `orchestrator base=`): read `BRANCH` from the same note (older notes without it: use
+the current branch and note `orchestrator branch=<BRANCH>`).
 1. **Live waves:** if any task worktrees exist under `<repo>/.pi/worktrees/`, ask the user once whether another session
    is still running a wave for this epic. Yes → stop. No → remove them and their `pi/wf/*` branches (a crash left them).
 2. **Set-aside list:** rebuild it from notes — tickets whose notes contain `stuck:` or `edits submodule` stay set aside
@@ -171,20 +179,26 @@ Epic <id> — <N> waves, <M> commits on <branch> since <BASE>
 
 Stuck: <id — last failure summary>
 Set aside: <id — submodule path / human task>
+Needs approval: <ticket — action that was denied or deferred, from child reports and denied integration commands>
 Strong passes: <N> wave passes (<range covered>), epic sweep <clean | N blocking fixed | unresolved after 2 rounds>
 Epic audit: missing [...], out of scope [...], contradicted [...]
 
 Review:  git diff origin/<branch>   (or git log --stat <BASE>..HEAD; each commit body carries its review summary)
-Re-sign: git rebase --exec 'git commit --amend --no-edit -S' <BASE>
+Undo:    git reset --keep <BASE>
+Sign:    git sign-unpushed   (optional, before you push)
 ```
+
+The run never pushes. List every **Needs approval** item, or write `none`.
 
 Confirm `git -C <repo> worktree list` shows no `.pi/worktrees/` entries and `git -C <repo> branch --list 'pi/wf/*'` is empty.
 
 ## Rules
 
 - **Never run the `pi` binary** and never tell a subagent to.
-- **Children:** subagents load skill-router, guardrails, audit and rtk, but no MCP, codemode, or web tools. Put
-  everything a coder needs in the ticket text.
+- **Children:** subagents load skill-router, guardrails, audit, rtk and pi-permission-system, but no MCP, codemode,
+  or web tools. Put everything a coder needs in the ticket text. Deny rules hold in children, and an `ask` is denied
+  at once (no prompt): a coder that reports a denied or deferred action goes into **Needs approval**, and the ticket
+  text must not depend on ask-tier commands (push, `rm`, `ssh`, cluster writes).
 - **Findings severity:** in the fast loop, `critical` and `important` block and trigger exactly one retry (inside
   `wave.js`); whatever survives defers to the strong pass — `suggestion` never blocks and is listed in the commit body.
   In the strong pass, `critical` preempts the next wave's queue and `important` becomes a fix ticket.

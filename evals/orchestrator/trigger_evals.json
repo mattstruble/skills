@@ -1,0 +1,8 @@
+[
+  {"query": "Orchestrate the dotfiles-e80 epic now that the graph is approved.", "should_trigger": true, "reasoning": "orchestrate"},
+  {"query": "Execute this epic: the frontier tickets are ready.", "should_trigger": true, "reasoning": "execute this epic"},
+  {"query": "Kick off the epic and run the tasks overnight.", "should_trigger": true, "reasoning": "kick off the epic / run the tasks"},
+  {"query": "The plan is approved, run the plan.", "should_trigger": true, "reasoning": "run the plan"},
+  {"query": "Break this feature down into tickets with dependencies.", "should_trigger": false, "reasoning": "planning, not execution"},
+  {"query": "Review the diff on my current branch.", "should_trigger": false, "reasoning": "single code review"}
+]
